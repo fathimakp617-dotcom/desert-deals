@@ -25,13 +25,13 @@ import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
 import { fadeInUp, staggerContainer, staggerItem } from "@/lib/animations";
 import { toast } from "sonner";
 
-const categories = ["All", "For Him", "For Her", "Unisex"];
+const categories = ["All", "Sneakers", "Casual", "Running", "Basketball", "Formal", "Outdoor"];
 const priceRanges = [
   { label: "All Prices", min: 0, max: Infinity },
-  { label: "Under ₹20,000", min: 0, max: 20000 },
-  { label: "₹20,000 - ₹25,000", min: 20000, max: 25000 },
-  { label: "₹25,000 - ₹30,000", min: 25000, max: 30000 },
-  { label: "Above ₹30,000", min: 30000, max: Infinity },
+  { label: "Under AED 200", min: 0, max: 200 },
+  { label: "AED 200 - AED 350", min: 200, max: 350 },
+  { label: "AED 350 - AED 500", min: 350, max: 500 },
+  { label: "Above AED 500", min: 500, max: Infinity },
 ];
 const sortOptions = [
   { label: "Featured", value: "featured" },
@@ -110,19 +110,19 @@ const Shop = () => {
   return (
     <>
       <Helmet>
-        <title>Shop Luxury Perfumes Online | Rayn Adam Collection India</title>
+        <title>Shop Premium Shoes Online | Desert Deal UAE</title>
         <meta
           name="description"
-          content="Browse Rayn Adam's exclusive luxury perfume collection. Premium Eau de Parfum, Attars & gift sets. Free shipping in India. Find your signature scent today."
+          content="Browse Desert Deal's exclusive shoe collection. Premium sneakers, casual shoes & formal footwear. Free shipping in UAE. Find your perfect pair today."
         />
         <meta
           name="keywords"
-          content="buy luxury perfume online, premium fragrance India, Rayn Adam shop, eau de parfum, attar, unisex perfume, gift set, designer fragrance"
+          content="buy shoes online UAE, premium sneakers, casual shoes, running shoes, Desert Deal shop, formal footwear, basketball shoes"
         />
-        <link rel="canonical" href="https://raynadamperfume.com/shop" />
-        <meta property="og:title" content="Shop Luxury Perfumes | Rayn Adam Collection" />
-        <meta property="og:description" content="Discover premium Eau de Parfum, Attars & exclusive gift sets. Free shipping across India on orders above ₹999." />
-        <meta property="og:url" content="https://raynadamperfume.com/shop" />
+        <link rel="canonical" href="https://desertsdeals.com/shop" />
+        <meta property="og:title" content="Shop Premium Shoes | Desert Deal UAE" />
+        <meta property="og:description" content="Discover premium sneakers, casual shoes & formal footwear. Free shipping across UAE." />
+        <meta property="og:url" content="https://desertsdeals.com/shop" />
         <meta property="og:type" content="website" />
       </Helmet>
       <CollectionPageSchema />
@@ -148,8 +148,8 @@ const Shop = () => {
                 Our <span className="text-gold-gradient">Collection</span>
               </motion.h1>
               <motion.p variants={fadeInUp} className="text-muted-foreground max-w-2xl mx-auto">
-                Discover our exquisite range of luxury fragrances, each crafted
-                to perfection with the finest ingredients from around the world.
+                Discover our premium range of shoes and accessories, each selected
+                for quality, comfort, and style.
               </motion.p>
             </motion.div>
           </div>
@@ -170,7 +170,7 @@ const Shop = () => {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   type="text"
-                  placeholder="Search fragrances..."
+                  placeholder="Search shoes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-12 h-12 bg-card border-border/50 focus:border-primary"
@@ -392,7 +392,7 @@ const Shop = () => {
 
             {/* Results Count */}
             <p className="text-sm text-muted-foreground mb-8">
-              Showing {filteredProducts.length} of {products.length} fragrances
+              Showing {filteredProducts.length} of {products.length} products
             </p>
 
             {/* Loading State */}
