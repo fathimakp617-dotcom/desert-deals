@@ -6,9 +6,9 @@ import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 
 const announcements = [
-  "Free Shipping on Orders Above ₹999 →",
-  "COD Available Across India →",
-  "Premium Luxury Perfumes →",
+  "COD Available Across the UAE →",
+  "Free Shipping on All Orders →",
+  "Premium Shoes & Accessories →",
 ];
 
 const Navbar = memo(() => {
@@ -73,7 +73,7 @@ const Navbar = memo(() => {
             {/* Logo */}
             <Link to="/" className="flex items-center">
               <span className="text-xl md:text-2xl font-heading font-bold tracking-tight text-foreground uppercase">
-                RAYN ADAM
+                DESERT DEAL
               </span>
             </Link>
 

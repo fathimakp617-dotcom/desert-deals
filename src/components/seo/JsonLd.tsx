@@ -1,8 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Product as ProductType, products } from "@/data/products";
 
-// Production domain
-const SITE_URL = "https://raynadamperfume.com";
+const SITE_URL = "https://desertsdeals.com";
 
 interface OrganizationSchemaProps {
   name?: string;
@@ -12,35 +11,29 @@ interface OrganizationSchemaProps {
 }
 
 export const OrganizationSchema = ({
-  name = "Rayn Adam",
+  name = "Desert Deal",
   url = SITE_URL,
-  logo = "https://storage.googleapis.com/gpt-engineer-file-uploads/9WSefgywaLh9J3niX7t9kD3292V2/uploads/1767712360626-Asset_91_4x_imresizer-removebg-preview.png",
-  description = "Discover the essence of sophistication with Rayn Adam's exclusive collection of luxury fragrances.",
+  logo = "",
+  description = "Your trusted destination for premium shoes and accessories across the UAE.",
 }: OrganizationSchemaProps) => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name,
     url,
-    logo,
+    ...(logo && { logo }),
     description,
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+91-99466-47442",
       contactType: "customer service",
-      availableLanguage: ["English", "Hindi"],
+      availableLanguage: ["English", "Arabic"],
     },
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal, Tirurangadi",
-      addressLocality: "Malappuram",
-      addressRegion: "Kerala",
-      postalCode: "673634",
-      addressCountry: "IN",
+      addressCountry: "AE",
     },
     sameAs: [
-      "https://instagram.com/raynadamperfume",
-      "https://facebook.com/raynadamperfume",
+      "https://instagram.com/desertsdeals",
     ],
   };
 
@@ -66,18 +59,18 @@ export const ProductSchema = ({ product, averageRating = 0, totalReviews = 0 }: 
     image: `${SITE_URL}${product.image}`,
     brand: {
       "@type": "Brand",
-      name: "Rayn Adam",
+      name: "Desert Deal",
     },
     offers: {
       "@type": "Offer",
       url: `${SITE_URL}/product/${product.id}`,
-      priceCurrency: "INR",
+      priceCurrency: "AED",
       price: product.price,
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       availability: "https://schema.org/InStock",
       seller: {
         "@type": "Organization",
-        name: "Rayn Adam",
+        name: "Desert Deal",
       },
     },
     ...(totalReviews > 0 && {
@@ -89,8 +82,7 @@ export const ProductSchema = ({ product, averageRating = 0, totalReviews = 0 }: 
         worstRating: 1,
       },
     }),
-    category: "Perfume",
-    material: product.concentration,
+    category: product.concentration,
     size: product.size,
   };
 
@@ -133,24 +125,13 @@ export const LocalBusinessSchema = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Store",
-    name: "Rayn Adam Luxury Perfumes",
-    image: "https://storage.googleapis.com/gpt-engineer-file-uploads/9WSefgywaLh9J3niX7t9kD3292V2/social-images/social-1767808964506-ChatGPT Image Jan 4, 2026, 02_05_19 AM.png",
+    name: "Desert Deal",
     "@id": SITE_URL,
     url: SITE_URL,
-    telephone: "+91-99466-47442",
-    priceRange: "₹₹₹",
+    priceRange: "$$",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal, Tirurangadi",
-      addressLocality: "Malappuram",
-      addressRegion: "Kerala",
-      postalCode: "673634",
-      addressCountry: "IN",
-    },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: 11.0510,
-      longitude: 75.9380,
+      addressCountry: "AE",
     },
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
@@ -171,7 +152,7 @@ export const WebsiteSchema = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Rayn Adam Luxury Perfumes",
+    name: "Desert Deal",
     url: SITE_URL,
     potentialAction: {
       "@type": "SearchAction",
@@ -190,33 +171,24 @@ export const WebsiteSchema = () => {
   );
 };
 
-// FAQ Schema for perfume-related questions
 export const FAQSchema = () => {
   const faqs = [
     {
-      question: "How long do Rayn Adam perfumes last?",
-      answer: "Our Eau de Parfum fragrances typically last 8-12 hours, while our concentrated Attars can last up to 16 hours. Longevity varies based on skin type, climate, and application method."
+      question: "Do you offer COD across the UAE?",
+      answer: "Yes, we offer Cash on Delivery across the entire UAE."
     },
     {
-      question: "Are Rayn Adam perfumes unisex?",
-      answer: "Yes, most of our fragrances are designed to be unisex and can be worn by anyone. Our collection includes versatile scents that transcend traditional gender boundaries."
+      question: "Do you offer free shipping?",
+      answer: "Yes, we offer free shipping on all orders within the UAE."
     },
     {
-      question: "Do you offer free shipping in India?",
-      answer: "Yes, we offer free shipping on all orders above ₹999 within India. Orders typically arrive within 3-7 business days depending on your location."
+      question: "Are all products authentic?",
+      answer: "Yes, all our products are 100% authentic and sourced directly from authorized distributors."
     },
     {
-      question: "What is the difference between Eau de Parfum and Attar?",
-      answer: "Eau de Parfum contains 15-20% fragrance oils in an alcohol base, offering moderate projection. Attar is a concentrated oil-based perfume with no alcohol, providing intimate, long-lasting scent closer to the skin."
+      question: "What is your return policy?",
+      answer: "We accept returns within 7 days of delivery for unused products in original packaging."
     },
-    {
-      question: "Can I return or exchange a perfume?",
-      answer: "We accept returns within 7 days of delivery for unused, sealed products. Please check our Return Policy for complete details on exchanges and refunds."
-    },
-    {
-      question: "How should I store my perfume?",
-      answer: "Store your perfume in a cool, dark place away from direct sunlight and heat. Avoid keeping it in bathrooms where humidity and temperature fluctuate. Proper storage ensures your fragrance maintains its quality for years."
-    }
   ];
 
   const schema = {
@@ -239,17 +211,16 @@ export const FAQSchema = () => {
   );
 };
 
-// Collection/Shop Page Schema
 export const CollectionPageSchema = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Luxury Perfume Collection | Rayn Adam",
-    description: "Browse Rayn Adam's exclusive luxury perfume collection. Premium Eau de Parfum, Attars & gift sets with free shipping in India.",
+    name: "Shop All Products | Desert Deal",
+    description: "Browse Desert Deal's exclusive collection of premium shoes and accessories. Free shipping & COD available across the UAE.",
     url: `${SITE_URL}/shop`,
     isPartOf: {
       "@type": "WebSite",
-      name: "Rayn Adam",
+      name: "Desert Deal",
       url: SITE_URL
     },
     mainEntity: {
@@ -266,7 +237,7 @@ export const CollectionPageSchema = () => {
           url: `${SITE_URL}/product/${product.id}`,
           offers: {
             "@type": "Offer",
-            priceCurrency: "INR",
+            priceCurrency: "AED",
             price: product.price,
             availability: "https://schema.org/InStock"
           }

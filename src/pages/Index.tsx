@@ -24,16 +24,16 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Rayn Adam | Premium Luxury Perfumes in India | Buy Online</title>
+        <title>Desert Deal | Premium Shoes & Accessories in UAE | Shop Online</title>
         <meta
           name="description"
-          content="Shop Rayn Adam's exclusive luxury perfumes online in India. Premium Eau de Parfum, Attars & fragrance collections. Free shipping on orders. Discover your signature scent today."
+          content="Shop Desert Deal's exclusive collection of premium shoes and accessories online in UAE. Free shipping & COD available. Discover your style today."
         />
         <meta
           name="keywords"
-          content="luxury perfume India, buy perfume online, Rayn Adam, eau de parfum, premium fragrance, attar, designer perfume, long lasting perfume, unisex perfume, gift set perfume"
+          content="shoes UAE, buy shoes online, Desert Deal, premium footwear, sneakers, running shoes, designer shoes"
         />
-        <link rel="canonical" href="https://raynadamperfume.com/" />
+        <link rel="canonical" href="https://desertsdeals.com/" />
       </Helmet>
       
       {/* Structured Data */}
