@@ -5,37 +5,37 @@ import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { products } from "@/data/products";
-import eliteMain from "@/assets/products/elite.jpg";
-import amberCrownMain from "@/assets/products/amber-crown.jpg";
-import eliteCollection from "@/assets/products/elite-collection.png";
-import comboMain from "@/assets/products/combo.jpg";
+import heroSneakers1 from "@/assets/shoes/hero-sneakers-1.jpg";
+import heroSneakers2 from "@/assets/shoes/hero-sneakers-2.jpg";
+import heroCollection from "@/assets/shoes/hero-collection.jpg";
+import heroLifestyle from "@/assets/shoes/hero-lifestyle.jpg";
 
 const slides = [
   {
-    image: eliteMain,
-    title: "Shop With Confidence and Convenience",
+    image: heroSneakers1,
+    title: "Step Into Style & Comfort",
     productId: "elite",
   },
   {
-    image: amberCrownMain,
-    title: "Discover Your Signature Scent",
+    image: heroSneakers2,
+    title: "Performance Meets Design",
     productId: "amber-crown",
   },
   {
-    image: eliteCollection,
-    title: "Premium Luxury Collections",
+    image: heroCollection,
+    title: "Premium Shoe Collections",
     productId: "elite-collection",
   },
   {
-    image: comboMain,
-    title: "Exclusive Fragrance Combos",
+    image: heroLifestyle,
+    title: "Elevate Every Step",
     productId: "combo",
   },
 ];
 
 const preloadFirstImage = () => {
   const img = new Image();
-  img.src = eliteMain;
+  img.src = heroSneakers1;
 };
 preloadFirstImage();
 

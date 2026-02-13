@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import comboMain from "@/assets/products/combo.jpg";
+import aboutShoes from "@/assets/shoes/about-shoes.jpg";
 import { fadeInUp, fadeInLeft, fadeInRight, staggerContainer, staggerItem, lineReveal } from "@/lib/animations";
 
 const About = () => {
@@ -34,7 +34,7 @@ const About = () => {
               />
               
               <motion.img
-                src={comboMain}
+                src={aboutShoes}
                 alt="The Art of Perfumery"
                 className="w-full object-cover relative z-10"
                 whileHover={{ scale: 1.02 }}
