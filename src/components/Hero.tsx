@@ -1,5 +1,5 @@
 import { useState, useEffect, memo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,31 +13,26 @@ import comboMain from "@/assets/products/combo.jpg";
 const slides = [
   {
     image: eliteMain,
-    title: "ELITE",
-    subtitle: "Smooth & Seductive",
+    title: "Shop With Confidence and Convenience",
     productId: "elite",
   },
   {
     image: amberCrownMain,
-    title: "AMBER CROWN",
-    subtitle: "Romantic & Enchanting",
+    title: "Discover Your Signature Scent",
     productId: "amber-crown",
   },
   {
     image: eliteCollection,
-    title: "ELITE COLLECTION",
-    subtitle: "Complete Luxury Set",
+    title: "Premium Luxury Collections",
     productId: "elite-collection",
   },
   {
     image: comboMain,
-    title: "COMBO",
-    subtitle: "Fresh & Invigorating",
+    title: "Exclusive Fragrance Combos",
     productId: "combo",
   },
 ];
 
-// Preload first image immediately
 const preloadFirstImage = () => {
   const img = new Image();
   img.src = eliteMain;
@@ -46,7 +41,6 @@ preloadFirstImage();
 
 const Hero = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [imagesLoaded, setImagesLoaded] = useState<Set<number>>(new Set([0]));
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
@@ -59,25 +53,6 @@ const Hero = memo(() => {
     }
   };
 
-  // Preload next slides in the background
-  useEffect(() => {
-    const preloadImages = () => {
-      slides.forEach((slide, index) => {
-        if (index !== 0) {
-          const img = new Image();
-          img.onload = () => {
-            setImagesLoaded(prev => new Set([...prev, index]));
-          };
-          img.src = slide.image;
-        }
-      });
-    };
-    
-    // Delay preloading other images
-    const timer = setTimeout(preloadImages, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -88,16 +63,17 @@ const Hero = memo(() => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-end overflow-hidden pb-32 sm:pb-0 sm:items-center"
+      className="relative w-full mt-[100px]"
+      style={{ height: "calc(100vh - 100px)" }}
     >
-      {/* Background Slideshow - optimized transitions */}
+      {/* Background Slideshow */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.5 }}
           className="absolute inset-0"
         >
           <img
@@ -108,103 +84,62 @@ const Hero = memo(() => {
             decoding="async"
             fetchPriority={currentSlide === 0 ? "high" : "auto"}
           />
-          {/* Simplified overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
+          {/* Subtle bottom gradient for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         </motion.div>
       </AnimatePresence>
 
-      {/* Simplified gold accent */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(35_49%_44%_/_0.1)_0%,_transparent_40%)]" />
+      {/* Centered bottom text */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 pb-20 sm:pb-28">
+        <div className="container mx-auto px-6 text-center">
+          <AnimatePresence mode="wait">
+            <motion.h1
+              key={currentSlide}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white tracking-tight"
+              style={{ textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
+            >
+              {slides[currentSlide].title}
+            </motion.h1>
+          </AnimatePresence>
 
-      <div className="container mx-auto px-6 sm:px-6 lg:px-12 relative z-10">
-        <div className="max-w-2xl">
-          {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-5 sm:space-y-8"
-          >
-            {/* Main heading */}
-            <div className="space-y-2">
-              <h1 className="text-5xl sm:text-5xl md:text-7xl lg:text-8xl font-heading tracking-tight leading-[0.9]">
-                <span className="block text-foreground">LUXURY</span>
-                <span className="block text-gold-gradient">PERFUME</span>
-              </h1>
-              {/* Brand tag - now under the heading */}
-              <p className="text-xs tracking-[0.3em] sm:tracking-[0.4em] text-primary pt-2">
-                EAU DE PARFUM
-              </p>
-            </div>
-
-            {/* Current Slide Info */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSlide}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="py-2"
-              >
-                <p className="text-lg sm:text-2xl font-heading tracking-[0.15em] sm:tracking-[0.2em] text-primary">
-                  {slides[currentSlide].title}
-                </p>
-                <p className="text-sm text-muted-foreground tracking-wider mt-1">
-                  {slides[currentSlide].subtitle}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Description - hidden on small mobile */}
-            <p className="hidden sm:block text-base sm:text-lg text-muted-foreground max-w-md leading-relaxed">
-              Discover the essence of sophistication with our exclusive collection 
-              of luxurious fragrances crafted for the discerning individual.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col gap-3 pt-2 sm:pt-0 sm:flex-row sm:gap-4">
+          <div className="flex justify-center gap-4 mt-8">
+            <Button
+              size="lg"
+              onClick={handleShopNow}
+              className="bg-white text-foreground hover:bg-white/90 px-8 py-6 text-sm tracking-widest font-medium rounded-none"
+            >
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              SHOP NOW
+            </Button>
+            <a href="#collection">
               <Button
+                variant="outline"
                 size="lg"
-                onClick={handleShopNow}
-                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-10 py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium transition-all duration-300 hover:shadow-[0_0_30px_hsl(var(--primary)/0.4)]"
+                className="border-white text-white hover:bg-white/20 px-8 py-6 text-sm tracking-widest font-medium rounded-none"
               >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                SHOP NOW
+                EXPLORE
               </Button>
-              <a href="#collection" className="w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full sm:w-auto border-primary/50 text-primary hover:bg-primary/10 px-6 sm:px-10 py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium transition-all duration-300"
-                >
-                  EXPLORE COLLECTION
-                </Button>
-              </a>
-            </div>
-          </motion.div>
+            </a>
+          </div>
         </div>
 
-        {/* Slide Indicators - visible on all screens */}
-        <div className="flex gap-2 sm:gap-3 mt-6 sm:mt-0 sm:absolute sm:bottom-16 sm:left-6 lg:left-12">
+        {/* Slide Indicators */}
+        <div className="flex justify-center gap-2 mt-8">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-1.5 sm:h-1 rounded-full transition-all duration-500 ${
+              className={`h-1 rounded-full transition-all duration-500 ${
                 index === currentSlide
-                  ? "w-8 sm:w-12 bg-primary"
-                  : "w-4 sm:w-6 bg-white/40 hover:bg-white/60"
+                  ? "w-10 bg-white"
+                  : "w-5 bg-white/50 hover:bg-white/70"
               }`}
             />
           ))}
-        </div>
-      </div>
-
-      {/* Scroll indicator - desktop only */}
-      <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 hidden sm:block">
-        <div className="w-6 h-10 border-2 border-primary/50 rounded-full flex justify-center">
-          <div className="w-1.5 h-3 bg-primary rounded-full mt-2" />
         </div>
       </div>
     </section>
