@@ -14,22 +14,22 @@ const slides = [
   {
     image: heroSneakers1,
     title: "Step Into Style & Comfort",
-    productId: "elite",
+    productId: "air-stride",
   },
   {
     image: heroSneakers2,
     title: "Performance Meets Design",
-    productId: "amber-crown",
+    productId: "sport-runner",
   },
   {
     image: heroCollection,
     title: "Premium Shoe Collections",
-    productId: "elite-collection",
+    productId: "slam-dunk",
   },
   {
     image: heroLifestyle,
     title: "Elevate Every Step",
-    productId: "combo",
+    productId: "urban-classic",
   },
 ];
 
