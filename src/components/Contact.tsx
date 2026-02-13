@@ -57,7 +57,6 @@ const Contact = () => {
 
   return (
     <section id="contact" className="py-24 sm:py-32 bg-background relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_hsl(35_49%_44%_/_0.03)_0%,_transparent_50%)]" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative">
         <div className="max-w-4xl mx-auto">

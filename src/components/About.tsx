@@ -4,9 +4,7 @@ import { fadeInUp, fadeInLeft, fadeInRight, staggerContainer, staggerItem, lineR
 
 const About = () => {
   return (
-    <section id="about" className="py-24 sm:py-32 bg-luxury-gradient relative overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(ellipse_at_right,_hsl(35_49%_44%_/_0.05)_0%,_transparent_50%)]" />
+    <section id="about" className="py-24 sm:py-32 bg-background relative overflow-hidden">
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -88,14 +86,13 @@ const About = () => {
 
             <motion.div variants={staggerContainer} className="space-y-4 sm:space-y-6 text-muted-foreground leading-relaxed">
               <motion.p variants={staggerItem}>
-                Each Rayn Adam fragrance is a masterpiece born from the finest ingredients 
-                sourced across the globe. Our perfumers blend tradition with innovation, 
-                creating scents that transcend time and trends.
+                At Desert Deal, we bring you the finest shoes and accessories from 
+                world-renowned brands. Every product is carefully curated and 
+                100% authentic, sourced directly from authorized distributors.
               </motion.p>
               <motion.p variants={staggerItem}>
-                From the ancient oud forests of Southeast Asia to the delicate rose gardens 
-                of Morocco, we travel the world to bring you fragrances that tell a story 
-                of elegance, passion, and uncompromising quality.
+                From the latest Nike and Adidas sneakers to premium designer footwear,
+                we make luxury accessible with free shipping and COD across the UAE.
               </motion.p>
             </motion.div>
 
@@ -105,9 +102,9 @@ const About = () => {
               className="grid grid-cols-3 gap-4 sm:gap-8 pt-8 border-t border-border/50"
             >
               {[
-                { number: "50+", label: "Unique Scents" },
-                { number: "15", label: "Countries" },
-                { number: "100%", label: "Natural Oils" },
+                { number: "500+", label: "Products" },
+                { number: "50+", label: "Brands" },
+                { number: "100%", label: "Authentic" },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
