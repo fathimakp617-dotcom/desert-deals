@@ -119,7 +119,7 @@ const Hero = memo(() => {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-white/20 px-8 py-6 text-sm tracking-widest font-medium rounded-none"
+                className="border-foreground bg-foreground text-background hover:bg-foreground/80 px-8 py-6 text-sm tracking-widest font-medium rounded-none"
               >
                 EXPLORE
               </Button>
