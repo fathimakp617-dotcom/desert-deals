@@ -1,4 +1,4 @@
-import { useState, memo, useEffect } from "react";
+import { useState, memo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingBag, Heart, User, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -11,6 +11,20 @@ const announcements = [
   "Premium Shoes & Accessories →",
 ];
 
+const brandLinks = [
+  { name: "All Shoes", href: "/shop" },
+  { name: "Nike", href: "/shop?category=nike" },
+  { name: "Jordan", href: "/shop?category=jordan" },
+  { name: "Adidas", href: "/shop?category=adidas" },
+  { name: "New Balance", href: "/shop?category=new-balance" },
+  { name: "On Cloud", href: "/shop?category=on-cloud" },
+  { name: "Running Shoes", href: "/shop?category=running" },
+  { name: "Hoka", href: "/shop?category=hoka" },
+  { name: "Asics", href: "/shop?category=asics" },
+  { name: "Puma", href: "/shop?category=puma" },
+  { name: "About Us", href: "/#about" },
+];
+
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
@@ -18,6 +32,7 @@ const Navbar = memo(() => {
   const isHomePage = location.pathname === "/";
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
+  const brandScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -25,14 +40,6 @@ const Navbar = memo(() => {
     }, 4000);
     return () => clearInterval(timer);
   }, []);
-
-  const navLinks = [
-    { name: "Home", href: isHomePage ? "#home" : "/", isRoute: !isHomePage },
-    { name: "Shop", href: "/shop", isRoute: true },
-    { name: "Collection", href: isHomePage ? "#collection" : "/#collection", isRoute: !isHomePage },
-    { name: "About", href: isHomePage ? "#about" : "/#about", isRoute: !isHomePage },
-    { name: "Contact", href: isHomePage ? "#contact" : "/#contact", isRoute: !isHomePage },
-  ];
 
   return (
     <>
@@ -69,39 +76,34 @@ const Navbar = memo(() => {
       {/* Main Navbar */}
       <nav className="fixed top-9 left-0 right-0 z-50 bg-background border-b border-border">
         <div className="container mx-auto px-6 lg:px-12">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
+          <div className="flex items-center justify-between h-14">
+            {/* Mobile menu toggle */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-2 text-foreground"
+              >
+                {isOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
+
+            {/* Logo - centered on mobile */}
             <Link to="/" className="flex items-center">
-              <span className="text-xl md:text-2xl font-heading font-bold tracking-tight text-foreground uppercase">
+              <span className="text-lg md:text-xl font-heading font-bold tracking-tight text-foreground uppercase">
                 DESERT DEAL
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) =>
-                link.isRoute ? (
-                  <Link
-                    key={link.name}
-                    to={link.href}
-                    className="text-sm tracking-wide text-foreground hover:opacity-60 transition-opacity duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    className="text-sm tracking-wide text-foreground hover:opacity-60 transition-opacity duration-200"
-                  >
-                    {link.name}
-                  </a>
-                )
-              )}
-            </div>
-
             {/* Icons */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Search - desktop only */}
+              <Link
+                to="/shop"
+                className="hidden md:flex p-2 text-foreground hover:opacity-60 transition-opacity"
+              >
+                <Search size={20} />
+              </Link>
+
               {/* Wishlist */}
               <Link
                 to="/wishlist"
@@ -109,7 +111,7 @@ const Navbar = memo(() => {
               >
                 <Heart size={20} />
                 {wishlistItems > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-foreground text-background text-xs flex items-center justify-center rounded-full">
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">
                     {wishlistItems}
                   </span>
                 )}
@@ -122,45 +124,40 @@ const Navbar = memo(() => {
               >
                 <ShoppingBag size={20} />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-foreground text-background text-xs flex items-center justify-center rounded-full">
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">
                     {totalItems}
                   </span>
                 )}
               </button>
 
-              {/* Account */}
+              {/* Account - desktop */}
               <Link
                 to="/account"
-                className="p-2 text-foreground hover:opacity-60 transition-opacity"
+                className="hidden md:flex p-2 text-foreground hover:opacity-60 transition-opacity"
               >
                 <User size={20} />
               </Link>
             </div>
+          </div>
+        </div>
 
-            {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center gap-3">
-              <Link to="/wishlist" className="relative p-2 text-foreground">
-                <Heart size={20} />
-                {wishlistItems > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-foreground text-background text-xs flex items-center justify-center rounded-full">
-                    {wishlistItems}
-                  </span>
-                )}
-              </Link>
-              <button onClick={() => openCart()} className="relative p-2 text-foreground">
-                <ShoppingBag size={20} />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-foreground text-background text-xs flex items-center justify-center rounded-full">
-                    {totalItems}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="p-2 text-foreground"
-              >
-                {isOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
+        {/* Brand navigation bar - desktop */}
+        <div className="hidden md:block border-t border-border/50">
+          <div className="container mx-auto px-6 lg:px-12">
+            <div
+              ref={brandScrollRef}
+              className="flex items-center gap-6 overflow-x-auto py-2.5"
+              style={{ scrollbarWidth: "none" }}
+            >
+              {brandLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-xs tracking-wide text-foreground hover:opacity-60 transition-opacity whitespace-nowrap flex-shrink-0"
+                >
+                  {link.name}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -172,31 +169,20 @@ const Navbar = memo(() => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-background border-t border-border"
+              className="md:hidden bg-background border-t border-border max-h-[70vh] overflow-y-auto"
             >
-              <div className="container mx-auto px-6 py-6 flex flex-col gap-5">
-                {navLinks.map((link) =>
-                  link.isRoute ? (
-                    <Link
-                      key={link.name}
-                      to={link.href}
-                      onClick={() => setIsOpen(false)}
-                      className="text-sm tracking-wide text-foreground hover:opacity-60 transition-opacity"
-                    >
-                      {link.name}
-                    </Link>
-                  ) : (
-                    <a
-                      key={link.name}
-                      href={link.href}
-                      onClick={() => setIsOpen(false)}
-                      className="text-sm tracking-wide text-foreground hover:opacity-60 transition-opacity"
-                    >
-                      {link.name}
-                    </a>
-                  )
-                )}
-                <div className="border-t border-border pt-4 mt-2">
+              <div className="container mx-auto px-6 py-5 flex flex-col gap-4">
+                {brandLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className="text-sm tracking-wide text-foreground hover:opacity-60 transition-opacity"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+                <div className="border-t border-border pt-4 mt-1">
                   <Link
                     to="/account"
                     onClick={() => setIsOpen(false)}

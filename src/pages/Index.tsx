@@ -6,7 +6,9 @@ import PageTransition from "@/components/PageTransition";
 import { OrganizationSchema, LocalBusinessSchema, WebsiteSchema, FAQSchema } from "@/components/seo/JsonLd";
 
 // Lazy load below-fold components
-const Collection = lazy(() => import("@/components/Collection"));
+const BrandCategories = lazy(() => import("@/components/BrandCategories"));
+const TopSellers = lazy(() => import("@/components/TopSellers"));
+const FeaturesBar = lazy(() => import("@/components/FeaturesBar"));
 const About = lazy(() => import("@/components/About"));
 const Contact = lazy(() => import("@/components/Contact"));
 const Footer = lazy(() => import("@/components/Footer"));
@@ -15,7 +17,7 @@ const CookieConsent = lazy(() => import("@/components/CookieConsent"));
 const SignupIncentivePopup = lazy(() => import("@/components/SignupIncentivePopup"));
 
 const SectionLoader = () => (
-  <div className="py-12 flex items-center justify-center">
+  <div className="py-8 flex items-center justify-center">
     <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
   </div>
 );
@@ -24,14 +26,14 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Desert Deal | Premium Shoes & Accessories in UAE | Shop Online</title>
+        <title>Desert Deal – Shop With Confidence and Convenience</title>
         <meta
           name="description"
-          content="Shop Desert Deal's exclusive collection of premium shoes and accessories online in UAE. Free shipping & COD available. Discover your style today."
+          content="Shop Desert Deal's exclusive collection of premium shoes online in UAE. Up to 75% off. Free shipping & COD available. Nike, Adidas, Jordan & more."
         />
         <meta
           name="keywords"
-          content="shoes UAE, buy shoes online, Desert Deal, premium footwear, sneakers, running shoes, designer shoes"
+          content="shoes UAE, buy shoes online, Desert Deal, premium footwear, sneakers, Nike, Adidas, Jordan, running shoes"
         />
         <link rel="canonical" href="https://desertsdeals.com/" />
       </Helmet>
@@ -54,9 +56,12 @@ const Index = () => {
           <Navbar />
           <Hero />
           
-          {/* Lazy load below-the-fold content */}
           <Suspense fallback={<SectionLoader />}>
-            <Collection />
+            <BrandCategories />
+          </Suspense>
+
+          <Suspense fallback={<SectionLoader />}>
+            <TopSellers />
           </Suspense>
           
           <Suspense fallback={<SectionLoader />}>
@@ -65,6 +70,10 @@ const Index = () => {
           
           <Suspense fallback={<SectionLoader />}>
             <Contact />
+          </Suspense>
+
+          <Suspense fallback={<SectionLoader />}>
+            <FeaturesBar />
           </Suspense>
           
           <Suspense fallback={<SectionLoader />}>
