@@ -8,13 +8,13 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Us | Rayn Adam Luxury Perfumes India</title>
+        <title>Contact Us | Desert Deal UAE</title>
         <meta
           name="description"
-          content="Contact Rayn Adam for luxury perfume inquiries, orders, and support. Located in Kerala, India. Email, phone, and WhatsApp support available."
+          content="Contact Desert Deal for premium shoes and accessories inquiries, orders, and support in UAE."
         />
-        <meta name="keywords" content="contact Rayn Adam, perfume store Kerala, luxury fragrance India, customer support" />
-        <link rel="canonical" href="https://raynadamperfume.com/contact" />
+        <meta name="keywords" content="contact Desert Deal, shoe store UAE, premium footwear, customer support" />
+        <link rel="canonical" href="https://desertsdeals.com/contact" />
       </Helmet>
 
       <PageTransition>

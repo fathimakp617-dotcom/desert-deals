@@ -111,12 +111,12 @@ const ProductDetail = () => {
 
   const handleShare = async () => {
     const shareUrl = window.location.href;
-    const shareText = `✨ Check out ${product.name} from RAYN ADAM!\n\n${product.tagline}\n\n💰 Price: ${formatPrice(product.price)}\n📦 Size: ${product.size} • ${product.concentration}\n\n🔗 `;
+    const shareText = `✨ Check out ${product.name} from Desert Deal!\n\n${product.tagline}\n\n💰 Price: ${formatPrice(product.price)}\n\n🔗 `;
     
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${product.name} | RAYN ADAM Perfumes`,
+          title: `${product.name} | Desert Deal`,
           text: shareText,
           url: shareUrl,
         });
@@ -137,26 +137,26 @@ const ProductDetail = () => {
   return (
     <>
       <Helmet>
-        <title>{product.name} - Buy {product.concentration} Online | Rayn Adam Perfumes</title>
-        <meta name="description" content={`${product.name}: ${product.tagline}. ${product.description.slice(0, 120)}... Buy online with free shipping in India.`} />
-        <meta name="keywords" content={`${product.name}, ${product.concentration}, luxury perfume, buy online India, ${product.notes.top.join(', ')}, ${product.notes.base.join(', ')}`} />
+        <title>{product.name} - Buy Online | Desert Deal UAE</title>
+        <meta name="description" content={`${product.name}: ${product.tagline}. ${product.description.slice(0, 120)}... Buy online with free shipping in UAE.`} />
+        <meta name="keywords" content={`${product.name}, premium shoes, buy online UAE`} />
         
         <link rel="canonical" href={`${window.location.origin}/product/${product.id}`} />
         
-        <meta property="og:title" content={`${product.name} - ${product.tagline} | Rayn Adam`} />
+        <meta property="og:title" content={`${product.name} - ${product.tagline} | Desert Deal`} />
         <meta property="og:description" content={`${product.description.slice(0, 150)}... Shop now!`} />
         <meta property="og:type" content="product" />
         <meta property="og:url" content={`${window.location.origin}/product/${product.id}`} />
         <meta property="og:image" content={`${window.location.origin}${product.image}`} />
-        <meta property="og:site_name" content="Rayn Adam Perfumes" />
+        <meta property="og:site_name" content="Desert Deal" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${product.name} - ${product.tagline} | Rayn Adam`} />
+        <meta name="twitter:title" content={`${product.name} - ${product.tagline} | Desert Deal`} />
         <meta name="twitter:description" content={`${product.description.slice(0, 150)}...`} />
         <meta name="twitter:image" content={`${window.location.origin}${product.image}`} />
         
         <meta property="product:price:amount" content={product.price.toString()} />
-        <meta property="product:price:currency" content="INR" />
+        <meta property="product:price:currency" content="AED" />
       </Helmet>
       
       <ProductSchema product={product} averageRating={averageRating} totalReviews={totalReviews} />

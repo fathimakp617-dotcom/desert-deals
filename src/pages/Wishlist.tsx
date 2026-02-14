@@ -24,8 +24,8 @@ const Wishlist = () => {
   return (
     <>
       <Helmet>
-        <title>My Wishlist | Rayn Adam Luxury Perfumes</title>
-        <meta name="description" content="View your saved luxury fragrances at Rayn Adam. Add perfumes to cart or continue shopping." />
+        <title>My Wishlist | Desert Deal</title>
+        <meta name="description" content="View your saved products at Desert Deal. Add items to cart or continue shopping." />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 

@@ -10,10 +10,10 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Privacy Policy | Rayn Adam Luxury Perfumes India</title>
-        <meta name="description" content="Privacy Policy for Rayn Adam Luxury Perfumes India. Learn how we collect, use, and protect your personal data. GDPR compliant." />
-        <meta name="keywords" content="Rayn Adam privacy, data protection, personal information, GDPR" />
-        <link rel="canonical" href="https://raynadamperfume.com/privacy" />
+        <title>Privacy Policy | Desert Deal UAE</title>
+        <meta name="description" content="Privacy Policy for Desert Deal UAE. Learn how we collect, use, and protect your personal data." />
+        <meta name="keywords" content="Desert Deal privacy, data protection, personal information" />
+        <link rel="canonical" href="https://desertsdeals.com/privacy" />
       </Helmet>
       
       <Navbar />
@@ -46,17 +46,15 @@ const PrivacyPolicy = () => {
               </div>
               <div className="bg-card border border-border rounded-xl p-6">
                 <p className="text-muted-foreground leading-relaxed">
-                  RAYN ADAM PRIVATE LIMITED ("we", "us", or "our") is committed to protecting your privacy. 
+                  DESERT DEAL ("we", "us", or "our") is committed to protecting your privacy. 
                   This Privacy Policy explains how we collect, use, disclose, and safeguard your information 
                   when you visit our website or make a purchase. Please read this policy carefully.
                 </p>
                 <div className="mt-4 p-4 bg-muted/50 rounded-lg">
                   <p className="text-sm text-muted-foreground">
-                    <strong className="text-foreground">Registered Office:</strong><br />
-                    Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal<br />
-                    Tirurangadi, Malappuram – 673634<br />
-                    Kerala, India<br />
-                    Phone: +91 99466 47442
+                    <strong className="text-foreground">Office:</strong><br />
+                    United Arab Emirates<br />
+                    Phone: +971 50 678 4405
                   </p>
                 </div>
               </div>
@@ -290,12 +288,12 @@ const PrivacyPolicy = () => {
                 For privacy-related queries, contact us at:
               </p>
               <p className="text-muted-foreground mb-4">
-                <a href="mailto:privacy@raynadamperfume.com" className="text-primary hover:underline">privacy@raynadamperfume.com</a>
+                <a href="mailto:support@desertsdeals.com" className="text-primary hover:underline">support@desertsdeals.com</a>
                 <br />
-                Phone: <a href="tel:+919946647442" className="text-primary hover:underline">+91 99466 47442</a>
+                Phone: <a href="tel:+971506784405" className="text-primary hover:underline">+971 50 678 4405</a>
               </p>
               <p className="text-sm text-muted-foreground">
-                © 2026 Rayn Adam Private Limited. All rights reserved.
+                © 2026 Desert Deal. All rights reserved.
               </p>
             </section>
           </div>

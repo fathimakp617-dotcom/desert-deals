@@ -10,10 +10,10 @@ const CancellationRefundPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Cancellation & Refund Policy | Rayn Adam Perfumes India</title>
-        <meta name="description" content="Cancellation and refund policy for Rayn Adam Luxury Perfumes. 7-day return window, easy cancellation, and full refund process for India orders." />
-        <meta name="keywords" content="Rayn Adam refund, cancel order, return perfume, 7 day return, money back guarantee" />
-        <link rel="canonical" href="https://raynadamperfume.com/cancellation-refund" />
+        <title>Cancellation & Refund Policy | Desert Deal UAE</title>
+        <meta name="description" content="Cancellation and refund policy for Desert Deal. 7-day return window, easy cancellation, and full refund process for UAE orders." />
+        <meta name="keywords" content="Desert Deal refund, cancel order, return shoes, 7 day return, money back guarantee" />
+        <link rel="canonical" href="https://desertsdeals.com/cancellation-refund" />
       </Helmet>
       
       <Navbar />
@@ -392,12 +392,12 @@ const CancellationRefundPolicy = () => {
             <section className="text-center p-8 bg-card border border-border rounded-xl">
               <h3 className="text-xl font-heading text-foreground mb-2">Need Help?</h3>
               <p className="text-muted-foreground mb-4">
-                Contact our support team at <a href="mailto:support@raynadamperfume.com" className="text-primary hover:underline">support@raynadamperfume.com</a>
+                Contact our support team at <a href="mailto:support@desertsdeals.com" className="text-primary hover:underline">support@desertsdeals.com</a>
                 <br />
-                or call us at <a href="tel:+919946647442" className="text-primary hover:underline">+91 99466 47442</a>
+                or call us at <a href="tel:+971506784405" className="text-primary hover:underline">+971 50 678 4405</a>
               </p>
               <p className="text-sm text-muted-foreground">
-                © 2026 Rayn Adam Private Limited. All rights reserved.
+                © 2026 Desert Deal. All rights reserved.
               </p>
             </section>
           </div>

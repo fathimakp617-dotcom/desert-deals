@@ -109,8 +109,8 @@ const OrderReceipt = ({
       </head>
       <body>
         <div class="header">
-          <div class="logo">RAYN ADAM</div>
-          <div class="logo-sub">LUXURY PERFUMES</div>
+          <div class="logo">DESERT DEAL</div>
+          <div class="logo-sub">PREMIUM SHOES & ACCESSORIES</div>
         </div>
         
         <div class="order-info">
@@ -170,9 +170,9 @@ const OrderReceipt = ({
         </div>
 
         <div class="footer">
-          <p>Thank you for shopping with Rayn Adam!</p>
-          <p>For questions, contact: support@raynadamperfume.com</p>
-          <p style="margin-top: 15px;">© ${new Date().getFullYear()} Rayn Adam. All rights reserved.</p>
+          <p>Thank you for shopping with Desert Deal!</p>
+          <p>For questions, contact: support@desertsdeals.com</p>
+          <p style="margin-top: 15px;">© ${new Date().getFullYear()} Desert Deal. All rights reserved.</p>
         </div>
       </body>
       </html>

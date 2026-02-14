@@ -10,10 +10,10 @@ const ShippingPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Shipping Policy | Rayn Adam Luxury Perfumes India</title>
-        <meta name="description" content="Shipping policy for Rayn Adam Luxury Perfumes. Free shipping above ₹999 in India. 5-7 business days delivery. COD available." />
-        <meta name="keywords" content="Rayn Adam shipping, perfume delivery India, free shipping, COD perfume, delivery time" />
-        <link rel="canonical" href="https://raynadamperfume.com/shipping-policy" />
+        <title>Shipping Policy | Desert Deal UAE</title>
+        <meta name="description" content="Shipping policy for Desert Deal. Free shipping on all orders in UAE. Fast delivery. COD available." />
+        <meta name="keywords" content="Desert Deal shipping, shoe delivery UAE, free shipping, COD shoes, delivery time" />
+        <link rel="canonical" href="https://desertsdeals.com/shipping-policy" />
       </Helmet>
       
       <Navbar />
@@ -277,12 +277,9 @@ const ShippingPolicy = () => {
                 <h2 className="text-2xl font-heading text-foreground">Ships From</h2>
               </div>
               <div className="bg-card border border-border rounded-xl p-6">
-                <p className="text-foreground font-medium">RAYN ADAM PRIVATE LIMITED</p>
+                <p className="text-foreground font-medium">DESERT DEAL</p>
                 <p className="text-muted-foreground mt-2">
-                  Ward No. 21, Door No. 553/1<br />
-                  Kavumpadi, Pallikkal, Tirurangadi<br />
-                  Malappuram – 673634<br />
-                  Kerala, India
+                  United Arab Emirates
                 </p>
               </div>
             </section>
@@ -291,12 +288,12 @@ const ShippingPolicy = () => {
             <section className="text-center p-8 bg-card border border-border rounded-xl">
               <h3 className="text-xl font-heading text-foreground mb-2">Shipping Questions?</h3>
               <p className="text-muted-foreground mb-4">
-                Contact us at <a href="mailto:shipping@raynadamperfume.com" className="text-primary hover:underline">shipping@raynadamperfume.com</a>
+                Contact us at <a href="mailto:support@desertsdeals.com" className="text-primary hover:underline">support@desertsdeals.com</a>
                 <br />
-                or call us at <a href="tel:+919946647442" className="text-primary hover:underline">+91 99466 47442</a>
+                or call us at <a href="tel:+971506784405" className="text-primary hover:underline">+971 50 678 4405</a>
               </p>
               <p className="text-sm text-muted-foreground">
-                © 2026 Rayn Adam Private Limited. All rights reserved.
+                © 2026 Desert Deal. All rights reserved.
               </p>
             </section>
           </div>
