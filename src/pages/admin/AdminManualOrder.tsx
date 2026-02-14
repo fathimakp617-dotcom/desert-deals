@@ -205,7 +205,7 @@ const AdminManualOrder = () => {
       order_number: orderNumber,
       customer_name: customerName,
       customer_phone: customerPhone || null,
-      customer_email: customerEmail || "whatsapp-order@raynadamperfume.com",
+      customer_email: customerEmail || "whatsapp-order@desertsdeals.com",
       payment_method: paymentMethod,
       payment_status: paymentStatus,
       total,

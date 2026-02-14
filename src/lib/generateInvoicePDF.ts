@@ -65,19 +65,19 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
     doc.setTextColor(...goldColor);
     doc.setFontSize(24);
     doc.setFont("helvetica", "bold");
-    doc.text("RAYN ADAM", pageWidth / 2, 18, { align: "center" });
+    doc.text("DESERT DEAL", pageWidth / 2, 18, { align: "center" });
   }
 
   doc.setTextColor(...goldColor);
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text("LUXURY PERFUMES", pageWidth / 2, 28, { align: "center" });
+  doc.text("PREMIUM SHOES & ACCESSORIES", pageWidth / 2, 28, { align: "center" });
 
   doc.setTextColor(180, 180, 180);
   doc.setFontSize(8);
-  doc.text("RAYN ADAM PRIVATE LIMITED", pageWidth / 2, 36, { align: "center" });
-  doc.text("Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal, Tirurangadi", pageWidth / 2, 43, { align: "center" });
-  doc.text("Malappuram – 673634, Kerala, India | Ph: +91 99466 47442", pageWidth / 2, 50, { align: "center" });
+  doc.text("DESERT DEAL", pageWidth / 2, 36, { align: "center" });
+  doc.text("United Arab Emirates", pageWidth / 2, 43, { align: "center" });
+  doc.text("Ph: +971 50 678 4405", pageWidth / 2, 50, { align: "center" });
 
   // Invoice title
   doc.setTextColor(...darkColor);
@@ -250,26 +250,20 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
 
   doc.setTextColor(...grayColor);
   doc.setFontSize(9);
-  doc.text("Thank you for shopping with Rayn Adam!", pageWidth / 2, footerY + 8, {
+  doc.text("Thank you for shopping with Desert Deal!", pageWidth / 2, footerY + 8, {
     align: "center",
   });
   doc.text(
-    "For questions, contact: support@raynadamperfume.com | Ph: +91 99466 47442",
+    "For questions, contact: support@desertsdeals.com | Ph: +971 50 678 4405",
     pageWidth / 2,
     footerY + 16,
     { align: "center" }
   );
   doc.setFontSize(8);
   doc.text(
-    "GSTIN: 32AAPCR2931R1ZS | TAN: CHNR06383G",
+    `© ${new Date().getFullYear()} Desert Deal. All rights reserved.`,
     pageWidth / 2,
     footerY + 24,
-    { align: "center" }
-  );
-  doc.text(
-    `© ${new Date().getFullYear()} Rayn Adam Private Limited. All rights reserved.`,
-    pageWidth / 2,
-    footerY + 32,
     { align: "center" }
   );
 
@@ -327,12 +321,12 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
   doc.setFontSize(28);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...darkColor);
-  doc.text("RAYN ADAM", margin, yPos);
+  doc.text("DESERT DEAL", margin, yPos);
 
   yPos += 15;
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
-  doc.text("LUXURY PERFUME", margin, yPos);
+  doc.text("PREMIUM SHOES", margin, yPos);
 
   // Header divider
   yPos += 12;
@@ -416,17 +410,13 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
   let sellerY = yPos + 42;
-  doc.text("RAYN ADAM PRIVATE LIMITED", sellerX + 10, sellerY);
+  doc.text("DESERT DEAL", sellerX + 10, sellerY);
   
   sellerY += 16;
   doc.setFont("helvetica", "normal");
-  doc.text("Ward No. 21, Door No. 553/1", sellerX + 10, sellerY);
+  doc.text("United Arab Emirates", sellerX + 10, sellerY);
   sellerY += 14;
-  doc.text("Kavumpadi, Pallikkal, Tirurangadi", sellerX + 10, sellerY);
-  sellerY += 14;
-  doc.text("Malappuram, Kerala – 673634", sellerX + 10, sellerY);
-  sellerY += 14;
-  doc.text("PHONE: +91 99466 47442", sellerX + 10, sellerY);
+  doc.text("PHONE: +971 50 678 4405", sellerX + 10, sellerY);
 
   // Product Details Table
   yPos += addressBoxHeight + 20;
@@ -475,7 +465,7 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
 
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  const returnAddr = "RAYN ADAM PRIVATE LIMITED, Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal, Tirurangadi, Malappuram, Kerala – 673634, PHONE: +91 99466 47442";
+  const returnAddr = "DESERT DEAL, United Arab Emirates, PHONE: +971 50 678 4405";
   const returnLines = doc.splitTextToSize(returnAddr, contentWidth - 20);
   doc.text(returnLines, pageWidth / 2, yPos + 42, { align: "center" });
 

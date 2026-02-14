@@ -10,10 +10,10 @@ const Terms = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Terms & Conditions | Rayn Adam Luxury Perfumes India</title>
-        <meta name="description" content="Terms and conditions for Rayn Adam Luxury Perfumes. Shipping policy, COD terms, payment options, and return/refund policies for India." />
-        <meta name="keywords" content="Rayn Adam terms, perfume shipping India, COD perfume, return policy, refund policy" />
-        <link rel="canonical" href="https://raynadamperfume.com/terms" />
+        <title>Terms & Conditions | Desert Deal UAE</title>
+        <meta name="description" content="Terms and conditions for Desert Deal. Shipping policy, COD terms, payment options, and return/refund policies for UAE." />
+        <meta name="keywords" content="Desert Deal terms, shoe shipping UAE, COD shoes, return policy, refund policy" />
+        <link rel="canonical" href="https://desertsdeals.com/terms" />
       </Helmet>
       
       <Navbar />
@@ -210,10 +210,10 @@ const Terms = () => {
             <section className="text-center p-8 bg-card border border-border rounded-xl">
               <h3 className="text-xl font-heading text-foreground mb-2">Have Questions?</h3>
               <p className="text-muted-foreground mb-4">
-                Contact us at <a href="mailto:support@raynadam.com" className="text-primary hover:underline">support@raynadam.com</a>
+                Contact us at <a href="mailto:support@desertsdeals.com" className="text-primary hover:underline">support@desertsdeals.com</a>
               </p>
               <p className="text-sm text-muted-foreground">
-                © 2026 Rayn Adam Luxury Perfumes. All rights reserved.
+                © 2026 Desert Deal. All rights reserved.
               </p>
             </section>
           </div>
