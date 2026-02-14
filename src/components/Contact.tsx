@@ -79,7 +79,7 @@ const Contact = () => {
               className="w-20 h-0.5 bg-primary mx-auto mt-6 origin-center"
             />
             <motion.p variants={fadeInUp} className="text-muted-foreground mt-6 max-w-xl mx-auto">
-              Have questions about our fragrances? We'd love to hear from you. 
+              Have questions about our products? We'd love to hear from you. 
               Send us a message and we'll respond as soon as possible.
             </motion.p>
           </motion.div>
