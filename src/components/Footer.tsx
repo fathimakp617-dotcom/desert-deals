@@ -1,110 +1,79 @@
 import { memo } from "react";
-import { Instagram, Facebook } from "lucide-react";
 import { Link } from "react-router-dom";
 
+// Exact footer structure from the original HTML
 const Footer = memo(() => {
   return (
-    <footer className="bg-background border-t border-border">
-      {/* Main footer */}
-      <div className="container mx-auto px-6 lg:px-12 py-12 sm:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Brand */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-heading font-bold tracking-tight text-foreground">
-              DESERT DEAL
-            </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Your trusted destination for premium shoes and accessories across the UAE.
-            </p>
-            <div className="flex gap-3">
-              <a
-                href="#"
-                className="w-9 h-9 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
-              >
-                <Instagram size={16} />
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
-              >
-                <Facebook size={16} />
-              </a>
+    <footer className="bg-background">
+      {/* Footer widgets row - matches site-footer-row footer-widgets */}
+      <div className="border-t border-border">
+        <div className="container mx-auto px-6 lg:px-12 py-10 sm:py-14">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            {/* Brand column with logo */}
+            <div className="space-y-4">
+              <Link to="/">
+                <h3 className="text-xl font-heading font-bold tracking-tight text-foreground uppercase">
+                  DESERT DEAL
+                </h3>
+              </Link>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Your trusted destination for premium shoes and accessories across the UAE.
+              </p>
             </div>
-          </div>
 
-          {/* Get to Know Us */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold tracking-wider text-foreground uppercase">
-              Get to Know Us
-            </h4>
-            <ul className="space-y-2.5">
-              {[
-                { label: "Home", to: "/" },
-                { label: "About Us", to: "/#about" },
-                { label: "Shop", to: "/shop" },
-                { label: "Contact", to: "/#contact" },
-              ].map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.to}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Empty column (matches original) */}
+            <div></div>
 
-          {/* Policies */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold tracking-wider text-foreground uppercase">
-              Policies
-            </h4>
-            <ul className="space-y-2.5">
-              {[
-                { label: "Privacy Policy", to: "/privacy" },
-                { label: "Terms & Conditions", to: "/terms" },
-                { label: "Refund & Returns", to: "/cancellation-refund-policy" },
-                { label: "Shipping Policy", to: "/shipping-policy" },
-              ].map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.to}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Get to Know Us - exact links from original HTML */}
+            <div className="space-y-4">
+              <h4 className="text-base font-heading font-semibold text-foreground">
+                Get to Know Us
+              </h4>
+              <ul className="space-y-2.5">
+                {[
+                  { label: "Home", to: "/" },
+                  { label: "Privacy Policy", to: "/privacy" },
+                  { label: "Terms and Conditions", to: "/terms" },
+                  { label: "Refund and Returns Policy", to: "/cancellation-refund-policy" },
+                  { label: "About Us", to: "/#about" },
+                ].map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.to}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Newsletter */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold tracking-wider text-foreground uppercase">
-              Sign Up for Email
-            </h4>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Subscribe now and get early access to new arrivals, special discounts, and Desert Deal updates.
-            </p>
+            {/* Sign Up for Email - matches original newsletter section */}
+            <div className="space-y-4">
+              <h4 className="text-base font-heading font-semibold text-foreground">
+                Sign Up for Email
+              </h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Subscribe now and get early access to new arrivals, special discounts, exclusive deals, and Desert Deal updates.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Copyright bar */}
+      {/* Copyright bar - matches site-row footer-copyright */}
       <div className="border-t border-border">
-        <div className="container mx-auto px-6 lg:px-12 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="container mx-auto px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
             ©Desert Deal All rights reserved.
           </p>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>💳</span>
-            <span>Visa</span>
-            <span>•</span>
-            <span>MasterCard</span>
-            <span>•</span>
-            <span>COD</span>
+
+          {/* Payment cards - matches site-payment-cards */}
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">Visa</span>
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">MasterCard</span>
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">COD</span>
           </div>
         </div>
       </div>
