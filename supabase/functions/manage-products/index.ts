@@ -121,7 +121,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { action, product, imageData } = await req.json();
+    const body = await req.json();
+    const { action, product, imageData, products: importProducts } = body;
 
     switch (action) {
       case "list": {
@@ -346,6 +347,67 @@ Deno.serve(async (req) => {
         }
 
         return new Response(JSON.stringify({ product: updatedProduct }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      case "bulk_import": {
+        const productsToImport = importProducts || [];
+
+        if (!Array.isArray(productsToImport) || productsToImport.length === 0) {
+          return new Response(JSON.stringify({ error: "No products to import" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        let imported = 0;
+        let skipped = 0;
+        const errors: string[] = [];
+
+        // Process in batches of 50
+        const batchSize = 50;
+        for (let i = 0; i < productsToImport.length; i += batchSize) {
+          const batch = productsToImport.slice(i, i + batchSize);
+          const rows = batch.map((p: Record<string, unknown>) => ({
+            id: String(p.id || '').trim(),
+            name: String(p.name || '').trim(),
+            description: String(p.description || '').trim().substring(0, 5000),
+            price: Number(p.price) || 0,
+            original_price: Number(p.original_price) || null,
+            discount_percent: Number(p.discount_percent) || 0,
+            stock_quantity: Number(p.stock_quantity) || 0,
+            category: String(p.category || 'All Shoes').trim(),
+            size: String(p.size || 'EU 36-45').trim(),
+            image_url: String(p.image_url || '').trim(),
+            is_active: p.is_active !== false,
+            notes: p.notes || { top: [], middle: [], base: [] },
+          })).filter((r: { id: string; name: string }) => r.id && r.name);
+
+          if (rows.length === 0) continue;
+
+          const { error: upsertError } = await supabaseClient
+            .from("products")
+            .upsert(rows, { onConflict: "id" });
+
+          if (upsertError) {
+            console.error("Batch upsert error:", upsertError);
+            errors.push(`Batch ${Math.floor(i / batchSize) + 1}: ${upsertError.message}`);
+            skipped += rows.length;
+          } else {
+            imported += rows.length;
+          }
+        }
+
+        // Log activity
+        await supabaseClient.from("activity_logs").insert({
+          actor_email: session.email,
+          actor_role: "admin",
+          action_type: "bulk_import",
+          action_details: { imported, skipped, errors: errors.slice(0, 5) },
+        });
+
+        return new Response(JSON.stringify({ imported, skipped, errors }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
