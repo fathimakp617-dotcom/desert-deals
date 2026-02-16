@@ -1,5 +1,6 @@
-import { memo } from "react";
-import { Headphones, Truck, RotateCcw, CreditCard } from "lucide-react";
+import { memo, useEffect, useState, useCallback } from "react";
+import { Headphones, Truck, RotateCcw, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const features = [
   {
@@ -25,24 +26,77 @@ const features = [
 ];
 
 const FeaturesBar = memo(() => {
+  const [current, setCurrent] = useState(0);
+
+  const next = useCallback(() => setCurrent((p) => (p + 1) % features.length), []);
+  const prev = useCallback(() => setCurrent((p) => (p - 1 + features.length) % features.length), []);
+
+  useEffect(() => {
+    const timer = setInterval(next, 4000);
+    return () => clearInterval(timer);
+  }, [next]);
+
   return (
-    <section className="py-10 sm:py-14 border-t border-border bg-background">
+    <section className="py-6 sm:py-10 border-t border-border bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Desktop: show all 4 */}
+        <div className="hidden lg:grid grid-cols-4 gap-8">
           {features.map((feature) => (
             <div key={feature.title} className="flex items-start gap-4">
               <div className="flex-shrink-0">
                 <feature.icon className="w-10 h-10 text-foreground" strokeWidth={1.2} />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-foreground leading-tight">
-                  {feature.title}
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                  {feature.description}
-                </p>
+                <h4 className="text-sm font-bold text-foreground leading-tight">{feature.title}</h4>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{feature.description}</p>
               </div>
             </div>
+          ))}
+        </div>
+
+        {/* Mobile/Tablet: carousel */}
+        <div className="lg:hidden flex items-center gap-2">
+          <button onClick={prev} className="p-1 text-muted-foreground hover:text-foreground shrink-0">
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div className="flex-1 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.25 }}
+                className="flex items-center gap-3 justify-center text-center"
+              >
+                {(() => {
+                  const Feature = features[current];
+                  return (
+                    <>
+                      <Feature.icon className="w-8 h-8 text-foreground shrink-0" strokeWidth={1.2} />
+                      <div className="text-left">
+                        <h4 className="text-sm font-bold text-foreground leading-tight">{Feature.title}</h4>
+                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{Feature.description}</p>
+                      </div>
+                    </>
+                  );
+                })()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+          <button onClick={next} className="p-1 text-muted-foreground hover:text-foreground shrink-0">
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Dots - mobile only */}
+        <div className="lg:hidden flex justify-center gap-1.5 mt-3">
+          {features.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrent(idx)}
+              className={`w-1.5 h-1.5 rounded-full transition-all ${current === idx ? "bg-foreground w-3" : "bg-foreground/30"}`}
+            />
           ))}
         </div>
       </div>
