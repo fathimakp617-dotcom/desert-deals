@@ -173,7 +173,7 @@ const ProductDetail = () => {
       ]} />
 
       <PageTransition>
-        <main className="min-h-screen bg-background relative z-10 pb-16 md:pb-0 overflow-x-hidden">
+        <main className="min-h-screen bg-background relative z-10 pb-20 md:pb-0 overflow-x-hidden">
           <Navbar />
 
         {/* Breadcrumb */}
@@ -192,26 +192,26 @@ const ProductDetail = () => {
         </section>
 
         {/* Product Hero */}
-        <section className="py-4 sm:py-12">
+        <section className="py-4 sm:py-8 lg:py-12">
           <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div className="grid md:grid-cols-2 gap-6 lg:gap-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
               {/* Image Gallery */}
               <motion.div
                 initial="hidden"
                 animate="visible"
                 variants={fadeInLeft}
-                className="space-y-4"
+                className="space-y-3"
               >
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden border border-border/50 bg-card/50">
-                  <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-primary/60 z-10" />
-                  <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-primary/60 z-10" />
-                  <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-primary/60 z-10" />
-                  <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-primary/60 z-10" />
+                <div className="relative w-full max-w-md mx-auto lg:max-w-none aspect-square overflow-hidden border border-border/50 bg-card/50">
+                  <div className="absolute top-3 left-3 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-l-2 border-primary/60 z-10" />
+                  <div className="absolute top-3 right-3 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-r-2 border-primary/60 z-10" />
+                  <div className="absolute bottom-3 left-3 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-l-2 border-primary/60 z-10" />
+                  <div className="absolute bottom-3 right-3 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-r-2 border-primary/60 z-10" />
                   
                   {isSoldOut && (
-                    <div className="absolute top-8 right-8 z-20">
-                      <Badge variant="destructive" className="text-sm font-semibold px-4 py-2">
+                    <div className="absolute top-6 right-6 z-20">
+                      <Badge variant="destructive" className="text-xs sm:text-sm font-semibold px-3 py-1.5">
                         SOLD OUT
                       </Badge>
                     </div>
@@ -233,12 +233,12 @@ const ProductDetail = () => {
 
                 {/* Thumbnails */}
                 {product.gallery.length > 1 && (
-                <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                <div className="flex gap-2 overflow-x-auto pb-2 max-w-md mx-auto lg:max-w-none" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
                   {product.gallery.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedImage(idx)}
-                      className={`flex-shrink-0 w-16 h-16 sm:w-24 sm:h-24 border-2 overflow-hidden transition-all ${
+                      className={`flex-shrink-0 w-14 h-14 sm:w-20 sm:h-20 border-2 overflow-hidden transition-all ${
                         selectedImage === idx ? "border-primary" : "border-border/50 hover:border-primary/50"
                       }`}
                     >
@@ -254,41 +254,41 @@ const ProductDetail = () => {
                 initial="hidden"
                 animate="visible"
                 variants={staggerContainer}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-5 min-w-0"
               >
                 {/* Product Name */}
                 <div>
-                  <motion.h1 variants={staggerItem} className="text-2xl sm:text-3xl md:text-4xl font-heading tracking-tight">
+                  <motion.h1 variants={staggerItem} className="text-xl sm:text-2xl lg:text-4xl font-heading tracking-tight break-words">
                     {product.name}
                   </motion.h1>
                 </div>
 
                 {/* Price & Stock */}
-                <motion.div variants={staggerItem} className="flex items-center justify-between flex-wrap gap-4">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-2xl sm:text-3xl font-heading text-foreground">
+                <motion.div variants={staggerItem} className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-baseline gap-2 sm:gap-3">
+                    <span className="text-xl sm:text-2xl lg:text-3xl font-heading text-foreground">
                       {formatPrice(product.price)}
                     </span>
-                    <span className="text-lg text-muted-foreground line-through">
+                    <span className="text-sm sm:text-lg text-muted-foreground line-through">
                       {formatPrice(product.originalPrice)}
                     </span>
                   </div>
                   {!isSoldOut ? (
-                    <span className="text-sm font-medium text-green-600">In Stock</span>
+                    <span className="text-xs sm:text-sm font-medium text-green-600">In Stock</span>
                   ) : (
-                    <span className="text-sm font-medium text-destructive">Sold Out</span>
+                    <span className="text-xs sm:text-sm font-medium text-destructive">Sold Out</span>
                   )}
                 </motion.div>
 
                 {/* Size Selector */}
-                <motion.div variants={staggerItem} className="space-y-3">
-                  <p className="text-sm text-muted-foreground">Size</p>
+                <motion.div variants={staggerItem} className="space-y-2">
+                  <p className="text-xs sm:text-sm text-muted-foreground">Size</p>
                   <div className="flex flex-wrap gap-1.5">
                     {[36, 37, 38, 39, 40, 41, 42, 43, 44, 45].map((size) => (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`w-10 h-8 sm:w-12 sm:h-10 border text-xs sm:text-sm font-medium transition-all duration-200 rounded-md ${
+                        className={`w-9 h-8 sm:w-11 sm:h-10 border text-xs sm:text-sm font-medium transition-all duration-200 rounded-md ${
                           selectedSize === size
                             ? "border-foreground bg-foreground text-background"
                             : "border-border hover:border-foreground text-foreground"
@@ -302,32 +302,32 @@ const ProductDetail = () => {
 
                 {/* Stock warnings */}
                 {isSoldOut && (
-                  <motion.div variants={staggerItem} className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
-                    <AlertCircle className="w-5 h-5 text-destructive" />
-                    <span className="text-destructive font-medium">This product is currently sold out</span>
+                  <motion.div variants={staggerItem} className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+                    <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
+                    <span className="text-destructive font-medium text-sm">This product is currently sold out</span>
                   </motion.div>
                 )}
                 
                 {!isSoldOut && stockQuantity > 0 && stockQuantity <= 10 && (
-                  <motion.div variants={staggerItem} className="flex items-center gap-2 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
-                    <AlertCircle className="w-4 h-4 text-orange-500" />
-                    <span className="text-orange-500 text-sm">Only {stockQuantity} left in stock!</span>
+                  <motion.div variants={staggerItem} className="flex items-center gap-2 p-2.5 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                    <AlertCircle className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                    <span className="text-orange-500 text-xs sm:text-sm">Only {stockQuantity} left in stock!</span>
                   </motion.div>
                 )}
 
                 {/* Quantity + Add to Cart */}
-                <motion.div variants={staggerItem} className="flex gap-3">
+                <motion.div variants={staggerItem} className="flex gap-2 sm:gap-3">
                   <div className="flex items-center border border-border rounded-md">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 py-3 text-foreground hover:bg-muted transition-colors"
+                      className="px-2 sm:px-3 py-2 sm:py-3 text-foreground hover:bg-muted transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
-                    <span className="px-4 py-3 text-sm font-medium min-w-[40px] text-center">{quantity}</span>
+                    <span className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium min-w-[32px] text-center">{quantity}</span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
-                      className="px-3 py-3 text-foreground hover:bg-muted transition-colors"
+                      className="px-2 sm:px-3 py-2 sm:py-3 text-foreground hover:bg-muted transition-colors"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -336,20 +336,20 @@ const ProductDetail = () => {
                     size="lg"
                     onClick={handleAddToCart}
                     disabled={isSoldOut}
-                    className="flex-1 bg-foreground hover:bg-foreground/90 text-background py-6 text-sm tracking-widest font-medium transition-all duration-300"
+                    className="flex-1 bg-foreground hover:bg-foreground/90 text-background py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium transition-all duration-300"
                   >
                     {isSoldOut ? "SOLD OUT" : "Add to cart"}
                   </Button>
                 </motion.div>
 
                 {/* Buy Now + Wishlist */}
-                <motion.div variants={staggerItem} className="flex gap-3">
+                <motion.div variants={staggerItem} className="flex gap-2 sm:gap-3">
                   <Button
                     size="lg"
                     onClick={handleBuyNow}
                     disabled={isSoldOut}
                     variant="outline"
-                    className="flex-1 py-6 text-sm tracking-widest font-medium border-foreground text-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+                    className="flex-1 py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium border-foreground text-foreground hover:bg-foreground hover:text-background transition-all duration-300"
                   >
                     Buy Now
                   </Button>
@@ -357,9 +357,9 @@ const ProductDetail = () => {
                     size="lg"
                     variant="outline"
                     onClick={handleToggleWishlist}
-                    className={`px-5 py-6 border-border hover:border-foreground ${inWishlist ? "bg-primary/10 border-primary" : ""}`}
+                    className={`px-4 sm:px-5 py-5 sm:py-6 border-border hover:border-foreground ${inWishlist ? "bg-primary/10 border-primary" : ""}`}
                   >
-                    <Heart className={`w-5 h-5 ${inWishlist ? "fill-primary text-primary" : ""}`} />
+                    <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${inWishlist ? "fill-primary text-primary" : ""}`} />
                   </Button>
                 </motion.div>
 
