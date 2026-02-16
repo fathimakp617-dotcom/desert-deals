@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
-import desertDealLogo from "@/assets/desert-deal-logo.png";
+import desertDealLogo from "@/assets/desert-deal-logo-dark.png";
 
 const Footer = memo(() => {
   return (
@@ -10,7 +10,7 @@ const Footer = memo(() => {
           {/* Logo */}
           <div>
             <Link to="/">
-              <img src={desertDealLogo} alt="Desert Deal" className="h-20 w-auto brightness-0 invert" />
+              <img src={desertDealLogo} alt="Desert Deal" className="h-28 w-auto" />
             </Link>
           </div>
 
