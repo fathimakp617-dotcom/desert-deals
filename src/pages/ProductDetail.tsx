@@ -304,7 +304,7 @@ const ProductDetail = () => {
                     {product.discountPercent}% OFF
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    {product.size} • {product.concentration}
+                    {product.size}
                   </span>
                 </motion.div>
 
@@ -312,17 +312,17 @@ const ProductDetail = () => {
                   {product.description}
                 </motion.p>
 
-                {/* Fragrance Notes Preview */}
-                {(product.notes.top.length > 0 || product.notes.heart.length > 0) && (
+                {/* Key Features Preview */}
+                {product.ingredients?.length > 0 && (
                 <motion.div variants={staggerItem} className="space-y-3">
-                  <p className="text-sm tracking-wider text-foreground">FRAGRANCE NOTES</p>
+                  <p className="text-sm tracking-wider text-foreground">KEY FEATURES</p>
                   <div className="flex flex-wrap gap-2">
-                    {[...product.notes.top, ...product.notes.heart.slice(0, 2)].map((note) => (
+                    {product.ingredients.slice(0, 4).map((item) => (
                       <span
-                        key={note}
+                        key={item}
                         className="px-3 py-1 bg-card border border-border/50 text-sm text-muted-foreground"
                       >
-                        {note}
+                        {item}
                       </span>
                     ))}
                   </div>
@@ -450,19 +450,13 @@ const ProductDetail = () => {
               viewport={{ once: true }}
               variants={fadeInUp}
             >
-              <Tabs defaultValue="story" className="w-full">
+              <Tabs defaultValue="description" className="w-full">
                 <TabsList className="w-full justify-start bg-transparent border-b border-border/50 rounded-none h-auto p-0 gap-4 sm:gap-8 flex-wrap">
                   <TabsTrigger 
-                    value="story" 
+                    value="description" 
                     className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-4 text-xs sm:text-sm tracking-wider"
                   >
-                    THE STORY
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="notes" 
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-4 text-xs sm:text-sm tracking-wider"
-                  >
-                    FRAGRANCE NOTES
+                    DESCRIPTION
                   </TabsTrigger>
                   <TabsTrigger 
                     value="details" 
@@ -478,85 +472,12 @@ const ProductDetail = () => {
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="story" className="pt-8">
+                <TabsContent value="description" className="pt-8">
                   <div className="max-w-3xl">
-                    <h3 className="text-2xl font-heading mb-4">The Story Behind {product.name}</h3>
+                    <h3 className="text-2xl font-heading mb-4">About {product.name}</h3>
                     <p className="text-muted-foreground leading-relaxed text-lg">
                       {product.story}
                     </p>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="notes" className="pt-8">
-                  <div className="grid sm:grid-cols-3 gap-8">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-heading">T</span>
-                        </div>
-                        <div>
-                          <h4 className="font-heading tracking-wider">TOP NOTES</h4>
-                          <p className="text-xs text-muted-foreground">First impression (0-30 min)</p>
-                        </div>
-                      </div>
-                      <ul className="space-y-2">
-                        {product.notes.top.map((note) => (
-                          <li key={note} className="text-muted-foreground flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-primary rounded-full" />
-                            {note}
-                          </li>
-                        ))}
-                        {product.notes.top.length === 0 && (
-                          <li className="text-muted-foreground/50 italic">Not specified</li>
-                        )}
-                      </ul>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-primary/30 flex items-center justify-center">
-                          <span className="text-primary font-heading">H</span>
-                        </div>
-                        <div>
-                          <h4 className="font-heading tracking-wider">HEART NOTES</h4>
-                          <p className="text-xs text-muted-foreground">The core (30 min - 4 hrs)</p>
-                        </div>
-                      </div>
-                      <ul className="space-y-2">
-                        {product.notes.heart.map((note) => (
-                          <li key={note} className="text-muted-foreground flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-primary rounded-full" />
-                            {note}
-                          </li>
-                        ))}
-                        {product.notes.heart.length === 0 && (
-                          <li className="text-muted-foreground/50 italic">Not specified</li>
-                        )}
-                      </ul>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-primary/40 flex items-center justify-center">
-                          <span className="text-primary font-heading">B</span>
-                        </div>
-                        <div>
-                          <h4 className="font-heading tracking-wider">BASE NOTES</h4>
-                          <p className="text-xs text-muted-foreground">The lasting impression (4+ hrs)</p>
-                        </div>
-                      </div>
-                      <ul className="space-y-2">
-                        {product.notes.base.map((note) => (
-                          <li key={note} className="text-muted-foreground flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-primary rounded-full" />
-                            {note}
-                          </li>
-                        ))}
-                        {product.notes.base.length === 0 && (
-                          <li className="text-muted-foreground/50 italic">Not specified</li>
-                        )}
-                      </ul>
-                    </div>
                   </div>
                 </TabsContent>
 
@@ -564,40 +485,32 @@ const ProductDetail = () => {
                   <div className="grid sm:grid-cols-2 gap-8 max-w-3xl">
                     <div className="space-y-4">
                       <div className="flex justify-between py-3 border-b border-border/30">
-                        <span className="text-muted-foreground">Concentration</span>
-                        <span className="text-foreground">{product.concentration}</span>
+                        <span className="text-muted-foreground">Category</span>
+                        <span className="text-foreground">{product.category}</span>
                       </div>
                       <div className="flex justify-between py-3 border-b border-border/30">
-                        <span className="text-muted-foreground">Size</span>
+                        <span className="text-muted-foreground">Available Sizes</span>
                         <span className="text-foreground">{product.size}</span>
-                      </div>
-                      <div className="flex justify-between py-3 border-b border-border/30">
-                        <span className="text-muted-foreground">Longevity</span>
-                        <span className="text-foreground">{product.longevity}</span>
-                      </div>
-                      <div className="flex justify-between py-3 border-b border-border/30">
-                        <span className="text-muted-foreground">Sillage</span>
-                        <span className="text-foreground">{product.sillage}</span>
                       </div>
                     </div>
 
                     <div className="space-y-4">
-                      <div className="py-3 border-b border-border/30">
-                        <span className="text-muted-foreground block mb-2">Best Seasons</span>
-                        <div className="flex flex-wrap gap-2">
-                          {product.season.map((s) => (
-                            <span key={s} className="px-3 py-1 bg-card border border-border/50 text-sm">
-                              {s}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
                       <div className="py-3 border-b border-border/30">
                         <span className="text-muted-foreground block mb-2">Best For</span>
                         <div className="flex flex-wrap gap-2">
                           {product.occasion.map((o) => (
                             <span key={o} className="px-3 py-1 bg-card border border-border/50 text-sm">
                               {o}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="py-3 border-b border-border/30">
+                        <span className="text-muted-foreground block mb-2">Materials</span>
+                        <div className="flex flex-wrap gap-2">
+                          {product.ingredients.map((m) => (
+                            <span key={m} className="px-3 py-1 bg-card border border-border/50 text-sm">
+                              {m}
                             </span>
                           ))}
                         </div>
