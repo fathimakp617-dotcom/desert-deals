@@ -125,6 +125,10 @@ const Index = () => {
           </section>
 
           <Suspense fallback={<SectionLoader />}>
+            <BrandProductRow brand="new balance" title="New Balance Collection" />
+          </Suspense>
+
+          <Suspense fallback={<SectionLoader />}>
             <Contact />
           </Suspense>
 
