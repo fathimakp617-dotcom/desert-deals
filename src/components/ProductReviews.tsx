@@ -290,7 +290,7 @@ const ProductReviews = ({ productId }: ProductReviewsProps) => {
             <Textarea
               value={newReview.content}
               onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
-              placeholder="Share your experience with this fragrance..."
+              placeholder="Share your experience with this product..."
               rows={4}
               className="bg-background border-border/50"
             />

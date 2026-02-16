@@ -144,7 +144,7 @@ const ProductForm = ({
             id="description"
             value={formData.description}
             onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-            placeholder="A bold, mysterious fragrance..."
+            placeholder="Premium footwear with great comfort..."
             rows={3}
           />
         </div>
@@ -243,9 +243,9 @@ const ProductForm = ({
           </div>
         </div>
 
-        {/* Fragrance Notes */}
+        {/* Material Notes */}
         <div className="space-y-3">
-          <Label className="text-base font-medium">Fragrance Notes (comma-separated)</Label>
+          <Label className="text-base font-medium">Materials (comma-separated)</Label>
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label htmlFor="notes_top" className="text-sm text-muted-foreground">Top Notes</Label>
