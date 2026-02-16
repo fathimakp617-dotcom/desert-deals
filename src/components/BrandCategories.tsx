@@ -102,7 +102,7 @@ const BrandCategories = memo(() => {
                 </span>
 
                 <div className="my-4 flex items-center justify-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg flex items-center justify-center p-2">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg flex items-center justify-center p-2">
                     <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
                   </div>
                 </div>
