@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import PageTransition from "@/components/PageTransition";
 import { CollectionPageSchema } from "@/components/seo/JsonLd";
 import { useWishlist } from "@/contexts/WishlistContext";
@@ -151,7 +152,7 @@ const Shop = () => {
       <CollectionPageSchema />
 
       <PageTransition>
-        <main className="min-h-screen bg-background relative z-10">
+        <main className="min-h-screen bg-background relative z-10 pb-16 md:pb-0">
           <Navbar />
 
           {/* Breadcrumb */}
@@ -343,6 +344,7 @@ const Shop = () => {
           </section>
 
           <Footer />
+          <MobileBottomNav />
         </main>
       </PageTransition>
     </>
