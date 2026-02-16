@@ -57,7 +57,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                       {item.originalPrice > item.price && (
                         <span className="text-xs text-muted-foreground line-through">{formatPrice(item.originalPrice)}</span>
                       )}
-                      <span className="text-sm font-semibold text-foreground">{formatPrice(item.price)}</span>
+                      <span className="text-sm text-foreground">{formatPrice(item.price)}</span>
                     </div>
                   </div>
                 </div>

@@ -159,7 +159,7 @@ const TopSellers = memo(() => {
                               {formatPrice(product.originalPrice)}
                             </span>
                           )}
-                          <span className="text-sm font-semibold text-foreground">
+                          <span className="text-sm text-foreground">
                             {formatPrice(product.price)}
                           </span>
                         </div>
