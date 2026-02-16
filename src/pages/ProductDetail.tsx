@@ -173,7 +173,7 @@ const ProductDetail = () => {
       ]} />
 
       <PageTransition>
-        <main className="min-h-screen bg-background relative z-10 pb-16 md:pb-0">
+        <main className="min-h-screen bg-background relative z-10 pb-16 md:pb-0 overflow-x-hidden">
           <Navbar />
 
         {/* Breadcrumb */}
@@ -203,7 +203,7 @@ const ProductDetail = () => {
                 className="space-y-4"
               >
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden border border-border/50 bg-card/50 flex items-center justify-center">
+                <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden border border-border/50 bg-card/50">
                   <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-primary/60 z-10" />
                   <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-primary/60 z-10" />
                   <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-primary/60 z-10" />
@@ -226,7 +226,7 @@ const ProductDetail = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.5 }}
-                      className="w-full h-full object-contain"
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
                   </AnimatePresence>
                 </div>
