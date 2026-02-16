@@ -68,7 +68,7 @@ export const useDbProducts = () => {
         .from("products")
         .select("*")
         .eq("is_active", true)
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: false });
 
       if (error) {
         console.error("Error fetching products:", error);
