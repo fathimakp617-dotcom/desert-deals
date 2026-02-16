@@ -283,12 +283,12 @@ const ProductDetail = () => {
                 {/* Size Selector */}
                 <motion.div variants={staggerItem} className="space-y-3">
                   <p className="text-sm text-muted-foreground">Size</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-7 sm:grid-cols-10 gap-2">
                     {[36, 37, 38, 39, 40, 41, 42, 43, 44, 45].map((size) => (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`w-12 h-12 border text-sm font-medium transition-all duration-200 rounded-md ${
+                        className={`h-10 sm:h-12 border text-sm font-medium transition-all duration-200 rounded-md ${
                           selectedSize === size
                             ? "border-foreground bg-foreground text-background"
                             : "border-border hover:border-foreground text-foreground"
