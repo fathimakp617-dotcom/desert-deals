@@ -20,6 +20,7 @@ import Index from "./pages/Index";
 const Shop = lazy(() => import("./pages/Shop"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
+const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Account = lazy(() => import("./pages/Account"));
@@ -118,6 +119,7 @@ const App = () => (
                       <Route path="/shop" element={<Shop />} />
                       <Route path="/product/:id" element={<ProductDetail />} />
                       <Route path="/wishlist" element={<Wishlist />} />
+                      <Route path="/cart" element={<Cart />} />
                       <Route path="/checkout" element={<Checkout />} />
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/account" element={<Account />} />

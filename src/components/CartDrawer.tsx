@@ -84,7 +84,7 @@ const CartDrawer = memo(() => {
                           {item.product.name}
                         </Link>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {item.product.size} • {item.product.concentration}
+                          {item.product.category}
                         </p>
                         <p className="text-primary mt-2">{formatPrice(item.product.price)}</p>
 
@@ -154,7 +154,7 @@ const CartDrawer = memo(() => {
                   onClick={closeCart}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-sm tracking-widest transition-all duration-300 hover:shadow-[0_0_30px_hsl(var(--primary)/0.4)]"
                 >
-                  <Link to="/checkout">PROCEED TO CHECKOUT</Link>
+                  <Link to="/cart">PROCEED TO CHECKOUT</Link>
                 </Button>
                 <Button
                   variant="outline"
