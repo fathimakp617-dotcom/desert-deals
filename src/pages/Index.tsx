@@ -97,7 +97,7 @@ const Index = () => {
               <Link to="/shop?brand=on-cloud" className="block relative rounded-lg overflow-hidden group">
                 <img src={onCloudAd} alt="On Cloud Shoes" className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover" />
                 <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-14">
-                  <h3 className="text-2xl sm:text-4xl font-heading font-bold text-foreground">On Cloud</h3>
+                  
                   
                   <span className="mt-4 inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
                     Shop Now →
