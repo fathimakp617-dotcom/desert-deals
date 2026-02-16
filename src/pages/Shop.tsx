@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, memo } from "react";
 import { Helmet } from "react-helmet-async";
+import { useSearchParams } from "react-router-dom";
 import { Search, Grid3X3, List, Filter, X, ChevronDown, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,11 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { usePaginatedProducts } from "@/hooks/usePaginatedProducts";
 import ProductCard from "@/components/ProductCard";
 
-const categories = ["All", "Sneakers", "Casual", "Running", "Basketball", "Formal", "Outdoor"];
+const categories = [
+  "All", "Nike", "Jordan", "New Balance", "On Cloud", "Asics", "Adidas",
+  "Hoka", "Puma", "Louis Vuitton", "Gucci", "Onitsuka Tiger", "Loro Piana",
+  "Brooks", "Dior", "Basketball Shoes",
+];
 const priceRanges = [
   { label: "All Prices", min: 0, max: Infinity },
   { label: "Under AED 200", min: 0, max: 200 },
@@ -35,10 +40,23 @@ const sortOptions = [
   { label: "Name: A-Z", value: "name-asc" },
 ];
 
+const brandSlugToCategory: Record<string, string> = {
+  "nike": "Nike", "jordan": "Jordan", "new-balance": "New Balance",
+  "on-cloud": "On Cloud", "asics": "Asics", "adidas": "Adidas",
+  "hoka": "Hoka", "puma": "Puma", "louis-vuitton": "Louis Vuitton",
+  "gucci": "Gucci", "onitsuka-tiger": "Onitsuka Tiger", "loro-piana": "Loro Piana",
+  "brooks": "Brooks", "dior": "Dior", "hermes": "Hermes",
+  "basketball": "Basketball Shoes", "running": "Running",
+};
+
 const Shop = () => {
+  const [searchParams] = useSearchParams();
+  const brandParam = searchParams.get("brand");
+  const initialCategory = (brandParam && brandSlugToCategory[brandParam]) || "All";
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchInput, setSearchInput] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [sortBy, setSortBy] = useState("featured");
   const [showFilters, setShowFilters] = useState(false);
@@ -66,6 +84,12 @@ const Shop = () => {
     priceMin: priceRange.min,
     priceMax: priceRange.max === Infinity ? undefined : priceRange.max,
   });
+
+  // Sync category from URL brand param
+  useEffect(() => {
+    const brand = searchParams.get("brand");
+    setSelectedCategory((brand && brandSlugToCategory[brand]) || "All");
+  }, [searchParams]);
 
   // Reset to page 0 when filters change
   useEffect(() => { resetPage(); }, [debouncedSearch, selectedCategory, selectedPriceRange, sortBy, resetPage]);
