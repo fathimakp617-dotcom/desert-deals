@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, memo } from "react";
 import { Helmet } from "react-helmet-async";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Search, Grid3X3, List, Filter, X, ChevronDown, ChevronLeft, ChevronRight, Loader2, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -151,21 +151,22 @@ const Shop = () => {
         <main className="min-h-screen bg-background relative z-10">
           <Navbar />
 
-          {/* #13: Plain header - no "Explore our collection" hero, just a simple breadcrumb-style header */}
-          <section className="pt-28 pb-4">
+          {/* Breadcrumb */}
+          <section className="pt-28 pb-2">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-              <h1 className="text-xl sm:text-2xl font-heading font-semibold">Shop</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {totalCount} products
-              </p>
+              <nav className="text-sm text-muted-foreground">
+                <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+                <span className="mx-2">›</span>
+                <span className="text-foreground font-medium">All Shoes</span>
+              </nav>
             </div>
           </section>
 
-          {/* Filters & Products */}
+          {/* Filter & Sort Bar */}
           <section className="py-4">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-              
-              {/* #12: Mobile filter/sort bar - horizontal row like old website */}
+
+              {/* Mobile: compact filter row */}
               <div className="lg:hidden flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar">
                 <div className="relative flex-1 min-w-0">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -196,51 +197,87 @@ const Shop = () => {
                 </Select>
               </div>
 
-              {/* Desktop Search & Filter Bar */}
-              <div className="hidden lg:flex flex-row gap-4 mb-6">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                  <Input
-                    type="text"
-                    placeholder="Search shoes..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    className="pl-12 h-12 bg-card border-border/50 focus:border-primary"
-                  />
+              {/* Desktop: reference-style filter bar */}
+              <div className="hidden lg:flex items-center justify-between mb-6">
+                {/* Left side: Filter toggle + result count */}
+                <div className="flex items-center gap-6">
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="flex items-center gap-2 text-sm font-medium text-foreground hover:opacity-70 transition-opacity"
+                  >
+                    <Filter className="w-4 h-4" />
+                    Filter Products
+                  </button>
+                  <span className="text-sm text-muted-foreground">
+                    Showing {products.length > 0 ? page * pageSize + 1 : 0}–{Math.min((page + 1) * pageSize, totalCount)} of {totalCount} results
+                    {isFetching && !isLoading && <Loader2 className="inline-block ml-2 h-3 w-3 animate-spin" />}
+                  </span>
                 </div>
 
+                {/* Right side: View toggle + Sort + Items */}
                 <div className="flex items-center gap-4">
+                  <div className="flex border border-border/50 rounded-lg overflow-hidden">
+                    <button onClick={() => setViewMode("grid")} className={`p-2.5 transition-colors ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                      <Grid3X3 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setViewMode("list")} className={`p-2.5 transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                      <List className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Sort:</span>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-44 h-10 bg-card border-border/50 text-sm"><SelectValue placeholder="Sort by latest" /></SelectTrigger>
+                      <SelectContent>
+                        {sortOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Select value={totalCount.toString()}>
+                    <SelectTrigger className="w-32 h-10 bg-card border-border/50 text-sm">
+                      <SelectValue placeholder={`${totalCount} Items`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={totalCount.toString()}>{totalCount} Items</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Expandable filter panel */}
+              {showFilters && (
+                <div className="hidden lg:flex flex-row gap-4 mb-6 p-4 bg-card rounded-lg border border-border/50">
+                  <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      type="text"
+                      placeholder="Search shoes..."
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      className="pl-10 h-10 bg-background border-border/50"
+                    />
+                  </div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-40 h-12 bg-card border-border/50"><SelectValue placeholder="Category" /></SelectTrigger>
+                    <SelectTrigger className="w-40 h-10 bg-background border-border/50"><SelectValue placeholder="Category" /></SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
                     </SelectContent>
                   </Select>
-
                   <Select value={selectedPriceRange.toString()} onValueChange={(v) => setSelectedPriceRange(parseInt(v))}>
-                    <SelectTrigger className="w-48 h-12 bg-card border-border/50"><SelectValue placeholder="Price Range" /></SelectTrigger>
+                    <SelectTrigger className="w-44 h-10 bg-background border-border/50"><SelectValue placeholder="Price Range" /></SelectTrigger>
                     <SelectContent>
                       {priceRanges.map((range, idx) => <SelectItem key={idx} value={idx.toString()}>{range.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
-
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-44 h-12 bg-card border-border/50"><SelectValue placeholder="Sort by" /></SelectTrigger>
-                    <SelectContent>
-                      {sortOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-
-                  <div className="flex border border-border/50 rounded-md overflow-hidden">
-                    <button onClick={() => setViewMode("grid")} className={`p-3 transition-colors ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                      <Grid3X3 className="w-5 h-5" />
-                    </button>
-                    <button onClick={() => setViewMode("list")} className={`p-3 transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                      <List className="w-5 h-5" />
-                    </button>
-                  </div>
+                  {hasActiveFilters && (
+                    <Button variant="outline" size="sm" onClick={clearFilters} className="h-10">
+                      <X className="w-3 h-3 mr-1" /> Clear
+                    </Button>
+                  )}
                 </div>
-              </div>
+              )}
 
               {/* Active Filters */}
               {hasActiveFilters && (
@@ -259,14 +296,6 @@ const Shop = () => {
                   <button onClick={clearFilters} className="text-xs text-primary hover:underline">Clear all</button>
                 </div>
               )}
-
-              {/* Results Count */}
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-xs text-muted-foreground">
-                  Showing {products.length > 0 ? page * pageSize + 1 : 0}–{Math.min((page + 1) * pageSize, totalCount)} of {totalCount}
-                  {isFetching && !isLoading && <Loader2 className="inline-block ml-2 h-3 w-3 animate-spin" />}
-                </p>
-              </div>
 
               {/* Loading */}
               {isLoading && (
