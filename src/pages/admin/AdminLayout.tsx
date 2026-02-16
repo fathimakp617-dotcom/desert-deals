@@ -238,7 +238,7 @@ const AdminLayout = () => {
     { title: "Withdrawals", url: "/admin/withdrawals", icon: IndianRupee },
     { title: "Coupons", url: "/admin/coupons", icon: Ticket },
     { title: "Activity Logs", url: "/admin/activity-logs", icon: Activity },
-    { title: "Staff", url: "/admin/staff", icon: UserCog },
+    
     { title: "Manual Order", url: "/admin/manual-order", icon: FilePlus },
     { title: "Bulk Import", url: "/admin/bulk-import", icon: Upload },
   ];
