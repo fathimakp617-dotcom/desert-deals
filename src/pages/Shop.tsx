@@ -311,37 +311,7 @@ const Shop = () => {
                 </div>
               )}
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-10">
-                  <Button variant="outline" size="sm" onClick={prevPage} disabled={page === 0} className="gap-1">
-                    <ChevronLeft className="w-4 h-4" /> Previous
-                  </Button>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-                      let pageNum: number;
-                      if (totalPages <= 7) pageNum = i;
-                      else if (page < 4) pageNum = i;
-                      else if (page > totalPages - 5) pageNum = totalPages - 7 + i;
-                      else pageNum = page - 3 + i;
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`w-9 h-9 rounded text-sm font-medium transition-colors ${
-                            pageNum === page ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          {pageNum + 1}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <Button variant="outline" size="sm" onClick={nextPage} disabled={!hasMore} className="gap-1">
-                    Next <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
+              {/* All products shown - no pagination */}
             </div>
           </section>
 
