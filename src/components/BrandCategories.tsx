@@ -1,4 +1,4 @@
-import { memo, useRef } from "react";
+import { memo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -6,30 +6,51 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import pumaLogo from "@/assets/brands/puma.webp";
 import onitsukaTigerLogo from "@/assets/brands/onitsuka-tiger.webp";
 import onCloudLogo from "@/assets/brands/on-cloud.png";
+import nikeLogo from "@/assets/brands/nike.svg";
 import newBalanceLogo from "@/assets/brands/new-balance.webp";
 import louisVuittonLogo from "@/assets/brands/louis-vuitton.webp";
 import loroPianaLogo from "@/assets/brands/loro-piana.webp";
 import jordanLogo from "@/assets/brands/jordan.webp";
 import hermesLogo from "@/assets/brands/hermes.webp";
 import diorLogo from "@/assets/brands/dior.webp";
+import airJordanLogo from "@/assets/brands/air-jordan.webp";
+import adidasLogo from "@/assets/brands/adidas.svg";
+import asicsLogo from "@/assets/brands/asics.svg";
 
 const brands = [
-  { name: "Puma", count: 14, slug: "puma", logo: pumaLogo },
-  { name: "Onitsuka Tiger", count: 15, slug: "onitsuka-tiger", logo: onitsukaTigerLogo },
-  { name: "On Cloud", count: 169, slug: "on-cloud", logo: onCloudLogo },
-  { name: "Nike", count: 203, slug: "nike", logo: "https://cdn.worldvectorlogo.com/logos/nike-4.svg" },
-  { name: "New Balance", count: 111, slug: "new-balance", logo: newBalanceLogo },
-  { name: "Louis Vuitton", count: 13, slug: "louis-vuitton", logo: louisVuittonLogo },
-  { name: "Loro Piana", count: 9, slug: "loro-piana", logo: loroPianaLogo },
-  { name: "Jordan", count: 110, slug: "jordan", logo: jordanLogo },
-  { name: "Hoka", count: 47, slug: "hoka", logo: "https://cdn.worldvectorlogo.com/logos/hoka-one-one.svg" },
-  { name: "Hermes", count: 2, slug: "hermes", logo: hermesLogo },
-  { name: "Gucci", count: 12, slug: "gucci", logo: "https://cdn.worldvectorlogo.com/logos/gucci-logo-1.svg" },
-  { name: "Dior", count: 3, slug: "dior", logo: diorLogo },
-  { name: "Basketball Shoes", count: 36, slug: "basketball", logo: "https://cdn.worldvectorlogo.com/logos/jumpman.svg" },
-  { name: "Asics", count: 94, slug: "asics", logo: "https://cdn.worldvectorlogo.com/logos/asics-1.svg" },
-  { name: "Adidas", count: 72, slug: "adidas", logo: "https://cdn.worldvectorlogo.com/logos/adidas-logo.svg" },
+  { name: "Puma", count: 14, slug: "puma", logo: pumaLogo, fallback: "PUMA" },
+  { name: "Onitsuka Tiger", count: 15, slug: "onitsuka-tiger", logo: onitsukaTigerLogo, fallback: "OT" },
+  { name: "On Cloud", count: 169, slug: "on-cloud", logo: onCloudLogo, fallback: "ON" },
+  { name: "Nike", count: 203, slug: "nike", logo: nikeLogo, fallback: "NIKE" },
+  { name: "New Balance", count: 111, slug: "new-balance", logo: newBalanceLogo, fallback: "NB" },
+  { name: "Louis Vuitton", count: 13, slug: "louis-vuitton", logo: louisVuittonLogo, fallback: "LV" },
+  { name: "Loro Piana", count: 9, slug: "loro-piana", logo: loroPianaLogo, fallback: "LP" },
+  { name: "Jordan", count: 110, slug: "jordan", logo: jordanLogo, fallback: "JD" },
+  { name: "Hoka", count: 47, slug: "hoka", logo: "", fallback: "HOKA" },
+  { name: "Hermes", count: 2, slug: "hermes", logo: hermesLogo, fallback: "HM" },
+  { name: "Gucci", count: 12, slug: "gucci", logo: "", fallback: "GUCCI" },
+  { name: "Dior", count: 3, slug: "dior", logo: diorLogo, fallback: "DIOR" },
+  { name: "Basketball Shoes", count: 36, slug: "basketball", logo: airJordanLogo, fallback: "🏀" },
+  { name: "Asics", count: 94, slug: "asics", logo: asicsLogo, fallback: "ASICS" },
+  { name: "Adidas", count: 72, slug: "adidas", logo: adidasLogo, fallback: "ADIDAS" },
 ];
+
+const BrandLogo = memo(({ logo, fallback, name }: { logo: string; fallback: string; name: string }) => {
+  const [failed, setFailed] = useState(false);
+  if (!logo || failed) {
+    return <span className="font-heading font-bold text-lg tracking-tight">{fallback}</span>;
+  }
+  return (
+    <img
+      src={logo}
+      alt={name}
+      className="w-full h-full object-contain"
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
+  );
+});
+BrandLogo.displayName = "BrandLogo";
 
 const BrandCategories = memo(() => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -80,12 +101,7 @@ const BrandCategories = memo(() => {
 
                 <div className="my-4 flex items-center justify-center">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg flex items-center justify-center p-2">
-                    <img
-                      src={brand.logo}
-                      alt={brand.name}
-                      className="w-full h-full object-contain"
-                      loading="lazy"
-                    />
+                    <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
                   </div>
                 </div>
 
