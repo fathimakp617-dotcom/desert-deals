@@ -7,7 +7,7 @@ import PageTransition from "@/components/PageTransition";
 import { OrganizationSchema, LocalBusinessSchema, WebsiteSchema, FAQSchema } from "@/components/seo/JsonLd";
 import onCloudAd from "@/assets/banners/on-cloud-ad.webp";
 import nikeDunkAd from "@/assets/banners/nike-dunk-low-ad.webp";
-import newBalanceAd from "@/assets/banners/new-balance-ad.jpeg";
+
 
 // Lazy load below-fold components - exact page order from HTML
 const BrandCategories = lazy(() => import("@/components/BrandCategories"));
@@ -17,6 +17,7 @@ const TopSellers = lazy(() => import("@/components/TopSellers"));
 const About = lazy(() => import("@/components/About"));
 const Contact = lazy(() => import("@/components/Contact"));
 const BrandProductRow = lazy(() => import("@/components/BrandProductRow"));
+const NewBalancePromoGrid = lazy(() => import("@/components/NewBalancePromoGrid"));
 const FeaturesBar = lazy(() => import("@/components/FeaturesBar"));
 const Footer = lazy(() => import("@/components/Footer"));
 const MobileBottomNav = lazy(() => import("@/components/MobileBottomNav"));
@@ -129,19 +130,9 @@ const Index = () => {
             <BrandProductRow brand="new balance" title="New Balance Collection" />
           </Suspense>
 
-          {/* New Balance Ad Banner */}
-          <section className="bg-background">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
-              <Link to="/shop?brand=new-balance" className="block relative rounded-lg overflow-hidden group">
-                <img src={newBalanceAd} alt="New Balance" className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover object-center" />
-                <div className="absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2">
-                  <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
-                    Shop Now →
-                  </span>
-                </div>
-              </Link>
-            </div>
-          </section>
+          <Suspense fallback={<SectionLoader />}>
+            <NewBalancePromoGrid />
+          </Suspense>
 
           <Suspense fallback={<SectionLoader />}>
             <Contact />
