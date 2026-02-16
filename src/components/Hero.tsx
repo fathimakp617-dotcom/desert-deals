@@ -61,12 +61,6 @@ const Hero = memo(() => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Text Overlay */}
-        <div className="absolute inset-0 flex items-end justify-center pb-16 sm:pb-24 z-10 pointer-events-none">
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-heading font-semibold text-white drop-shadow-lg text-center px-4" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.5)" }}>
-            Shop With Confidence and Convenience
-          </h2>
-        </div>
 
         {/* Navigation Arrows */}
         <button
