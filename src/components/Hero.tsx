@@ -53,7 +53,7 @@ const Hero = memo(() => {
             <img
               src={slides[currentSlide].image}
               alt={slides[currentSlide].alt}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-contain object-center"
               loading={currentSlide === 0 ? "eager" : "lazy"}
               decoding="async"
               fetchPriority={currentSlide === 0 ? "high" : "auto"}
