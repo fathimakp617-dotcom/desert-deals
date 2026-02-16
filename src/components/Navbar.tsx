@@ -114,12 +114,12 @@ const Navbar = memo(() => {
             </div>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center shrink-0 mr-6 lg:mr-10 pr-6 lg:pr-10 border-r border-border">
+            <Link to="/" className="flex items-center shrink-0 mr-8 lg:mr-12">
               <img src={logoImg} alt="Desert Deal" className="h-8 sm:h-10 w-auto object-contain" />
             </Link>
 
             {/* Desktop Row 1 nav links */}
-            <div className="hidden lg:flex items-center gap-x-5 flex-1 overflow-x-auto no-scrollbar">
+            <div className="hidden lg:flex items-center gap-x-5 flex-1 overflow-x-auto no-scrollbar border-l border-border pl-8">
               {topLinks.map((link) => (
                 <Link
                   key={link.name}
