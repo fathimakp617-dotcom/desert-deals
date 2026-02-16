@@ -1,10 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingBag } from "lucide-react";
 import { formatPrice, Product } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
-import { staggerContainer, staggerItem, fadeInUp } from "@/lib/animations";
-import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 
@@ -14,74 +11,60 @@ interface RelatedProductsProps {
 }
 
 const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsProps) => {
-  const { addToCart } = useCart();
   const { data: products = [] } = useDbProducts();
   
-  // Show all products except the current one
   const relatedProducts = products.filter((p) => p.id !== currentProductId);
 
   if (relatedProducts.length === 0) return null;
 
-  const handleAddToCart = (item: Product) => {
-    addToCart(item);
-    toast.success(`${item.name} added to cart`);
-  };
-
   return (
-    <section className="py-16 sm:py-24">
+    <section className="py-10 sm:py-14">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-        >
-          <motion.h2
-            variants={fadeInUp}
-            className="text-2xl sm:text-3xl font-heading tracking-tight mb-8 text-center"
-          >
-            You May Also Like
-          </motion.h2>
+        <h2 className="text-lg sm:text-xl font-heading font-semibold tracking-tight mb-6">
+          You May Also Like
+        </h2>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            {relatedProducts.map((item) => (
-              <motion.div key={item.id} variants={staggerItem}>
-                <div className="relative overflow-hidden border border-border/50 bg-card/50 p-6 transition-all duration-500 hover:border-primary/50">
-                  <Link to={`/product/${item.id}`} className="group block">
-                    <div className="aspect-square mb-4 overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
+        {/* 2-column grid on mobile, 6-column on desktop (#2, #5) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
+          {relatedProducts.slice(0, 12).map((item, index) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.3 }}
+            >
+              <Link to={`/product/${item.id}`} className="group block">
+                <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
+                  <div className="relative aspect-square bg-muted overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="block w-full bg-foreground text-background text-center text-[11px] font-medium py-2.5">
+                        Select options
+                      </span>
                     </div>
-                    <div className="text-center">
-                      <h3 className="font-heading tracking-[0.1em] text-foreground group-hover:text-primary transition-colors">
-                        {item.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mt-1">{item.tagline}</p>
-                      <div className="flex items-center justify-center gap-2 flex-wrap mt-2">
-                        <span className="text-primary font-medium">{formatPrice(item.price)}</span>
-                        <span className="text-sm text-muted-foreground line-through">{formatPrice(item.originalPrice)}</span>
-                        <span className="bg-emerald-500/20 text-emerald-400 text-xs font-medium px-1.5 py-0.5 rounded-full">
-                          {item.discountPercent}% OFF
-                        </span>
-                      </div>
+                  </div>
+                  <div className="p-3">
+                    <span className="text-[10px] text-muted-foreground">{item.category}</span>
+                    <h3 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 mb-1 leading-snug">
+                      {item.name}
+                    </h3>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {item.originalPrice > item.price && (
+                        <span className="text-xs text-muted-foreground line-through">{formatPrice(item.originalPrice)}</span>
+                      )}
+                      <span className="text-sm font-semibold text-foreground">{formatPrice(item.price)}</span>
                     </div>
-                  </Link>
-                  <Button
-                    size="sm"
-                    onClick={() => handleAddToCart(item)}
-                    className="w-full mt-4 bg-primary hover:bg-primary/90 text-primary-foreground text-xs tracking-wider flex items-center justify-center gap-2"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    ADD TO CART
-                  </Button>
+                  </div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

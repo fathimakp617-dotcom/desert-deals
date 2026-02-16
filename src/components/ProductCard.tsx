@@ -21,14 +21,21 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
           <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
         </Link>
         <div className="flex-1 min-w-0">
-          <span className="text-xs text-muted-foreground">{product.category}</span>
+          <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
           <Link to={`/product/${product.id}`}>
-            <h3 className="text-lg font-heading mt-1 text-foreground hover:text-primary transition-colors truncate">{product.name}</h3>
+            <h3 className="text-base font-heading font-bold mt-1 text-foreground hover:text-primary transition-colors truncate">{product.name}</h3>
           </Link>
           <div className="flex items-center gap-2 mt-2">
-            <span className="text-lg text-primary font-medium">{formatPrice(product.price)}</span>
+            <span className="text-base text-foreground font-semibold">{formatPrice(product.price)}</span>
             {product.originalPrice > product.price && (
               <span className="text-sm text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
+            )}
+          </div>
+          <div className="mt-1.5">
+            {soldOut ? (
+              <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
+            ) : (
+              <span className="text-[11px] font-bold text-emerald-600 uppercase">In Stock</span>
             )}
           </div>
         </div>
@@ -80,10 +87,11 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
         </div>
       </div>
 
+      {/* Product info - #6: Name bold, stock status, adjusted font sizes */}
       <div className="p-3">
-        <span className="text-[10px] text-muted-foreground">{product.category}</span>
+        <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
         <Link to={`/product/${product.id}`}>
-          <h2 className="text-xs sm:text-sm font-medium text-foreground line-clamp-2 mb-2 leading-snug hover:text-primary transition-colors">
+          <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors">
             {product.name}
           </h2>
         </Link>
@@ -91,7 +99,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
           {product.originalPrice > product.price && (
             <span className="text-xs text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
           )}
-          <span className="text-sm font-semibold text-foreground">{formatPrice(product.price)}</span>
+          <span className="text-[13px] font-semibold text-foreground">{formatPrice(product.price)}</span>
         </div>
         <div className="mt-1.5">
           {soldOut ? (

@@ -12,7 +12,6 @@ const announcements = [
   "Free Shipping on All Orders →",
 ];
 
-// Row 1 nav links
 const topLinks = [
   { name: "All Shoes", href: "/shop" },
   { name: "Nike", href: "/shop?brand=nike" },
@@ -27,7 +26,6 @@ const topLinks = [
   { name: "Onitsuka Tiger", href: "/shop?brand=onitsuka-tiger" },
 ];
 
-// Row 2 nav links
 const bottomLinks = [
   { name: "Puma", href: "/shop?brand=puma" },
   { name: "Loro Piana", href: "/shop?brand=loro-piana" },
@@ -43,6 +41,7 @@ const allLinks = [...topLinks, ...bottomLinks];
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
 
@@ -59,9 +58,16 @@ const Navbar = memo(() => {
     return () => clearInterval(timer);
   }, [nextAnnouncement]);
 
+  // Sticky header shadow on scroll
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <>
-      {/* Announcement Bar - black bar at very top */}
+      {/* Announcement Bar */}
       <div className="fixed top-0 left-0 right-0 z-[60] bg-foreground text-background">
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
@@ -93,10 +99,9 @@ const Navbar = memo(() => {
         </div>
       </div>
 
-      {/* Main Header */}
-      <header className="fixed top-9 left-0 right-0 z-50 bg-background border-b border-border">
+      {/* Main Header - sticky with shadow */}
+      <header className={`fixed top-9 left-0 right-0 z-50 bg-background border-b border-border transition-shadow duration-300 ${scrolled ? "shadow-md" : ""}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          {/* Top section: Logo + Row 1 links + Icons */}
           <div className="flex items-center h-12 sm:h-14">
             {/* Mobile hamburger */}
             <div className="lg:hidden flex items-center">
@@ -126,11 +131,11 @@ const Navbar = memo(() => {
               ))}
             </div>
 
-            {/* Action icons */}
+            {/* Action icons - Search visible on ALL screen sizes now (#1) */}
             <div className="flex items-center gap-1 sm:gap-2 ml-auto shrink-0">
               <Link
                 to="/shop"
-                className="hidden sm:flex p-2 text-foreground hover:opacity-60 transition-opacity"
+                className="p-2 text-foreground hover:opacity-60 transition-opacity"
               >
                 <Search size={20} />
               </Link>

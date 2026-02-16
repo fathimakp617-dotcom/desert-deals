@@ -155,7 +155,7 @@ const TopSellers = memo(() => {
 
                         {/* Product title - matches product-title */}
                         <Link to={`/product/${product.id}`}>
-                          <h2 className="text-xs sm:text-sm font-medium text-foreground line-clamp-2 mb-2 leading-snug hover:text-primary transition-colors">
+                          <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors">
                             {product.name}
                           </h2>
                         </Link>

@@ -2,7 +2,7 @@ import { useState, useEffect, memo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Heart, Share2, Truck, Shield, RotateCcw, Star, ShoppingBag, PenLine, Zap, AlertCircle, Loader2, MessageCircle } from "lucide-react";
+import { ArrowLeft, Heart, Share2, Truck, Shield, RotateCcw, Star, ShoppingBag, PenLine, Zap, AlertCircle, Loader2, MessageCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -328,6 +328,39 @@ const ProductDetail = () => {
                   </div>
                 </motion.div>
                 )}
+
+                {/* #7: Size Chart before Add to Cart */}
+                <motion.div variants={staggerItem} className="pt-2">
+                  <details className="group border border-border/50 rounded-lg">
+                    <summary className="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-medium text-foreground hover:bg-muted/50 transition-colors">
+                      <span className="tracking-wider">📏 SIZE CHART</span>
+                      <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
+                    </summary>
+                    <div className="px-4 pb-4 overflow-x-auto">
+                      <table className="w-full text-xs text-center border-collapse">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="py-2 px-2 text-muted-foreground font-medium">EU</th>
+                            <th className="py-2 px-2 text-muted-foreground font-medium">US</th>
+                            <th className="py-2 px-2 text-muted-foreground font-medium">UK</th>
+                            <th className="py-2 px-2 text-muted-foreground font-medium">CM</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-foreground">
+                          <tr className="border-b border-border/30"><td className="py-1.5">38</td><td>6</td><td>5</td><td>24</td></tr>
+                          <tr className="border-b border-border/30"><td className="py-1.5">39</td><td>6.5</td><td>5.5</td><td>24.5</td></tr>
+                          <tr className="border-b border-border/30"><td className="py-1.5">40</td><td>7</td><td>6</td><td>25</td></tr>
+                          <tr className="border-b border-border/30"><td className="py-1.5">41</td><td>8</td><td>7</td><td>26</td></tr>
+                          <tr className="border-b border-border/30"><td className="py-1.5">42</td><td>8.5</td><td>7.5</td><td>26.5</td></tr>
+                          <tr className="border-b border-border/30"><td className="py-1.5">43</td><td>9.5</td><td>8.5</td><td>27.5</td></tr>
+                          <tr className="border-b border-border/30"><td className="py-1.5">44</td><td>10</td><td>9</td><td>28</td></tr>
+                          <tr className="border-b border-border/30"><td className="py-1.5">45</td><td>11</td><td>10</td><td>29</td></tr>
+                          <tr><td className="py-1.5">46</td><td>12</td><td>11</td><td>30</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </details>
+                </motion.div>
 
                 {/* Add to Cart & Actions */}
                 <motion.div variants={staggerItem} className="space-y-4 pt-4">
