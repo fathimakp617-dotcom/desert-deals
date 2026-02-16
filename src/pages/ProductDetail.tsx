@@ -2,7 +2,7 @@ import { useState, useEffect, memo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Heart, Share2, Truck, Shield, RotateCcw, Star, ShoppingBag, PenLine, Zap, AlertCircle, Loader2, ChevronDown } from "lucide-react";
+import { ArrowLeft, Heart, Share2, Truck, Shield, RotateCcw, Star, ShoppingBag, PenLine, Zap, AlertCircle, Loader2, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,6 +29,7 @@ const ProductDetail = () => {
   const { data: product, isLoading } = useDbProduct(id);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
   const { addToCart, buyNow } = useCart();
@@ -250,191 +251,111 @@ const ProductDetail = () => {
                 variants={staggerContainer}
                 className="space-y-6"
               >
+                {/* Product Name */}
                 <div>
-                  <motion.p variants={staggerItem} className="text-sm tracking-[0.3em] text-primary mb-2">
-                    {product.category.toUpperCase()}
-                  </motion.p>
-                  <motion.h1 variants={staggerItem} className="text-3xl sm:text-4xl md:text-5xl font-heading tracking-tight">
+                  <motion.h1 variants={staggerItem} className="text-2xl sm:text-3xl md:text-4xl font-heading tracking-tight">
                     {product.name}
                   </motion.h1>
-                  <motion.p variants={staggerItem} className="text-lg text-muted-foreground mt-2">
-                    {product.tagline}
-                  </motion.p>
-                  {/* Rating Preview */}
-                  <motion.div variants={staggerItem} className="flex items-center gap-3 mt-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className={`w-4 h-4 ${star <= Math.round(averageRating) ? "fill-primary text-primary" : "text-muted-foreground/30"}`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        {totalReviews > 0 ? `${averageRating.toFixed(1)} (${totalReviews})` : "No reviews"}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => {
-                        const reviewsTab = document.querySelector('[data-state="inactive"][value="reviews"]') as HTMLElement;
-                        if (reviewsTab) reviewsTab.click();
-                        setTimeout(() => {
-                          document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' });
-                        }, 100);
-                      }}
-                      className="text-xs text-primary hover:underline flex items-center gap-1"
-                    >
-                      <PenLine className="w-3 h-3" />
-                      Add Review
-                    </button>
-                  </motion.div>
                 </div>
 
-                <motion.div variants={staggerItem} className="flex items-center gap-4 flex-wrap">
+                {/* Price & Stock */}
+                <motion.div variants={staggerItem} className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-baseline gap-3">
-                    <span className="text-3xl sm:text-4xl text-primary font-heading">
+                    <span className="text-2xl sm:text-3xl font-heading text-foreground">
                       {formatPrice(product.price)}
                     </span>
-                    <span className="text-lg sm:text-xl text-muted-foreground line-through">
+                    <span className="text-lg text-muted-foreground line-through">
                       {formatPrice(product.originalPrice)}
                     </span>
                   </div>
-                  <span className="bg-emerald-500/20 text-emerald-400 text-sm font-medium px-3 py-1 rounded-full">
-                    {product.discountPercent}% OFF
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {product.size}
-                  </span>
+                  {!isSoldOut ? (
+                    <span className="text-sm font-medium text-green-600">In Stock</span>
+                  ) : (
+                    <span className="text-sm font-medium text-destructive">Sold Out</span>
+                  )}
                 </motion.div>
 
-                <motion.p variants={staggerItem} className="text-muted-foreground leading-relaxed">
-                  {product.description}
-                </motion.p>
-
-                {/* Key Features Preview */}
-                {product.ingredients?.length > 0 && (
+                {/* Size Selector */}
                 <motion.div variants={staggerItem} className="space-y-3">
-                  <p className="text-sm tracking-wider text-foreground">KEY FEATURES</p>
+                  <p className="text-sm text-muted-foreground">Size</p>
                   <div className="flex flex-wrap gap-2">
-                    {product.ingredients.slice(0, 4).map((item) => (
-                      <span
-                        key={item}
-                        className="px-3 py-1 bg-card border border-border/50 text-sm text-muted-foreground"
+                    {[36, 37, 38, 39, 40, 41, 42, 43, 44, 45].map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`w-12 h-12 border text-sm font-medium transition-all duration-200 rounded-md ${
+                          selectedSize === size
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border hover:border-foreground text-foreground"
+                        }`}
                       >
-                        {item}
-                      </span>
+                        {size}
+                      </button>
                     ))}
                   </div>
                 </motion.div>
+
+                {/* Stock warnings */}
+                {isSoldOut && (
+                  <motion.div variants={staggerItem} className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
+                    <AlertCircle className="w-5 h-5 text-destructive" />
+                    <span className="text-destructive font-medium">This product is currently sold out</span>
+                  </motion.div>
+                )}
+                
+                {!isSoldOut && stockQuantity > 0 && stockQuantity <= 10 && (
+                  <motion.div variants={staggerItem} className="flex items-center gap-2 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                    <AlertCircle className="w-4 h-4 text-orange-500" />
+                    <span className="text-orange-500 text-sm">Only {stockQuantity} left in stock!</span>
+                  </motion.div>
                 )}
 
-                {/* #7: Size Chart before Add to Cart */}
-                <motion.div variants={staggerItem} className="pt-2">
-                  <details className="group border border-border/50 rounded-lg">
-                    <summary className="flex items-center justify-between cursor-pointer px-4 py-3 text-sm font-medium text-foreground hover:bg-muted/50 transition-colors">
-                      <span className="tracking-wider">📏 SIZE CHART</span>
-                      <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
-                    </summary>
-                    <div className="px-4 pb-4 overflow-x-auto">
-                      <table className="w-full text-xs text-center border-collapse">
-                        <thead>
-                          <tr className="border-b border-border">
-                            <th className="py-2 px-2 text-muted-foreground font-medium">EU</th>
-                            <th className="py-2 px-2 text-muted-foreground font-medium">US</th>
-                            <th className="py-2 px-2 text-muted-foreground font-medium">UK</th>
-                            <th className="py-2 px-2 text-muted-foreground font-medium">CM</th>
-                          </tr>
-                        </thead>
-                        <tbody className="text-foreground">
-                          <tr className="border-b border-border/30"><td className="py-1.5">38</td><td>6</td><td>5</td><td>24</td></tr>
-                          <tr className="border-b border-border/30"><td className="py-1.5">39</td><td>6.5</td><td>5.5</td><td>24.5</td></tr>
-                          <tr className="border-b border-border/30"><td className="py-1.5">40</td><td>7</td><td>6</td><td>25</td></tr>
-                          <tr className="border-b border-border/30"><td className="py-1.5">41</td><td>8</td><td>7</td><td>26</td></tr>
-                          <tr className="border-b border-border/30"><td className="py-1.5">42</td><td>8.5</td><td>7.5</td><td>26.5</td></tr>
-                          <tr className="border-b border-border/30"><td className="py-1.5">43</td><td>9.5</td><td>8.5</td><td>27.5</td></tr>
-                          <tr className="border-b border-border/30"><td className="py-1.5">44</td><td>10</td><td>9</td><td>28</td></tr>
-                          <tr className="border-b border-border/30"><td className="py-1.5">45</td><td>11</td><td>10</td><td>29</td></tr>
-                          <tr><td className="py-1.5">46</td><td>12</td><td>11</td><td>30</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </details>
+                {/* Quantity + Add to Cart */}
+                <motion.div variants={staggerItem} className="flex gap-3">
+                  <div className="flex items-center border border-border rounded-md">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-3 py-3 text-foreground hover:bg-muted transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="px-4 py-3 text-sm font-medium min-w-[40px] text-center">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-3 py-3 text-foreground hover:bg-muted transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <Button
+                    size="lg"
+                    onClick={handleAddToCart}
+                    disabled={isSoldOut}
+                    className="flex-1 bg-foreground hover:bg-foreground/90 text-background py-6 text-sm tracking-widest font-medium transition-all duration-300"
+                  >
+                    {isSoldOut ? "SOLD OUT" : "Add to cart"}
+                  </Button>
                 </motion.div>
 
-                {/* Add to Cart & Actions */}
-                <motion.div variants={staggerItem} className="space-y-4 pt-4">
-                  {isSoldOut && (
-                    <div className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
-                      <AlertCircle className="w-5 h-5 text-destructive" />
-                      <span className="text-destructive font-medium">This product is currently sold out</span>
-                    </div>
-                  )}
-                  
-                  {!isSoldOut && stockQuantity > 0 && stockQuantity <= 10 && (
-                    <div className="flex items-center gap-2 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
-                      <AlertCircle className="w-4 h-4 text-orange-500" />
-                      <span className="text-orange-500 text-sm">Only {stockQuantity} left in stock!</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Button
-                      size="lg"
-                      onClick={handleAddToCart}
-                      disabled={isSoldOut}
-                      className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-sm tracking-widest font-medium transition-all duration-300 hover:shadow-[0_0_30px_hsl(var(--primary)/0.4)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
-                    >
-                      <ShoppingBag className="w-5 h-5" />
-                      {isSoldOut ? "SOLD OUT" : "ADD TO CART"}
-                    </Button>
-                    <Button
-                      size="lg"
-                      onClick={handleBuyNow}
-                      disabled={isSoldOut}
-                      variant="secondary"
-                      className="flex-1 py-6 text-sm tracking-widest font-medium transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Zap className="w-5 h-5" />
-                      BUY NOW
-                    </Button>
-                  </div>
-                  <div className="flex gap-4">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={handleToggleWishlist}
-                      className={`flex-1 p-6 border-border/50 hover:border-primary ${inWishlist ? "bg-primary/10 border-primary" : ""}`}
-                    >
-                      <Heart className={`w-5 h-5 mr-2 ${inWishlist ? "fill-primary text-primary" : ""}`} />
-                      {inWishlist ? "WISHLISTED" : "WISHLIST"}
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={handleShare}
-                      className="flex-1 p-6 border-border/50 hover:border-primary"
-                    >
-                      <Share2 className="w-5 h-5 mr-2" />
-                      SHARE
-                    </Button>
-                  </div>
-                </motion.div>
-
-                {/* Features */}
-                <motion.div variants={staggerItem} className="grid grid-cols-3 gap-4 pt-6 border-t border-border/50">
-                  <div className="text-center">
-                    <Truck className="w-6 h-6 mx-auto text-primary mb-2" />
-                    <p className="text-xs text-muted-foreground">Free Shipping</p>
-                  </div>
-                  <div className="text-center">
-                    <Shield className="w-6 h-6 mx-auto text-primary mb-2" />
-                    <p className="text-xs text-muted-foreground">Authentic</p>
-                  </div>
-                  <div className="text-center">
-                    <RotateCcw className="w-6 h-6 mx-auto text-primary mb-2" />
-                    <p className="text-xs text-muted-foreground">Easy Returns</p>
-                  </div>
+                {/* Buy Now + Wishlist */}
+                <motion.div variants={staggerItem} className="flex gap-3">
+                  <Button
+                    size="lg"
+                    onClick={handleBuyNow}
+                    disabled={isSoldOut}
+                    variant="outline"
+                    className="flex-1 py-6 text-sm tracking-widest font-medium border-foreground text-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+                  >
+                    Buy Now
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={handleToggleWishlist}
+                    className={`px-5 py-6 border-border hover:border-foreground ${inWishlist ? "bg-primary/10 border-primary" : ""}`}
+                  >
+                    <Heart className={`w-5 h-5 ${inWishlist ? "fill-primary text-primary" : ""}`} />
+                  </Button>
                 </motion.div>
               </motion.div>
             </div>
