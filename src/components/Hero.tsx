@@ -39,8 +39,8 @@ const Hero = memo(() => {
 
   {/* top offset: announcement bar (36px) + nav row1 (48-56px) + nav row2 (~28px) */}
   return (
-    <section id="home" className="relative w-full mt-[100px] sm:mt-[116px] mb-0">
-      <div className="relative w-full aspect-[16/9] sm:aspect-[16/7] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer bg-muted" onClick={() => navigate("/shop")}>
+    <section id="home" className="relative w-full mt-[100px] sm:mt-[116px] px-3 sm:px-4">
+      <div className="relative w-full aspect-[16/9] sm:aspect-[16/7] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer bg-muted rounded-xl sm:rounded-2xl" onClick={() => navigate("/shop")}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}

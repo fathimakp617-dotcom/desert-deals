@@ -123,7 +123,7 @@ const BrandCategories = memo(() => {
   };
 
   return (
-    <section className="-mt-1 pb-6 sm:pb-10 bg-background">
+    <section className="pt-3 pb-6 sm:pt-4 sm:pb-10 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative">
         <button
           onClick={() => scroll("left")}
