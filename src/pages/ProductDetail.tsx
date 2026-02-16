@@ -103,15 +103,23 @@ const ProductDetail = () => {
       toast.error("This product is currently sold out");
       return;
     }
+    if (!selectedSize) {
+      toast.error("Please select a size first");
+      return;
+    }
     addToCart(product, quantity);
     toast.success(`${product.name} added to cart`, {
-      description: `Quantity: ${quantity}`,
+      description: `Size: ${selectedSize} · Quantity: ${quantity}`,
     });
   };
 
   const handleBuyNow = () => {
     if (isSoldOut) {
       toast.error("This product is currently sold out");
+      return;
+    }
+    if (!selectedSize) {
+      toast.error("Please select a size first");
       return;
     }
     buyNow(product, quantity);
@@ -335,7 +343,7 @@ const ProductDetail = () => {
 
                 {/* Size Selector */}
                 <motion.div variants={staggerItem} className="space-y-2">
-                  <p className="text-xs sm:text-sm text-muted-foreground">Size</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Size <span className="text-destructive">*</span></p>
                   <div className="flex flex-wrap gap-1.5">
                     {[36, 37, 38, 39, 40, 41, 42, 43, 44, 45].map((size) => (
                       <button
