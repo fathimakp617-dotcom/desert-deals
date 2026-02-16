@@ -16,7 +16,7 @@ interface VerifyOtpRequest {
 function getSafeRedirectTo(req: Request): string {
   // Default to configured site URL (production) but prefer the current request origin
   // so Preview auth flows return to Preview and can read localStorage.
-  const fallback = Deno.env.get("SITE_URL") || "https://raynadamperfume.com";
+  const fallback = Deno.env.get("SITE_URL") || "https://desertsdeals.com";
   const origin = req.headers.get("origin")?.trim();
   const referer = req.headers.get("referer")?.trim();
 
@@ -35,8 +35,8 @@ function getSafeRedirectTo(req: Request): string {
     const u = new URL(candidate);
     const host = u.hostname;
     const allowedHosts = new Set([
-      "raynadamperfume.com",
-      "www.raynadamperfume.com",
+      "desertsdeals.com",
+      "www.desertsdeals.com",
     ]);
 
     const isLovablePreview = host.endsWith(".lovable.app") || host.endsWith(".lovableproject.com");

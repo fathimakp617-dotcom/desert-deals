@@ -783,7 +783,7 @@ const Auth = () => {
 
   const getSubtitle = () => {
     switch (mode) {
-      case "signup": return "Join RAYN ADAM for exclusive offers";
+      case "signup": return "Join DESERT DEAL for exclusive offers";
       case "signup-verify": return `Enter the 4-digit code sent to ${formData.email}`;
       case "forgot": return "Enter your email to receive a verification code";
       case "forgot-verify": return `Enter the 4-digit code sent to ${formData.email}`;
@@ -847,7 +847,7 @@ const Auth = () => {
                 <div className="text-center mb-6">
                   <div className="inline-block">
                     <span className="text-2xl md:text-3xl font-heading tracking-[0.4em] bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-                      RAYN ADAM
+                      DESERT DEAL
                     </span>
                     <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/50 to-transparent mt-2" />
                   </div>
@@ -882,7 +882,7 @@ const Auth = () => {
                     className="w-full mb-6 p-4 rounded-xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border border-primary/20 hover:border-primary/40 hover:from-primary/15 hover:to-secondary/15 transition-all duration-300 group"
                   >
                     <p className="text-center">
-                      <span className="text-muted-foreground font-medium text-sm">New to RAYN ADAM?</span>{" "}
+                      <span className="text-muted-foreground font-medium text-sm">New to DESERT DEAL?</span>{" "}
                       <span className="text-primary group-hover:text-secondary font-heading text-base font-bold tracking-wide transition-colors">
                         Create an account →
                       </span>

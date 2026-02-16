@@ -137,15 +137,15 @@ const handler = async (req: Request): Promise<Response> => {
       // Send customer cancellation email
       try {
         await resend.emails.send({
-          from: "Rayn Adam <shipping@raynadamperfume.com>",
+          from: "Desert Deal <shipping@desertsdeals.com>",
           to: [order.customer_email],
           subject: `❌ Order Cancelled - ${order.order_number}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0;">
               <!-- Header -->
               <div style="background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 100%); padding: 30px; text-align: center;">
-                <h1 style="color: #c7915e; margin: 0; font-size: 28px; letter-spacing: 2px;">RAYN ADAM</h1>
-                <p style="color: #a87c39; margin: 5px 0 0 0; font-size: 12px; letter-spacing: 1px;">LUXURY PERFUMES</p>
+                <h1 style="color: #c7915e; margin: 0; font-size: 28px; letter-spacing: 2px;">DESERT DEAL</h1>
+                <p style="color: #a87c39; margin: 5px 0 0 0; font-size: 12px; letter-spacing: 1px;">PREMIUM FOOTWEAR</p>
               </div>
 
               <!-- Status Banner -->
@@ -178,14 +178,14 @@ const handler = async (req: Request): Promise<Response> => {
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
                   <p style="color: #6b7280; font-size: 14px;">
                     Questions? Contact us at<br>
-                    <a href="mailto:support@raynadamperfume.com" style="color: #a87c39;">support@raynadamperfume.com</a>
+                    <a href="mailto:support@desertsdeals.com" style="color: #a87c39;">support@desertsdeals.com</a>
                   </p>
                 </div>
               </div>
 
               <!-- Footer -->
               <div style="background: #1c1c1c; padding: 20px; text-align: center;">
-                <p style="color: #a87c39; margin: 0; font-size: 12px;">© 2026 Rayn Adam. All rights reserved.</p>
+                <p style="color: #a87c39; margin: 0; font-size: 12px;">© 2026 Desert Deal. All rights reserved.</p>
               </div>
             </div>
           `,
@@ -199,7 +199,7 @@ const handler = async (req: Request): Promise<Response> => {
       if (adminEmail) {
         try {
           await resend.emails.send({
-            from: "Rayn Adam <shipping@raynadamperfume.com>",
+            from: "Desert Deal <shipping@desertsdeals.com>",
             to: [adminEmail],
             subject: `⚠️ Order Cancelled - ${order.order_number}`,
             html: `
@@ -240,7 +240,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
 
                 <p style="color: #6b7280; font-size: 12px; margin-top: 30px; text-align: center;">
-                  This is an automated notification from Rayn Adam
+                  This is an automated notification from Desert Deal
                 </p>
               </div>
             `,

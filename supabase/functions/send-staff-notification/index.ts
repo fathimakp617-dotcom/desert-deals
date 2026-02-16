@@ -82,7 +82,7 @@ const getOrderStatusEmailTemplate = (
     .join("");
 
   return {
-    subject: `📦 RAYN ADAM - Order ${orderNumber} → ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`,
+    subject: `📦 DESERT DEAL - Order ${orderNumber} → ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -98,7 +98,7 @@ const getOrderStatusEmailTemplate = (
                 <!-- Header -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 100%); padding: 40px; text-align: center; border-bottom: 2px solid #a87c39;">
-                    <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">RAYN ADAM</h1>
+                    <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">DESERT DEAL</h1>
                     <p style="color: #a87c39; margin: 8px 0 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">Staff Notification</p>
                   </td>
                 </tr>
@@ -172,16 +172,16 @@ const getOrderStatusEmailTemplate = (
                 <tr>
                   <td style="background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%); padding: 25px; text-align: center; border-top: 1px solid #3d3d3d;">
                     <p style="color: #666; font-size: 12px; margin: 0;">
-                      This is an automated staff notification from RAYN ADAM
+                      This is an automated staff notification from DESERT DEAL
                     </p>
                     <p style="color: #a87c39; margin: 10px 0 0; font-size: 13px; letter-spacing: 2px;">
-                      RAYN ADAM
+                      DESERT DEAL
                     </p>
                     <p style="color: #555; margin: 8px 0 0; font-size: 11px;">
-                      © 2026 Rayn Adam Private Limited. All rights reserved.
+                      © 2026 Desert Deal. All rights reserved.
                     </p>
                     <p style="color: #444; margin: 5px 0 0; font-size: 10px;">
-                      Malappuram – 673634, Kerala, India | +91 99466 47442
+                      UAE
                     </p>
                   </td>
                 </tr>
@@ -198,7 +198,7 @@ const getOrderStatusEmailTemplate = (
 const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, createdBy?: string, tempPassword?: string) => {
   if (type === "account_created") {
     return {
-      subject: `🎉 RAYN ADAM - New ${staffRole.charAt(0).toUpperCase() + staffRole.slice(1)} Account Created`,
+      subject: `🎉 DESERT DEAL - New ${staffRole.charAt(0).toUpperCase() + staffRole.slice(1)} Account Created`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -214,7 +214,7 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
                   <!-- Header -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 100%); padding: 40px; text-align: center; border-bottom: 2px solid #a87c39;">
-                      <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">RAYN ADAM</h1>
+                      <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">DESERT DEAL</h1>
                       <p style="color: #a87c39; margin: 8px 0 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">Staff Account Created</p>
                     </td>
                   </tr>
@@ -258,10 +258,10 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
                   <!-- Footer -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%); padding: 25px; text-align: center; border-top: 1px solid #3d3d3d;">
-                      <p style="color: #666; font-size: 12px; margin: 0;">This is an automated notification from RAYN ADAM</p>
-                      <p style="color: #a87c39; margin: 10px 0 0; font-size: 13px; letter-spacing: 2px;">RAYN ADAM</p>
-                      <p style="color: #555; margin: 8px 0 0; font-size: 11px;">© 2026 Rayn Adam Private Limited. All rights reserved.</p>
-                      <p style="color: #444; margin: 5px 0 0; font-size: 10px;">Malappuram – 673634, Kerala, India | +91 99466 47442</p>
+                      <p style="color: #666; font-size: 12px; margin: 0;">This is an automated notification from DESERT DEAL</p>
+                      <p style="color: #a87c39; margin: 10px 0 0; font-size: 13px; letter-spacing: 2px;">DESERT DEAL</p>
+                      <p style="color: #555; margin: 8px 0 0; font-size: 11px;">© 2026 Desert Deal. All rights reserved.</p>
+                      <p style="color: #444; margin: 5px 0 0; font-size: 10px;">UAE</p>
                     </td>
                   </tr>
                 </table>
@@ -276,7 +276,7 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
 
   if (type === "account_blocked") {
     return {
-      subject: `⛔ RAYN ADAM - Staff Account Blocked: ${staffEmail}`,
+      subject: `⛔ DESERT DEAL - Staff Account Blocked: ${staffEmail}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -292,7 +292,7 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
                   <!-- Header -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 100%); padding: 40px; text-align: center; border-bottom: 2px solid #a87c39;">
-                      <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">RAYN ADAM</h1>
+                      <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">DESERT DEAL</h1>
                       <p style="color: #a87c39; margin: 8px 0 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">Security Alert</p>
                     </td>
                   </tr>
@@ -327,10 +327,10 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
                   <!-- Footer -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%); padding: 25px; text-align: center; border-top: 1px solid #3d3d3d;">
-                      <p style="color: #666; font-size: 12px; margin: 0;">This is an automated security notification from RAYN ADAM</p>
-                      <p style="color: #a87c39; margin: 10px 0 0; font-size: 13px; letter-spacing: 2px;">RAYN ADAM</p>
-                      <p style="color: #555; margin: 8px 0 0; font-size: 11px;">© 2026 Rayn Adam Private Limited. All rights reserved.</p>
-                      <p style="color: #444; margin: 5px 0 0; font-size: 10px;">Malappuram – 673634, Kerala, India | +91 99466 47442</p>
+                      <p style="color: #666; font-size: 12px; margin: 0;">This is an automated security notification from DESERT DEAL</p>
+                      <p style="color: #a87c39; margin: 10px 0 0; font-size: 13px; letter-spacing: 2px;">DESERT DEAL</p>
+                      <p style="color: #555; margin: 8px 0 0; font-size: 11px;">© 2026 Desert Deal. All rights reserved.</p>
+                      <p style="color: #444; margin: 5px 0 0; font-size: 10px;">UAE</p>
                     </td>
                   </tr>
                 </table>
@@ -345,7 +345,7 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
 
   if (type === "account_unblocked") {
     return {
-      subject: `✅ RAYN ADAM - Staff Account Restored: ${staffEmail}`,
+      subject: `✅ DESERT DEAL - Staff Account Restored: ${staffEmail}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -361,7 +361,7 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
                   <!-- Header -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 100%); padding: 40px; text-align: center; border-bottom: 2px solid #a87c39;">
-                      <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">RAYN ADAM</h1>
+                      <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">DESERT DEAL</h1>
                       <p style="color: #a87c39; margin: 8px 0 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">Account Update</p>
                     </td>
                   </tr>
@@ -396,10 +396,10 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
                   <!-- Footer -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%); padding: 25px; text-align: center; border-top: 1px solid #3d3d3d;">
-                      <p style="color: #666; font-size: 12px; margin: 0;">This is an automated notification from RAYN ADAM</p>
-                      <p style="color: #a87c39; margin: 10px 0 0; font-size: 13px; letter-spacing: 2px;">RAYN ADAM</p>
-                      <p style="color: #555; margin: 8px 0 0; font-size: 11px;">© 2026 Rayn Adam Private Limited. All rights reserved.</p>
-                      <p style="color: #444; margin: 5px 0 0; font-size: 10px;">Malappuram – 673634, Kerala, India | +91 99466 47442</p>
+                      <p style="color: #666; font-size: 12px; margin: 0;">This is an automated notification from DESERT DEAL</p>
+                      <p style="color: #a87c39; margin: 10px 0 0; font-size: 13px; letter-spacing: 2px;">DESERT DEAL</p>
+                      <p style="color: #555; margin: 8px 0 0; font-size: 11px;">© 2026 Desert Deal. All rights reserved.</p>
+                      <p style="color: #444; margin: 5px 0 0; font-size: 10px;">UAE</p>
                     </td>
                   </tr>
                 </table>
@@ -414,7 +414,7 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
 
   // password_changed
   return {
-    subject: `🔐 RAYN ADAM - Password Changed for ${staffEmail}`,
+    subject: `🔐 DESERT DEAL - Password Changed for ${staffEmail}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -430,7 +430,7 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
                 <!-- Header -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 100%); padding: 40px; text-align: center; border-bottom: 2px solid #a87c39;">
-                    <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">RAYN ADAM</h1>
+                    <h1 style="color: #c7915e; margin: 0; font-size: 32px; font-weight: 300; letter-spacing: 3px;">DESERT DEAL</h1>
                     <p style="color: #a87c39; margin: 8px 0 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">Security Notification</p>
                   </td>
                 </tr>
@@ -465,10 +465,10 @@ const getEmailTemplate = (type: string, staffEmail: string, staffRole: string, c
                 <!-- Footer -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%); padding: 25px; text-align: center; border-top: 1px solid #3d3d3d;">
-                    <p style="color: #666; font-size: 12px; margin: 0;">This is an automated security notification from RAYN ADAM</p>
-                    <p style="color: #a87c39; margin: 10px 0 0; font-size: 13px; letter-spacing: 2px;">RAYN ADAM</p>
-                    <p style="color: #555; margin: 8px 0 0; font-size: 11px;">© 2026 Rayn Adam Private Limited. All rights reserved.</p>
-                    <p style="color: #444; margin: 5px 0 0; font-size: 10px;">Malappuram – 673634, Kerala, India | +91 99466 47442</p>
+                    <p style="color: #666; font-size: 12px; margin: 0;">This is an automated security notification from DESERT DEAL</p>
+                    <p style="color: #a87c39; margin: 10px 0 0; font-size: 13px; letter-spacing: 2px;">DESERT DEAL</p>
+                    <p style="color: #555; margin: 8px 0 0; font-size: 11px;">© 2026 Desert Deal. All rights reserved.</p>
+                    <p style="color: #444; margin: 5px 0 0; font-size: 10px;">UAE</p>
                   </td>
                 </tr>
               </table>
@@ -551,7 +551,7 @@ serve(async (req) => {
       const emailPromises = allStaffEmails.map(async (email) => {
         try {
           const { error } = await resend.emails.send({
-          from: "Rayn Adam <notifications@raynadamperfume.com>",
+          from: "Desert Deal <notifications@desertsdeals.com>",
             to: [email],
             subject: emailTemplate.subject,
             html: emailTemplate.html,
@@ -644,7 +644,7 @@ serve(async (req) => {
     const emailPromises = recipients.map(async (email) => {
       try {
         const { error } = await resend.emails.send({
-          from: "Rayn Adam <notifications@raynadamperfume.com>",
+          from: "Desert Deal <notifications@desertsdeals.com>",
           to: [email],
           subject: emailTemplate.subject,
           html: emailTemplate.html,

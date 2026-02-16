@@ -20,7 +20,7 @@ import {
 import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, UserCheck, Activity, UserCog, User, Ticket, RotateCcw, Receipt, Star, ShoppingBag, IndianRupee, FilePlus, Upload } from "lucide-react";
 import { motion } from "framer-motion";
 
-const ADMIN_SESSION_KEY = "rayn_admin_session";
+const ADMIN_SESSION_KEY = "dd_admin_session";
 
 interface AdminSession {
   token: string;
@@ -308,8 +308,7 @@ const AdminLayout = () => {
             {/* Logo/Brand */}
             <div className="px-4 py-4 mb-4">
               <Link to="/" className="block">
-                <h1 className="text-xl font-heading font-bold text-primary">RAYN ADAM</h1>
-                <p className="text-xs text-muted-foreground">Admin Dashboard</p>
+                <h1 className="text-xl font-heading font-bold text-primary">DESERT DEAL</h1>
               </Link>
             </div>
 
