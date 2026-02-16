@@ -155,12 +155,6 @@ const Navbar = memo(() => {
 
             {/* Action icons - Search visible on ALL screen sizes now (#1) */}
             <div className="flex items-center gap-1 sm:gap-2 ml-auto shrink-0">
-              <button
-                onClick={() => { setSearchOpen(true); setTimeout(() => searchInputRef.current?.focus(), 100); }}
-                className="p-2 text-foreground hover:opacity-60 transition-opacity"
-              >
-                <Search size={20} />
-              </button>
               <Link
                 to="/wishlist"
                 className="relative p-2 text-foreground hover:opacity-60 transition-opacity"
