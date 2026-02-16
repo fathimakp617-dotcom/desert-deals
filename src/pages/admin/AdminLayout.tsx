@@ -25,7 +25,7 @@ const ADMIN_SESSION_KEY = "dd_admin_session";
 interface AdminSession {
   token: string;
   email: string;
-  expiry: number;
+  expiry: string | number;
   role?: string;
 }
 
@@ -45,7 +45,7 @@ const AdminLayout = () => {
       const stored = sessionStorage.getItem(ADMIN_SESSION_KEY);
       if (stored) {
         const session: AdminSession = JSON.parse(stored);
-        if (session.expiry > Date.now()) {
+        if (new Date(session.expiry) > new Date()) {
           setAdminSession(session);
         } else {
           sessionStorage.removeItem(ADMIN_SESSION_KEY);
