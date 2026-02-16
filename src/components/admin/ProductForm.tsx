@@ -121,7 +121,7 @@ const ProductForm = ({
                   id: isEditing ? prev.id : generateSlug(e.target.value),
                 }));
               }}
-              placeholder="Noir Intense"
+              placeholder="Air Stride Pro"
               required
             />
           </div>
@@ -131,7 +131,7 @@ const ProductForm = ({
               id="id"
               value={formData.id}
               onChange={(e) => setFormData((prev) => ({ ...prev, id: e.target.value }))}
-              placeholder="noir-intense"
+              placeholder="air-stride-pro"
               required
               disabled={isEditing}
             />

@@ -138,7 +138,7 @@ For questions: support@desertsdeals.com
                     DESERT DEAL
                   </h1>
                   <p style="margin: 10px 0 0; color: #a87c39; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">
-                    Luxury Perfumes
+                    Premium Footwear
                   </p>
                 </td>
               </tr>
@@ -337,7 +337,7 @@ const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint
   });
   
   yPos -= 20;
-  page.drawText('LUXURY PERFUMES', {
+  page.drawText('PREMIUM FOOTWEAR', {
     x: width / 2 - 55,
     y: yPos,
     size: 12,
@@ -896,7 +896,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
   });
   
   yPos -= 18;
-  page.drawText('LUXURY PERFUME', {
+  page.drawText('PREMIUM FOOTWEAR', {
     x: margin,
     y: yPos,
     size: 11,
