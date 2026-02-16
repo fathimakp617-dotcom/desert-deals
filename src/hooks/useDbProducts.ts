@@ -40,8 +40,10 @@ const mapDbToProduct = (db: DbProduct): Product => {
     discountPercent: db.discount_percent || 0,
     category: db.category || "Unisex",
     size: db.size || "EU 40-45",
-    image: db.image_url || staticData?.image || "",
-    gallery: staticData?.gallery || (db.image_url ? [db.image_url] : []),
+    image: db.image_url ? db.image_url.split(",")[0].trim() : (staticData?.image || ""),
+    gallery: staticData?.gallery || (db.image_url
+      ? db.image_url.split(",").map(u => u.trim()).filter(Boolean)
+      : []),
     notes: {
       top: db.notes?.top || staticData?.notes?.top || [],
       heart: db.notes?.middle || staticData?.notes?.heart || [],
