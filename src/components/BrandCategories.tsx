@@ -4,21 +4,21 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Exact brands from original HTML with product counts
 const brands = [
-  { name: "Puma", count: 14, slug: "puma", logo: "https://logo.clearbit.com/puma.com" },
-  { name: "Onitsuka Tiger", count: 15, slug: "onitsuka-tiger", logo: "https://logo.clearbit.com/onitsukatiger.com" },
-  { name: "On Cloud", count: 169, slug: "on-cloud", logo: "https://logo.clearbit.com/on-running.com" },
-  { name: "Nike", count: 203, slug: "nike", logo: "https://logo.clearbit.com/nike.com" },
-  { name: "New Balance", count: 111, slug: "new-balance", logo: "https://logo.clearbit.com/newbalance.com" },
-  { name: "Louis Vuitton", count: 13, slug: "louis-vuitton", logo: "https://logo.clearbit.com/louisvuitton.com" },
-  { name: "Loro Piana", count: 9, slug: "loro-piana", logo: "https://logo.clearbit.com/loropiana.com" },
-  { name: "Jordan", count: 110, slug: "jordan", logo: "https://logo.clearbit.com/jordan.com" },
-  { name: "Hoka", count: 47, slug: "hoka", logo: "https://logo.clearbit.com/hoka.com" },
-  { name: "Hermes", count: 2, slug: "hermes", logo: "https://logo.clearbit.com/hermes.com" },
-  { name: "Gucci", count: 12, slug: "gucci", logo: "https://logo.clearbit.com/gucci.com" },
-  { name: "Dior", count: 3, slug: "dior", logo: "https://logo.clearbit.com/dior.com" },
+  { name: "Puma", count: 14, slug: "puma", logo: "https://cdn.worldvectorlogo.com/logos/puma-logo.svg" },
+  { name: "Onitsuka Tiger", count: 15, slug: "onitsuka-tiger", logo: "https://cdn.worldvectorlogo.com/logos/onitsuka-tiger.svg" },
+  { name: "On Cloud", count: 169, slug: "on-cloud", logo: "https://cdn.worldvectorlogo.com/logos/on-running.svg" },
+  { name: "Nike", count: 203, slug: "nike", logo: "https://cdn.worldvectorlogo.com/logos/nike-4.svg" },
+  { name: "New Balance", count: 111, slug: "new-balance", logo: "https://cdn.worldvectorlogo.com/logos/new-balance-2.svg" },
+  { name: "Louis Vuitton", count: 13, slug: "louis-vuitton", logo: "https://cdn.worldvectorlogo.com/logos/louis-vuitton-4.svg" },
+  { name: "Loro Piana", count: 9, slug: "loro-piana", initials: "LP" },
+  { name: "Jordan", count: 110, slug: "jordan", logo: "https://cdn.worldvectorlogo.com/logos/jumpman.svg" },
+  { name: "Hoka", count: 47, slug: "hoka", logo: "https://cdn.worldvectorlogo.com/logos/hoka-one-one.svg" },
+  { name: "Hermes", count: 2, slug: "hermes", logo: "https://cdn.worldvectorlogo.com/logos/hermes-logo.svg" },
+  { name: "Gucci", count: 12, slug: "gucci", logo: "https://cdn.worldvectorlogo.com/logos/gucci-logo-1.svg" },
+  { name: "Dior", count: 3, slug: "dior", logo: "https://cdn.worldvectorlogo.com/logos/dior-1.svg" },
   { name: "Basketball Shoes", count: 36, slug: "basketball", initials: "🏀" },
-  { name: "Asics", count: 94, slug: "asics", logo: "https://logo.clearbit.com/asics.com" },
-  { name: "Adidas", count: 72, slug: "adidas", logo: "https://logo.clearbit.com/adidas.com" },
+  { name: "Asics", count: 94, slug: "asics", logo: "https://cdn.worldvectorlogo.com/logos/asics-1.svg" },
+  { name: "Adidas", count: 72, slug: "adidas", logo: "https://cdn.worldvectorlogo.com/logos/adidas-logo.svg" },
 ];
 
 const BrandCategories = memo(() => {
