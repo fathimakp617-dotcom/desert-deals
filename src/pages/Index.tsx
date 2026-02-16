@@ -79,9 +79,6 @@ const Index = () => {
             <TopSellers />
           </Suspense>
           
-          <Suspense fallback={<SectionLoader />}>
-            <About />
-          </Suspense>
           
           <Suspense fallback={<SectionLoader />}>
             <Contact />
