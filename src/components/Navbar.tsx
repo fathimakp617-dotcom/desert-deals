@@ -123,7 +123,7 @@ const Navbar = memo(() => {
       {/* Main Header - sticky with shadow */}
       <header className={`fixed top-9 left-0 right-0 z-50 bg-background border-b border-border transition-shadow duration-300 ${scrolled ? "shadow-md" : ""}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex items-center h-12 sm:h-14">
+          <div className="flex items-center h-14 sm:h-16">
             {/* Mobile hamburger */}
             <div className="lg:hidden flex items-center">
               <button
@@ -136,7 +136,7 @@ const Navbar = memo(() => {
 
             {/* Logo */}
             <Link to="/" ref={logoRef} className="flex items-center shrink-0 mr-8 lg:mr-12">
-              <img src={logoImg} alt="Desert Deal" className="h-12 sm:h-14 w-auto object-contain" />
+              <img src={logoImg} alt="Desert Deal" className="h-14 sm:h-16 w-auto object-contain" />
             </Link>
 
             {/* Desktop Row 1 nav links */}
@@ -191,8 +191,8 @@ const Navbar = memo(() => {
             </div>
           </div>
 
-          {/* Desktop Row 2 nav links */}
-          <div className="hidden lg:flex items-center gap-x-5 pb-2" style={{ paddingLeft: logoWidth ? `${logoWidth + 48 + 32 + 1}px` : undefined }}>
+          {/* Desktop Row 2 nav links - right aligned */}
+          <div className="hidden lg:flex items-center justify-end gap-x-5 pb-2">
             {bottomLinks.map((link) => (
               <Link
                 key={link.name}
