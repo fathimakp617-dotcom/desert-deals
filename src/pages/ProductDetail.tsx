@@ -283,7 +283,7 @@ const ProductDetail = () => {
                 {/* Size Selector */}
                 <motion.div variants={staggerItem} className="space-y-3">
                   <p className="text-sm text-muted-foreground">Size</p>
-                  <div className="grid grid-cols-7 sm:grid-cols-10 gap-2">
+                  <div className="grid grid-cols-5 sm:grid-cols-7 lg:grid-cols-10 gap-2">
                     {[36, 37, 38, 39, 40, 41, 42, 43, 44, 45].map((size) => (
                       <button
                         key={size}
