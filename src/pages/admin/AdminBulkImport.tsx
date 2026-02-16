@@ -26,7 +26,7 @@ const getAdminSession = () => {
   if (!stored) return null;
   try {
     const session = JSON.parse(stored);
-    if (session.expiry > Date.now()) return session;
+    if (new Date(session.expiry) > new Date()) return session;
   } catch {
     return null;
   }
