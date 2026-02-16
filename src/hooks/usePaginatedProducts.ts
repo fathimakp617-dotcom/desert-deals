@@ -43,7 +43,7 @@ const mapProduct = (db: DbProduct): SimpleProduct => ({
   discountPercent: db.discount_percent || 0,
   category: db.category || "General",
   size: db.size || "Standard",
-  image: db.image_url || "",
+  image: db.image_url ? db.image_url.split(",")[0].trim() : "",
   tagline: db.category || "Premium Footwear",
   notes: {
     top: db.notes?.top || [],
