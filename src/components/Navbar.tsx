@@ -54,7 +54,7 @@ const Navbar = memo(() => {
       {/* Main Header - matches site-header header-type1 sticky-header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex items-center h-10 sm:h-12">
+          <div className="flex items-center h-14 sm:h-16">
             {/* Mobile: hamburger menu */}
             <div className="md:hidden flex items-center">
               <button
@@ -67,7 +67,7 @@ const Navbar = memo(() => {
 
             {/* Logo - matches site-brand */}
             <Link to="/" className="flex items-center shrink-0 mr-8">
-              <img src={logoImg} alt="Desert Deal" className="h-5 sm:h-6 w-auto object-contain" />
+              <img src={logoImg} alt="Desert Deal" className="h-7 sm:h-9 w-auto object-contain" />
             </Link>
 
             {/* Desktop nav - single row */}
