@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import ProductReviews from "@/components/ProductReviews";
 import RelatedProducts from "@/components/RelatedProducts";
 
@@ -172,7 +173,7 @@ const ProductDetail = () => {
       ]} />
 
       <PageTransition>
-        <main className="min-h-screen bg-background relative z-10">
+        <main className="min-h-screen bg-background relative z-10 pb-16 md:pb-0">
           <Navbar />
 
         {/* Breadcrumb */}
@@ -232,12 +233,12 @@ const ProductDetail = () => {
 
                 {/* Thumbnails */}
                 {product.gallery.length > 1 && (
-                <div className="flex gap-4">
+                <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
                   {product.gallery.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedImage(idx)}
-                      className={`w-20 h-20 sm:w-24 sm:h-24 border-2 overflow-hidden transition-all ${
+                      className={`flex-shrink-0 w-16 h-16 sm:w-24 sm:h-24 border-2 overflow-hidden transition-all ${
                         selectedImage === idx ? "border-primary" : "border-border/50 hover:border-primary/50"
                       }`}
                     >
@@ -455,6 +456,7 @@ const ProductDetail = () => {
         <RelatedProducts currentProductId={product.id} currentCategory={product.category} />
 
         <Footer />
+        <MobileBottomNav />
         </main>
       </PageTransition>
     </>
