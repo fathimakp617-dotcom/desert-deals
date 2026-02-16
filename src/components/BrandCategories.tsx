@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from "react";
+import { memo, useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -54,6 +54,62 @@ const BrandLogo = memo(({ logo, fallback, name }: { logo: string; fallback: stri
 });
 BrandLogo.displayName = "BrandLogo";
 
+// Mobile carousel: shows 2 brands per page
+const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands }) => {
+  const totalPages = Math.ceil(brandList.length / 2);
+  const [page, setPage] = useState(0);
+
+  const next = useCallback(() => setPage((p) => (p + 1) % totalPages), [totalPages]);
+
+  useEffect(() => {
+    const timer = setInterval(next, 5000);
+    return () => clearInterval(timer);
+  }, [next]);
+
+  const pair = brandList.slice(page * 2, page * 2 + 2);
+
+  return (
+    <div className="sm:hidden">
+      <div className="grid grid-cols-2 gap-3">
+        {pair.map((brand) => (
+          <Link
+            key={brand.slug}
+            to={`/shop?brand=${brand.slug}`}
+            className="group"
+          >
+            <div className="bg-muted rounded-lg p-4 text-center transition-all duration-300 hover:shadow-md">
+              <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">
+                {brand.name}
+              </h3>
+              <span className="text-[11px] text-muted-foreground mt-0.5 block">
+                {brand.count} Products
+              </span>
+              <div className="my-4 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-lg flex items-center justify-center p-2">
+                  <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
+                </div>
+              </div>
+              <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
+                View Products
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+      <div className="flex justify-center gap-1.5 mt-3">
+        {Array.from({ length: totalPages }).map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setPage(idx)}
+            className={`w-1.5 h-1.5 rounded-full transition-all ${page === idx ? "bg-foreground w-3" : "bg-foreground/30"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+});
+MobileBrandCarousel.displayName = "MobileBrandCarousel";
+
 const BrandCategories = memo(() => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -82,33 +138,8 @@ const BrandCategories = memo(() => {
           <ChevronRight className="w-4 h-4" />
         </button>
 
-        {/* Mobile: 2-column grid */}
-        <div className="grid grid-cols-2 gap-3 sm:hidden">
-          {brands.map((brand) => (
-            <Link
-              key={brand.slug}
-              to={`/shop?brand=${brand.slug}`}
-              className="group"
-            >
-              <div className="bg-muted rounded-lg p-4 text-center transition-all duration-300 hover:shadow-md">
-                <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">
-                  {brand.name}
-                </h3>
-                <span className="text-[11px] text-muted-foreground mt-0.5 block">
-                  {brand.count} Products
-                </span>
-                <div className="my-4 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-lg flex items-center justify-center p-2">
-                    <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
-                  View Products
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {/* Mobile: carousel showing 2 at a time */}
+        <MobileBrandCarousel brands={brands} />
 
         {/* Tablet/Desktop: horizontal scroll */}
         <div
