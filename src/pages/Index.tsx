@@ -96,10 +96,8 @@ const Index = () => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
               <Link to="/shop?brand=on-cloud" className="block relative rounded-lg overflow-hidden group">
                 <img src={onCloudAd} alt="On Cloud Shoes" className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover" />
-                <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-14">
-                  
-                  
-                  <span className="mt-4 inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+                <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
+                  <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
                     Shop Now →
                   </span>
                 </div>
