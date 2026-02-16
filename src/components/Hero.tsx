@@ -39,7 +39,7 @@ const Hero = memo(() => {
 
   return (
     <section id="home" className="relative w-full mt-[56px] sm:mt-[64px]">
-      <div className="relative w-full h-[200px] sm:h-[520px] lg:h-[820px] rounded-lg overflow-hidden mx-auto cursor-pointer" onClick={() => navigate("/shop")}>
+      <div className="relative w-full aspect-[3/1] rounded-lg overflow-hidden mx-auto cursor-pointer" onClick={() => navigate("/shop")}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
