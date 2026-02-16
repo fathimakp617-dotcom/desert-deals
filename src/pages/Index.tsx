@@ -12,6 +12,7 @@ const PromoGrid = lazy(() => import("@/components/PromoGrid"));
 const TopSellers = lazy(() => import("@/components/TopSellers"));
 const About = lazy(() => import("@/components/About"));
 const Contact = lazy(() => import("@/components/Contact"));
+const BrandProductRow = lazy(() => import("@/components/BrandProductRow"));
 const FeaturesBar = lazy(() => import("@/components/FeaturesBar"));
 const Footer = lazy(() => import("@/components/Footer"));
 const MobileBottomNav = lazy(() => import("@/components/MobileBottomNav"));
@@ -82,6 +83,10 @@ const Index = () => {
           
           <Suspense fallback={<SectionLoader />}>
             <PromoGrid />
+          </Suspense>
+
+          <Suspense fallback={<SectionLoader />}>
+            <BrandProductRow brand="adidas" title="Adidas Collection" />
           </Suspense>
 
           <Suspense fallback={<SectionLoader />}>
