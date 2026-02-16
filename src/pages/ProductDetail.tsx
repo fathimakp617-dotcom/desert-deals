@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductReviews from "@/components/ProductReviews";
 import RelatedProducts from "@/components/RelatedProducts";
+import FeaturesBar from "@/components/FeaturesBar";
 import PageTransition from "@/components/PageTransition";
 import { formatPrice } from "@/data/products";
 import { useDbProduct } from "@/hooks/useDbProducts";
@@ -451,6 +452,7 @@ const ProductDetail = () => {
         {/* Related Products */}
         <RelatedProducts currentProductId={product.id} currentCategory={product.category} />
 
+        <FeaturesBar />
         <Footer />
         </main>
       </PageTransition>
