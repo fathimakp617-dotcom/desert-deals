@@ -145,7 +145,7 @@ const TopSellers = memo(() => {
                       </div>
 
                       {/* Product content - matches product-content-wrapper */}
-                      <div className="p-3 sm:p-4">
+                      <div className="p-3 sm:p-4 bg-muted rounded-b-lg">
                         {/* Brand tags - matches product-brand */}
                         <div className="flex flex-wrap gap-1 mb-1.5">
                           <span className="text-[10px] text-muted-foreground">
