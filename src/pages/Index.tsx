@@ -113,9 +113,9 @@ const Index = () => {
           {/* Nike Dunk Low Ad Banner */}
           <section className="bg-background">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
-              <Link to="/shop?brand=nike" className="block relative rounded-lg overflow-hidden group">
-                <img src={nikeDunkAd} alt="Nike Dunk Low" className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover" />
-                <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
+              <Link to="/shop?brand=nike" className="block relative rounded-lg overflow-hidden group bg-white">
+                <img src={nikeDunkAd} alt="Nike Dunk Low" className="w-full object-contain" />
+                <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2">
                   <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
                     Shop Now →
                   </span>
