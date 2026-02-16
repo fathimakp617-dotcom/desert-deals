@@ -4,7 +4,7 @@ import desertDealLogo from "@/assets/desert-deal-logo-dark.png";
 
 const Footer = memo(() => {
   return (
-    <footer className="bg-[#1a1a1a] text-white">
+    <footer className="bg-black text-white">
       <div className="container mx-auto px-6 lg:px-12 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16">
           {/* Logo */}
