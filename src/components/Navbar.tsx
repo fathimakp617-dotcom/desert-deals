@@ -100,7 +100,7 @@ const Navbar = memo(() => {
       </div>
 
       {/* Main Header - sticky with shadow */}
-      <header className={`fixed top-9 left-0 right-0 z-50 bg-background border-b border-border transition-shadow duration-300 ${scrolled ? "shadow-md" : ""}`}>
+      <header className={`fixed top-9 left-0 right-0 z-50 bg-background border-b border-border rounded-b-xl transition-shadow duration-300 ${scrolled ? "shadow-md" : ""}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center h-12 sm:h-14">
             {/* Mobile hamburger */}
@@ -115,7 +115,7 @@ const Navbar = memo(() => {
 
             {/* Logo */}
             <Link to="/" className="flex items-center shrink-0 mr-8 lg:mr-12">
-              <img src={logoImg} alt="Desert Deal" className="h-8 sm:h-10 w-auto object-contain" />
+              <img src={logoImg} alt="Desert Deal" className="h-10 sm:h-12 w-auto object-contain" />
             </Link>
 
             {/* Desktop Row 1 nav links */}
