@@ -226,7 +226,7 @@ const ProductDetail = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.5 }}
-                      className="absolute inset-0 w-full h-full object-contain object-center p-2"
+                      className="absolute inset-0 w-full h-full object-contain sm:object-cover object-center"
                     />
                   </AnimatePresence>
                 </div>
