@@ -54,7 +54,7 @@ const Navbar = memo(() => {
       {/* Main Header - matches site-header header-type1 sticky-header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex items-center justify-between h-16 sm:h-20">
+          <div className="flex items-center h-10 sm:h-12">
             {/* Mobile: hamburger menu */}
             <div className="md:hidden flex items-center">
               <button
@@ -66,17 +66,17 @@ const Navbar = memo(() => {
             </div>
 
             {/* Logo - matches site-brand */}
-            <Link to="/" className="flex items-center shrink-0">
-              <img src={logoImg} alt="Desert Deal" className="h-7 sm:h-9 w-auto object-contain" />
+            <Link to="/" className="flex items-center shrink-0 mr-8">
+              <img src={logoImg} alt="Desert Deal" className="h-5 sm:h-6 w-auto object-contain" />
             </Link>
 
-            {/* Desktop nav - matches site-nav site-menu (wrapping) */}
-            <div className="hidden lg:flex items-center flex-wrap gap-x-6 gap-y-1 max-w-[750px] xl:max-w-[950px]">
+            {/* Desktop nav - single row */}
+            <div className="hidden lg:flex items-center gap-x-5 flex-1 overflow-x-auto no-scrollbar">
               {menuLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="text-sm text-foreground hover:opacity-60 transition-opacity whitespace-nowrap leading-[44px] font-medium"
+                  className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
                 >
                   {link.name}
                 </Link>
@@ -84,7 +84,7 @@ const Navbar = memo(() => {
             </div>
 
             {/* Action icons - matches site-actions */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1 sm:gap-2 ml-auto shrink-0">
               {/* Search */}
               <Link
                 to="/shop"
