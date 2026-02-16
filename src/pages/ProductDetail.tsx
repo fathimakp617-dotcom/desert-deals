@@ -194,7 +194,7 @@ const ProductDetail = () => {
         {/* Product Hero */}
         <section className="py-4 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
+            <div className="grid lg:grid-cols-2 gap-6 lg:gap-16">
               {/* Image Gallery */}
               <motion.div
                 initial="hidden"
@@ -203,7 +203,7 @@ const ProductDetail = () => {
                 className="space-y-4"
               >
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden border border-border/50 bg-card/50">
+                <div className="relative aspect-[3/2] sm:aspect-square overflow-hidden border border-border/50 bg-card/50">
                   <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-primary/60 z-10" />
                   <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-primary/60 z-10" />
                   <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-primary/60 z-10" />
