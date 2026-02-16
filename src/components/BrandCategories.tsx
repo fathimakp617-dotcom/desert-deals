@@ -4,21 +4,21 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Exact brands from original HTML with product counts
 const brands = [
-  { name: "Puma", count: 14, slug: "puma", initials: "PM" },
-  { name: "Onitsuka Tiger", count: 15, slug: "onitsuka-tiger", initials: "OT" },
-  { name: "On Cloud", count: 169, slug: "on-cloud", initials: "OC" },
-  { name: "Nike", count: 203, slug: "nike", initials: "NK" },
-  { name: "New Balance", count: 111, slug: "new-balance", initials: "NB" },
-  { name: "Louis Vuitton", count: 13, slug: "louis-vuitton", initials: "LV" },
-  { name: "Loro Piana", count: 9, slug: "loro-piana", initials: "LP" },
-  { name: "Jordan", count: 110, slug: "jordan", initials: "JD" },
-  { name: "Hoka", count: 47, slug: "hoka", initials: "HK" },
-  { name: "Hermes", count: 2, slug: "hermes", initials: "HM" },
-  { name: "Gucci", count: 12, slug: "gucci", initials: "GC" },
-  { name: "Dior", count: 3, slug: "dior", initials: "DR" },
-  { name: "Basketball Shoes", count: 36, slug: "basketball", initials: "BS" },
-  { name: "Asics", count: 94, slug: "asics", initials: "AS" },
-  { name: "Adidas", count: 72, slug: "adidas", initials: "AD" },
+  { name: "Puma", count: 14, slug: "puma", logo: "https://logo.clearbit.com/puma.com" },
+  { name: "Onitsuka Tiger", count: 15, slug: "onitsuka-tiger", logo: "https://logo.clearbit.com/onitsukatiger.com" },
+  { name: "On Cloud", count: 169, slug: "on-cloud", logo: "https://logo.clearbit.com/on-running.com" },
+  { name: "Nike", count: 203, slug: "nike", logo: "https://logo.clearbit.com/nike.com" },
+  { name: "New Balance", count: 111, slug: "new-balance", logo: "https://logo.clearbit.com/newbalance.com" },
+  { name: "Louis Vuitton", count: 13, slug: "louis-vuitton", logo: "https://logo.clearbit.com/louisvuitton.com" },
+  { name: "Loro Piana", count: 9, slug: "loro-piana", logo: "https://logo.clearbit.com/loropiana.com" },
+  { name: "Jordan", count: 110, slug: "jordan", logo: "https://logo.clearbit.com/jordan.com" },
+  { name: "Hoka", count: 47, slug: "hoka", logo: "https://logo.clearbit.com/hoka.com" },
+  { name: "Hermes", count: 2, slug: "hermes", logo: "https://logo.clearbit.com/hermes.com" },
+  { name: "Gucci", count: 12, slug: "gucci", logo: "https://logo.clearbit.com/gucci.com" },
+  { name: "Dior", count: 3, slug: "dior", logo: "https://logo.clearbit.com/dior.com" },
+  { name: "Basketball Shoes", count: 36, slug: "basketball", logo: "https://logo.clearbit.com/nba.com" },
+  { name: "Asics", count: 94, slug: "asics", logo: "https://logo.clearbit.com/asics.com" },
+  { name: "Adidas", count: 72, slug: "adidas", logo: "https://logo.clearbit.com/adidas.com" },
 ];
 
 const BrandCategories = memo(() => {
@@ -75,8 +75,13 @@ const BrandCategories = memo(() => {
 
                 {/* Brand image placeholder - matching category-block-image */}
                 <div className="my-4 flex items-center justify-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-background flex items-center justify-center text-foreground font-heading font-bold text-lg sm:text-xl">
-                    {brand.initials}
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-background flex items-center justify-center p-2">
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                    />
                   </div>
                 </div>
 
