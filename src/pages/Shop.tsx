@@ -20,7 +20,7 @@ import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePaginatedProducts } from "@/hooks/usePaginatedProducts";
 import ProductCard from "@/components/ProductCard";
-import { motion } from "framer-motion";
+
 
 const categories = [
   "All", "Nike", "Jordan", "New Balance", "On Cloud", "Asics", "Adidas",
@@ -311,13 +311,8 @@ const Shop = () => {
                     ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4"
                     : "flex flex-col gap-4"
                 }>
-                  {products.map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.03, duration: 0.3 }}
-                    >
+                  {products.map((product) => (
+                    <div key={product.id}>
                       <ProductCard
                         product={product}
                         soldOut={isProductSoldOut(stockMap, product.id)}
@@ -325,7 +320,7 @@ const Shop = () => {
                         onToggleWishlist={handleToggleWishlist}
                         viewMode={viewMode}
                       />
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               )}
