@@ -2,16 +2,18 @@ import { useState, useEffect, useCallback, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import slide5 from "@/assets/banners/slide-5.jpg";
-import slide6 from "@/assets/banners/slide-6.png";
-import slide7 from "@/assets/banners/slide-7.jpg";
-import slide8 from "@/assets/banners/slide-8.webp";
+import promo1 from "@/assets/banners/promo-1.webp";
+import promo2 from "@/assets/banners/promo-2.webp";
+import promo3 from "@/assets/banners/promo-3.webp";
+import promo4 from "@/assets/banners/promo-4.webp";
+import promo5 from "@/assets/banners/promo-5.webp";
 
 const banners = [
-  { image: slide5, alt: "Comfort and High Performance Shoes" },
-  { image: slide6, alt: "Ramadan Collection - Best Sellers" },
-  { image: slide7, alt: "On Cloud - Engineered for Comfort" },
-  { image: slide8, alt: "Ramadan Season - Nike Collection" },
+  { image: promo1, alt: "Adidas Originals Samba" },
+  { image: promo2, alt: "Asics Gel-Kayano 14" },
+  { image: promo3, alt: "New Balance 9060" },
+  { image: promo4, alt: "Nike Dunk Low" },
+  { image: promo5, alt: "New Balance 530" },
 ];
 
 const PromoBanner = memo(() => {
