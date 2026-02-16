@@ -37,9 +37,10 @@ const Hero = memo(() => {
     return () => clearInterval(timer);
   }, [nextSlide]);
 
+  {/* top offset: announcement bar (36px) + nav row1 (48-56px) + nav row2 (~28px) */}
   return (
-    <section id="home" className="relative w-full mt-[56px] sm:mt-[64px]">
-      <div className="relative w-full h-[300px] sm:h-[500px] lg:h-[calc(100vh-80px)] overflow-hidden mx-auto cursor-pointer" onClick={() => navigate("/shop")}>
+    <section id="home" className="relative w-full mt-[100px] sm:mt-[116px]">
+      <div className="relative w-full h-[300px] sm:h-[500px] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer" onClick={() => navigate("/shop")}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -60,20 +61,27 @@ const Hero = memo(() => {
           </motion.div>
         </AnimatePresence>
 
+        {/* Text Overlay */}
+        <div className="absolute inset-0 flex items-end justify-center pb-16 sm:pb-24 z-10 pointer-events-none">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-heading font-semibold text-white drop-shadow-lg text-center px-4" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.5)" }}>
+            Shop With Confidence and Convenience
+          </h2>
+        </div>
+
         {/* Navigation Arrows */}
         <button
           onClick={(e) => { e.stopPropagation(); prevSlide(); }}
-          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white transition-colors bg-black/20 rounded-full p-1"
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 text-foreground bg-background/80 hover:bg-background rounded-full p-2 transition-colors shadow"
           aria-label="Previous slide"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2} />
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); nextSlide(); }}
-          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white transition-colors bg-black/20 rounded-full p-1"
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 text-foreground bg-background/80 hover:bg-background rounded-full p-2 transition-colors shadow"
           aria-label="Next slide"
         >
-          <ChevronRight className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2} />
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
         </button>
 
         {/* Dots */}

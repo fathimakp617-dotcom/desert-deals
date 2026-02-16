@@ -1,4 +1,4 @@
-import { useState, memo, useEffect } from "react";
+import { useState, memo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingBag, Heart, User, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -7,13 +7,13 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import logoImg from "@/assets/logo.png";
 
 const announcements = [
+  "Ramadan Sale Live Now - Up To 75% Off →",
   "COD Available Across the UAE →",
   "Free Shipping on All Orders →",
-  "Premium Shoes & Accessories →",
 ];
 
-// Exact nav menu from original HTML
-const menuLinks = [
+// Row 1 nav links
+const topLinks = [
   { name: "All Shoes", href: "/shop" },
   { name: "Nike", href: "/shop?brand=nike" },
   { name: "Running Shoes", href: "/shop?brand=running" },
@@ -25,6 +25,10 @@ const menuLinks = [
   { name: "Adidas", href: "/shop?brand=adidas" },
   { name: "Hoka", href: "/shop?brand=hoka" },
   { name: "Onitsuka Tiger", href: "/shop?brand=onitsuka-tiger" },
+];
+
+// Row 2 nav links
+const bottomLinks = [
   { name: "Puma", href: "/shop?brand=puma" },
   { name: "Loro Piana", href: "/shop?brand=loro-piana" },
   { name: "Louis Vuitton", href: "/shop?brand=louis-vuitton" },
@@ -34,29 +38,68 @@ const menuLinks = [
   { name: "Reviews", href: "/#collection" },
 ];
 
+const allLinks = [...topLinks, ...bottomLinks];
+
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setAnnouncementIndex((prev) => (prev + 1) % announcements.length);
-    }, 4000);
-    return () => clearInterval(timer);
+  const nextAnnouncement = useCallback(() => {
+    setAnnouncementIndex((prev) => (prev + 1) % announcements.length);
   }, []);
+
+  const prevAnnouncement = useCallback(() => {
+    setAnnouncementIndex((prev) => (prev - 1 + announcements.length) % announcements.length);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(nextAnnouncement, 4000);
+    return () => clearInterval(timer);
+  }, [nextAnnouncement]);
 
   return (
     <>
-      {/* Announcement Bar - not present in original HTML header but keep for consistency */}
+      {/* Announcement Bar - black bar at very top */}
+      <div className="fixed top-0 left-0 right-0 z-[60] bg-foreground text-background">
+        <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
+          <button
+            onClick={prevAnnouncement}
+            className="absolute left-4 text-background/70 hover:text-background transition-colors"
+            aria-label="Previous announcement"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={announcementIndex}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3 }}
+              className="text-xs sm:text-sm font-medium tracking-wide"
+            >
+              {announcements[announcementIndex]}
+            </motion.span>
+          </AnimatePresence>
+          <button
+            onClick={nextAnnouncement}
+            className="absolute right-4 text-background/70 hover:text-background transition-colors"
+            aria-label="Next announcement"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
 
-      {/* Main Header - matches site-header header-type1 sticky-header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+      {/* Main Header */}
+      <header className="fixed top-9 left-0 right-0 z-50 bg-background border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex items-center h-14 sm:h-16">
-            {/* Mobile: hamburger menu */}
-            <div className="md:hidden flex items-center">
+          {/* Top section: Logo + Row 1 links + Icons */}
+          <div className="flex items-center h-12 sm:h-14">
+            {/* Mobile hamburger */}
+            <div className="lg:hidden flex items-center">
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="p-2 text-foreground"
@@ -65,14 +108,14 @@ const Navbar = memo(() => {
               </button>
             </div>
 
-            {/* Logo - matches site-brand */}
+            {/* Logo */}
             <Link to="/" className="flex items-center shrink-0 mr-8">
               <img src={logoImg} alt="Desert Deal" className="h-7 sm:h-9 w-auto object-contain" />
             </Link>
 
-            {/* Desktop nav - single row */}
+            {/* Desktop Row 1 nav links */}
             <div className="hidden lg:flex items-center gap-x-5 flex-1 overflow-x-auto no-scrollbar">
-              {menuLinks.map((link) => (
+              {topLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
@@ -83,17 +126,14 @@ const Navbar = memo(() => {
               ))}
             </div>
 
-            {/* Action icons - matches site-actions */}
+            {/* Action icons */}
             <div className="flex items-center gap-1 sm:gap-2 ml-auto shrink-0">
-              {/* Search */}
               <Link
                 to="/shop"
                 className="hidden sm:flex p-2 text-foreground hover:opacity-60 transition-opacity"
               >
                 <Search size={20} />
               </Link>
-
-              {/* Wishlist - matches wishlist-toggle */}
               <Link
                 to="/wishlist"
                 className="relative p-2 text-foreground hover:opacity-60 transition-opacity"
@@ -105,8 +145,6 @@ const Navbar = memo(() => {
                   </span>
                 )}
               </Link>
-
-              {/* Cart - matches cart-toggle with custom SVG */}
               <button
                 onClick={() => openCart()}
                 className="relative p-2 text-foreground hover:opacity-60 transition-opacity"
@@ -118,8 +156,6 @@ const Navbar = memo(() => {
                   </span>
                 )}
               </button>
-
-              {/* Account - desktop */}
               <Link
                 to="/account"
                 className="hidden md:flex p-2 text-foreground hover:opacity-60 transition-opacity"
@@ -128,9 +164,22 @@ const Navbar = memo(() => {
               </Link>
             </div>
           </div>
+
+          {/* Desktop Row 2 nav links */}
+          <div className="hidden lg:flex items-center gap-x-5 pb-2">
+            {bottomLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.href}
+                className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Mobile Menu - matches site-drawer menu */}
+        {/* Mobile Menu */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -140,7 +189,7 @@ const Navbar = memo(() => {
               className="lg:hidden bg-background border-t border-border max-h-[70vh] overflow-y-auto"
             >
               <div className="container mx-auto px-6 py-4 flex flex-col gap-3">
-                {menuLinks.map((link) => (
+                {allLinks.map((link) => (
                   <Link
                     key={link.name}
                     to={link.href}
