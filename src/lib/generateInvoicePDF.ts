@@ -45,7 +45,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   doc.rect(0, 0, pageWidth, 58, "F");
 
   // Try to load and add logo
-  const logoUrl = "https://ryanadamperfume.lovable.app/lovable-uploads/eb8b7d91-8b18-4a81-a5e1-9d3f91d4f7df.png";
+  const logoUrl = "https://desert-deals.lovable.app/favicon.png";
   
   try {
     const response = await fetch(logoUrl);
