@@ -1,12 +1,11 @@
 import { memo } from "react";
-import { Shield, Truck, RotateCcw, Lock } from "lucide-react";
+import { Headphones, Truck, RotateCcw, CreditCard } from "lucide-react";
 
-// Exact features from original HTML footer iconboxes
 const features = [
   {
-    icon: Shield,
-    title: "Quality Promise",
-    description: "100% authentic products sourced from authorized distributors.",
+    icon: Headphones,
+    title: "Customer service",
+    description: "Friendly and responsive support, always ready to assist.",
   },
   {
     icon: Truck,
@@ -19,7 +18,7 @@ const features = [
     description: "Free returns for damaged items within days.",
   },
   {
-    icon: Lock,
+    icon: CreditCard,
     title: "Secure payment",
     description: "Secure payment: COD (cash only) or online card payment",
   },
@@ -27,19 +26,19 @@ const features = [
 
 const FeaturesBar = memo(() => {
   return (
-    <section className="py-8 sm:py-12 border-t border-border bg-background">
+    <section className="py-10 sm:py-14 border-t border-border bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature) => (
-            <div key={feature.title} className="flex items-center gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                <feature.icon className="w-5 h-5 text-foreground" />
+            <div key={feature.title} className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <feature.icon className="w-10 h-10 text-foreground" strokeWidth={1.2} />
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-foreground leading-tight">
+                <h4 className="text-sm font-bold text-foreground leading-tight">
                   {feature.title}
                 </h4>
-                <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                   {feature.description}
                 </p>
               </div>
