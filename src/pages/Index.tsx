@@ -134,9 +134,7 @@ const Index = () => {
             <NewBalancePromoGrid />
           </Suspense>
 
-          <Suspense fallback={<SectionLoader />}>
-            <Contact />
-          </Suspense>
+          {/* Placeholder for replacement section - user will share */}
 
           <Suspense fallback={<SectionLoader />}>
             <FeaturesBar />
