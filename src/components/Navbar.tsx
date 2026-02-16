@@ -1,7 +1,7 @@
-import { useState, memo, useEffect, useCallback } from "react";
+import { useState, memo, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingBag, Heart, User, Search, ChevronLeft, ChevronRight } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import logoImg from "@/assets/logo.png";
@@ -40,10 +40,14 @@ const allLinks = [...topLinks, ...bottomLinks];
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
+  const navigate = useNavigate();
 
   const nextAnnouncement = useCallback(() => {
     setAnnouncementIndex((prev) => (prev + 1) % announcements.length);
@@ -64,6 +68,15 @@ const Navbar = memo(() => {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Close search on Esc
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); }
+    };
+    if (searchOpen) window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [searchOpen]);
 
   return (
     <>
@@ -133,12 +146,12 @@ const Navbar = memo(() => {
 
             {/* Action icons - Search visible on ALL screen sizes now (#1) */}
             <div className="flex items-center gap-1 sm:gap-2 ml-auto shrink-0">
-              <Link
-                to="/shop"
+              <button
+                onClick={() => { setSearchOpen(true); setTimeout(() => searchInputRef.current?.focus(), 100); }}
                 className="p-2 text-foreground hover:opacity-60 transition-opacity"
               >
                 <Search size={20} />
-              </Link>
+              </button>
               <Link
                 to="/wishlist"
                 className="relative p-2 text-foreground hover:opacity-60 transition-opacity"
@@ -219,6 +232,58 @@ const Navbar = memo(() => {
           )}
         </AnimatePresence>
       </header>
+      {/* Search Overlay */}
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] bg-background/95 backdrop-blur-sm flex items-start justify-center pt-32"
+            onClick={() => setSearchOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="w-full max-w-lg mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim()) {
+                    navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                  }
+                }}
+                className="relative"
+              >
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full h-14 pl-12 pr-12 text-lg bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground placeholder:text-muted-foreground"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X size={20} />
+                </button>
+              </form>
+              <p className="text-sm text-muted-foreground mt-3 text-center">
+                Press Enter to search or Esc to close
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 });
