@@ -66,8 +66,8 @@ const Navbar = memo(() => {
             </div>
 
             {/* Logo - matches site-brand */}
-            <Link to="/" className="flex items-center">
-              <img src={logoImg} alt="Desert Deal" className="h-8 sm:h-10" />
+            <Link to="/" className="flex items-center shrink-0">
+              <img src={logoImg} alt="Desert Deal" className="h-6 sm:h-8 w-auto object-contain" />
             </Link>
 
             {/* Desktop nav - matches site-nav site-menu (wrapping) */}
