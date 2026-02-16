@@ -288,7 +288,7 @@ const ProductDetail = () => {
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`h-10 sm:h-12 border text-sm font-medium transition-all duration-200 rounded-md ${
+                        className={`h-8 sm:h-10 border text-xs sm:text-sm font-medium transition-all duration-200 rounded-md ${
                           selectedSize === size
                             ? "border-foreground bg-foreground text-background"
                             : "border-border hover:border-foreground text-foreground"
