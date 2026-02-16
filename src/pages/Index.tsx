@@ -15,7 +15,7 @@ const PromoBanner = lazy(() => import("@/components/PromoBanner"));
 const PromoGrid = lazy(() => import("@/components/PromoGrid"));
 const TopSellers = lazy(() => import("@/components/TopSellers"));
 const About = lazy(() => import("@/components/About"));
-const Contact = lazy(() => import("@/components/Contact"));
+const Testimonials = lazy(() => import("@/components/Testimonials"));
 const BrandProductRow = lazy(() => import("@/components/BrandProductRow"));
 const NewBalancePromoGrid = lazy(() => import("@/components/NewBalancePromoGrid"));
 const FeaturesBar = lazy(() => import("@/components/FeaturesBar"));
@@ -134,7 +134,9 @@ const Index = () => {
             <NewBalancePromoGrid />
           </Suspense>
 
-          {/* Placeholder for replacement section - user will share */}
+          <Suspense fallback={<SectionLoader />}>
+            <Testimonials />
+          </Suspense>
 
           <Suspense fallback={<SectionLoader />}>
             <FeaturesBar />
