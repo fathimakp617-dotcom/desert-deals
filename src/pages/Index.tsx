@@ -8,6 +8,7 @@ import { OrganizationSchema, LocalBusinessSchema, WebsiteSchema, FAQSchema } fro
 // Lazy load below-fold components - exact page order from HTML
 const BrandCategories = lazy(() => import("@/components/BrandCategories"));
 const PromoBanner = lazy(() => import("@/components/PromoBanner"));
+const PromoGrid = lazy(() => import("@/components/PromoGrid"));
 const TopSellers = lazy(() => import("@/components/TopSellers"));
 const About = lazy(() => import("@/components/About"));
 const Contact = lazy(() => import("@/components/Contact"));
@@ -79,7 +80,10 @@ const Index = () => {
             <TopSellers />
           </Suspense>
           
-          
+          <Suspense fallback={<SectionLoader />}>
+            <PromoGrid />
+          </Suspense>
+
           <Suspense fallback={<SectionLoader />}>
             <Contact />
           </Suspense>
