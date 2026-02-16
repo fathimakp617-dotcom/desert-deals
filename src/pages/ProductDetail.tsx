@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Heart, Share2, Truck, Shield, RotateCcw, Star, ShoppingBag, PenLine, Zap, AlertCircle, Loader2, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductReviews from "@/components/ProductReviews";
@@ -33,6 +33,9 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
+  const [showDescription, setShowDescription] = useState(true);
+  const [showSpecification, setShowSpecification] = useState(false);
+  const [showAdditional, setShowAdditional] = useState(false);
   const { addToCart, buyNow } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { data: stockMap } = useProductStock();
@@ -358,119 +361,93 @@ const ProductDetail = () => {
                     <Heart className={`w-5 h-5 ${inWishlist ? "fill-primary text-primary" : ""}`} />
                   </Button>
                 </motion.div>
+
+                {/* Description - inline */}
+                <motion.div variants={staggerItem} className="space-y-3 pt-4">
+                  <button
+                    onClick={() => setShowDescription(!showDescription)}
+                    className="flex items-center justify-between w-full text-left border-b border-border/50 pb-3"
+                  >
+                    <span className="text-base font-heading font-semibold underline">Description</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showDescription ? "rotate-180" : ""}`} />
+                  </button>
+                  {showDescription && (
+                    <div className="pt-2">
+                      <p className="text-muted-foreground leading-relaxed text-sm">
+                        {product.story || product.description}
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+
+                {/* Specification - collapsible */}
+                <motion.div variants={staggerItem} className="space-y-3">
+                  <button
+                    onClick={() => setShowSpecification(!showSpecification)}
+                    className="flex items-center justify-between w-full text-left border-b border-border/50 pb-3"
+                  >
+                    <span className="text-base font-heading text-muted-foreground">Specification</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showSpecification ? "rotate-180" : ""}`} />
+                  </button>
+                  {showSpecification && (
+                    <div className="pt-2 space-y-2 text-sm">
+                      <div className="flex justify-between py-2 border-b border-border/20">
+                        <span className="text-muted-foreground">Category</span>
+                        <span className="text-foreground">{product.category}</span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-border/20">
+                        <span className="text-muted-foreground">Available Sizes</span>
+                        <span className="text-foreground">{product.size}</span>
+                      </div>
+                      {product.occasion.length > 0 && (
+                        <div className="flex justify-between py-2 border-b border-border/20">
+                          <span className="text-muted-foreground">Best For</span>
+                          <span className="text-foreground">{product.occasion.join(", ")}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </motion.div>
+
+                {/* Additional Information - collapsible */}
+                <motion.div variants={staggerItem} className="space-y-3">
+                  <button
+                    onClick={() => setShowAdditional(!showAdditional)}
+                    className="flex items-center justify-between w-full text-left border-b border-border/50 pb-3"
+                  >
+                    <span className="text-base font-heading text-muted-foreground">Additional information</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showAdditional ? "rotate-180" : ""}`} />
+                  </button>
+                  {showAdditional && (
+                    <div className="pt-2 space-y-2 text-sm">
+                      {product.ingredients.length > 0 && (
+                        <div className="flex justify-between py-2 border-b border-border/20">
+                          <span className="text-muted-foreground">Materials</span>
+                          <span className="text-foreground">{product.ingredients.join(", ")}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between py-2 border-b border-border/20">
+                        <span className="text-muted-foreground">Comfort</span>
+                        <span className="text-foreground">{product.longevity}</span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-border/20">
+                        <span className="text-muted-foreground">Fit</span>
+                        <span className="text-foreground">{product.sillage}</span>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+
               </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Product Details Tabs */}
-        <section className="py-12 sm:py-16 bg-card/30">
+        {/* Reviews Section */}
+        <section className="py-12 sm:py-16 bg-card/30" id="reviews-section">
           <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeInUp}
-            >
-              <Tabs defaultValue="description" className="w-full">
-                <TabsList className="w-full justify-start bg-transparent border-b border-border/50 rounded-none h-auto p-0 gap-4 sm:gap-8 flex-wrap">
-                  <TabsTrigger 
-                    value="description" 
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-4 text-xs sm:text-sm tracking-wider"
-                  >
-                    DESCRIPTION
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="details" 
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-4 text-xs sm:text-sm tracking-wider"
-                  >
-                    DETAILS
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="reviews" 
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-0 pb-4 text-xs sm:text-sm tracking-wider"
-                  >
-                    REVIEWS
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="description" className="pt-8">
-                  <div className="max-w-3xl">
-                    <h3 className="text-2xl font-heading mb-4">About {product.name}</h3>
-                    <p className="text-muted-foreground leading-relaxed text-lg">
-                      {product.story}
-                    </p>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="details" className="pt-8">
-                  <div className="grid sm:grid-cols-2 gap-8 max-w-3xl">
-                    <div className="space-y-4">
-                      <div className="flex justify-between py-3 border-b border-border/30">
-                        <span className="text-muted-foreground">Category</span>
-                        <span className="text-foreground">{product.category}</span>
-                      </div>
-                      <div className="flex justify-between py-3 border-b border-border/30">
-                        <span className="text-muted-foreground">Available Sizes</span>
-                        <span className="text-foreground">{product.size}</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="py-3 border-b border-border/30">
-                        <span className="text-muted-foreground block mb-2">Best For</span>
-                        <div className="flex flex-wrap gap-2">
-                          {product.occasion.map((o) => (
-                            <span key={o} className="px-3 py-1 bg-card border border-border/50 text-sm">
-                              {o}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="py-3 border-b border-border/30">
-                        <span className="text-muted-foreground block mb-2">Materials</span>
-                        <div className="flex flex-wrap gap-2">
-                          {product.ingredients.map((m) => (
-                            <span key={m} className="px-3 py-1 bg-card border border-border/50 text-sm">
-                              {m}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="reviews" className="pt-8" id="reviews-section">
-                  <ProductReviews productId={product.id} />
-                </TabsContent>
-              </Tabs>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Product Gallery Grid */}
-        <section className="py-12 sm:py-16">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <h2 className="text-2xl font-heading mb-6">Product Images</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-              {(product.gallery.length > 1 ? product.gallery : [product.image]).map((img, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="aspect-square overflow-hidden border border-border/30 rounded-lg cursor-pointer"
-                  onClick={() => {
-                    setSelectedImage(idx);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  <img src={img} alt={`${product.name} view ${idx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" loading="lazy" />
-                </motion.div>
-              ))}
-            </div>
+            <h2 className="text-2xl font-heading mb-6">Reviews</h2>
+            <ProductReviews productId={product.id} />
           </div>
         </section>
 
