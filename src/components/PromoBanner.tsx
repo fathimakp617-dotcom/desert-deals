@@ -37,7 +37,7 @@ const PromoBanner = memo(() => {
     <section className="py-2 sm:py-4 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
         <div
-          className="relative w-full aspect-[3/1] rounded-lg overflow-hidden cursor-pointer"
+          className="relative w-full aspect-[5/1] sm:aspect-[4/1] rounded-lg overflow-hidden cursor-pointer bg-muted"
           onClick={() => navigate("/shop")}
         >
           <AnimatePresence mode="wait">
@@ -52,7 +52,7 @@ const PromoBanner = memo(() => {
               <img
                 src={banners[current].image}
                 alt={banners[current].alt}
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-contain"
                 loading="lazy"
                 decoding="async"
               />
