@@ -4,6 +4,7 @@ import { Menu, X, ShoppingBag, Heart, User, Search, ChevronLeft, ChevronRight } 
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
+import logoImg from "@/assets/logo.png";
 
 const announcements = [
   "COD Available Across the UAE →",
@@ -66,9 +67,7 @@ const Navbar = memo(() => {
 
             {/* Logo - matches site-brand */}
             <Link to="/" className="flex items-center">
-              <span className="text-lg sm:text-xl font-heading font-bold tracking-tight text-foreground uppercase">
-                DESERT DEAL
-              </span>
+              <img src={logoImg} alt="Desert Deal" className="h-8 sm:h-10" />
             </Link>
 
             {/* Desktop nav - matches site-nav site-menu (wrapping) */}
