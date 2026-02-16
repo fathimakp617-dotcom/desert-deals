@@ -1,5 +1,5 @@
-# Robots.txt for Rayn Adam Luxury Perfumes
-# https://raynadamperfume.com
+# Robots.txt for Desert Deal
+# https://desertsdeals.com
 
 User-agent: *
 Allow: /
@@ -17,4 +17,4 @@ Allow: /contact
 Allow: /about
 
 # Sitemap location
-Sitemap: https://raynadamperfume.com/sitemap.xml
+Sitemap: https://desertsdeals.com/sitemap.xml
