@@ -35,7 +35,7 @@ const PromoBanner = memo(() => {
     <section className="py-2 sm:py-4 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
         <div
-          className="relative w-full h-[200px] sm:h-[520px] lg:h-[820px] rounded-lg overflow-hidden cursor-pointer"
+          className="relative w-full aspect-[3/1] rounded-lg overflow-hidden cursor-pointer"
           onClick={() => navigate("/shop")}
         >
           <AnimatePresence mode="wait">
