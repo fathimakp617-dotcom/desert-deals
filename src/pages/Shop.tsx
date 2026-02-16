@@ -306,46 +306,28 @@ const Shop = () => {
 
               {/* #11: Products Grid with slide-in animation, #5: 6 columns on desktop */}
               {!isLoading && products.length > 0 && (
-                viewMode === "list" ? (
-                  <div className="flex flex-col gap-4">
-                    {products.map((product, index) => (
-                      <motion.div
-                        key={product.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.03, duration: 0.3 }}
-                      >
-                        <ProductCard
-                          product={product}
-                          soldOut={isProductSoldOut(stockMap, product.id)}
-                          inWishlist={isInWishlist(product.id)}
-                          onToggleWishlist={handleToggleWishlist}
-                          viewMode={viewMode}
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex overflow-x-auto gap-3 sm:gap-4 no-scrollbar pb-2 -mr-4 sm:-mr-6 lg:-mr-12">
-                    {products.map((product, index) => (
-                      <motion.div
-                        key={product.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.03, duration: 0.3 }}
-                        className="flex-shrink-0 w-[calc(50%-6px)] sm:w-[calc(33.333%-8px)] lg:w-[calc(16.666%-10px)]"
-                      >
-                        <ProductCard
-                          product={product}
-                          soldOut={isProductSoldOut(stockMap, product.id)}
-                          inWishlist={isInWishlist(product.id)}
-                          onToggleWishlist={handleToggleWishlist}
-                          viewMode={viewMode}
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
-                )
+                <div className={
+                  viewMode === "grid"
+                    ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4"
+                    : "flex flex-col gap-4"
+                }>
+                  {products.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.03, duration: 0.3 }}
+                    >
+                      <ProductCard
+                        product={product}
+                        soldOut={isProductSoldOut(stockMap, product.id)}
+                        inWishlist={isInWishlist(product.id)}
+                        onToggleWishlist={handleToggleWishlist}
+                        viewMode={viewMode}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
               )}
 
               {/* Empty State */}
