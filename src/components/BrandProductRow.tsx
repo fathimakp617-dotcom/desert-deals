@@ -126,7 +126,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                         </div>
                       </div>
 
-                      <div className="p-3 sm:p-4">
+                      <div className="p-3 sm:p-4 bg-muted rounded-b-lg">
                         <div className="flex flex-wrap gap-1 mb-1.5">
                           <span className="text-[10px] text-muted-foreground">{product.category}</span>
                         </div>
