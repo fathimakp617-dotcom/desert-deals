@@ -153,7 +153,7 @@ serve(async (req) => {
           : "";
 
         await resend.emails.send({
-          from: "Rayn Adam <onboarding@resend.dev>",
+          from: "Desert Deal <onboarding@resend.dev>",
           to: [customer_email],
           subject: `🎁 ${couponDescription} - Thank you for your order!`,
           html: `
@@ -167,8 +167,8 @@ serve(async (req) => {
               <div style="max-width: 600px; margin: 0 auto; background-color: #0d0d0d;">
                 <!-- Header -->
                 <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 40px 30px; text-align: center; border-bottom: 2px solid #c9a962;">
-                  <h1 style="color: #c9a962; margin: 0; font-size: 28px; font-weight: normal; letter-spacing: 3px;">RAYN ADAM</h1>
-                  <p style="color: #888; margin: 8px 0 0 0; font-size: 12px; letter-spacing: 2px;">LUXURY PERFUMES</p>
+                  <h1 style="color: #c9a962; margin: 0; font-size: 28px; font-weight: normal; letter-spacing: 3px;">DESERT DEAL</h1>
+                  <p style="color: #888; margin: 8px 0 0 0; font-size: 12px; letter-spacing: 2px;">PREMIUM FOOTWEAR</p>
                 </div>
                 
                 <!-- Content -->
@@ -201,7 +201,7 @@ serve(async (req) => {
                     Use this code on your next purchase to enjoy your exclusive discount!
                   </p>
                   
-                  <a href="https://raynadam.com/shop" style="display: inline-block; background: linear-gradient(135deg, #c9a962 0%, #a88a4a 100%); color: #1a1a1a; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-weight: bold; letter-spacing: 1px; margin-top: 20px;">
+                  <a href="https://desertsdeals.com/shop" style="display: inline-block; background: linear-gradient(135deg, #c9a962 0%, #a88a4a 100%); color: #1a1a1a; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-weight: bold; letter-spacing: 1px; margin-top: 20px;">
                     SHOP NOW
                   </a>
                 </div>
@@ -209,7 +209,7 @@ serve(async (req) => {
                 <!-- Footer -->
                 <div style="background-color: #1a1a1a; padding: 30px; text-align: center; border-top: 1px solid #333;">
                   <p style="color: #888; font-size: 12px; margin: 0;">
-                    © 2026 Rayn Adam Luxury Perfumes. All rights reserved.
+                    © 2026 Desert Deal. All rights reserved.
                   </p>
                 </div>
               </div>

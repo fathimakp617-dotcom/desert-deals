@@ -317,7 +317,7 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
   doc.setLineWidth(2);
   doc.rect(margin - 10, 30, contentWidth + 20, 700);
 
-  // Header - RAYN ADAM
+  // Header - DESERT DEAL
   doc.setFontSize(28);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...darkColor);

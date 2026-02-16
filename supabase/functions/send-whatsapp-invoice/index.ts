@@ -120,8 +120,8 @@ const generateInvoiceMessage = (data: InvoiceRequest): string => {
   });
 
   const items = data.items || [
-    { name: "RAYN ADAM Elite EDP 50ml", quantity: 1, price: 299 },
-    { name: "RAYN ADAM Amber Crown Attar 6ml", quantity: 1, price: 199 }
+    { name: "Desert Deal Premium Sneakers", quantity: 1, price: 299 },
+    { name: "Desert Deal Running Shoes", quantity: 1, price: 199 }
   ];
 
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -133,7 +133,7 @@ const generateInvoiceMessage = (data: InvoiceRequest): string => {
 
   const message = `
 ━━━━━━━━━━━━━━━━━━━━━
-🧾 *RAYN ADAM - INVOICE*
+🧾 *DESERT DEAL - INVOICE*
 ━━━━━━━━━━━━━━━━━━━━━
 
 📋 *Order:* ${orderNumber}
@@ -150,13 +150,11 @@ ${itemsText}
 💰 *TOTAL: ₹${total.toFixed(2)}*
 ━━━━━━━━━━━━━━━━━━━━━
 
-✅ Thank you for shopping with RAYN ADAM!
+✅ Thank you for shopping with DESERT DEAL!
 
-📍 RAYN ADAM PRIVATE LIMITED
-Ward No. 21, Door No. 553/1
-Kavumpadi, Pallikkal, Tirurangadi
-Malappuram – 673634, Kerala, India
-📞 +91 99466 47442
+📍 DESERT DEAL
+UAE
+📞 Contact us via WhatsApp
 
 GSTIN: 32AAPCR2931R1ZS
 ━━━━━━━━━━━━━━━━━━━━━

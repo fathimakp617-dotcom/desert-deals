@@ -61,8 +61,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     // Send notification to admin
     const adminEmailResponse = await resend.emails.send({
-      from: "Rayn Adam <notifications@raynadamperfume.com>",
-      to: ["raynadamperfume@gmail.com"],
+      from: "Desert Deal <notifications@desertsdeals.com>",
+      to: ["support@desertsdeals.com"],
       subject: `New Contact: ${safeSubject}`,
       html: `
         <!DOCTYPE html>
@@ -79,7 +79,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
                   <!-- Header -->
                   <tr>
                     <td style="padding: 40px; text-align: center; border-bottom: 1px solid #333;">
-                      <h1 style="margin: 0; color: #a87c39; font-size: 28px; letter-spacing: 4px; font-weight: 300;">RAYN ADAM</h1>
+                      <h1 style="margin: 0; color: #a87c39; font-size: 28px; letter-spacing: 4px; font-weight: 300;">DESERT DEAL</h1>
                       <p style="margin: 10px 0 0; color: #888; font-size: 12px; letter-spacing: 2px;">NEW CONTACT MESSAGE</p>
                     </td>
                   </tr>
@@ -136,9 +136,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     // Send confirmation to customer
     const customerEmailResponse = await resend.emails.send({
-      from: "Rayn Adam <notifications@raynadamperfume.com>",
+      from: "Desert Deal <notifications@desertsdeals.com>",
       to: [email],
-      subject: "We received your message - Rayn Adam",
+      subject: "We received your message - Desert Deal",
       html: `
         <!DOCTYPE html>
         <html>
@@ -154,8 +154,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
                   <!-- Header -->
                   <tr>
                     <td style="padding: 40px; text-align: center; border-bottom: 1px solid #333;">
-                      <h1 style="margin: 0; color: #a87c39; font-size: 28px; letter-spacing: 4px; font-weight: 300;">RAYN ADAM</h1>
-                      <p style="margin: 10px 0 0; color: #888; font-size: 12px; letter-spacing: 2px;">LUXURY PERFUMES</p>
+                      <h1 style="margin: 0; color: #a87c39; font-size: 28px; letter-spacing: 4px; font-weight: 300;">DESERT DEAL</h1>
+                      <p style="margin: 10px 0 0; color: #888; font-size: 12px; letter-spacing: 2px;">PREMIUM FOOTWEAR</p>
                     </td>
                   </tr>
                   
@@ -174,7 +174,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
                       
                       <p style="margin: 0; color: #888; font-size: 14px;">
                         In the meantime, feel free to explore our collection at<br>
-                        <a href="https://raynadamperfume.com" style="color: #a87c39; text-decoration: none;">raynadamperfume.com</a>
+                        <a href="https://desertsdeals.com" style="color: #a87c39; text-decoration: none;">desertsdeals.com</a>
                       </p>
                     </td>
                   </tr>
@@ -182,11 +182,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
                   <!-- Footer -->
                   <tr>
                     <td style="padding: 30px; text-align: center; border-top: 1px solid #333;">
-                      <p style="margin: 0; color: #a87c39; font-size: 14px; letter-spacing: 2px;">RAYN ADAM PRIVATE LIMITED</p>
+                      <p style="margin: 0; color: #a87c39; font-size: 14px; letter-spacing: 2px;">DESERT DEAL</p>
                       <p style="margin: 10px 0 0; color: #666; font-size: 12px; line-height: 1.6;">
-                        Ward No. 21, Door No. 553/1, Kavumpadi<br>
-                        Pallikkal, Tirurangadi, Malappuram – 673634<br>
-                        Kerala, India | +91 99466 47442
+                        UAE
+                      </p>
                       </p>
                     </td>
                   </tr>

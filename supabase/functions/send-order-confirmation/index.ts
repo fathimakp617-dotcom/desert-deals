@@ -75,13 +75,12 @@ const generateOrderEmailHTML = (order: OrderConfirmationRequest): string => {
 
   // Generate a simple text-based invoice for PDF-like attachment simulation
   const invoiceText = `
-RAYN ADAM - LUXURY PERFUMES
+DESERT DEAL - PREMIUM FOOTWEAR
 ================================
-RAYN ADAM PRIVATE LIMITED
-Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal
-Tirurangadi, Malappuram – 673634, Kerala, India
-Phone: +91 99466 47442
-GSTIN: 32AAPCR2931R1ZS | TAN: CHNR06383G
+DESERT DEAL
+UAE
+Phone: +971 XX XXX XXXX
+================================
 ================================
 
 INVOICE
@@ -112,9 +111,9 @@ TOTAL: ${formatCurrency(order.total)}
 Payment Method: ${paymentMethodLabel}
 
 ================================
-Thank you for shopping with Rayn Adam!
-For questions: support@raynadamperfume.com
-© ${new Date().getFullYear()} Rayn Adam Private Limited
+Thank you for shopping with Desert Deal!
+For questions: support@desertsdeals.com
+© ${new Date().getFullYear()} Desert Deal
   `.trim();
 
   // Base64 encode the invoice text for attachment
@@ -136,7 +135,7 @@ For questions: support@raynadamperfume.com
               <tr>
                 <td style="background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 100%); padding: 45px 40px; text-align: center; border-bottom: 2px solid #a87c39;">
                   <h1 style="margin: 0; color: #c7915e; font-family: Georgia, serif; font-size: 32px; letter-spacing: 3px; font-weight: 300;">
-                    RAYN ADAM
+                    DESERT DEAL
                   </h1>
                   <p style="margin: 10px 0 0; color: #a87c39; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">
                     Luxury Perfumes
@@ -276,7 +275,7 @@ For questions: support@raynadamperfume.com
                   <!-- Footer Message -->
                   <p style="margin: 0; text-align: center; color: #888; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.6;">
                     If you have any questions about your order, please contact us at<br>
-                    <a href="mailto:support@raynadamperfume.com" style="color: #c7915e; text-decoration: none;">support@raynadamperfume.com</a>
+                    <a href="mailto:support@desertsdeals.com" style="color: #c7915e; text-decoration: none;">support@desertsdeals.com</a>
                   </p>
                 </td>
               </tr>
@@ -285,10 +284,10 @@ For questions: support@raynadamperfume.com
               <tr>
                 <td style="background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%); padding: 30px; text-align: center; border-top: 1px solid #3d3d3d;">
                   <p style="margin: 0 0 10px; color: #a87c39; font-family: Georgia, serif; font-size: 14px; letter-spacing: 2px;">
-                    RAYN ADAM
+                    DESERT DEAL
                   </p>
                   <p style="margin: 0; color: #666; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px;">
-                    © ${new Date().getFullYear()} Rayn Adam Private Limited. All rights reserved.
+                    © ${new Date().getFullYear()} Desert Deal. All rights reserved.
                   </p>
                   <p style="margin: 8px 0 0; color: #555; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 10px;">
                     Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal<br>
@@ -329,7 +328,7 @@ const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint
   let yPos = height - 50;
   
   // Header
-  page.drawText('RAYN ADAM', {
+  page.drawText('DESERT DEAL', {
     x: width / 2 - 50,
     y: yPos,
     size: 24,
@@ -347,7 +346,7 @@ const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint
   });
   
   yPos -= 12;
-  page.drawText('RAYN ADAM PRIVATE LIMITED', {
+  page.drawText('DESERT DEAL', {
     x: width / 2 - 70,
     y: yPos,
     size: 9,
@@ -665,7 +664,7 @@ const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint
   });
   
   yPos -= 20;
-  page.drawText('Thank you for shopping with Rayn Adam!', {
+  page.drawText('Thank you for shopping with Desert Deal!', {
     x: width / 2 - 100,
     y: yPos,
     size: 11,
@@ -683,7 +682,7 @@ const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint
   });
   
   yPos -= 14;
-  page.drawText('Email: support@raynadamperfume.com | Phone: +91 99466 47442', {
+  page.drawText('Email: support@desertsdeals.com', {
     x: width / 2 - 150,
     y: yPos,
     size: 9,
@@ -846,7 +845,7 @@ const generateAdminOrderEmailHTML = (order: OrderConfirmationRequest): string =>
               <tr>
                 <td style="background-color: #1a1a1a; padding: 15px; text-align: center;">
                   <p style="margin: 0; color: #888; font-family: Arial, sans-serif; font-size: 12px;">
-                    Rayn Adam Order Management System
+                    Desert Deal Order Management System
                   </p>
                 </td>
               </tr>
@@ -887,8 +886,8 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
     borderWidth: 2,
   });
   
-  // Header - RAYN ADAM
-  page.drawText('RAYN ADAM', {
+  // Header - DESERT DEAL
+  page.drawText('DESERT DEAL', {
     x: margin,
     y: yPos,
     size: 28,
@@ -1076,7 +1075,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
   });
   
   let sellerY = yPos - 40;
-  page.drawText('RAYN ADAM PRIVATE LIMITED', {
+  page.drawText('DESERT DEAL', {
     x: sellerX + 10,
     y: sellerY,
     size: 11,
@@ -1243,7 +1242,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
     color: rgb(0, 0, 0),
   });
   
-  page.drawText('RAYN ADAM PRIVATE LIMITED, Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal,', {
+  page.drawText('DESERT DEAL, UAE', {
     x: margin + 20,
     y: yPos - 40,
     size: 9,
@@ -1323,14 +1322,14 @@ Payment Method: ${orderData.payment_method === 'cod' ? 'Cash on Delivery' : 'Onl
 
 Your invoice is attached to this email.
 
-For questions, contact us at support@raynadamperfume.com
+For questions, contact us at support@desertsdeals.com
 
-Thank you for shopping with Rayn Adam!
+Thank you for shopping with Desert Deal!
 `;
 
     // Send customer confirmation email with PDF invoice
     const emailResponse = await resend.emails.send({
-      from: "Rayn Adam <orders@raynadamperfume.com>",
+      from: "Desert Deal <orders@desertsdeals.com>",
       to: [orderData.customer_email],
       subject: `Order Confirmed - ${orderData.order_number}`,
       html: emailHTML,
@@ -1396,7 +1395,7 @@ Invoice and shipping label are attached.
 
         const sendAdminEmail = async () =>
           await resend.emails.send({
-            from: "Rayn Adam <notifications@raynadamperfume.com>",
+            from: "Desert Deal <notifications@desertsdeals.com>",
             to: allRecipients,
             subject: `🚚 NEW ORDER - ${orderData.order_number} - ${orderData.customer_name}`,
             html: adminEmailHTML,

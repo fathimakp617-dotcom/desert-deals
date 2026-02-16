@@ -27,9 +27,9 @@ const ShippingSlip = forwardRef<HTMLDivElement, ShippingSlipProps>(({ order }, r
         {/* Header */}
         <div style={{ borderBottom: "1.5px solid black", paddingBottom: "0.2cm", marginBottom: "0.2cm" }}>
           <h1 style={{ fontSize: "16px", fontWeight: "bold", letterSpacing: "1.5px", margin: 0, fontFamily: "Georgia, serif" }}>
-            RAYN ADAM
+            DESERT DEAL
           </h1>
-          <p style={{ fontSize: "7px", letterSpacing: "2px", marginTop: "1px" }}>LUXURY PERFUME</p>
+          <p style={{ fontSize: "7px", letterSpacing: "2px", marginTop: "1px" }}>PREMIUM FOOTWEAR</p>
         </div>
 
         {/* Order Info */}
@@ -76,7 +76,7 @@ const ShippingSlip = forwardRef<HTMLDivElement, ShippingSlipProps>(({ order }, r
                 <div style={{ fontSize: "9px", textTransform: "uppercase", borderBottom: "1.5px solid black", paddingBottom: "0.1cm", marginBottom: "0.1cm" }}>
                   SELLER
                 </div>
-                RAYN ADAM PVT LTD<br />
+                DESERT DEAL<br />
                 Ward 21, Door 553/1<br />
                 Kavumpadi, Pallikkal<br />
                 Tirurangadi, Malappuram<br />
@@ -125,7 +125,7 @@ const ShippingSlip = forwardRef<HTMLDivElement, ShippingSlipProps>(({ order }, r
                   RETURN ADDRESS
                 </div>
                 <p style={{ textAlign: "center", margin: 0, lineHeight: "1.3" }}>
-                  RAYN ADAM PVT LTD, Ward 21, Door 553/1, Kavumpadi, Pallikkal, Tirurangadi, Malappuram, Kerala – 673634, PH: +91 99466 47442
+                  DESERT DEAL, UAE
                 </p>
               </td>
             </tr>

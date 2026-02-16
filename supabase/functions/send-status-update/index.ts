@@ -120,8 +120,8 @@ const generateStatusEmailHTML = (request: StatusUpdateRequest): string => {
         
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 100%); padding: 40px 30px; text-align: center; border-bottom: 2px solid #a87c39;">
-          <h1 style="color: #c7915e; margin: 0; font-size: 32px; letter-spacing: 3px; font-weight: 300;">RAYN ADAM</h1>
-          <p style="color: #a87c39; margin: 8px 0 0 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">Luxury Perfumes</p>
+          <h1 style="color: #c7915e; margin: 0; font-size: 32px; letter-spacing: 3px; font-weight: 300;">DESERT DEAL</h1>
+          <p style="color: #a87c39; margin: 8px 0 0 0; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">Premium Footwear</p>
         </div>
 
         <!-- Status Banner -->
@@ -178,7 +178,7 @@ const generateStatusEmailHTML = (request: StatusUpdateRequest): string => {
           <div style="text-align: center; margin-top: 35px; padding-top: 25px; border-top: 1px solid #3d3d3d;">
             <p style="color: #888; font-size: 14px;">
               Questions? Contact us at<br>
-              <a href="mailto:support@raynadamperfume.com" style="color: #c7915e; text-decoration: none;">support@raynadamperfume.com</a>
+              <a href="mailto:support@desertsdeals.com" style="color: #c7915e; text-decoration: none;">support@desertsdeals.com</a>
             </p>
           </div>
         </div>
@@ -186,10 +186,10 @@ const generateStatusEmailHTML = (request: StatusUpdateRequest): string => {
         <!-- Footer -->
         <div style="background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%); padding: 25px; text-align: center; border-top: 1px solid #3d3d3d;">
           <p style="color: #a87c39; margin: 0; font-size: 13px; letter-spacing: 2px;">
-            RAYN ADAM
+            DESERT DEAL
           </p>
           <p style="color: #666; margin: 8px 0 0 0; font-size: 11px;">
-            © 2026 Rayn Adam. All rights reserved.
+            © 2026 Desert Deal. All rights reserved.
           </p>
           <p style="color: #555; margin: 8px 0 0 0; font-size: 10px;">
             Malappuram – 673634, Kerala, India | +91 99466 47442
@@ -236,7 +236,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailHtml = generateStatusEmailHTML(request);
 
     const { data, error } = await resend.emails.send({
-      from: "Rayn Adam <shipping@raynadamperfume.com>",
+      from: "Desert Deal <shipping@desertsdeals.com>",
       to: [request.customer_email],
       subject: `${config.emoji} ${config.title} - Order #${request.order_number}`,
       html: emailHtml,

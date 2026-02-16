@@ -217,7 +217,7 @@ const handler = async (req: Request): Promise<Response> => {
           <tr>
             <td style="background-color: #1a1a1a; padding: 20px; text-align: center; border-top: 1px solid #3a3a3a;">
               <p style="margin: 0; color: #666; font-size: 12px;">
-                This is a bulk order notification from Rayn Adam Perfumes
+                This is a bulk order notification from Desert Deal
               </p>
             </td>
           </tr>
@@ -231,7 +231,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const { data: emailResult, error: emailError } = await resend.emails.send({
-      from: "Rayn Adam <notifications@raynadamperfume.com>",
+      from: "Desert Deal <notifications@desertsdeals.com>",
       to: uniqueRecipients,
       subject: `🚨 BULK ORDER: ${data.total_quantity} Items - Order #${data.order_number}`,
       html: emailHtml,

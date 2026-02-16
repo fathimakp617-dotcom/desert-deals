@@ -87,9 +87,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send branded email via Resend with the 4-digit OTP
     const emailResponse = await resend.emails.send({
-      from: "Rayn Adam <noreply@raynadamperfume.com>",
+      from: "Desert Deal <noreply@desertsdeals.com>",
       to: [email],
-      subject: "Your Login Code - Rayn Adam",
+      subject: "Your Login Code - Desert Deal",
       html: `
         <!DOCTYPE html>
         <html>
@@ -107,10 +107,10 @@ const handler = async (req: Request): Promise<Response> => {
                   <tr>
                     <td style="padding: 40px 40px 30px; text-align: center; border-bottom: 1px solid #333;">
                       <h1 style="margin: 0; font-size: 28px; letter-spacing: 8px; color: #c9a45c; font-weight: normal;">
-                        RAYN ADAM
+                        DESERT DEAL
                       </h1>
                       <p style="margin: 10px 0 0; font-size: 11px; letter-spacing: 3px; color: #888;">
-                        LUXURY PERFUMES
+                        PREMIUM FOOTWEAR
                       </p>
                     </td>
                   </tr>
@@ -122,7 +122,7 @@ const handler = async (req: Request): Promise<Response> => {
                         Your Login Code
                       </h2>
                       <p style="margin: 0 0 30px; font-size: 15px; line-height: 1.8; color: #aaa; text-align: center;">
-                        Use the code below to sign in to your Rayn Adam account. This code will expire in 10 minutes.
+                        Use the code below to sign in to your Desert Deal account. This code will expire in 10 minutes.
                       </p>
                       
                       <div style="text-align: center; margin: 40px 0;">
@@ -144,7 +144,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <tr>
                     <td style="padding: 30px 40px; border-top: 1px solid #333; text-align: center;">
                       <p style="margin: 0; font-size: 11px; color: #666; letter-spacing: 1px;">
-                        © 2026 Rayn Adam Private Limited. All rights reserved.
+                        © 2026 Desert Deal. All rights reserved.
                       </p>
                       <p style="margin: 8px 0 0; font-size: 10px; color: #555;">
                         Malappuram – 673634, Kerala, India | +91 99466 47442

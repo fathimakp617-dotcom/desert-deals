@@ -297,7 +297,7 @@ const ShippingLayout = () => {
             {/* Logo/Brand */}
             <div className="px-4 py-4 mb-4">
               <Link to="/" className="block">
-                <h1 className="text-xl font-heading font-bold text-primary">RAYN ADAM</h1>
+                <h1 className="text-xl font-heading font-bold text-primary">DESERT DEAL</h1>
                 <p className="text-xs text-muted-foreground">Shipping Dashboard</p>
               </Link>
             </div>
