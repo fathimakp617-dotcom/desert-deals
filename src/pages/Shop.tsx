@@ -53,10 +53,11 @@ const brandSlugToCategory: Record<string, string> = {
 const Shop = () => {
   const [searchParams] = useSearchParams();
   const brandParam = searchParams.get("brand");
+  const searchParam = searchParams.get("search");
   const initialCategory = (brandParam && brandSlugToCategory[brandParam]) || "All";
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [searchInput, setSearchInput] = useState("");
+  const [searchInput, setSearchInput] = useState(searchParam || "");
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [sortBy, setSortBy] = useState("featured");
@@ -88,7 +89,9 @@ const Shop = () => {
 
   useEffect(() => {
     const brand = searchParams.get("brand");
+    const search = searchParams.get("search");
     setSelectedCategory((brand && brandSlugToCategory[brand]) || "All");
+    if (search) setSearchInput(search);
   }, [searchParams]);
 
   useEffect(() => { resetPage(); }, [debouncedSearch, selectedCategory, selectedPriceRange, sortBy, resetPage]);
