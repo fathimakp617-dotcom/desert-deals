@@ -35,7 +35,7 @@ const About = () => {
               
               <motion.img
                 src={aboutShoes}
-                alt="The Art of Perfumery"
+                alt="Premium Footwear Collection"
                 className="w-full object-cover relative z-10"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.6 }}

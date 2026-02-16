@@ -612,7 +612,7 @@ const Checkout = () => {
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: "Desert Deal",
-        description: isUPI ? "UPI Payment - Luxury Perfume" : "Card/Netbanking - Luxury Perfume",
+        description: isUPI ? "UPI Payment - Desert Deal" : "Card/Netbanking - Desert Deal",
         image: "https://uyrudydfpbisawgsepxd.supabase.co/storage/v1/object/public/assets/logo.png",
         order_id: orderData.order.id,
         handler: async (response: any) => {

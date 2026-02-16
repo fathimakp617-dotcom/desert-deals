@@ -43,7 +43,7 @@ const Wishlist = () => {
               <motion.div variants={fadeInUp} className="text-center">
                 <p className="text-sm tracking-[0.3em] text-primary mb-4">MY WISHLIST</p>
                 <h1 className="text-4xl md:text-5xl font-heading tracking-tight">
-                  Saved Fragrances
+                  Saved Products
                 </h1>
                 <p className="text-muted-foreground mt-4">
                   {items.length} {items.length === 1 ? "item" : "items"} in your wishlist
@@ -55,7 +55,7 @@ const Wishlist = () => {
                   <Heart className="w-20 h-20 text-muted-foreground/20 mx-auto mb-6" />
                   <h2 className="text-2xl font-heading mb-4">Your wishlist is empty</h2>
                   <p className="text-muted-foreground mb-8">
-                    Save your favorite fragrances to revisit them later
+                    Save your favorite products to revisit them later
                   </p>
                   <Button asChild className="bg-primary hover:bg-primary/90">
                     <Link to="/shop">Explore Collection</Link>
