@@ -412,6 +412,28 @@ Deno.serve(async (req) => {
         });
       }
 
+      case "delete_all": {
+        // Delete all products (for replace import)
+        const { error: deleteAllError } = await supabaseClient
+          .from("products")
+          .delete()
+          .neq("id", "___impossible___"); // delete all rows
+
+        if (deleteAllError) throw deleteAllError;
+
+        // Log activity
+        await supabaseClient.from("activity_logs").insert({
+          actor_email: session.email,
+          actor_role: "admin",
+          action_type: "products_deleted_all",
+          action_details: { reason: "bulk_replace_import" },
+        });
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       default:
         return new Response(JSON.stringify({ error: "Invalid action" }), {
           status: 400,
