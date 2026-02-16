@@ -88,7 +88,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
       </div>
 
       {/* Product info - #6: Name bold, stock status, adjusted font sizes */}
-      <div className="p-3">
+      <div className="p-3 bg-muted rounded-b-lg">
         <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
         <Link to={`/product/${product.id}`}>
           <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors">
