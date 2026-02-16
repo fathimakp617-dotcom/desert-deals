@@ -3,19 +3,21 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Local brand logo imports
-import pumaLogo from "@/assets/brands/puma.webp";
-import onitsukaTigerLogo from "@/assets/brands/onitsuka-tiger.webp";
+import pumaLogo from "@/assets/brands/puma.png";
+import onitsukaTigerLogo from "@/assets/brands/onitsuka-tiger.png";
 import onCloudLogo from "@/assets/brands/on-cloud.png";
-import nikeLogo from "@/assets/brands/nike.svg";
+import nikeLogo from "@/assets/brands/nike.png";
 import newBalanceLogo from "@/assets/brands/new-balance.webp";
-import louisVuittonLogo from "@/assets/brands/louis-vuitton.webp";
-import loroPianaLogo from "@/assets/brands/loro-piana.webp";
+import louisVuittonLogo from "@/assets/brands/louis-vuitton.png";
+import loroPianaLogo from "@/assets/brands/loro-piana.png";
 import jordanLogo from "@/assets/brands/jordan.webp";
 import hermesLogo from "@/assets/brands/hermes.webp";
 import diorLogo from "@/assets/brands/dior.webp";
-import airJordanLogo from "@/assets/brands/air-jordan.webp";
-import adidasLogo from "@/assets/brands/adidas.svg";
+import airJordanLogo from "@/assets/brands/air-jordan.png";
+import adidasLogo from "@/assets/brands/adidas.png";
 import asicsLogo from "@/assets/brands/asics.svg";
+import hokaLogo from "@/assets/brands/hoka.png";
+import gucciLogo from "@/assets/brands/gucci.png";
 
 const brands = [
   { name: "Puma", count: 14, slug: "puma", logo: pumaLogo, fallback: "PUMA" },
@@ -26,9 +28,9 @@ const brands = [
   { name: "Louis Vuitton", count: 13, slug: "louis-vuitton", logo: louisVuittonLogo, fallback: "LV" },
   { name: "Loro Piana", count: 9, slug: "loro-piana", logo: loroPianaLogo, fallback: "LP" },
   { name: "Jordan", count: 110, slug: "jordan", logo: jordanLogo, fallback: "JD" },
-  { name: "Hoka", count: 47, slug: "hoka", logo: "", fallback: "HOKA" },
+  { name: "Hoka", count: 47, slug: "hoka", logo: hokaLogo, fallback: "HOKA" },
   { name: "Hermes", count: 2, slug: "hermes", logo: hermesLogo, fallback: "HM" },
-  { name: "Gucci", count: 12, slug: "gucci", logo: "", fallback: "GUCCI" },
+  { name: "Gucci", count: 12, slug: "gucci", logo: gucciLogo, fallback: "GUCCI" },
   { name: "Dior", count: 3, slug: "dior", logo: diorLogo, fallback: "DIOR" },
   { name: "Basketball Shoes", count: 36, slug: "basketball", logo: airJordanLogo, fallback: "🏀" },
   { name: "Asics", count: 94, slug: "asics", logo: asicsLogo, fallback: "ASICS" },
