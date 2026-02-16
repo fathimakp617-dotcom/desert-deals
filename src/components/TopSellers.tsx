@@ -93,14 +93,6 @@ const TopSellers = memo(() => {
                           />
                         </Link>
 
-                        {/* Discount badge - matches sale badge */}
-                        {product.discountPercent > 0 && !soldOut && (
-                          <div className="absolute top-2 left-2">
-                            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">
-                              -{product.discountPercent}%
-                            </span>
-                          </div>
-                        )}
 
                         {/* Sold out */}
                         {soldOut && (

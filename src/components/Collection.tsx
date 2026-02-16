@@ -110,9 +110,6 @@ const Collection = forwardRef<HTMLDivElement>((_, ref) => {
                     <div className="flex items-center justify-center gap-2 flex-wrap">
                       <span className="text-lg sm:text-xl text-primary font-medium">{formatPrice(product.price)}</span>
                       <span className="text-sm text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
-                      <span className="bg-emerald-500/20 text-emerald-400 text-xs font-medium px-2 py-0.5 rounded-full">
-                        {product.discountPercent}% OFF
-                      </span>
                     </div>
                   </div>
                 </div>
