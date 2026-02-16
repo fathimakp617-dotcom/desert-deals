@@ -41,71 +41,21 @@ const AdminLayout = () => {
 
   // Check existing session on mount only
   useEffect(() => {
-    const checkExistingSession = () => {
-      try {
-        const stored = sessionStorage.getItem(ADMIN_SESSION_KEY);
-        if (stored) {
-          const session: AdminSession = JSON.parse(stored);
-          if (session.expiry > Date.now()) {
-            setAdminSession(session);
-          } else {
-            sessionStorage.removeItem(ADMIN_SESSION_KEY);
-            toast({
-              title: "Session Expired",
-              description: "Your session has expired. Please log in again.",
-              variant: "destructive",
-            });
-          }
-        }
-      } catch (error) {
-        sessionStorage.removeItem(ADMIN_SESSION_KEY);
-      }
-      setIsChecking(false);
-    };
-
-    checkExistingSession();
-  }, [toast]);
-
-  // Sync session with storage periodically (separate effect to avoid infinite loop)
-  useEffect(() => {
-    const intervalId = setInterval(() => {
+    try {
       const stored = sessionStorage.getItem(ADMIN_SESSION_KEY);
-      
-      if (!stored) {
-        setAdminSession(prev => {
-          if (prev !== null) return null;
-          return prev;
-        });
-        return;
-      }
-
-      try {
+      if (stored) {
         const session: AdminSession = JSON.parse(stored);
-        if (session.expiry <= Date.now()) {
-          sessionStorage.removeItem(ADMIN_SESSION_KEY);
-          setAdminSession(null);
-          toast({
-            title: "Session Expired",
-            description: "Your session has expired. Please log in again.",
-            variant: "destructive",
-          });
+        if (session.expiry > Date.now()) {
+          setAdminSession(session);
         } else {
-          setAdminSession(prev => {
-            // Only update if token or expiry changed
-            if (!prev || prev.token !== session.token || prev.expiry !== session.expiry) {
-              return session;
-            }
-            return prev;
-          });
+          sessionStorage.removeItem(ADMIN_SESSION_KEY);
         }
-      } catch {
-        sessionStorage.removeItem(ADMIN_SESSION_KEY);
-        setAdminSession(null);
       }
-    }, 3000);
-    
-    return () => clearInterval(intervalId);
-  }, [toast]);
+    } catch {
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    }
+    setIsChecking(false);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
