@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
-import { Search, Heart } from "lucide-react";
+import { Search, Heart, MessageCircle } from "lucide-react";
 import { useWishlist } from "@/contexts/WishlistContext";
 
 const MobileBottomNav = memo(() => {
@@ -16,6 +16,16 @@ const MobileBottomNav = memo(() => {
           <Search size={20} />
           <span className="text-[10px]">Search</span>
         </Link>
+
+        <a
+          href="https://wa.me/971506784405"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col items-center gap-0.5 text-foreground"
+        >
+          <MessageCircle size={20} />
+          <span className="text-[10px]">WhatsApp</span>
+        </a>
 
         <Link
           to="/wishlist"
