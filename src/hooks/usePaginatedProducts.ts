@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 1000;
 
 interface DbProduct {
   id: string;
@@ -106,7 +106,7 @@ export const usePaginatedProducts = (options: UsePaginatedProductsOptions) => {
           q = q.order("name", { ascending: true });
           break;
         default:
-          q = q.order("created_at", { ascending: true });
+          q = q.order("created_at", { ascending: false });
       }
 
       // Pagination
