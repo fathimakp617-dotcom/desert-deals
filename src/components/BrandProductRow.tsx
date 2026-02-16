@@ -132,7 +132,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                           {product.originalPrice > product.price && (
                             <span className="text-xs text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
                           )}
-                          <span className="text-sm font-semibold text-foreground">{formatPrice(product.price)}</span>
+                          <span className="text-sm text-foreground">{formatPrice(product.price)}</span>
                         </div>
                         <div className="mt-2">
                           {soldOut ? (

@@ -26,7 +26,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
             <h3 className="text-base font-heading font-bold mt-1 text-foreground hover:text-primary transition-colors truncate">{product.name}</h3>
           </Link>
           <div className="flex items-center gap-2 mt-2">
-            <span className="text-base text-foreground font-semibold">{formatPrice(product.price)}</span>
+            <span className="text-base text-foreground">{formatPrice(product.price)}</span>
             {product.originalPrice > product.price && (
               <span className="text-sm text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
             )}
@@ -92,7 +92,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
           {product.originalPrice > product.price && (
             <span className="text-xs text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
           )}
-          <span className="text-[13px] font-semibold text-foreground">{formatPrice(product.price)}</span>
+          <span className="text-[13px] text-foreground">{formatPrice(product.price)}</span>
         </div>
         <div className="mt-1.5">
           {soldOut ? (
