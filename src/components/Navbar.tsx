@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import logoImg from "@/assets/logo.png";
+import SearchSuggestions from "@/components/SearchSuggestions";
 
 const announcements = [
   "Ramadan Sale Live Now - Up To 75% Off →",
@@ -285,9 +286,23 @@ const Navbar = memo(() => {
                   <X size={20} />
                 </button>
               </form>
-              <p className="text-sm text-muted-foreground mt-3 text-center">
-                Press Enter to search or Esc to close
-              </p>
+              <SearchSuggestions
+                query={searchQuery}
+                onSelect={(q) => {
+                  navigate(`/shop?search=${encodeURIComponent(q.trim())}`);
+                  setSearchOpen(false);
+                  setSearchQuery("");
+                }}
+                onClose={() => {
+                  setSearchOpen(false);
+                  setSearchQuery("");
+                }}
+              />
+              {!searchQuery.trim() && (
+                <p className="text-sm text-muted-foreground mt-3 text-center">
+                  Start typing to see suggestions
+                </p>
+              )}
             </motion.div>
           </motion.div>
         )}
