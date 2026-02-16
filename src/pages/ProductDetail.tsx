@@ -10,7 +10,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductReviews from "@/components/ProductReviews";
 import RelatedProducts from "@/components/RelatedProducts";
-import FeaturesBar from "@/components/FeaturesBar";
+
 import PageTransition from "@/components/PageTransition";
 import { formatPrice } from "@/data/products";
 import { useDbProduct } from "@/hooks/useDbProducts";
@@ -449,10 +449,36 @@ const ProductDetail = () => {
           </div>
         </section>
 
+        {/* Product Gallery Grid */}
+        {product.gallery.length > 1 && (
+          <section className="py-12 sm:py-16">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+              <h2 className="text-2xl font-heading mb-6">More Views</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                {product.gallery.map((img, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="aspect-square overflow-hidden border border-border/30 rounded-lg cursor-pointer"
+                    onClick={() => {
+                      setSelectedImage(idx);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  >
+                    <img src={img} alt={`${product.name} view ${idx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" loading="lazy" />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Related Products */}
         <RelatedProducts currentProductId={product.id} currentCategory={product.category} />
 
-        <FeaturesBar />
         <Footer />
         </main>
       </PageTransition>
