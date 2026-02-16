@@ -40,7 +40,7 @@ const Hero = memo(() => {
   {/* top offset: announcement bar (36px) + nav row1 (48-56px) + nav row2 (~28px) */}
   return (
     <section id="home" className="relative w-full mt-[100px] sm:mt-[116px] mb-0">
-      <div className="relative w-full h-[300px] sm:h-[500px] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer" onClick={() => navigate("/shop")}>
+      <div className="relative w-full aspect-[16/9] sm:aspect-[16/7] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer bg-muted" onClick={() => navigate("/shop")}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -53,7 +53,7 @@ const Hero = memo(() => {
             <img
               src={slides[currentSlide].image}
               alt={slides[currentSlide].alt}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-contain object-center"
               loading={currentSlide === 0 ? "eager" : "lazy"}
               decoding="async"
               fetchPriority={currentSlide === 0 ? "high" : "auto"}
