@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, useCallback, useRef, memo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,6 +32,16 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
+  const touchStartX = useRef(0);
+
+  // Auto-slide images every 10 seconds
+  useEffect(() => {
+    if (!product || product.gallery.length <= 1) return;
+    const timer = setInterval(() => {
+      setSelectedImage((p) => (p + 1) % product.gallery.length);
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [product]);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
   const [showDescription, setShowDescription] = useState(true);
@@ -202,8 +212,18 @@ const ProductDetail = () => {
                 variants={fadeInLeft}
                 className="space-y-3"
               >
-                {/* Main Image */}
-                <div className="relative w-full max-w-md mx-auto lg:max-w-none aspect-square overflow-hidden border border-border/50 bg-card/50">
+                {/* Main Image with swipe & auto-slide */}
+                <div
+                  className="relative w-full max-w-md mx-auto lg:max-w-none aspect-square overflow-hidden border border-border/50 bg-card/50 touch-pan-y"
+                  onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                  onTouchEnd={(e) => {
+                    const diff = touchStartX.current - e.changedTouches[0].clientX;
+                    if (Math.abs(diff) > 50 && product.gallery.length > 1) {
+                      if (diff > 0) setSelectedImage((p) => (p + 1) % product.gallery.length);
+                      else setSelectedImage((p) => (p - 1 + product.gallery.length) % product.gallery.length);
+                    }
+                  }}
+                >
                   <div className="absolute top-3 left-3 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-l-2 border-primary/60 z-10" />
                   <div className="absolute top-3 right-3 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-r-2 border-primary/60 z-10" />
                   <div className="absolute bottom-3 left-3 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-l-2 border-primary/60 z-10" />
@@ -214,6 +234,39 @@ const ProductDetail = () => {
                       <Badge variant="destructive" className="text-xs sm:text-sm font-semibold px-3 py-1.5">
                         SOLD OUT
                       </Badge>
+                    </div>
+                  )}
+
+                  {/* Navigation arrows */}
+                  {product.gallery.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => setSelectedImage((p) => (p - 1 + product.gallery.length) % product.gallery.length)}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setSelectedImage((p) => (p + 1) % product.gallery.length)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+
+                  {/* Dot indicators */}
+                  {product.gallery.length > 1 && (
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+                      {product.gallery.map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setSelectedImage(idx)}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            selectedImage === idx ? "bg-foreground w-4" : "bg-foreground/40"
+                          }`}
+                        />
+                      ))}
                     </div>
                   )}
                   
