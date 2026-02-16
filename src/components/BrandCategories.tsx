@@ -82,16 +82,45 @@ const BrandCategories = memo(() => {
           <ChevronRight className="w-4 h-4" />
         </button>
 
+        {/* Mobile: 2-column grid */}
+        <div className="grid grid-cols-2 gap-3 sm:hidden">
+          {brands.map((brand) => (
+            <Link
+              key={brand.slug}
+              to={`/shop?brand=${brand.slug}`}
+              className="group"
+            >
+              <div className="bg-muted rounded-lg p-4 text-center transition-all duration-300 hover:shadow-md">
+                <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">
+                  {brand.name}
+                </h3>
+                <span className="text-[11px] text-muted-foreground mt-0.5 block">
+                  {brand.count} Products
+                </span>
+                <div className="my-4 flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-lg flex items-center justify-center p-2">
+                    <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
+                  </div>
+                </div>
+                <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
+                  View Products
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Tablet/Desktop: horizontal scroll */}
         <div
           ref={scrollRef}
-          className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 sm:mx-8"
+          className="hidden sm:flex gap-4 overflow-x-auto pb-2 sm:mx-8"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {brands.map((brand) => (
             <Link
               key={brand.slug}
               to={`/shop?brand=${brand.slug}`}
-              className="flex-shrink-0 w-[140px] sm:w-[180px] lg:w-[200px] group"
+              className="flex-shrink-0 sm:w-[180px] lg:w-[200px] group"
             >
               <div className="bg-[hsl(var(--muted))] rounded-lg p-4 sm:p-5 text-center transition-all duration-300 hover:shadow-md">
                 <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">
