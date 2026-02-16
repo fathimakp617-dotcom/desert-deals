@@ -34,12 +34,11 @@ const PromoBanner = memo(() => {
   }, [next]);
 
   return (
-    <section className="py-2 sm:py-4 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-        <div
-          className="relative w-full aspect-[5/1] sm:aspect-[4/1] rounded-lg overflow-hidden cursor-pointer bg-muted"
-          onClick={() => navigate("/shop")}
-        >
+    <section className="bg-background">
+      <div
+        className="relative w-full aspect-[5/1] sm:aspect-[4/1] overflow-hidden cursor-pointer bg-muted"
+        onClick={() => navigate("/shop")}
+      >
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
@@ -90,7 +89,6 @@ const PromoBanner = memo(() => {
             ))}
           </div>
         </div>
-      </div>
     </section>
   );
 });
