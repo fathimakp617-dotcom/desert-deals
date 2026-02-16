@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Loader2, CheckCircle, AlertCircle, FileSpreadsheet } from "lucide-react";
+import { Upload, Loader2, CheckCircle, AlertCircle, FileSpreadsheet, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface ParsedProduct {
@@ -54,33 +54,235 @@ const stripHtml = (html: string): string => {
 const extractFirstImage = (images: string): string => {
   if (!images) return "";
   const first = images.split(",")[0].trim();
-  // Unescape backslashes from parsed markdown
   return first.replace(/\\:/g, ":").replace(/\\_/g, "_");
 };
 
 /** Extract brand/category from WooCommerce categories string */
 const extractCategory = (cats: string): string => {
   if (!cats) return "All Shoes";
-  // Categories like "All Shoes, Nike" or "Adidas, All Shoes"
   const parts = cats.split(",").map((c) => c.trim());
-  // Prefer brand-specific category over "All Shoes"
   const brand = parts.find((p) => p !== "All Shoes" && p !== "Uncategorized");
   return brand || parts[0] || "All Shoes";
 };
 
 /**
- * Parse WooCommerce export text (pipe-delimited table from xlsx parse)
- * into product objects. Only processes `variable` type rows (parent products)
- * and gets prices from their first `variation` child.
+ * RFC 4180 compliant CSV parser that handles:
+ * - Quoted fields with commas
+ * - Multi-line quoted fields (newlines inside quotes)
+ * - Escaped quotes ("" inside quoted fields)
  */
-const parseWooCommerceData = (text: string): ParsedProduct[] => {
+const parseCSV = (text: string): string[][] => {
+  const rows: string[][] = [];
+  let currentRow: string[] = [];
+  let currentField = "";
+  let inQuotes = false;
+  let i = 0;
+
+  // Remove BOM if present
+  if (text.charCodeAt(0) === 0xFEFF) i = 1;
+
+  while (i < text.length) {
+    const ch = text[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        if (i + 1 < text.length && text[i + 1] === '"') {
+          // Escaped quote
+          currentField += '"';
+          i += 2;
+        } else {
+          // End of quoted field
+          inQuotes = false;
+          i++;
+        }
+      } else {
+        currentField += ch;
+        i++;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+        i++;
+      } else if (ch === ',') {
+        currentRow.push(currentField);
+        currentField = "";
+        i++;
+      } else if (ch === '\n' || (ch === '\r' && i + 1 < text.length && text[i + 1] === '\n')) {
+        currentRow.push(currentField);
+        currentField = "";
+        if (currentRow.length > 1) {
+          rows.push(currentRow);
+        }
+        currentRow = [];
+        i += ch === '\r' ? 2 : 1;
+      } else if (ch === '\r') {
+        currentRow.push(currentField);
+        currentField = "";
+        if (currentRow.length > 1) {
+          rows.push(currentRow);
+        }
+        currentRow = [];
+        i++;
+      } else {
+        currentField += ch;
+        i++;
+      }
+    }
+  }
+
+  // Don't forget the last field/row
+  if (currentField || currentRow.length > 0) {
+    currentRow.push(currentField);
+    if (currentRow.length > 1) {
+      rows.push(currentRow);
+    }
+  }
+
+  return rows;
+};
+
+/**
+ * Parse WooCommerce CSV export into product objects.
+ * Processes `variable` type rows (parent products) and gets prices from their first `variation` child.
+ */
+const parseWooCommerceCSV = (text: string): ParsedProduct[] => {
+  const rows = parseCSV(text);
+  if (rows.length < 2) return [];
+
+  // Build header index map
+  const headers = rows[0];
+  const colIndex = (name: string): number => headers.findIndex((h) => h.trim() === name);
+
+  const iID = colIndex("ID");
+  const iType = colIndex("Type");
+  const iSKU = colIndex("SKU");
+  const iName = colIndex("Name");
+  const iPublished = colIndex("Published");
+  const iDesc = colIndex("Description");
+  const iShortDesc = colIndex("Short description");
+  const iInStock = colIndex("In stock?");
+  const iStock = colIndex("Stock");
+  const iSalePrice = colIndex("Sale price");
+  const iRegPrice = colIndex("Regular price");
+  const iCategories = colIndex("Categories");
+  const iImages = colIndex("Images");
+  const iAttr1Name = colIndex("Attribute 1 name");
+  const iAttr1Values = colIndex("Attribute 1 value(s)");
+
+  const products: ParsedProduct[] = [];
+  const seenIds = new Set<string>();
+
+  let currentParent: {
+    wooId: string;
+    sku: string;
+    name: string;
+    description: string;
+    categories: string;
+    images: string;
+    sizes: string;
+    inStock: boolean;
+    stockQty: number;
+  } | null = null;
+
+  let parentPrice = 0;
+  let parentOrigPrice = 0;
+  let gotPriceFromVariation = false;
+
+  const flushParent = () => {
+    if (!currentParent) return;
+    const id = currentParent.sku
+      ? currentParent.sku
+      : slugify(currentParent.name, currentParent.wooId);
+    if (seenIds.has(id)) return;
+    seenIds.add(id);
+
+    const price = parentPrice || 0;
+    const origPrice = parentOrigPrice || price * 2;
+    const discount = origPrice > price && price > 0 ? Math.round(((origPrice - price) / origPrice) * 100) : 0;
+
+    const desc = currentParent.description
+      ? stripHtml(currentParent.description).substring(0, 2000)
+      : "";
+
+    products.push({
+      id,
+      name: currentParent.name,
+      description: desc,
+      price,
+      original_price: origPrice,
+      discount_percent: discount,
+      stock_quantity: currentParent.stockQty || 50,
+      category: extractCategory(currentParent.categories),
+      size: currentParent.sizes ? `EU ${currentParent.sizes}` : "EU 36-45",
+      image_url: extractFirstImage(currentParent.images),
+      is_active: currentParent.inStock,
+      notes: { top: [], middle: [], base: [] },
+    });
+  };
+
+  const getCol = (row: string[], idx: number): string => (idx >= 0 && idx < row.length ? row[idx] : "");
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const type = getCol(row, iType).trim();
+    const wooId = getCol(row, iID).trim();
+    const sku = getCol(row, iSKU).trim();
+    const name = getCol(row, iName).trim();
+    const description = getCol(row, iDesc) || getCol(row, iShortDesc) || "";
+    const inStock = getCol(row, iInStock).trim();
+    const stockQty = getCol(row, iStock).trim();
+    const salePrice = getCol(row, iSalePrice).trim();
+    const regularPrice = getCol(row, iRegPrice).trim();
+    const categories = getCol(row, iCategories).trim();
+    const images = getCol(row, iImages).trim();
+
+    // Get sizes from attribute
+    const attr1Name = getCol(row, iAttr1Name).trim().toLowerCase();
+    const attr1Values = getCol(row, iAttr1Values).trim();
+    const sizeValues = (attr1Name === "size" || attr1Name === "shoe size") ? attr1Values : "";
+
+    if (type === "variable") {
+      flushParent();
+
+      currentParent = {
+        wooId,
+        sku,
+        name,
+        description,
+        categories,
+        images,
+        sizes: sizeValues.replace(/\s/g, ""),
+        inStock: inStock !== "0",
+        stockQty: parseInt(stockQty) || 50,
+      };
+      parentPrice = parseFloat(salePrice) || 0;
+      parentOrigPrice = parseFloat(regularPrice) || 0;
+      gotPriceFromVariation = false;
+    } else if (type === "variation" && currentParent && !gotPriceFromVariation) {
+      const vSale = parseFloat(salePrice);
+      const vReg = parseFloat(regularPrice);
+      if (vSale > 0 || vReg > 0) {
+        parentPrice = vSale > 0 ? vSale : parentPrice;
+        parentOrigPrice = vReg > 0 ? vReg : parentOrigPrice;
+        gotPriceFromVariation = true;
+      }
+    }
+  }
+
+  flushParent();
+  return products;
+};
+
+/**
+ * Parse pipe-delimited text (legacy format from xlsx parse)
+ */
+const parseWooCommercePipe = (text: string): ParsedProduct[] => {
   const lines = text.split("\n").filter((l) => l.startsWith("|"));
   if (lines.length < 2) return [];
 
   const products: ParsedProduct[] = [];
   const seenIds = new Set<string>();
 
-  // Track current parent for getting variation prices
   let currentParent: {
     wooId: string;
     slug: string;
@@ -126,12 +328,10 @@ const parseWooCommerceData = (text: string): ParsedProduct[] => {
 
   for (let i = 1; i < lines.length; i++) {
     const cols = lines[i].split("|").map((c) => c.trim());
-    // cols[0] is empty (before first pipe), actual data starts at cols[1]
     const wooId = cols[1] || "";
     const type = cols[2] || "";
     const sku = cols[3] || "";
     const name = cols[5] || "";
-    const published = cols[6] || "";
     const description = cols[10] || "";
     const inStock = cols[15] || "";
     const stockQty = cols[16] || "";
@@ -142,9 +342,7 @@ const parseWooCommerceData = (text: string): ParsedProduct[] => {
     const sizeValues = cols[44] || "";
 
     if (type === "variable") {
-      // Flush previous parent
       flushParent();
-
       currentParent = {
         wooId,
         slug: sku ? slugify(name, wooId) : slugify(name, wooId),
@@ -161,7 +359,6 @@ const parseWooCommerceData = (text: string): ParsedProduct[] => {
       parentOrigPrice = parseFloat(regularPrice) || 0;
       gotPriceFromVariation = false;
     } else if (type === "variation" && currentParent && !gotPriceFromVariation) {
-      // Get price from first variation
       const vSale = parseFloat(salePrice);
       const vReg = parseFloat(regularPrice);
       if (vSale > 0 || vReg > 0) {
@@ -172,10 +369,18 @@ const parseWooCommerceData = (text: string): ParsedProduct[] => {
     }
   }
 
-  // Flush last parent
   flushParent();
-
   return products;
+};
+
+/** Auto-detect format and parse */
+const parseWooCommerceData = (text: string): ParsedProduct[] => {
+  // If it starts with pipe-delimited rows, use legacy parser
+  if (text.split("\n").some((l) => l.startsWith("|"))) {
+    return parseWooCommercePipe(text);
+  }
+  // Otherwise treat as CSV
+  return parseWooCommerceCSV(text);
 };
 
 const AdminBulkImport = () => {
@@ -183,13 +388,13 @@ const AdminBulkImport = () => {
   const [parsedProducts, setParsedProducts] = useState<ParsedProduct[]>([]);
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [replaceMode, setReplaceMode] = useState(false);
   const [result, setResult] = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // For now, we expect a text/CSV file or we'll read the parsed data
     const text = await file.text();
     const products = parseWooCommerceData(text);
 
@@ -227,7 +432,18 @@ const AdminBulkImport = () => {
       setImporting(true);
       setProgress(0);
 
-      // Send in batches of 50 to avoid payload limits
+      // If replace mode, delete all existing products first
+      if (replaceMode) {
+        const { error: delError } = await supabase.functions.invoke("manage-products", {
+          body: { action: "delete_all" },
+          headers: { Authorization: `Bearer ${session.token}` },
+        });
+        if (delError) {
+          throw new Error(`Failed to clear products: ${delError.message}`);
+        }
+      }
+
+      // Send in batches of 50
       const batchSize = 50;
       let totalImported = 0;
       let totalSkipped = 0;
@@ -271,7 +487,7 @@ const AdminBulkImport = () => {
       <div>
         <h1 className="text-2xl font-heading font-bold">Bulk Import Products</h1>
         <p className="text-muted-foreground">
-          Import products from your WooCommerce export file
+          Import products from your WooCommerce export file (CSV or pipe-delimited)
         </p>
       </div>
 
@@ -308,26 +524,38 @@ const AdminBulkImport = () => {
       {/* Preview */}
       {parsedProducts.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <h2 className="text-lg font-semibold">
               Preview ({parsedProducts.length} products)
             </h2>
-            <Button
-              onClick={() => importMutation.mutate(parsedProducts)}
-              disabled={importing}
-            >
-              {importing ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Importing...
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Import {parsedProducts.length} Products
-                </>
-              )}
-            </Button>
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={replaceMode}
+                  onChange={(e) => setReplaceMode(e.target.checked)}
+                  className="rounded"
+                />
+                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                Replace all existing products
+              </label>
+              <Button
+                onClick={() => importMutation.mutate(parsedProducts)}
+                disabled={importing}
+              >
+                {importing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Importing...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    {replaceMode ? "Replace" : "Import"} {parsedProducts.length} Products
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {importing && (
