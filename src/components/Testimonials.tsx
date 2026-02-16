@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ChevronRight, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { formatPrice } from "@/data/products";
+import { useDbProducts } from "@/hooks/useDbProducts";
 
 const testimonials = [
   [
@@ -69,20 +69,9 @@ const Testimonials = () => {
     return () => clearInterval(timer);
   }, [next]);
 
-  // Fetch 3 random products for the bottom of each card
-  const { data: products } = useQuery({
-    queryKey: ["testimonial-products"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("id, name, price, original_price, image_url")
-        .eq("is_active", true)
-        .gt("stock_quantity", 0)
-        .limit(3);
-      if (error) throw error;
-      return data;
-    },
-  });
+  // Use enriched products (with static image fallback)
+  const { data: allProducts } = useDbProducts();
+  const products = allProducts?.filter(p => p.image)?.slice(0, 3) || [];
 
   return (
     <section className="bg-background py-12 sm:py-16 lg:py-20">
@@ -124,7 +113,7 @@ const Testimonials = () => {
                     <div className="border-t border-border pt-4 mt-auto">
                       <Link to={`/product/${products[i].id}`} className="flex items-center gap-3 group">
                         <img
-                          src={products[i].image_url || ""}
+                          src={products[i].image || ""}
                           alt={products[i].name}
                           className="w-14 h-14 object-contain rounded"
                           loading="lazy"
@@ -135,11 +124,11 @@ const Testimonials = () => {
                           </p>
                           <div className="flex items-baseline gap-1.5 mt-0.5">
                             <span className="text-sm font-semibold text-foreground">
-                              {products[i].price.toFixed(2)} د.إ
+                              {formatPrice(products[i].price)}
                             </span>
-                            {products[i].original_price && products[i].original_price > 0 && (
+                            {products[i].originalPrice > products[i].price && (
                               <span className="text-xs text-muted-foreground line-through">
-                                {products[i].original_price.toFixed(2)} د.إ
+                                {formatPrice(products[i].originalPrice)}
                               </span>
                             )}
                           </div>
