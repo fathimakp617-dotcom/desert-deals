@@ -1,6 +1,7 @@
 import { memo, useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Local brand logo imports
 import pumaLogo from "@/assets/brands/puma.png";
@@ -70,31 +71,42 @@ const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands
 
   return (
     <div className="sm:hidden">
-      <div className="grid grid-cols-2 gap-3">
-        {pair.map((brand) => (
-          <Link
-            key={brand.slug}
-            to={`/shop?brand=${brand.slug}`}
-            className="group"
+      <div className="overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={page}
+            initial={{ opacity: 0, x: 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -60 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="grid grid-cols-2 gap-3"
           >
-            <div className="bg-muted rounded-lg p-4 text-center transition-all duration-300 hover:shadow-md">
-              <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">
-                {brand.name}
-              </h3>
-              <span className="text-[11px] text-muted-foreground mt-0.5 block">
-                {brand.count} Products
-              </span>
-              <div className="my-4 flex items-center justify-center">
-                <div className="w-20 h-20 rounded-lg flex items-center justify-center p-2">
-                  <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
+            {pair.map((brand) => (
+              <Link
+                key={brand.slug}
+                to={`/shop?brand=${brand.slug}`}
+                className="group"
+              >
+                <div className="bg-muted rounded-lg p-4 text-center transition-all duration-300 hover:shadow-md">
+                  <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">
+                    {brand.name}
+                  </h3>
+                  <span className="text-[11px] text-muted-foreground mt-0.5 block">
+                    {brand.count} Products
+                  </span>
+                  <div className="my-4 flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-lg flex items-center justify-center p-2">
+                      <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
+                    </div>
+                  </div>
+                  <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
+                    View Products
+                  </span>
                 </div>
-              </div>
-              <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
-                View Products
-              </span>
-            </div>
-          </Link>
-        ))}
+              </Link>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
       <div className="flex justify-center gap-1.5 mt-3">
         {Array.from({ length: totalPages }).map((_, idx) => (
