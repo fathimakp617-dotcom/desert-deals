@@ -1,9 +1,11 @@
 import { Suspense, lazy } from "react";
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import PageTransition from "@/components/PageTransition";
 import { OrganizationSchema, LocalBusinessSchema, WebsiteSchema, FAQSchema } from "@/components/seo/JsonLd";
+import onCloudAd from "@/assets/banners/on-cloud-ad.webp";
 
 // Lazy load below-fold components - exact page order from HTML
 const BrandCategories = lazy(() => import("@/components/BrandCategories"));
@@ -88,6 +90,22 @@ const Index = () => {
           <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="adidas" title="Adidas Collection" />
           </Suspense>
+
+          {/* On Cloud Ad Banner */}
+          <section className="bg-background">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
+              <Link to="/shop?brand=on-cloud" className="block relative rounded-lg overflow-hidden group">
+                <img src={onCloudAd} alt="On Cloud Shoes" className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover" />
+                <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-14">
+                  <h3 className="text-2xl sm:text-4xl font-heading font-bold text-foreground">On Cloud</h3>
+                  <p className="text-sm sm:text-lg text-foreground/80 mt-2">Engineered for comfort<br />Designed for life</p>
+                  <span className="mt-4 inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+                    Shop Now →
+                  </span>
+                </div>
+              </Link>
+            </div>
+          </section>
 
           <Suspense fallback={<SectionLoader />}>
             <Contact />
