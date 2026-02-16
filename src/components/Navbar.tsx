@@ -68,7 +68,7 @@ const Navbar = memo(() => {
   return (
     <>
       {/* Announcement Bar */}
-      <div className="fixed top-0 left-0 right-0 z-[60] bg-foreground text-background">
+      <div className="fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-xl">
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={prevAnnouncement}
@@ -100,7 +100,7 @@ const Navbar = memo(() => {
       </div>
 
       {/* Main Header - sticky with shadow */}
-      <header className={`fixed top-9 left-0 right-0 z-50 bg-background border-b border-border rounded-b-xl transition-shadow duration-300 ${scrolled ? "shadow-md" : ""}`}>
+      <header className={`fixed top-9 left-0 right-0 z-50 bg-background border-b border-border transition-shadow duration-300 ${scrolled ? "shadow-md" : ""}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center h-12 sm:h-14">
             {/* Mobile hamburger */}
