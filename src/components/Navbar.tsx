@@ -114,8 +114,8 @@ const Navbar = memo(() => {
             </div>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center shrink-0 mr-8">
-              <img src={logoImg} alt="Desert Deal" className="h-7 sm:h-9 w-auto object-contain" />
+            <Link to="/" className="flex items-center shrink-0 mr-6 lg:mr-10 pr-6 lg:pr-10 border-r border-border">
+              <img src={logoImg} alt="Desert Deal" className="h-8 sm:h-10 w-auto object-contain" />
             </Link>
 
             {/* Desktop Row 1 nav links */}
