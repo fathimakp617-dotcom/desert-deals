@@ -43,11 +43,19 @@ const Navbar = memo(() => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const logoRef = useRef<HTMLAnchorElement>(null);
+  const [logoWidth, setLogoWidth] = useState(0);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (logoRef.current) {
+      setLogoWidth(logoRef.current.offsetWidth);
+    }
+  }, []);
 
   const nextAnnouncement = useCallback(() => {
     setAnnouncementIndex((prev) => (prev + 1) % announcements.length);
@@ -127,7 +135,7 @@ const Navbar = memo(() => {
             </div>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center shrink-0 mr-8 lg:mr-12">
+            <Link to="/" ref={logoRef} className="flex items-center shrink-0 mr-8 lg:mr-12">
               <img src={logoImg} alt="Desert Deal" className="h-12 sm:h-14 w-auto object-contain" />
             </Link>
 
@@ -184,7 +192,7 @@ const Navbar = memo(() => {
           </div>
 
           {/* Desktop Row 2 nav links */}
-          <div className="hidden lg:flex items-center gap-x-5 pb-2 ml-[calc(theme(spacing.10)+theme(spacing.10)+1px)]">
+          <div className="hidden lg:flex items-center gap-x-5 pb-2" style={{ paddingLeft: logoWidth ? `${logoWidth + 48 + 32 + 1}px` : undefined }}>
             {bottomLinks.map((link) => (
               <Link
                 key={link.name}
