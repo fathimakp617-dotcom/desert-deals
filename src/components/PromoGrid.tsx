@@ -30,7 +30,7 @@ const PromoGrid = () => {
 
   return (
     <section className="w-full">
-      <div className="grid grid-cols-2 md:grid-cols-3 h-[280px] sm:h-[350px] md:h-[420px]">
+      <div className="grid grid-cols-2 md:grid-cols-3 auto-rows-auto">
         {/* Large left image - spans 2 columns on desktop, 1 on mobile */}
         <Link to="/shop" className="col-span-1 md:col-span-2 overflow-hidden group">
           <img
