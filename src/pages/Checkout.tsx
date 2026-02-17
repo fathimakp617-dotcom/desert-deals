@@ -118,7 +118,8 @@ const Checkout = () => {
     city: "",
     state: "",
     zipCode: "",
-    country: "India",
+    country: "United Arab Emirates",
+    orderNotes: "",
   });
 
   // Track if we've already loaded address to prevent multiple loads
@@ -167,7 +168,8 @@ const Checkout = () => {
                 city: pendingNormalized.city,
                 state: pendingNormalized.state || "",
                 zipCode: pendingNormalized.zipCode || "",
-                country: pendingNormalized.country || "India",
+                country: "United Arab Emirates",
+                orderNotes: "",
               });
               setIsExpressMode(true);
 
@@ -230,7 +232,8 @@ const Checkout = () => {
             city: normalized.city,
             state: normalized.state || "",
             zipCode: normalized.zipCode || "",
-            country: normalized.country || "India",
+            country: "United Arab Emirates",
+            orderNotes: "",
           });
           setIsExpressMode(true);
           setLoadingSavedAddress(false);
@@ -883,222 +886,194 @@ const Checkout = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="grid lg:grid-cols-3 gap-12">
-              {/* Left Column - Forms */}
-              <div className="lg:col-span-2 space-y-8">
-                {/* Contact Information */}
-                <div className="bg-card border border-border rounded-lg p-6">
-                  <h2 className="text-xl font-heading text-foreground mb-6 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm">
-                      1
-                    </span>
-                    Contact Information
-                  </h2>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="md:col-span-2">
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="your@email.com"
-                        required
-                        className="mt-1 bg-input border-border"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        placeholder="+91 98765 43210"
-                        required
-                        className="mt-1 bg-input border-border"
-                      />
-                    </div>
+              {/* Left Column - Billing Details */}
+              <div className="lg:col-span-2 space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      required
+                      className="mt-1 bg-input border-border"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      required
+                      className="mt-1 bg-input border-border"
+                    />
                   </div>
                 </div>
 
-                {/* Shipping Address */}
-                <div className="bg-card border border-border rounded-lg p-6">
-                  <h2 className="text-xl font-heading text-foreground mb-6 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm">
-                      2
-                    </span>
-                    Shipping Address
-                  </h2>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 bg-input border-border"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 bg-input border-border"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label htmlFor="address">Street Address</Label>
-                      <Input
-                        id="address"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 bg-input border-border"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="city">City</Label>
-                      <Input
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 bg-input border-border"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="state">State</Label>
-                      <Input
-                        id="state"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 bg-input border-border"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="zipCode">PIN Code</Label>
-                      <div className="relative mt-1">
-                        <Input
-                          id="zipCode"
-                          name="zipCode"
-                          value={formData.zipCode}
-                          onChange={handleInputChange}
-                          onBlur={(e) => handlePinCodeBlur(e.target.value)}
-                          required
-                          maxLength={6}
-                          placeholder="6-digit PIN code"
-                          className={`bg-input border-border ${isPinLoading ? "pr-10" : ""}`}
-                        />
-                        {isPinLoading && (
-                          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary animate-spin" />
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Enter PIN to auto-fill city & state
-                      </p>
-                    </div>
-                    <div>
-                      <Label htmlFor="country">Country</Label>
-                      <Input
-                        id="country"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 bg-input border-border"
-                      />
-                    </div>
-                  </div>
+                <div>
+                  <Label>Country / Region *</Label>
+                  <p className="text-foreground font-medium mt-1">United Arab Emirates</p>
                 </div>
 
-                {/* Payment Method */}
-                <div id="payment-section" className="bg-card border border-border rounded-lg p-6">
-                  <h2 className="text-xl font-heading text-foreground mb-6 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm">
-                      3
-                    </span>
-                    Payment Method
-                  </h2>
+                <div>
+                  <Label htmlFor="address">Street address *</Label>
+                  <Input
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    placeholder="House number and street name"
+                    required
+                    className="mt-1 bg-input border-border"
+                  />
+                </div>
 
-                  <div className="flex items-center space-x-3 bg-input border border-primary rounded-lg p-4">
-                    <Truck className="w-5 h-5 text-primary" />
-                    <div className="flex-1">
-                      <span className="font-medium">Cash on Delivery</span>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Pay when you receive your order • 20 AED shipping
-                      </p>
-                    </div>
-                  </div>
+                <div>
+                  <Label htmlFor="city">Town / City *</Label>
+                  <Input
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1 bg-input border-border"
+                  />
+                </div>
 
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
-                    <Lock className="w-4 h-4" />
-                    Your information is secured with SSL encryption
-                  </div>
+                <div>
+                  <Label htmlFor="state">State / County (optional)</Label>
+                  <Input
+                    id="state"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleInputChange}
+                    className="mt-1 bg-input border-border"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="phone">Phone *</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1 bg-input border-border"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="email">Email address *</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="your@email.com"
+                    required
+                    className="mt-1 bg-input border-border"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="orderNotes">Order notes (optional)</Label>
+                  <textarea
+                    id="orderNotes"
+                    name="orderNotes"
+                    value={formData.orderNotes}
+                    onChange={(e) => setFormData(prev => ({ ...prev, orderNotes: e.target.value }))}
+                    placeholder="Notes about your order, e.g. special notes for delivery."
+                    className="mt-1 w-full min-h-[100px] rounded-md border border-border bg-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  />
                 </div>
               </div>
 
               {/* Right Column - Order Summary */}
               <div className="lg:col-span-1">
-                <div className="bg-card border border-border rounded-lg p-6 sticky top-24">
-                  <h2 className="text-xl font-heading text-foreground mb-6">Order Summary</h2>
+                <div className="border border-border rounded-lg p-6 sticky top-24">
+                  {/* Product table header */}
+                  <div className="flex justify-between text-sm font-medium text-foreground border-b border-border pb-3 mb-3">
+                    <span>Product</span>
+                    <span>Subtotal</span>
+                  </div>
 
-                  <div className="space-y-4 max-h-64 overflow-y-auto mb-6">
+                  {/* Product items */}
+                  <div className="space-y-3 mb-4">
                     {items.map((item) => (
-                      <div key={item.product.id} className="flex gap-4">
-                        <img
-                          src={item.product.image}
-                          alt={item.product.name}
-                          className="w-16 h-16 object-cover rounded-md"
-                        />
-                        <div className="flex-1">
-                          <h3 className="text-sm font-medium text-foreground">{item.product.name}</h3>
-                          <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
-                        </div>
-                        <p className="text-sm text-foreground">
+                      <div key={item.product.id} className="flex justify-between text-sm">
+                        <span className="text-muted-foreground flex-1 pr-4">
+                          {item.product.name}
+                          <br />
+                          <span className="text-xs">× {item.quantity}</span>
+                        </span>
+                        <span className="text-foreground whitespace-nowrap">
                           {formatPrice(item.product.price * item.quantity)}
-                        </p>
+                        </span>
                       </div>
                     ))}
                   </div>
 
-                  <Separator className="my-4" />
+                  <Separator />
 
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Subtotal ({totalItems} items)</span>
-                      <span>{formatPrice(totalPrice)}</span>
-                    </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Truck className="w-4 h-4" />
-                        Shipping
-                      </span>
-                      <span>{formatPrice(shipping)}</span>
-                    </div>
+                  {/* Subtotal */}
+                  <div className="flex justify-between text-sm py-3">
+                    <span className="text-foreground font-medium">Subtotal</span>
+                    <span className="text-foreground">{formatPrice(totalPrice)}</span>
                   </div>
 
-                  <Separator className="my-4" />
+                  <Separator />
 
-                  <div className="flex justify-between text-lg font-heading text-foreground mb-6">
-                    <span>Total</span>
-                    <span className="text-primary">{formatPrice(orderTotal)}</span>
+                  {/* Shipping */}
+                  <div className="flex justify-between text-sm py-3">
+                    <span className="text-foreground font-medium">Shipment 1</span>
+                    <span className="text-foreground">Cash On Delivery: {formatPrice(shipping)}</span>
                   </div>
 
+                  <Separator />
+
+                  {/* Total */}
+                  <div className="flex justify-between py-3">
+                    <span className="text-foreground font-bold">Total</span>
+                    <span className="text-foreground font-bold text-lg">{formatPrice(orderTotal)}</span>
+                  </div>
+
+                  <Separator className="mb-4" />
+
+                  {/* Cash on Delivery */}
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-4 h-4 rounded-full border-2 border-foreground flex items-center justify-center">
+                      <div className="w-2 h-2 rounded-full bg-foreground" />
+                    </div>
+                    <span className="font-medium text-foreground">Cash On Delivery</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-6 ml-7">Pay with cash upon delivery.</p>
+
+                  {/* Terms checkbox */}
+                  <div className="flex items-start gap-2 mb-6">
+                    <input
+                      type="checkbox"
+                      id="terms-checkout"
+                      required
+                      className="mt-1 accent-primary"
+                    />
+                    <Label htmlFor="terms-checkout" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+                      I have read and agree to the website{" "}
+                      <Link to="/terms" target="_blank" className="text-primary hover:underline">
+                        terms and conditions
+                      </Link>{" "}*
+                    </Label>
+                  </div>
+
+                  {/* Place Order Button */}
                   <Button
                     type="submit"
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="w-full bg-foreground hover:bg-foreground/90 text-background py-6 text-sm font-medium tracking-wide"
                     size="lg"
                     disabled={isProcessing}
                   >
@@ -1107,22 +1082,14 @@ const Checkout = () => {
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full"
+                          className="w-5 h-5 border-2 border-background border-t-transparent rounded-full"
                         />
                         Processing...
                       </span>
                     ) : (
-                      <span className="flex items-center gap-2">
-                        <Check className="w-5 h-5" />
-                        Place Order
-                      </span>
+                      "Place order"
                     )}
                   </Button>
-
-                  <p className="text-xs text-center text-muted-foreground mt-4">
-                    By placing this order, you agree to our{" "}
-                    <Link to="/terms" className="text-primary hover:underline">Terms & Conditions</Link>
-                  </p>
                 </div>
               </div>
             </div>
