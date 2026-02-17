@@ -52,6 +52,9 @@ const Hero = memo(() => {
           </div>
         ))}
 
+        {/* Light black gradient overlay at top */}
+        <div className="absolute inset-x-0 top-0 h-24 sm:h-32 bg-gradient-to-b from-black/40 to-transparent z-10 pointer-events-none rounded-t-xl sm:rounded-t-2xl" />
+
         <button
           onClick={(e) => { e.stopPropagation(); prevSlide(); }}
           className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 text-foreground bg-background/80 hover:bg-background rounded-full p-2 transition-colors shadow"
