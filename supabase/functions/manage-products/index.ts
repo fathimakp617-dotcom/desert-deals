@@ -107,14 +107,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check if admin
+    // Check if admin - first check staff_members, then fallback to ADMIN_EMAILS env
     const { data: staff } = await supabaseClient
       .from("staff_members")
       .select("role")
       .eq("email", session.email)
       .single();
 
-    if (!staff || staff.role !== "admin") {
+    const adminEmailsRaw = Deno.env.get("ADMIN_EMAILS") || "";
+    const adminEmails = adminEmailsRaw.split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+    const isEnvAdmin = adminEmails.includes(session.email.toLowerCase());
+
+    if ((!staff || staff.role !== "admin") && !isEnvAdmin) {
       return new Response(JSON.stringify({ error: "Admin access required" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
