@@ -279,7 +279,7 @@ const AdminReturns = () => {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Order Total:</span>
-                  <p className="font-medium">₹{selectedReturn.total.toLocaleString()}</p>
+                  <p className="font-medium">{selectedReturn.total.toLocaleString()} AED</p>
                 </div>
               </div>
 

@@ -48,7 +48,7 @@ const ShippingSlip = forwardRef<HTMLDivElement, ShippingSlipProps>(({ order }, r
                   display: "inline-block",
                   marginTop: "0.2cm",
                 }}>
-                  {isPrepaid ? <>PREPAID : ₹{totalAmount}</> : <>COD : ₹{totalAmount}</>}
+                  {isPrepaid ? <>PREPAID : {totalAmount} AED</> : <>COD : {totalAmount} AED</>}
                 </div>
               </td>
               <td style={{ padding: "0.2cm", verticalAlign: "top", fontWeight: "bold", width: "30%", textAlign: "right", border: "1.5px solid black", fontSize: "8px" }}>
@@ -110,7 +110,7 @@ const ShippingSlip = forwardRef<HTMLDivElement, ShippingSlipProps>(({ order }, r
           <tbody>
             <tr>
               <td style={{ padding: "0.15cm 0.2cm", fontWeight: "bold", textAlign: "right", fontSize: "9px" }}>
-                TOTAL : ₹{totalAmount}
+                TOTAL : {totalAmount} AED
               </td>
             </tr>
           </tbody>

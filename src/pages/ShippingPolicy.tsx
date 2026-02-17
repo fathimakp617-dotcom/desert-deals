@@ -49,7 +49,7 @@ const ShippingPolicy = () => {
                   <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle className="w-5 h-5 text-green-500" />
-                      <p className="font-medium text-foreground">Orders ₹999 & Above</p>
+                      <p className="font-medium text-foreground">Orders 999 AED & Above</p>
                     </div>
                     <p className="text-2xl font-bold text-green-500">FREE</p>
                     <p className="text-sm text-muted-foreground">Shipping across India</p>
@@ -57,9 +57,9 @@ const ShippingPolicy = () => {
                   <div className="p-4 bg-orange-500/5 border border-orange-500/20 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <AlertTriangle className="w-5 h-5 text-orange-500" />
-                      <p className="font-medium text-foreground">Orders Below ₹999</p>
+                      <p className="font-medium text-foreground">Orders Below 999 AED</p>
                     </div>
-                    <p className="text-2xl font-bold text-orange-500">₹79</p>
+                    <p className="text-2xl font-bold text-orange-500">79 AED</p>
                     <p className="text-sm text-muted-foreground">Flat shipping charge</p>
                   </div>
                 </div>
@@ -142,7 +142,7 @@ const ShippingPolicy = () => {
                   <div>
                     <p className="font-medium text-foreground">Important: COD Advance Payment</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      For COD orders, the <span className="text-orange-500 font-semibold">shipping charge (₹79) must be paid in advance</span> online 
+                      For COD orders, the <span className="text-orange-500 font-semibold">shipping charge (79 AED) must be paid in advance</span> online 
                       before order confirmation. Only the product amount is collected at delivery.
                     </p>
                   </div>

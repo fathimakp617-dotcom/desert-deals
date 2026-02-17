@@ -32,7 +32,7 @@ interface OrderReceiptProps {
 }
 
 const formatCurrency = (amount: number): string => {
-  return `₹${amount.toLocaleString('en-IN')}`;
+  return `${Math.round(amount).toLocaleString()} AED`;
 };
 
 const OrderReceipt = ({

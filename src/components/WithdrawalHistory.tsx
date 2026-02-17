@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IndianRupee, Clock, CheckCircle, XCircle, Loader2, History } from "lucide-react";
+import { Wallet, Clock, CheckCircle, XCircle, Loader2, History } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface WithdrawalRequest {
@@ -125,9 +125,9 @@ const WithdrawalHistory = ({ userId }: WithdrawalHistoryProps) => {
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <IndianRupee size={16} className="text-primary" />
+                    <Wallet size={16} className="text-primary" />
                     <span className="font-semibold text-foreground">
-                      ₹{request.amount.toLocaleString()}
+                      {request.amount.toLocaleString()} AED
                     </span>
                     {getStatusBadge(request.status)}
                   </div>

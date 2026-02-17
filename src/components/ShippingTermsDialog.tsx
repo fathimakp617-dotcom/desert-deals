@@ -69,10 +69,10 @@ const ShippingTermsDialog = ({
               <AlertTriangle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  Additional Shipping Charge: ₹{shippingCharge}
+                  Additional Shipping Charge: {shippingCharge} AED
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  This charge applies to orders below ₹999. Orders above ₹999 get FREE shipping.
+                  This charge applies to orders below 999 AED. Orders above 999 AED get FREE shipping.
                 </p>
               </div>
             </div>
@@ -87,8 +87,8 @@ const ShippingTermsDialog = ({
                   Cash on Delivery - Shipping Prepayment Required
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  You will be redirected to <span className="text-orange-500 font-semibold">pay ₹{shippingCharge} shipping charge via Razorpay</span> first. 
-                  After payment, your order will be confirmed and you'll pay the product amount (₹{shippingCharge > 0 ? "remaining" : "total"}) at delivery.
+                  You will be redirected to <span className="text-orange-500 font-semibold">pay {shippingCharge} AED shipping charge via Razorpay</span> first. 
+                  After payment, your order will be confirmed and you'll pay the product amount ({shippingCharge > 0 ? "remaining" : "total"}) at delivery.
                 </p>
               </div>
             </div>
@@ -133,7 +133,7 @@ const ShippingTermsDialog = ({
                   onCheckedChange={(checked) => setCodTermsAccepted(checked === true)}
                 />
                 <Label htmlFor="cod-terms" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                  I understand that I will <span className="text-orange-500 font-medium">pay ₹{shippingCharge} shipping via Razorpay now</span>, and pay the product amount at delivery.
+                  I understand that I will <span className="text-orange-500 font-medium">pay {shippingCharge} AED shipping via Razorpay now</span>, and pay the product amount at delivery.
                 </Label>
               </div>
             )}

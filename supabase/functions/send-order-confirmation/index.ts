@@ -53,7 +53,7 @@ interface OrderConfirmationRequest {
 }
 
 const formatCurrency = (amount: number): string => {
-  return `₹${amount.toLocaleString('en-IN')}`;
+  return `${Math.round(amount).toLocaleString()} AED`;
 };
 
 const generateOrderEmailHTML = (order: OrderConfirmationRequest): string => {
@@ -759,7 +759,7 @@ const generateAdminOrderEmailHTML = (order: OrderConfirmationRequest): string =>
                       <td style="padding: 10px; background-color: ${order.payment_method === 'cod' ? '#fff3cd' : '#d4edda'}; border-radius: 4px;">
                         <strong style="font-family: Arial, sans-serif;">Payment:</strong>
                         <span style="font-family: Arial, sans-serif; font-weight: bold; color: ${order.payment_method === 'cod' ? '#856404' : '#155724'};"> ${paymentMethodLabel}</span>
-                        ${order.payment_method === 'cod' ? '<span style="font-family: Arial, sans-serif; color: #856404;"> - Collect ₹' + order.total.toLocaleString('en-IN') + '</span>' : ''}
+                        ${order.payment_method === 'cod' ? '<span style="font-family: Arial, sans-serif; color: #856404;"> - Collect ' + Math.round(order.total).toLocaleString() + ' AED</span>' : ''}
                       </td>
                     </tr>
                   </table>
@@ -1306,11 +1306,11 @@ const handler = async (req: Request): Promise<Response> => {
 Order Number: ${orderData.order_number}
 
 Order Summary:
-${orderData.items.map(item => `- ${item.name} x${item.quantity}: ₹${(item.price * item.quantity).toLocaleString('en-IN')}`).join('\n')}
+${orderData.items.map(item => `- ${item.name} x${item.quantity}: ${(item.price * item.quantity).toLocaleString()} AED`).join('\n')}
 
-Subtotal: ₹${orderData.subtotal.toLocaleString('en-IN')}
-${orderData.discount > 0 ? `Discount: -₹${orderData.discount.toLocaleString('en-IN')}\n` : ''}Shipping: ${orderData.shipping === 0 ? 'FREE' : `₹${orderData.shipping.toLocaleString('en-IN')}`}
-Total: ₹${orderData.total.toLocaleString('en-IN')}
+Subtotal: ${orderData.subtotal.toLocaleString()} AED
+${orderData.discount > 0 ? `Discount: -${orderData.discount.toLocaleString()} AED\n` : ''}Shipping: ${orderData.shipping === 0 ? 'FREE' : `${orderData.shipping.toLocaleString()} AED`}
+Total: ${orderData.total.toLocaleString()} AED
 
 Shipping Address:
 ${orderData.customer_name}
@@ -1380,7 +1380,7 @@ Order: ${orderData.order_number}
 Customer: ${orderData.customer_name}
 Email: ${orderData.customer_email}
 Phone: ${orderData.customer_phone || 'N/A'}
-Total: ₹${orderData.total.toLocaleString('en-IN')}
+Total: ${orderData.total.toLocaleString()} AED
 Payment: ${orderData.payment_method === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
 
 Items:

@@ -151,7 +151,7 @@ const ProductForm = ({
 
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <Label htmlFor="original_price">Original Price (₹)</Label>
+            <Label htmlFor="original_price">Original Price (AED)</Label>
             <Input
               id="original_price"
               type="number"
@@ -176,7 +176,7 @@ const ProductForm = ({
             />
           </div>
           <div>
-            <Label htmlFor="price">Final Price (₹)</Label>
+            <Label htmlFor="price">Final Price (AED)</Label>
             <Input
               id="price"
               type="number"
