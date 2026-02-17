@@ -28,7 +28,7 @@ import MobileFilterSheet from "@/components/MobileFilterSheet";
 const categories = [
   "All", "Nike", "Jordan", "New Balance", "On Cloud", "Asics", "Adidas",
   "Hoka", "Puma", "Louis Vuitton", "Gucci", "Onitsuka Tiger", "Loro Piana",
-  "Brooks", "Dior", "Basketball Shoes",
+  "Brooks", "Dior", "Hermes", "Basketball Shoes",
 ];
 const priceRanges = [
   { label: "All Prices", min: 0, max: Infinity },
