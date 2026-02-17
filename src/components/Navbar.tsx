@@ -184,8 +184,8 @@ const Navbar = memo(() => {
       {/* Search Side Panel */}
       {searchOpen && (
         <>
-          <div className="fixed inset-0 z-[70] bg-foreground/30" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} />
-          <div className="fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col">
+          <div className="fixed inset-0 z-[70] bg-foreground/30 animate-fade-in" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} />
+          <div className="fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col animate-slide-in-right">
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <h2 className="text-xl font-semibold text-foreground">Search</h2>
               <button onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="p-1 text-foreground hover:opacity-60 transition-opacity">
