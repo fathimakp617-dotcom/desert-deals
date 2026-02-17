@@ -71,8 +71,7 @@ const AdminProducts = () => {
       if (!session) throw new Error("Not authenticated");
 
       const { data, error } = await supabase.functions.invoke("manage-products", {
-        body: { action: "list" },
-        headers: { Authorization: `Bearer ${session.token}` },
+        body: { action: "list", admin_email: session.email, admin_token: session.token },
       });
 
       if (error) throw error;
@@ -95,6 +94,8 @@ const AdminProducts = () => {
       const { data, error } = await supabase.functions.invoke("manage-products", {
         body: {
           action: "upload_image",
+          admin_email: session.email,
+          admin_token: session.token,
           imageData: {
             base64,
             fileName: file.name,
@@ -102,7 +103,6 @@ const AdminProducts = () => {
             productId,
           },
         },
-        headers: { Authorization: `Bearer ${session.token}` },
       });
 
       if (error) throw error;
@@ -144,8 +144,7 @@ const AdminProducts = () => {
       if (!session) throw new Error("Not authenticated");
 
       const { data, error } = await supabase.functions.invoke("manage-products", {
-        body: { action: "create", product: buildProductPayload(fd) },
-        headers: { Authorization: `Bearer ${session.token}` },
+        body: { action: "create", product: buildProductPayload(fd), admin_email: session.email, admin_token: session.token },
       });
 
       if (error) throw error;
@@ -168,8 +167,7 @@ const AdminProducts = () => {
       if (!session) throw new Error("Not authenticated");
 
       const { data, error } = await supabase.functions.invoke("manage-products", {
-        body: { action: "update", product: buildProductPayload(fd) },
-        headers: { Authorization: `Bearer ${session.token}` },
+        body: { action: "update", product: buildProductPayload(fd), admin_email: session.email, admin_token: session.token },
       });
 
       if (error) throw error;
@@ -192,8 +190,7 @@ const AdminProducts = () => {
       if (!session) throw new Error("Not authenticated");
 
       const { data, error } = await supabase.functions.invoke("manage-products", {
-        body: { action: "delete", product: { id: productId } },
-        headers: { Authorization: `Bearer ${session.token}` },
+        body: { action: "delete", product: { id: productId }, admin_email: session.email, admin_token: session.token },
       });
 
       if (error) throw error;
@@ -214,8 +211,7 @@ const AdminProducts = () => {
       if (!session) throw new Error("Not authenticated");
 
       const { data, error } = await supabase.functions.invoke("manage-products", {
-        body: { action: "update_stock", product: { id, stock_quantity } },
-        headers: { Authorization: `Bearer ${session.token}` },
+        body: { action: "update_stock", product: { id, stock_quantity }, admin_email: session.email, admin_token: session.token },
       });
 
       if (error) throw error;

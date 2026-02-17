@@ -58,12 +58,6 @@ const AdminReviewsPage = lazy(() => import("./pages/admin/AdminReviewsPage"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminBulkImport = lazy(() => import("./pages/admin/AdminBulkImport"));
 
-// Shipping pages - all lazy loaded
-const ShippingLayout = lazy(() => import("./pages/shipping/ShippingLayout"));
-const ShippingDashboard = lazy(() => import("./pages/shipping/ShippingDashboard"));
-const ShippingOrders = lazy(() => import("./pages/shipping/ShippingOrders"));
-const ShippingAccount = lazy(() => import("./pages/shipping/ShippingAccount"));
-const ShippingReturns = lazy(() => import("./pages/shipping/ShippingReturns"));
 
 
 // Minimal loading fallback
@@ -126,17 +120,12 @@ const App = () => (
                       <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<AdminDashboard />} />
                         <Route path="orders" element={<AdminOrders />} />
+                        <Route path="customers" element={<AdminCustomers />} />
                         <Route path="account" element={<AdminAccount />} />
                         <Route path="returns" element={<AdminReturns />} />
                         <Route path="reviews" element={<AdminReviewsPage />} />
                         <Route path="products" element={<AdminProducts />} />
                         <Route path="bulk-import" element={<AdminBulkImport />} />
-                      </Route>
-                      <Route path="/shipping" element={<ShippingLayout />}>
-                        <Route index element={<ShippingDashboard />} />
-                        <Route path="orders" element={<ShippingOrders />} />
-                        <Route path="account" element={<ShippingAccount />} />
-                        <Route path="returns" element={<ShippingReturns />} />
                       </Route>
                       <Route path="*" element={<NotFound />} />
                     </Routes>
