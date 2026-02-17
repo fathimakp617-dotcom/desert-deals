@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import promo1 from "@/assets/banners/promo-1.webp";
+import promo1 from "@/assets/banners/promo-ramadan-delivery.webp";
 import promo2 from "@/assets/banners/promo-2.webp";
 import promo3 from "@/assets/banners/promo-3.webp";
 import promo4 from "@/assets/banners/promo-4.webp";
 import promo5 from "@/assets/banners/promo-5.webp";
 
 const banners = [
-  { image: promo1, alt: "Adidas Originals Samba" },
+  { image: promo1, alt: "Ramadan Delivery - Shop Now" },
   { image: promo2, alt: "Asics Gel-Kayano 14" },
   { image: promo3, alt: "New Balance 9060" },
   { image: promo4, alt: "Nike Dunk Low" },
