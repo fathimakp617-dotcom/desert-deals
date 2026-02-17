@@ -232,10 +232,6 @@ const ProductDetail = () => {
                     }
                   }}
                 >
-                  <div className="absolute top-3 left-3 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-l-2 border-primary/60 z-10" />
-                  <div className="absolute top-3 right-3 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-r-2 border-primary/60 z-10" />
-                  <div className="absolute bottom-3 left-3 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-l-2 border-primary/60 z-10" />
-                  <div className="absolute bottom-3 right-3 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-r-2 border-primary/60 z-10" />
                   
                   {isSoldOut && (
                     <div className="absolute top-6 right-6 z-20">
