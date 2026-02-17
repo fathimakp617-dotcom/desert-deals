@@ -84,20 +84,22 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    const body = await req.json();
+    const { action, product, imageData, products: importProducts, admin_email, admin_token } = body;
+
     // Validate admin session
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    if (!admin_email || !admin_token) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const sessionToken = authHeader.replace("Bearer ", "");
     const { data: session, error: sessionError } = await supabaseClient
       .from("staff_sessions")
       .select("email, expires_at")
-      .eq("session_token", sessionToken)
+      .eq("session_token", admin_token)
+      .eq("email", admin_email.toLowerCase())
       .single();
 
     if (sessionError || !session || new Date(session.expires_at) < new Date()) {
@@ -125,8 +127,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const body = await req.json();
-    const { action, product, imageData, products: importProducts } = body;
+
+
 
     switch (action) {
       case "list": {

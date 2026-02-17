@@ -435,8 +435,7 @@ const AdminBulkImport = () => {
       // If replace mode, delete all existing products first
       if (replaceMode) {
         const { error: delError } = await supabase.functions.invoke("manage-products", {
-          body: { action: "delete_all" },
-          headers: { Authorization: `Bearer ${session.token}` },
+          body: { action: "delete_all", admin_email: session.email, admin_token: session.token },
         });
         if (delError) {
           throw new Error(`Failed to clear products: ${delError.message}`);
@@ -453,8 +452,7 @@ const AdminBulkImport = () => {
         const batch = products.slice(i, i + batchSize);
 
         const { data, error } = await supabase.functions.invoke("manage-products", {
-          body: { action: "bulk_import", products: batch },
-          headers: { Authorization: `Bearer ${session.token}` },
+          body: { action: "bulk_import", products: batch, admin_email: session.email, admin_token: session.token },
         });
 
         if (error) {
