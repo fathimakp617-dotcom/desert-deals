@@ -443,10 +443,10 @@ const AdminProducts = () => {
                 </TableCell>
                 <TableCell>
                   <div>
-                    <span className="font-medium">₹{product.price}</span>
+                    <span className="font-medium">{product.price} AED</span>
                     {product.original_price && (
                       <span className="ml-2 text-sm text-muted-foreground line-through">
-                        ₹{product.original_price}
+                        {product.original_price} AED
                       </span>
                     )}
                   </div>
