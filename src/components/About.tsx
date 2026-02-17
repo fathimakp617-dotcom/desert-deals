@@ -1,128 +1,66 @@
-import { motion } from "framer-motion";
 import aboutShoes from "@/assets/shoes/about-shoes.jpg";
-import { fadeInUp, fadeInLeft, fadeInRight, staggerContainer, staggerItem, lineReveal } from "@/lib/animations";
 
 const About = () => {
   return (
     <section id="about" className="py-24 sm:py-32 bg-background relative overflow-hidden">
-
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Image */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeInLeft}
-            className="relative order-2 lg:order-1"
-          >
+          <div className="relative order-2 lg:order-1">
             <div className="relative">
-              {/* Frame decoration */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.3 }}
-                className="absolute -inset-4 border border-primary/20" 
-              />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.5 }}
-                className="absolute -inset-8 border border-primary/10" 
-              />
-              
-              <motion.img
+              <div className="absolute -inset-4 border border-primary/20" />
+              <div className="absolute -inset-8 border border-primary/10" />
+              <img
                 src={aboutShoes}
                 alt="Premium Footwear Collection"
                 className="w-full object-cover relative z-10"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.6 }}
               />
-
-              {/* Corner accents */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20, y: -20 }}
-                whileInView={{ opacity: 1, x: 0, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.7 }}
-                className="absolute -top-2 -left-2 w-12 h-12 border-t-2 border-l-2 border-primary z-20" 
-              />
-              <motion.div 
-                initial={{ opacity: 0, x: 20, y: 20 }}
-                whileInView={{ opacity: 1, x: 0, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.7 }}
-                className="absolute -bottom-2 -right-2 w-12 h-12 border-b-2 border-r-2 border-primary z-20" 
-              />
+              <div className="absolute -top-2 -left-2 w-12 h-12 border-t-2 border-l-2 border-primary z-20" />
+              <div className="absolute -bottom-2 -right-2 w-12 h-12 border-b-2 border-r-2 border-primary z-20" />
             </div>
-          </motion.div>
+          </div>
 
           {/* Content */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="space-y-6 sm:space-y-8 order-1 lg:order-2"
-          >
+          <div className="space-y-6 sm:space-y-8 order-1 lg:order-2">
             <div className="space-y-4">
-              <motion.p variants={fadeInUp} className="text-sm tracking-[0.4em] text-primary">
-                OUR STORY
-              </motion.p>
-              <motion.h2 
-                variants={fadeInUp}
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading tracking-tight leading-tight"
-              >
+              <p className="text-sm tracking-[0.4em] text-primary">OUR STORY</p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading tracking-tight leading-tight">
                 Premium Shoes
                 <span className="block text-gold-gradient">& Style</span>
-              </motion.h2>
-              <motion.div 
-                variants={lineReveal}
-                className="w-16 h-0.5 bg-primary origin-left"
-              />
+              </h2>
+              <div className="w-16 h-0.5 bg-primary" />
             </div>
 
-            <motion.div variants={staggerContainer} className="space-y-4 sm:space-y-6 text-muted-foreground leading-relaxed">
-              <motion.p variants={staggerItem}>
+            <div className="space-y-4 sm:space-y-6 text-muted-foreground leading-relaxed">
+              <p>
                 At Desert Deal, we bring you the finest shoes and accessories from 
                 world-renowned brands. Every product is carefully curated and 
                 100% authentic, sourced directly from authorized distributors.
-              </motion.p>
-              <motion.p variants={staggerItem}>
+              </p>
+              <p>
                 From the latest Nike and Adidas sneakers to premium designer footwear,
                 we make luxury accessible with free shipping and COD across the UAE.
-              </motion.p>
-            </motion.div>
+              </p>
+            </div>
 
             {/* Stats */}
-            <motion.div 
-              variants={fadeInUp}
-              className="grid grid-cols-3 gap-4 sm:gap-8 pt-8 border-t border-border/50"
-            >
+            <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-8 border-t border-border/50">
               {[
                 { number: "500+", label: "Products" },
                 { number: "50+", label: "Brands" },
                 { number: "100%", label: "Authentic" },
-              ].map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 + index * 0.15 }}
-                  viewport={{ once: true }}
-                >
+              ].map((stat) => (
+                <div key={stat.label}>
                   <p className="text-2xl sm:text-3xl md:text-4xl font-heading text-gold-gradient">
                     {stat.number}
                   </p>
                   <p className="text-xs sm:text-sm text-muted-foreground tracking-wider mt-1">
                     {stat.label}
                   </p>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
