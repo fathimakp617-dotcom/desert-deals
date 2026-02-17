@@ -117,15 +117,7 @@ const sanitizeString = (str: string, maxLength: number): string => {
     .trim();
 };
 
-// Product prices - server-side source of truth (all prices include taxes)
-const PRODUCT_PRICES: Record<string, number> = {
-  "elite": 444,
-  "amber-crown": 444,
-  "legacy": 444,
-  "combo": 444,
-};
-
-const VALID_PRODUCT_IDS = Object.keys(PRODUCT_PRICES);
+// Product prices are now fetched from the database instead of hardcoded
 
 // Bulk discount tiers - must match frontend
 const BULK_DISCOUNT_TIERS = [
@@ -269,14 +261,6 @@ serve(async (req) => {
      const stockUpdates: { productId: string; productName?: string; beforeStock: number; quantity: number }[] = [];
 
     for (const item of orderRequest.items) {
-      if (!VALID_PRODUCT_IDS.includes(item.productId)) {
-        console.error("Invalid product ID:", item.productId);
-        return new Response(
-          JSON.stringify({ error: `Invalid product: ${item.productId}` }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
       const quantity = Math.floor(Number(item.quantity));
       if (quantity < 1 || quantity > 1000) {
         console.error("Invalid quantity for product:", item.productId, quantity);
@@ -286,52 +270,57 @@ serve(async (req) => {
         );
       }
 
-      // Check stock availability
+      // Fetch product from DB to get server-side price and validate
        const { data: product, error: productError } = await supabase
         .from('products')
-         .select('stock_quantity, is_active, name')
+         .select('stock_quantity, is_active, name, price')
         .eq('id', item.productId)
         .maybeSingle();
 
       if (productError) {
-        console.error("Error checking stock for:", item.productId, productError);
+        console.error("Error checking product:", item.productId, productError);
       }
 
-      // If product exists in DB, check stock
-      if (product) {
-        if (!product.is_active) {
-          console.error("Product is not active:", item.productId);
-          return new Response(
-            JSON.stringify({ error: `Product ${item.productId} is currently unavailable` }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-
-        if (product.stock_quantity < quantity) {
-          console.error("Insufficient stock for:", item.productId, "requested:", quantity, "available:", product.stock_quantity);
-          return new Response(
-            JSON.stringify({ error: `Insufficient stock for ${item.productId}. Only ${product.stock_quantity} available.` }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-
-         // Track stock update for this product
-         stockUpdates.push({
-           productId: item.productId,
-           productName: product.name ?? undefined,
-           beforeStock: product.stock_quantity,
-           quantity,
-         });
+      if (!product) {
+        console.error("Product not found:", item.productId);
+        return new Response(
+          JSON.stringify({ error: `Product not found: ${item.productId}` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
 
-      // Use server-side price, not client-provided price
-      const serverPrice = PRODUCT_PRICES[item.productId];
+      if (!product.is_active) {
+        console.error("Product is not active:", item.productId);
+        return new Response(
+          JSON.stringify({ error: `Product ${item.productId} is currently unavailable` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (product.stock_quantity < quantity) {
+        console.error("Insufficient stock for:", item.productId, "requested:", quantity, "available:", product.stock_quantity);
+        return new Response(
+          JSON.stringify({ error: `Insufficient stock for ${item.productId}. Only ${product.stock_quantity} available.` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+       // Track stock update for this product
+       stockUpdates.push({
+         productId: item.productId,
+         productName: product.name ?? undefined,
+         beforeStock: product.stock_quantity,
+         quantity,
+       });
+
+      // Use server-side price from DB, not client-provided price
+      const serverPrice = product.price;
       subtotal += serverPrice * quantity;
       totalQuantity += quantity;
 
       validatedItems.push({
         productId: item.productId,
-        name: sanitizeName(item.name || '', 100),
+        name: sanitizeName(item.name || product.name || '', 100),
         price: serverPrice,
         quantity: quantity,
       });
@@ -539,8 +528,6 @@ serve(async (req) => {
     }
 
     try {
-      const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-      
       const emailPayload = {
         order_number: order.order_number,
         customer_name: customerName,
@@ -557,12 +544,12 @@ serve(async (req) => {
         affiliate_code: validAffiliateCode,
       };
 
-      // Send email confirmation asynchronously
+      // Send email confirmation asynchronously - use service role key since send-order-confirmation requires it
       fetch(`${supabaseUrl}/functions/v1/send-order-confirmation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Authorization': `Bearer ${supabaseServiceKey}`,
         },
         body: JSON.stringify(emailPayload),
       }).then(res => {
