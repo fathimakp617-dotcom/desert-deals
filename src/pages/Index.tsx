@@ -108,10 +108,6 @@ const Index = () => {
             </div>
           </section>
 
-          <Suspense fallback={<SectionLoader />}>
-            <BrandProductRow brand="nike" title="Nike Collection" />
-          </Suspense>
-
           {/* Nike Dunk Low Ad Banner */}
           <section className="bg-background">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
@@ -125,6 +121,10 @@ const Index = () => {
               </Link>
             </div>
           </section>
+
+          <Suspense fallback={<SectionLoader />}>
+            <BrandProductRow brand="nike" title="Nike Collection" />
+          </Suspense>
 
           <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="new balance" title="New Balance Collection" />
