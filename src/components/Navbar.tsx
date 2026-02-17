@@ -112,14 +112,14 @@ const Navbar = memo(() => {
       {/* Main Header */}
       <header className={`fixed top-9 left-0 right-0 z-50 bg-background border-b border-border transition-shadow duration-300 ${scrolled ? "shadow-md" : ""}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex items-center h-14 sm:h-16">
+          <div className="flex items-center h-14 sm:h-16 relative">
             <div className="lg:hidden flex items-center">
               <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
                 {isOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>
 
-            <Link to="/" ref={logoRef} className="flex items-center shrink-0 mr-8 lg:mr-12 mt-1">
+            <Link to="/" ref={logoRef} className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:mr-12 mt-1">
               <img src={logoImg} alt="Desert Deal" className="h-14 sm:h-16 w-auto object-contain" />
             </Link>
 
