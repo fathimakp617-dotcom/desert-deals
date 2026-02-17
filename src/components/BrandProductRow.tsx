@@ -82,7 +82,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                 const inWishlist = isInWishlist(product.id);
 
                 return (
-                  <div key={product.id} className="flex-shrink-0 w-[180px] sm:w-[220px] lg:w-[246px] group">
+                  <div key={product.id} className="flex-shrink-0 w-[145px] sm:w-[220px] lg:w-[246px] group">
                     <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
                       <div className="relative aspect-square bg-muted overflow-hidden">
                         <Link to={`/product/${product.id}`}>
