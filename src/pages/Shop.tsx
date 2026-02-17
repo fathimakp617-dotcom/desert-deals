@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import { useSearchParams, Link } from "react-router-dom";
 import { Search, Grid3X3, List, Filter, X, ChevronDown, ChevronLeft, ChevronRight, Loader2, SlidersHorizontal } from "lucide-react";
@@ -21,6 +21,7 @@ import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePaginatedProducts } from "@/hooks/usePaginatedProducts";
 import ProductCard from "@/components/ProductCard";
+import SearchSuggestions from "@/components/SearchSuggestions";
 
 
 const categories = [
@@ -63,6 +64,8 @@ const Shop = () => {
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [sortBy, setSortBy] = useState("featured");
   const [showFilters, setShowFilters] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebounce(searchInput, 300);
   const priceRange = priceRanges[selectedPriceRange];
@@ -96,6 +99,16 @@ const Shop = () => {
   }, [searchParams]);
 
   useEffect(() => { resetPage(); }, [debouncedSearch, selectedCategory, selectedPriceRange, sortBy, resetPage]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const products = data?.products || [];
   const totalCount = data?.totalCount || 0;
@@ -155,14 +168,35 @@ const Shop = () => {
         <main className="min-h-screen bg-background relative z-10 pb-16 md:pb-0">
           <Navbar />
 
-          {/* Breadcrumb */}
           <section className="pt-28 pb-2">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-              <nav className="text-sm text-muted-foreground">
-                <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
-                <span className="mx-2">›</span>
-                <span className="text-foreground font-medium">All Shoes</span>
-              </nav>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <nav className="text-sm text-muted-foreground">
+                  <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+                  <span className="mx-2">›</span>
+                  <span className="text-foreground font-medium">All Shoes</span>
+                </nav>
+                <div className="relative w-full sm:max-w-xs" ref={searchContainerRef}>
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    type="text"
+                    placeholder="Search shoes..."
+                    value={searchInput}
+                    onChange={(e) => { setSearchInput(e.target.value); setShowSuggestions(true); }}
+                    onFocus={() => setShowSuggestions(true)}
+                    className="pl-9 h-10 text-sm bg-card border-border/50"
+                  />
+                  {showSuggestions && searchInput.trim() && (
+                    <div className="absolute z-50 w-full">
+                      <SearchSuggestions
+                        query={searchInput}
+                        onSelect={(name) => { setSearchInput(name); setShowSuggestions(false); }}
+                        onClose={() => setShowSuggestions(false)}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </section>
 
