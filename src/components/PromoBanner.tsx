@@ -1,85 +1,23 @@
-import { useState, useEffect, useCallback, memo } from "react";
+import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import promo1 from "@/assets/banners/promo-ramadan-delivery.webp";
-import promo2 from "@/assets/banners/promo-2.webp";
-import promo3 from "@/assets/banners/promo-3.webp";
-import promo4 from "@/assets/banners/promo-4.webp";
-import promo5 from "@/assets/banners/promo-5.webp";
-
-const banners = [
-  { image: promo1, alt: "Ramadan Delivery - Shop Now" },
-  { image: promo2, alt: "Asics Gel-Kayano 14" },
-  { image: promo3, alt: "New Balance 9060" },
-  { image: promo4, alt: "Nike Dunk Low" },
-  { image: promo5, alt: "New Balance 530" },
-];
+import promoImg from "@/assets/banners/promo-ramadan-delivery.webp";
 
 const PromoBanner = memo(() => {
-  const [current, setCurrent] = useState(0);
   const navigate = useNavigate();
-
-  const next = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % banners.length);
-  }, []);
-
-  const prev = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + banners.length) % banners.length);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(next, 5000);
-    return () => clearInterval(timer);
-  }, [next]);
 
   return (
     <section className="bg-background">
       <div
-        className="relative w-full aspect-[5/1] sm:aspect-[4/1] overflow-hidden cursor-pointer bg-muted"
+        className="relative w-full overflow-hidden cursor-pointer bg-muted"
         onClick={() => navigate("/shop")}
       >
-        {banners.map((banner, index) => (
-          <div
-            key={index}
-            className="absolute inset-0 transition-opacity duration-700"
-            style={{ opacity: index === current ? 1 : 0 }}
-          >
-            <img
-              src={banner.image}
-              alt={banner.alt}
-              className="w-full h-full object-contain"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        ))}
-
-        <button
-          onClick={(e) => { e.stopPropagation(); prev(); }}
-          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white transition-colors bg-black/20 rounded-full p-1"
-          aria-label="Previous banner"
-        >
-          <ChevronLeft className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2} />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); next(); }}
-          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white transition-colors bg-black/20 rounded-full p-1"
-          aria-label="Next banner"
-        >
-          <ChevronRight className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2} />
-        </button>
-
-        <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 z-10 flex justify-center gap-2">
-          {banners.map((_, index) => (
-            <button
-              key={index}
-              onClick={(e) => { e.stopPropagation(); setCurrent(index); }}
-              className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
-                index === current ? "bg-white" : "bg-white/40 hover:bg-white/70"
-              }`}
-            />
-          ))}
-        </div>
+        <img
+          src={promoImg}
+          alt="Ramadan Delivery - Shop Now"
+          className="w-full h-auto object-contain"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     </section>
   );
