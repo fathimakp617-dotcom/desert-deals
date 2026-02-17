@@ -1,16 +1,12 @@
 import { useState, useEffect, memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import slide1 from "@/assets/banners/slide-1.webp";
-import slide2 from "@/assets/banners/slide-2.png";
-import slide3 from "@/assets/banners/slide-3.webp";
-import slide4 from "@/assets/banners/slide-4.webp";
+import slide1 from "@/assets/banners/slide-9.webp";
+import slide2 from "@/assets/banners/slide-10.png";
 
 const slides = [
-  { image: slide1, alt: "Ramadan Season - Premium Shoes Collection" },
-  { image: slide2, alt: "Ramadan Sale - Family Collection" },
-  { image: slide3, alt: "Ramadan Delivery - Shop Now" },
-  { image: slide4, alt: "Ramadan Balance - New Balance Collection" },
+  { image: slide1, alt: "Shopping Sale - Desert Deal" },
+  { image: slide2, alt: "Ramadan Season - Family Collection" },
 ];
 
 const preloadFirstImage = () => {
