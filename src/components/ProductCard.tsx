@@ -104,7 +104,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWishlist(product.id); }}
             className="w-5 h-5 flex items-center justify-center"
           >
-            <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-foreground text-foreground" : "text-foreground"}`} />
+            <Heart className={`w-3.5 h-3.5 transition-colors ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
           </button>
         </div>
       </div>
