@@ -290,12 +290,12 @@ const ProductDetail = () => {
 
                 {/* Thumbnails */}
                 {product.gallery.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2 max-w-md mx-auto lg:max-w-none" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                <div className="grid grid-cols-4 gap-2 max-w-md mx-auto lg:max-w-none">
                   {product.gallery.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedImage(idx)}
-                      className={`flex-shrink-0 w-14 h-14 sm:w-20 sm:h-20 border-2 overflow-hidden transition-all ${
+                      className={`w-full aspect-square border-2 overflow-hidden transition-all ${
                         selectedImage === idx ? "border-primary" : "border-border/50 hover:border-primary/50"
                       }`}
                     >
