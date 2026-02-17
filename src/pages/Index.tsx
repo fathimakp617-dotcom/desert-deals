@@ -131,15 +131,15 @@ const Index = () => {
           </Suspense>
 
           <Suspense fallback={<SectionLoader />}>
+            <Testimonials />
+          </Suspense>
+
+          <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="new balance" title="New Balance Collection" />
           </Suspense>
 
           <Suspense fallback={<SectionLoader />}>
             <NewBalancePromoGrid />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
-            <Testimonials />
           </Suspense>
 
           <Suspense fallback={<SectionLoader />}>
