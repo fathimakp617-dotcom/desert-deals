@@ -7,15 +7,14 @@ import { formatPrice } from "@/data/products";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FeaturesBar from "@/components/FeaturesBar";
-import CouponInput from "@/components/CouponInput";
 import PageTransition from "@/components/PageTransition";
 
 const Cart = memo(() => {
-  const { items, updateQuantity, removeFromCart, totalPrice, bulkDiscountPercent, bulkDiscountAmount } = useCart();
+  const { items, updateQuantity, removeFromCart, totalPrice } = useCart();
 
   const subtotal = totalPrice;
   const shipping = 20;
-  const total = subtotal - bulkDiscountAmount + shipping;
+  const total = subtotal + shipping;
 
   return (
     <PageTransition>
@@ -113,10 +112,6 @@ const Cart = memo(() => {
                   ))}
                 </div>
 
-                {/* Coupon */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-6">
-                  <CouponInput />
-                </div>
               </div>
 
               {/* Cart Totals Sidebar */}
@@ -129,21 +124,9 @@ const Cart = memo(() => {
                     <span className="text-foreground">{formatPrice(subtotal)}</span>
                   </div>
 
-                  {bulkDiscountAmount > 0 && (
-                    <div className="flex justify-between text-sm py-2 border-b border-border/50 text-green-600">
-                      <span>Bulk Discount ({bulkDiscountPercent}%)</span>
-                      <span>-{formatPrice(bulkDiscountAmount)}</span>
-                    </div>
-                  )}
-
-                  <div className="py-2 border-b border-border/50">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Shipment</span>
-                      <div className="text-right">
-                        <p className="text-sm text-foreground">Cash On Delivery: {formatPrice(shipping)}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Shipping options will be updated during checkout.</p>
-                      </div>
-                    </div>
+                  <div className="flex justify-between text-sm py-2 border-b border-border/50">
+                    <span className="text-muted-foreground">Shipping</span>
+                    <span className="text-foreground">{formatPrice(shipping)}</span>
                   </div>
 
                   <div className="flex justify-between text-base font-bold py-2">
