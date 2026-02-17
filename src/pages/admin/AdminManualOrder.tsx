@@ -765,7 +765,7 @@ const AdminManualOrder = () => {
                     />
                   </div>
                   <div className="w-24">
-                    {index === 0 && <Label className="text-xs text-muted-foreground">Price (₹)</Label>}
+                    {index === 0 && <Label className="text-xs text-muted-foreground">Price (AED)</Label>}
                     <Input
                       type="number"
                       min={0}
@@ -807,7 +807,7 @@ const AdminManualOrder = () => {
             <CardContent className="space-y-4">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-medium">₹{subtotal.toLocaleString("en-IN")}</span>
+                <span className="font-medium">{subtotal.toLocaleString()} AED</span>
               </div>
               <div className="flex items-center gap-3">
                 <Label className="text-sm text-muted-foreground w-20">Discount</Label>
@@ -833,7 +833,7 @@ const AdminManualOrder = () => {
               </div>
               <div className="border-t border-border pt-3 flex justify-between text-lg font-bold">
                 <span>Total</span>
-                <span className="text-primary">₹{total.toLocaleString("en-IN")}</span>
+                <span className="text-primary">{total.toLocaleString()} AED</span>
               </div>
             </CardContent>
           </Card>

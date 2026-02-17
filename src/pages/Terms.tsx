@@ -50,8 +50,8 @@ const Terms = () => {
                   <div>
                     <p className="font-medium text-foreground">Additional Shipping Charge</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      A shipping charge of <span className="text-primary font-semibold">₹79</span> applies to all orders below ₹999. 
-                      Orders above ₹999 qualify for FREE shipping across India.
+                      A shipping charge of <span className="text-primary font-semibold">79 AED</span> applies to all orders below 999 AED. 
+                      Orders above 999 AED qualify for FREE shipping across the UAE.
                     </p>
                   </div>
                 </div>

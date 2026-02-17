@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Package, IndianRupee, Clock, CheckCircle, Users, TrendingUp, Calendar, RefreshCw, BarChart3, CreditCard, Banknote, Wallet, Activity, LogIn, Truck } from "lucide-react";
+import { Package, Wallet, Clock, CheckCircle, Users, TrendingUp, Calendar, RefreshCw, BarChart3, CreditCard, Banknote, Activity, LogIn, Truck } from "lucide-react";
 
 interface OrderStats {
   total: number;
@@ -304,11 +304,7 @@ const AdminDashboard = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-    }).format(amount);
+    return `${Math.round(amount).toLocaleString()} AED`;
   };
 
   const navigateToFilteredOrders = (status?: string) => {
@@ -443,7 +439,7 @@ const AdminDashboard = () => {
             <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-5 border border-primary/20">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-primary/20 rounded-lg">
-                  <IndianRupee className="h-5 w-5 text-primary" />
+                  <Wallet className="h-5 w-5 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">Total Revenue</span>
               </div>
@@ -517,7 +513,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { title: "Orders", value: stats.total, subtitle: getFilterLabel(), icon: Package, color: "text-primary", bgColor: "bg-primary/10", onClick: () => navigateToFilteredOrders() },
-          { title: "Revenue", value: formatCurrency(stats.totalRevenue), subtitle: getFilterLabel(), icon: IndianRupee, color: "text-green-500", bgColor: "bg-green-500/10", onClick: () => navigateToFilteredOrders() },
+          { title: "Revenue", value: formatCurrency(stats.totalRevenue), subtitle: getFilterLabel(), icon: Wallet, color: "text-green-500", bgColor: "bg-green-500/10", onClick: () => navigateToFilteredOrders() },
           { title: "Pending", value: stats.pending, subtitle: "Needs attention", icon: Clock, color: "text-yellow-500", bgColor: "bg-yellow-500/10", onClick: () => navigateToFilteredOrders("pending") },
           { title: "Delivered", value: stats.delivered, subtitle: "Completed", icon: CheckCircle, color: "text-green-500", bgColor: "bg-green-500/10", onClick: () => navigateToFilteredOrders("delivered") },
         ].map((stat, index) => (

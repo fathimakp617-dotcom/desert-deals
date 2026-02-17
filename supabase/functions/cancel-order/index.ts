@@ -131,7 +131,7 @@ const handler = async (req: Request): Promise<Response> => {
       const resend = new Resend(resendApiKey);
       const items = order.items as Array<{ name: string; quantity: number; price: number }>;
       const itemsList = items.map((item) => 
-        `<li>${item.name} x${item.quantity} - ₹${item.price.toLocaleString()}</li>`
+        `<li>${item.name} x${item.quantity} - ${item.price.toLocaleString()} AED</li>`
       ).join("");
 
       // Send customer cancellation email
@@ -167,7 +167,7 @@ const handler = async (req: Request): Promise<Response> => {
                     ${itemsList}
                   </ul>
                   <p style="margin: 15px 0 0 0; font-weight: bold;">
-                    Total: ₹${order.total.toLocaleString()}
+                    Total: ${order.total.toLocaleString()} AED
                   </p>
                 </div>
 
@@ -234,7 +234,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </ul>
 
                 <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 20px;">
-                  <p style="margin: 0;"><strong>Order Total:</strong> ₹${order.total.toLocaleString()}</p>
+                  <p style="margin: 0;"><strong>Order Total:</strong> ${order.total.toLocaleString()} AED</p>
                   <p style="margin: 10px 0 0 0;"><strong>Payment Method:</strong> ${order.payment_method}</p>
                   <p style="margin: 10px 0 0 0;"><strong>Payment Status:</strong> ${order.payment_status}</p>
                 </div>

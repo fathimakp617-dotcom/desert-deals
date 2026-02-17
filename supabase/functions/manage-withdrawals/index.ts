@@ -100,7 +100,7 @@ serve(async (req) => {
       // Check minimum amount
       if (amount < 500) {
         return new Response(
-          JSON.stringify({ error: "Minimum withdrawal amount is ₹500" }),
+          JSON.stringify({ error: "Minimum withdrawal amount is 500 AED" }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -185,7 +185,7 @@ serve(async (req) => {
         throw createError;
       }
 
-      console.log(`Withdrawal request created: ${newRequest.id} for amount ₹${amount}`);
+      console.log(`Withdrawal request created: ${newRequest.id} for amount ${amount} AED`);
 
       return new Response(
         JSON.stringify({ success: true, request: newRequest }),
@@ -400,7 +400,7 @@ serve(async (req) => {
         }
       });
 
-      console.log(`Withdrawal request ${request_id} completed by ${admin_email}. Amount: ₹${existingRequest.amount}`);
+      console.log(`Withdrawal request ${request_id} completed by ${admin_email}. Amount: ${existingRequest.amount} AED`);
 
       return new Response(
         JSON.stringify({ success: true, request }),

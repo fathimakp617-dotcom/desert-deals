@@ -28,7 +28,7 @@ interface InvoiceData {
 }
 
 const formatCurrency = (amount: number): string => {
-  return `₹${amount.toLocaleString("en-IN")}`;
+  return `${Math.round(amount).toLocaleString()} AED`;
 };
 
 export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {

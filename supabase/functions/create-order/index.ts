@@ -352,7 +352,7 @@ serve(async (req) => {
       );
     }
 
-    // Calculate shipping - FREE for online payment, ₹79 for COD under ₹999
+    // Calculate shipping - FREE for online payment, 79 AED for COD under 999 AED
     const priceAfterBulk = subtotal - bulkDiscount;
     const shipping = orderRequest.payment_method === 'razorpay' ? 0 : (priceAfterBulk >= 999 ? 0 : 79);
 

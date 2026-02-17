@@ -343,7 +343,7 @@ const CancellationRefundPolicy = () => {
                   <ul className="space-y-2 text-muted-foreground mt-4">
                     <li className="flex items-start gap-2">
                       <span className="text-primary">•</span>
-                      Original shipping charges (₹79 for orders below ₹999)
+                      Original shipping charges (79 AED for orders below 999 AED)
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-primary">•</span>

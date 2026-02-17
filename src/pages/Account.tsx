@@ -22,7 +22,7 @@ import {
   Copy, 
   Link, 
   Users, 
-  IndianRupee, 
+  Wallet, 
   LogOut, 
   Check, 
   User, 
@@ -833,9 +833,9 @@ const Account = () => {
                     transition={{ delay: 0.3 }}
                     className="bg-card border border-border rounded-xl p-4 text-center"
                   >
-                    <IndianRupee size={24} className="mx-auto text-green-500 mb-2" />
+                    <Wallet size={24} className="mx-auto text-green-500 mb-2" />
                     <p className="text-2xl font-bold text-foreground">
-                      ₹{orders.reduce((sum, o) => sum + o.total, 0).toLocaleString()}
+                      {orders.reduce((sum, o) => sum + o.total, 0).toLocaleString()} AED
                     </p>
                     <p className="text-xs text-muted-foreground">Total Spent</p>
                   </motion.div>
@@ -855,9 +855,9 @@ const Account = () => {
                     transition={{ delay: 0.5 }}
                     className="bg-card border border-border rounded-xl p-4 text-center"
                   >
-                    <IndianRupee size={24} className="mx-auto text-primary mb-2" />
+                    <Wallet size={24} className="mx-auto text-primary mb-2" />
                     <p className="text-2xl font-bold text-foreground">
-                      ₹{affiliate?.total_earnings?.toLocaleString() || 0}
+                      {affiliate?.total_earnings?.toLocaleString() || 0} AED
                     </p>
                     <p className="text-xs text-muted-foreground">Affiliate Earnings</p>
                   </motion.div>
@@ -1093,7 +1093,7 @@ const Account = () => {
                               </span>
                             )}
                             <p className="font-semibold text-foreground">
-                              ₹{order.total.toLocaleString()}
+                              {order.total.toLocaleString()} AED
                             </p>
                           </div>
                         </div>
@@ -1264,11 +1264,11 @@ const Account = () => {
                       >
                         <div className="flex items-center gap-3 mb-3">
                           <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                            <IndianRupee size={20} className="text-green-500" />
+                            <Wallet size={20} className="text-green-500" />
                           </div>
                           <span className="text-sm text-muted-foreground">Total Earnings</span>
                         </div>
-                        <p className="text-3xl font-bold text-foreground">₹{affiliate.total_earnings.toLocaleString()}</p>
+                        <p className="text-3xl font-bold text-foreground">{affiliate.total_earnings.toLocaleString()} AED</p>
                       </motion.div>
 
                       <motion.div
@@ -1297,11 +1297,11 @@ const Account = () => {
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                           <div className="h-12 w-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                            <IndianRupee size={24} className="text-green-500" />
+                            <Wallet size={24} className="text-green-500" />
                           </div>
                           <div>
                             <h3 className="font-semibold text-foreground">Available Balance</h3>
-                            <p className="text-2xl font-bold text-green-500">₹{affiliate.total_earnings.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-green-500">{affiliate.total_earnings.toLocaleString()} AED</p>
                           </div>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-3">
@@ -1311,13 +1311,13 @@ const Account = () => {
                             onClick={() => setWithdrawDialogOpen(true)}
                             disabled={affiliate.total_earnings < 500}
                           >
-                            <IndianRupee size={16} className="mr-2" />
+                            <Wallet size={16} className="mr-2" />
                             Withdraw Earnings
                           </Button>
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-4">
-                        Minimum withdrawal: ₹500 • Withdrawals are processed within 3-5 business days
+                        Minimum withdrawal: 500 AED • Withdrawals are processed within 3-5 business days
                       </p>
                       
                       {/* Withdrawal Dialog */}
@@ -1661,7 +1661,7 @@ const Account = () => {
                         <p className="font-medium text-foreground">{item.name}</p>
                         <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                       </div>
-                      <p className="font-semibold text-foreground">₹{(item.price * item.quantity).toLocaleString()}</p>
+                      <p className="font-semibold text-foreground">{(item.price * item.quantity).toLocaleString()} AED</p>
                     </div>
                   ))}
                 </div>
@@ -1671,23 +1671,23 @@ const Account = () => {
               <div className="border-t border-border pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-foreground">₹{selectedOrder.subtotal.toLocaleString()}</span>
+                  <span className="text-foreground">{selectedOrder.subtotal.toLocaleString()} AED</span>
                 </div>
                 {selectedOrder.discount && selectedOrder.discount > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-green-500">Discount</span>
-                    <span className="text-green-500">-₹{selectedOrder.discount.toLocaleString()}</span>
+                    <span className="text-green-500">-{selectedOrder.discount.toLocaleString()} AED</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
                   <span className="text-foreground">
-                    {selectedOrder.shipping === 0 ? 'FREE' : `₹${selectedOrder.shipping?.toLocaleString()}`}
+                    {selectedOrder.shipping === 0 ? 'FREE' : `${selectedOrder.shipping?.toLocaleString()} AED`}
                   </span>
                 </div>
                 <div className="flex justify-between text-lg font-semibold pt-2 border-t border-border">
                   <span className="text-foreground">Total</span>
-                  <span className="text-primary">₹{selectedOrder.total.toLocaleString()}</span>
+                  <span className="text-primary">{selectedOrder.total.toLocaleString()} AED</span>
                 </div>
               </div>
 

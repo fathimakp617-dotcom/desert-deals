@@ -198,7 +198,7 @@ const ReturnRequestDialog = ({
               {items.map((item, index) => (
                 <div key={index} className="flex items-center justify-between text-sm">
                   <span className="text-foreground">{item.name} × {item.quantity}</span>
-                  <span className="text-muted-foreground">₹{(item.price * item.quantity).toLocaleString()}</span>
+                  <span className="text-muted-foreground">{(item.price * item.quantity).toLocaleString()} AED</span>
                 </div>
               ))}
             </div>

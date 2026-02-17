@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { IndianRupee, Loader2, Building2, Smartphone } from "lucide-react";
+import { Wallet, Loader2, Building2, Smartphone } from "lucide-react";
 
 interface WithdrawalRequestDialogProps {
   open: boolean;
@@ -69,7 +69,7 @@ export default function WithdrawalRequestDialog({
     if (isNaN(amountNum) || amountNum < 500) {
       toast({
         title: "Invalid Amount",
-        description: "Minimum withdrawal amount is ₹500",
+        description: "Minimum withdrawal amount is 500 AED",
         variant: "destructive",
       });
       return;
@@ -177,18 +177,18 @@ export default function WithdrawalRequestDialog({
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <IndianRupee className="h-5 w-5 text-green-500" />
+            <Wallet className="h-5 w-5 text-green-500" />
             Withdraw Earnings
           </DialogTitle>
           <DialogDescription>
-            Available balance: ₹{affiliate.total_earnings.toLocaleString()}
+            Available balance: {affiliate.total_earnings.toLocaleString()} AED
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Withdrawal Amount (₹)</Label>
+            <Label htmlFor="amount">Withdrawal Amount (AED)</Label>
             <Input
               id="amount"
               type="number"
@@ -196,7 +196,7 @@ export default function WithdrawalRequestDialog({
               max={affiliate.total_earnings}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="Enter amount (min ₹500)"
+              placeholder="Enter amount (min 500 AED)"
             />
           </div>
 
@@ -329,7 +329,7 @@ export default function WithdrawalRequestDialog({
               </>
             ) : (
               <>
-                <IndianRupee className="h-4 w-4 mr-2" />
+                <Wallet className="h-4 w-4 mr-2" />
                 Request Withdrawal
               </>
             )}

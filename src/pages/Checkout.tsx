@@ -321,7 +321,7 @@ const Checkout = () => {
     }
   };
 
-  // Free shipping for online payment (UPI/Card), coupon with free shipping, or COD orders ≥₹999
+  // Free shipping for online payment (UPI/Card), coupon with free shipping, or COD orders ≥999 AED
   const hasFreeShipping = appliedCoupon?.freeShipping || paymentMethod === "upi" || paymentMethod === "card" || totalPrice >= 999;
   const shipping = hasFreeShipping ? 0 : 79;
   // Only apply coupon discount if no bulk discount is active
