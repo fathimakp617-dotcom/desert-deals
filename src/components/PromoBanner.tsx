@@ -6,9 +6,9 @@ const PromoBanner = memo(() => {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-background">
+    <section className="bg-background px-3 sm:px-4">
       <div
-        className="relative w-full overflow-hidden cursor-pointer bg-muted"
+        className="relative w-full overflow-hidden cursor-pointer bg-muted rounded-xl sm:rounded-2xl"
         onClick={() => navigate("/shop")}
       >
         <img
