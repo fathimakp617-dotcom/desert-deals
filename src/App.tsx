@@ -52,17 +52,10 @@ const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminCustomers = lazy(() => import("./pages/admin/AdminCustomers"));
-const AdminAffiliates = lazy(() => import("./pages/admin/AdminAffiliates"));
-const AdminActivityLogs = lazy(() => import("./pages/admin/AdminActivityLogs"));
-const AdminStaff = lazy(() => import("./pages/admin/AdminStaff"));
 const AdminAccount = lazy(() => import("./pages/admin/AdminAccount"));
-const AdminCoupons = lazy(() => import("./pages/admin/AdminCoupons"));
 const AdminReturns = lazy(() => import("./pages/admin/AdminReturns"));
-const AdminExpenses = lazy(() => import("./pages/admin/AdminExpenses"));
 const AdminReviewsPage = lazy(() => import("./pages/admin/AdminReviewsPage"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
-const AdminWithdrawals = lazy(() => import("./pages/admin/AdminWithdrawals"));
-const AdminManualOrder = lazy(() => import("./pages/admin/AdminManualOrder"));
 const AdminBulkImport = lazy(() => import("./pages/admin/AdminBulkImport"));
 
 // Shipping pages - all lazy loaded
@@ -133,18 +126,10 @@ const App = () => (
                       <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<AdminDashboard />} />
                         <Route path="orders" element={<AdminOrders />} />
-                        <Route path="customers" element={<AdminCustomers />} />
-                      <Route path="affiliates" element={<AdminAffiliates />} />
-                        <Route path="activity-logs" element={<AdminActivityLogs />} />
-                        <Route path="staff" element={<AdminStaff />} />
-                        <Route path="coupons" element={<AdminCoupons />} />
                         <Route path="account" element={<AdminAccount />} />
                         <Route path="returns" element={<AdminReturns />} />
-                        <Route path="expenses" element={<AdminExpenses />} />
                         <Route path="reviews" element={<AdminReviewsPage />} />
                         <Route path="products" element={<AdminProducts />} />
-                        <Route path="withdrawals" element={<AdminWithdrawals />} />
-                        <Route path="manual-order" element={<AdminManualOrder />} />
                         <Route path="bulk-import" element={<AdminBulkImport />} />
                       </Route>
                       <Route path="/shipping" element={<ShippingLayout />}>
