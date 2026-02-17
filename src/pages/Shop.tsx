@@ -170,33 +170,11 @@ const Shop = () => {
 
           <section className="pt-28 pb-2">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <nav className="text-sm text-muted-foreground">
-                  <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
-                  <span className="mx-2">›</span>
-                  <span className="text-foreground font-medium">All Shoes</span>
-                </nav>
-                <div className="relative w-full sm:max-w-xs" ref={searchContainerRef}>
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    type="text"
-                    placeholder="Search shoes..."
-                    value={searchInput}
-                    onChange={(e) => { setSearchInput(e.target.value); setShowSuggestions(true); }}
-                    onFocus={() => setShowSuggestions(true)}
-                    className="pl-9 h-10 text-sm bg-card border-border/50"
-                  />
-                  {showSuggestions && searchInput.trim() && (
-                    <div className="absolute z-50 w-full">
-                      <SearchSuggestions
-                        query={searchInput}
-                        onSelect={(name) => { setSearchInput(name); setShowSuggestions(false); }}
-                        onClose={() => setShowSuggestions(false)}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
+              <nav className="text-sm text-muted-foreground">
+                <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+                <span className="mx-2">›</span>
+                <span className="text-foreground font-medium">All Shoes</span>
+              </nav>
             </div>
           </section>
 
