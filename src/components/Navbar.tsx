@@ -132,7 +132,7 @@ const Navbar = memo(() => {
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2 ml-auto shrink-0 relative z-10">
-              <button onClick={() => setSearchOpen(true)} className="p-2 text-foreground hover:opacity-60 transition-opacity">
+              <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity">
                 <Search size={20} />
               </button>
               <Link to="/wishlist" className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
