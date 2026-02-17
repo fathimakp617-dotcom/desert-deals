@@ -182,36 +182,6 @@ const Shop = () => {
           <section className="py-4">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
 
-              {/* Mobile: compact filter row */}
-              <div className="lg:hidden flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar">
-                <div className="relative flex-1 min-w-0">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    className="pl-9 h-10 text-sm bg-card border-border/50"
-                  />
-                </div>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-auto min-w-[100px] h-10 text-xs bg-card border-border/50">
-                    <SlidersHorizontal className="w-3.5 h-3.5 mr-1" />
-                    <SelectValue placeholder="Filter" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-auto min-w-[90px] h-10 text-xs bg-card border-border/50">
-                    <SelectValue placeholder="Sort" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sortOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
 
               {/* Desktop: reference-style filter bar */}
               <div className="hidden lg:flex items-center justify-between mb-6">
