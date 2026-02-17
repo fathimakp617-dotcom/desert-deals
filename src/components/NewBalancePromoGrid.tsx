@@ -53,6 +53,7 @@ const NewBalancePromoGrid = () => {
                 alt={productName}
                 className="w-auto h-[120px] sm:h-[150px] md:h-[180px] object-contain transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
+                onError={(e) => { e.currentTarget.src = newBalanceAd; }}
               />
             </div>
             <div className="w-full text-left space-y-0.5">
