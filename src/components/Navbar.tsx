@@ -87,7 +87,7 @@ const Navbar = memo(() => {
   return (
     <>
       {/* Announcement Bar */}
-      <div className="fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-xl">
+      <div className="fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2">
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={prevAnnouncement}
