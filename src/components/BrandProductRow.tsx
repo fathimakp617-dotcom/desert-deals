@@ -20,8 +20,11 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const brandLower = brand.toLowerCase();
   const products = allProducts.filter(
-    (p) => p.category?.toLowerCase() === brand.toLowerCase()
+    (p) =>
+      p.category?.toLowerCase() === brandLower ||
+      p.name?.toLowerCase().includes(brandLower)
   );
 
   const scroll = (direction: "left" | "right") => {
