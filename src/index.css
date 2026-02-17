@@ -216,8 +216,16 @@
     animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
+  .animate-slide-out-right {
+    animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
   .animate-fade-in {
     animation: fadeInOverlay 0.3s ease-out forwards;
+  }
+
+  .animate-fade-out {
+    animation: fadeOutOverlay 0.25s ease-in forwards;
   }
 }
 
@@ -226,7 +234,17 @@
   to { transform: translateX(0); }
 }
 
+@keyframes slideOutRight {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
 @keyframes fadeInOverlay {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes fadeOutOverlay {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }

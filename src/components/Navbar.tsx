@@ -41,6 +41,7 @@ const allLinks = [...topLinks, ...bottomLinks];
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchClosing, setSearchClosing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLAnchorElement>(null);
@@ -76,13 +77,18 @@ const Navbar = memo(() => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const closeSearch = useCallback(() => {
+    setSearchClosing(true);
+    setTimeout(() => { setSearchOpen(false); setSearchClosing(false); setSearchQuery(""); }, 300);
+  }, []);
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); }
+      if (e.key === "Escape") closeSearch();
     };
     if (searchOpen) window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [searchOpen]);
+  }, [searchOpen, closeSearch]);
 
   return (
     <>
@@ -132,7 +138,7 @@ const Navbar = memo(() => {
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2 ml-auto shrink-0 relative z-10">
-              <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity">
+              <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
               </button>
               <Link to="/wishlist" className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
@@ -184,11 +190,11 @@ const Navbar = memo(() => {
       {/* Search Side Panel */}
       {searchOpen && (
         <>
-          <div className="fixed inset-0 z-[70] bg-foreground/30 animate-fade-in" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} />
-          <div className="fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col animate-slide-in-right">
+          <div className={`fixed inset-0 z-[70] bg-foreground/30 ${searchClosing ? "animate-fade-out" : "animate-fade-in"}`} onClick={closeSearch} />
+          <div className={`fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col ${searchClosing ? "animate-slide-out-right" : "animate-slide-in-right"}`}>
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <h2 className="text-xl font-semibold text-foreground">Search</h2>
-              <button onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="p-1 text-foreground hover:opacity-60 transition-opacity">
+              <button onClick={closeSearch} className="p-1 text-foreground hover:opacity-60 transition-opacity">
                 <X size={22} />
               </button>
             </div>
@@ -198,8 +204,7 @@ const Navbar = memo(() => {
                   e.preventDefault();
                   if (searchQuery.trim()) {
                     navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-                    setSearchOpen(false);
-                    setSearchQuery("");
+                    closeSearch();
                   }
                 }}
                 className="relative"
@@ -218,8 +223,8 @@ const Navbar = memo(() => {
             <div className="flex-1 overflow-y-auto px-6">
               <SearchSuggestions
                 query={searchQuery}
-                onSelect={(q) => { navigate(`/shop?search=${encodeURIComponent(q.trim())}`); setSearchOpen(false); setSearchQuery(""); }}
-                onClose={() => { setSearchOpen(false); setSearchQuery(""); }}
+                onSelect={(q) => { navigate(`/shop?search=${encodeURIComponent(q.trim())}`); closeSearch(); }}
+                onClose={closeSearch}
               />
             </div>
           </div>
