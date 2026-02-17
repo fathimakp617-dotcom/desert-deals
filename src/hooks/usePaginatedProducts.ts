@@ -81,9 +81,32 @@ export const usePaginatedProducts = (options: UsePaginatedProductsOptions) => {
         q = q.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
       }
 
-      // Category filter
+      // Category/Brand filter - search by name since most products use generic categories
       if (category && category !== "All") {
-        q = q.eq("category", category);
+        const brandSearchTerms: Record<string, string> = {
+          "Nike": "Nike",
+          "Jordan": "Jordan",
+          "New Balance": "New Balance",
+          "On Cloud": "On ",
+          "Asics": "Asics",
+          "Adidas": "Adidas",
+          "Hoka": "Hoka",
+          "Puma": "Puma",
+          "Louis Vuitton": "Louis Vuitton",
+          "Gucci": "Gucci",
+          "Onitsuka Tiger": "Onitsuka",
+          "Loro Piana": "Loro Piana",
+          "Brooks": "Brooks",
+          "Dior": "Dior",
+          "Hermes": "Hermes",
+          "Basketball Shoes": "Basketball",
+        };
+        const brandTerm = brandSearchTerms[category];
+        if (brandTerm) {
+          q = q.or(`category.eq.${category},name.ilike.%${brandTerm}%`);
+        } else {
+          q = q.eq("category", category);
+        }
       }
 
       // Price filter
