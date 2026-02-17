@@ -108,6 +108,10 @@ const Index = () => {
             </div>
           </section>
 
+          <Suspense fallback={<SectionLoader />}>
+            <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
+          </Suspense>
+
           {/* Nike Dunk Low Ad Banner */}
           <section className="bg-background">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
