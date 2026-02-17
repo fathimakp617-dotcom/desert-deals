@@ -22,6 +22,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { usePaginatedProducts } from "@/hooks/usePaginatedProducts";
 import ProductCard from "@/components/ProductCard";
 import SearchSuggestions from "@/components/SearchSuggestions";
+import MobileFilterSheet from "@/components/MobileFilterSheet";
 
 
 const categories = [
@@ -64,6 +65,7 @@ const Shop = () => {
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [sortBy, setSortBy] = useState("featured");
   const [showFilters, setShowFilters] = useState(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
@@ -324,6 +326,28 @@ const Shop = () => {
               {/* All products shown - no pagination */}
             </div>
           </section>
+
+          {/* Mobile floating filter button */}
+          <button
+            onClick={() => setMobileFilterOpen(true)}
+            className="lg:hidden fixed bottom-20 right-4 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            <span className="text-sm font-medium">Filter</span>
+          </button>
+
+          <MobileFilterSheet
+            open={mobileFilterOpen}
+            onOpenChange={setMobileFilterOpen}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            sortOptions={sortOptions}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            onClear={clearFilters}
+            hasActiveFilters={!!hasActiveFilters}
+          />
 
           <Footer />
           <MobileBottomNav />
