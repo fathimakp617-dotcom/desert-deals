@@ -181,47 +181,49 @@ const Navbar = memo(() => {
         )}
       </header>
 
-      {/* Search Overlay */}
+      {/* Search Side Panel */}
       {searchOpen && (
-        <div
-          className="fixed inset-0 z-[70] bg-background/95 backdrop-blur-sm flex items-start justify-center pt-32"
-          onClick={() => setSearchOpen(false)}
-        >
-          <div className="w-full max-w-lg mx-4" onClick={(e) => e.stopPropagation()}>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (searchQuery.trim()) {
-                  navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-                  setSearchOpen(false);
-                  setSearchQuery("");
-                }
-              }}
-              className="relative"
-            >
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="w-full h-14 pl-12 pr-12 text-lg bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground placeholder:text-muted-foreground"
-              />
-              <button type="button" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                <X size={20} />
+        <>
+          <div className="fixed inset-0 z-[70] bg-foreground/30" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} />
+          <div className="fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-6 pt-6 pb-4">
+              <h2 className="text-xl font-semibold text-foreground">Search</h2>
+              <button onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="p-1 text-foreground hover:opacity-60 transition-opacity">
+                <X size={22} />
               </button>
-            </form>
-            <SearchSuggestions
-              query={searchQuery}
-              onSelect={(q) => { navigate(`/shop?search=${encodeURIComponent(q.trim())}`); setSearchOpen(false); setSearchQuery(""); }}
-              onClose={() => { setSearchOpen(false); setSearchQuery(""); }}
-            />
-            {!searchQuery.trim() && (
-              <p className="text-sm text-muted-foreground mt-3 text-center">Start typing to see suggestions</p>
-            )}
+            </div>
+            <div className="px-6 pb-4">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim()) {
+                    navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                  }
+                }}
+                className="relative"
+              >
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search everything..."
+                  className="w-full h-12 pl-11 pr-4 text-sm bg-muted rounded-lg focus:outline-none text-foreground placeholder:text-muted-foreground"
+                />
+              </form>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6">
+              <SearchSuggestions
+                query={searchQuery}
+                onSelect={(q) => { navigate(`/shop?search=${encodeURIComponent(q.trim())}`); setSearchOpen(false); setSearchQuery(""); }}
+                onClose={() => { setSearchOpen(false); setSearchQuery(""); }}
+              />
+            </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );
