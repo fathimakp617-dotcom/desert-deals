@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCart } from "@/contexts/CartContext";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -944,14 +945,24 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="state">State / County (optional)</Label>
-                  <Input
-                    id="state"
-                    name="state"
+                  <Label htmlFor="state">Emirate *</Label>
+                  <Select
                     value={formData.state}
-                    onChange={handleInputChange}
-                    className="mt-1 bg-input border-border"
-                  />
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, state: value }))}
+                  >
+                    <SelectTrigger className="mt-1 bg-input border-border">
+                      <SelectValue placeholder="Select Emirate" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
+                      <SelectItem value="Dubai">Dubai</SelectItem>
+                      <SelectItem value="Sharjah">Sharjah</SelectItem>
+                      <SelectItem value="Ajman">Ajman</SelectItem>
+                      <SelectItem value="Umm Al Quwain">Umm Al Quwain</SelectItem>
+                      <SelectItem value="Ras Al Khaimah">Ras Al Khaimah</SelectItem>
+                      <SelectItem value="Fujairah">Fujairah</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
