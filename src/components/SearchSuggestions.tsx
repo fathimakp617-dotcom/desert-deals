@@ -69,7 +69,7 @@ const SearchSuggestions = ({ query, onSelect, onClose }: SearchSuggestionsProps)
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {product.category} · AED {product.price}
+                    {product.category} · {product.price} AED
                   </p>
                 </div>
               </button>
