@@ -94,7 +94,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
           )}
           <span className="text-[13px] text-foreground">{formatPrice(product.price)}</span>
         </div>
-        <div className="mt-1.5 flex items-center justify-between">
+        <div className="mt-1.5 flex items-center gap-1.5">
           {soldOut ? (
             <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
           ) : (
@@ -102,9 +102,9 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
           )}
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWishlist(product.id); }}
-            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+            className="w-5 h-5 flex items-center justify-center"
           >
-            <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+            <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-foreground text-foreground" : "text-foreground"}`} />
           </button>
         </div>
       </div>
