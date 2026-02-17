@@ -20,7 +20,7 @@ import {
 import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, UserCheck, Activity, UserCog, User, Ticket, RotateCcw, Receipt, Star, ShoppingBag, IndianRupee, FilePlus, Upload } from "lucide-react";
 import { motion } from "framer-motion";
 
-const ADMIN_SESSION_KEY = "dd_admin_session";
+const ADMIN_SESSION_KEY = "rayn_admin_session";
 
 interface AdminSession {
   token: string;
