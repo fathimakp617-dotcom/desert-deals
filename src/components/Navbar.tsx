@@ -1,5 +1,4 @@
 import { useState, memo, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingBag, Heart, User, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
@@ -71,14 +70,12 @@ const Navbar = memo(() => {
     return () => clearInterval(timer);
   }, [nextAnnouncement]);
 
-  // Sticky header shadow on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close search on Esc
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); }
@@ -99,18 +96,9 @@ const Navbar = memo(() => {
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={announcementIndex}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
-              className="text-xs sm:text-sm font-medium tracking-wide"
-            >
-              {announcements[announcementIndex]}
-            </motion.span>
-          </AnimatePresence>
+          <span className="text-xs sm:text-sm font-medium tracking-wide">
+            {announcements[announcementIndex]}
+          </span>
           <button
             onClick={nextAnnouncement}
             className="absolute right-4 text-background/70 hover:text-background transition-colors"
@@ -121,79 +109,50 @@ const Navbar = memo(() => {
         </div>
       </div>
 
-      {/* Main Header - sticky with shadow */}
+      {/* Main Header */}
       <header className={`fixed top-9 left-0 right-0 z-50 bg-background border-b border-border transition-shadow duration-300 ${scrolled ? "shadow-md" : ""}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center h-14 sm:h-16">
-            {/* Mobile hamburger */}
             <div className="lg:hidden flex items-center">
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="p-2 text-foreground"
-              >
+              <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
                 {isOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>
 
-            {/* Logo */}
             <Link to="/" ref={logoRef} className="flex items-center shrink-0 mr-8 lg:mr-12 mt-1">
               <img src={logoImg} alt="Desert Deal" className="h-14 sm:h-16 w-auto object-contain" />
             </Link>
 
-            {/* Desktop Row 1 nav links */}
             <div className="hidden lg:flex items-center gap-x-5 flex-1 overflow-x-auto no-scrollbar border-l border-border pl-8">
               {topLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.href}
-                  className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
-                >
+                <Link key={link.name} to={link.href} className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium">
                   {link.name}
                 </Link>
               ))}
             </div>
 
-            {/* Action icons - Search visible on ALL screen sizes now (#1) */}
             <div className="flex items-center gap-1 sm:gap-2 ml-auto shrink-0">
-              <Link
-                to="/wishlist"
-                className="relative p-2 text-foreground hover:opacity-60 transition-opacity"
-              >
+              <Link to="/wishlist" className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <Heart size={20} />
                 {wishlistItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">
-                    {wishlistItems}
-                  </span>
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
                 )}
               </Link>
-              <button
-                onClick={() => openCart()}
-                className="relative p-2 text-foreground hover:opacity-60 transition-opacity"
-              >
+              <button onClick={() => openCart()} className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <ShoppingBag size={20} />
                 {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">
-                    {totalItems}
-                  </span>
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{totalItems}</span>
                 )}
               </button>
-              <Link
-                to="/account"
-                className="hidden md:flex p-2 text-foreground hover:opacity-60 transition-opacity"
-              >
+              <Link to="/account" className="hidden md:flex p-2 text-foreground hover:opacity-60 transition-opacity">
                 <User size={20} />
               </Link>
             </div>
           </div>
 
-          {/* Desktop Row 2 nav links - right aligned */}
           <div className="hidden lg:flex items-center justify-center gap-x-5 pb-2">
             {bottomLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
-              >
+              <Link key={link.name} to={link.href} className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium">
                 {link.name}
               </Link>
             ))}
@@ -201,106 +160,66 @@ const Navbar = memo(() => {
         </div>
 
         {/* Mobile Menu */}
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-background border-t border-border max-h-[70vh] overflow-y-auto"
-            >
-              <div className="container mx-auto px-6 py-4 flex flex-col gap-3">
-                {allLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    to={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className="text-sm text-foreground hover:opacity-60 transition-opacity py-1"
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-                <div className="border-t border-border pt-3 mt-1">
-                  <Link
-                    to="/account"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2 text-sm text-foreground hover:opacity-60 transition-opacity"
-                  >
-                    <User size={16} />
-                    My Account
-                  </Link>
-                </div>
+        {isOpen && (
+          <div className="lg:hidden bg-background border-t border-border max-h-[70vh] overflow-y-auto">
+            <div className="container mx-auto px-6 py-4 flex flex-col gap-3">
+              {allLinks.map((link) => (
+                <Link key={link.name} to={link.href} onClick={() => setIsOpen(false)} className="text-sm text-foreground hover:opacity-60 transition-opacity py-1">
+                  {link.name}
+                </Link>
+              ))}
+              <div className="border-t border-border pt-3 mt-1">
+                <Link to="/account" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-sm text-foreground hover:opacity-60 transition-opacity">
+                  <User size={16} /> My Account
+                </Link>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
-      {/* Search Overlay */}
-      <AnimatePresence>
-        {searchOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] bg-background/95 backdrop-blur-sm flex items-start justify-center pt-32"
-            onClick={() => setSearchOpen(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="w-full max-w-lg mx-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (searchQuery.trim()) {
-                    navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-                    setSearchOpen(false);
-                    setSearchQuery("");
-                  }
-                }}
-                className="relative"
-              >
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full h-14 pl-12 pr-12 text-lg bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground placeholder:text-muted-foreground"
-                />
-                <button
-                  type="button"
-                  onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X size={20} />
-                </button>
-              </form>
-              <SearchSuggestions
-                query={searchQuery}
-                onSelect={(q) => {
-                  navigate(`/shop?search=${encodeURIComponent(q.trim())}`);
-                  setSearchOpen(false);
-                  setSearchQuery("");
-                }}
-                onClose={() => {
-                  setSearchOpen(false);
-                  setSearchQuery("");
-                }}
-              />
-              {!searchQuery.trim() && (
-                <p className="text-sm text-muted-foreground mt-3 text-center">
-                  Start typing to see suggestions
-                </p>
-              )}
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
+      </header>
+
+      {/* Search Overlay */}
+      {searchOpen && (
+        <div
+          className="fixed inset-0 z-[70] bg-background/95 backdrop-blur-sm flex items-start justify-center pt-32"
+          onClick={() => setSearchOpen(false)}
+        >
+          <div className="w-full max-w-lg mx-4" onClick={(e) => e.stopPropagation()}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (searchQuery.trim()) {
+                  navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+                  setSearchOpen(false);
+                  setSearchQuery("");
+                }
+              }}
+              className="relative"
+            >
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products..."
+                className="w-full h-14 pl-12 pr-12 text-lg bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground placeholder:text-muted-foreground"
+              />
+              <button type="button" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                <X size={20} />
+              </button>
+            </form>
+            <SearchSuggestions
+              query={searchQuery}
+              onSelect={(q) => { navigate(`/shop?search=${encodeURIComponent(q.trim())}`); setSearchOpen(false); setSearchQuery(""); }}
+              onClose={() => { setSearchOpen(false); setSearchQuery(""); }}
+            />
+            {!searchQuery.trim() && (
+              <p className="text-sm text-muted-foreground mt-3 text-center">Start typing to see suggestions</p>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 });

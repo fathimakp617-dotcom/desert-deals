@@ -1,9 +1,7 @@
 import { memo, useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
-// Local brand logo imports
 import pumaLogo from "@/assets/brands/puma.png";
 import onitsukaTigerLogo from "@/assets/brands/onitsuka-tiger.png";
 import onCloudLogo from "@/assets/brands/on-cloud.png";
@@ -43,19 +41,10 @@ const BrandLogo = memo(({ logo, fallback, name }: { logo: string; fallback: stri
   if (!logo || failed) {
     return <span className="font-heading font-bold text-lg tracking-tight">{fallback}</span>;
   }
-  return (
-    <img
-      src={logo}
-      alt={name}
-      className="w-full h-full object-contain"
-      loading="lazy"
-      onError={() => setFailed(true)}
-    />
-  );
+  return <img src={logo} alt={name} className="w-full h-full object-contain" loading="lazy" onError={() => setFailed(true)} />;
 });
 BrandLogo.displayName = "BrandLogo";
 
-// Mobile carousel: shows 2 brands per page
 const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands }) => {
   const totalPages = Math.ceil(brandList.length / 2);
   const [page, setPage] = useState(0);
@@ -71,50 +60,27 @@ const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands
 
   return (
     <div className="sm:hidden">
-      <div className="overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={page}
-            initial={{ opacity: 0, x: 60 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -60 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="grid grid-cols-2 gap-3"
-          >
-            {pair.map((brand) => (
-              <Link
-                key={brand.slug}
-                to={`/shop?brand=${brand.slug}`}
-                className="group"
-              >
-                <div className="bg-muted rounded-lg p-4 text-center transition-all duration-300 hover:shadow-md">
-                  <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">
-                    {brand.name}
-                  </h3>
-                  <span className="text-[11px] text-muted-foreground mt-0.5 block">
-                    {brand.count} Products
-                  </span>
-                  <div className="my-4 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-lg flex items-center justify-center p-2">
-                      <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
-                    </div>
-                  </div>
-                  <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
-                    View Products
-                  </span>
+      <div className="grid grid-cols-2 gap-3">
+        {pair.map((brand) => (
+          <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="group">
+            <div className="bg-muted rounded-lg p-4 text-center transition-all duration-300 hover:shadow-md">
+              <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">{brand.name}</h3>
+              <span className="text-[11px] text-muted-foreground mt-0.5 block">{brand.count} Products</span>
+              <div className="my-4 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-lg flex items-center justify-center p-2">
+                  <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
                 </div>
-              </Link>
-            ))}
-          </motion.div>
-        </AnimatePresence>
+              </div>
+              <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
+                View Products
+              </span>
+            </div>
+          </Link>
+        ))}
       </div>
       <div className="flex justify-center gap-1.5 mt-3">
         {Array.from({ length: totalPages }).map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setPage(idx)}
-            className={`w-1.5 h-1.5 rounded-full transition-all ${page === idx ? "bg-foreground w-3" : "bg-foreground/30"}`}
-          />
+          <button key={idx} onClick={() => setPage(idx)} className={`w-1.5 h-1.5 rounded-full transition-all ${page === idx ? "bg-foreground w-3" : "bg-foreground/30"}`} />
         ))}
       </div>
     </div>
@@ -127,58 +93,33 @@ const BrandCategories = memo(() => {
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: direction === "left" ? -260 : 260,
-        behavior: "smooth",
-      });
+      scrollRef.current.scrollBy({ left: direction === "left" ? -260 : 260, behavior: "smooth" });
     }
   };
 
   return (
     <section className="pt-3 pb-6 sm:pt-4 sm:pb-10 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative">
-        <button
-          onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full flex items-center justify-center text-foreground hover:bg-muted transition-colors shadow-sm hidden sm:flex"
-        >
+        <button onClick={() => scroll("left")} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full flex items-center justify-center text-foreground hover:bg-muted transition-colors shadow-sm hidden sm:flex">
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <button
-          onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full flex items-center justify-center text-foreground hover:bg-muted transition-colors shadow-sm hidden sm:flex"
-        >
+        <button onClick={() => scroll("right")} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full flex items-center justify-center text-foreground hover:bg-muted transition-colors shadow-sm hidden sm:flex">
           <ChevronRight className="w-4 h-4" />
         </button>
 
-        {/* Mobile: carousel showing 2 at a time */}
         <MobileBrandCarousel brands={brands} />
 
-        {/* Tablet/Desktop: horizontal scroll */}
-        <div
-          ref={scrollRef}
-          className="hidden sm:flex gap-4 overflow-x-auto pb-2 sm:mx-8"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
+        <div ref={scrollRef} className="hidden sm:flex gap-4 overflow-x-auto pb-2 sm:mx-8" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
           {brands.map((brand) => (
-            <Link
-              key={brand.slug}
-              to={`/shop?brand=${brand.slug}`}
-              className="flex-shrink-0 sm:w-[180px] lg:w-[200px] group"
-            >
+            <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 sm:w-[180px] lg:w-[200px] group">
               <div className="bg-[hsl(var(--muted))] rounded-lg p-4 sm:p-5 text-center transition-all duration-300 hover:shadow-md">
-                <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">
-                  {brand.name}
-                </h3>
-                <span className="text-[11px] text-muted-foreground mt-0.5 block">
-                  {brand.count} Products
-                </span>
-
+                <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">{brand.name}</h3>
+                <span className="text-[11px] text-muted-foreground mt-0.5 block">{brand.count} Products</span>
                 <div className="my-4 flex items-center justify-center">
                   <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg flex items-center justify-center p-2">
                     <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
                   </div>
                 </div>
-
                 <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
                   View Products
                 </span>

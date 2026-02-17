@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import promo1 from "@/assets/banners/promo-1.webp";
 import promo2 from "@/assets/banners/promo-2.webp";
@@ -39,56 +38,49 @@ const PromoBanner = memo(() => {
         className="relative w-full aspect-[5/1] sm:aspect-[4/1] overflow-hidden cursor-pointer bg-muted"
         onClick={() => navigate("/shop")}
       >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.9 }}
-              className="absolute inset-0"
-            >
-              <img
-                src={banners[current].image}
-                alt={banners[current].alt}
-                className="w-full h-full object-contain"
-                loading="lazy"
-                decoding="async"
-              />
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Navigation Arrows */}
-          <button
-            onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white transition-colors bg-black/20 rounded-full p-1"
-            aria-label="Previous banner"
+        {banners.map((banner, index) => (
+          <div
+            key={index}
+            className="absolute inset-0 transition-opacity duration-700"
+            style={{ opacity: index === current ? 1 : 0 }}
           >
-            <ChevronLeft className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2} />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); next(); }}
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white transition-colors bg-black/20 rounded-full p-1"
-            aria-label="Next banner"
-          >
-            <ChevronRight className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2} />
-          </button>
-
-          {/* Dots */}
-          <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 z-10 flex justify-center gap-2">
-            {banners.map((_, index) => (
-              <button
-                key={index}
-                onClick={(e) => { e.stopPropagation(); setCurrent(index); }}
-                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
-                  index === current
-                    ? "bg-white"
-                    : "bg-white/40 hover:bg-white/70"
-                }`}
-              />
-            ))}
+            <img
+              src={banner.image}
+              alt={banner.alt}
+              className="w-full h-full object-contain"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
+        ))}
+
+        <button
+          onClick={(e) => { e.stopPropagation(); prev(); }}
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white transition-colors bg-black/20 rounded-full p-1"
+          aria-label="Previous banner"
+        >
+          <ChevronLeft className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2} />
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); next(); }}
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white transition-colors bg-black/20 rounded-full p-1"
+          aria-label="Next banner"
+        >
+          <ChevronRight className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2} />
+        </button>
+
+        <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 z-10 flex justify-center gap-2">
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              onClick={(e) => { e.stopPropagation(); setCurrent(index); }}
+              className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
+                index === current ? "bg-white" : "bg-white/40 hover:bg-white/70"
+              }`}
+            />
+          ))}
         </div>
+      </div>
     </section>
   );
 });

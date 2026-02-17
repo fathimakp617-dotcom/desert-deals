@@ -1,6 +1,5 @@
 import { memo, useEffect, useState, useCallback } from "react";
 import { Headphones, Truck, RotateCcw, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 
 const features = [
   {
@@ -36,6 +35,8 @@ const FeaturesBar = memo(() => {
     return () => clearInterval(timer);
   }, [next]);
 
+  const Feature = features[current];
+
   return (
     <section className="py-6 sm:py-10 border-t border-border bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
@@ -54,35 +55,17 @@ const FeaturesBar = memo(() => {
           ))}
         </div>
 
-        {/* Mobile/Tablet: carousel */}
+        {/* Mobile/Tablet: simple swap */}
         <div className="lg:hidden flex items-center gap-2">
           <button onClick={prev} className="p-1 text-muted-foreground hover:text-foreground shrink-0">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div className="flex-1 overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={current}
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.25 }}
-                className="flex items-center gap-3 justify-center text-center"
-              >
-                {(() => {
-                  const Feature = features[current];
-                  return (
-                    <>
-                      <Feature.icon className="w-8 h-8 text-foreground shrink-0" strokeWidth={1.2} />
-                      <div className="text-left">
-                        <h4 className="text-sm font-bold text-foreground leading-tight">{Feature.title}</h4>
-                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{Feature.description}</p>
-                      </div>
-                    </>
-                  );
-                })()}
-              </motion.div>
-            </AnimatePresence>
+          <div className="flex-1 flex items-center gap-3 justify-center text-center">
+            <Feature.icon className="w-8 h-8 text-foreground shrink-0" strokeWidth={1.2} />
+            <div className="text-left">
+              <h4 className="text-sm font-bold text-foreground leading-tight">{Feature.title}</h4>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{Feature.description}</p>
+            </div>
           </div>
           <button onClick={next} className="p-1 text-muted-foreground hover:text-foreground shrink-0">
             <ChevronRight className="w-5 h-5" />
