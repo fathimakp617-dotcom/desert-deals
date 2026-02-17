@@ -48,7 +48,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                       </span>
                     </div>
                   </div>
-                  <div className="p-3">
+                  <div className="p-3 bg-muted rounded-b-lg">
                     <span className="text-[10px] text-muted-foreground">{item.category}</span>
                     <h3 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 mb-1 leading-snug">
                       {item.name}
