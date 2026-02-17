@@ -1,14 +1,13 @@
 import { useState, useEffect, memo, useCallback, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, CreditCard, Truck, Check, Lock, LogIn, AlertTriangle, Smartphone, Zap, MapPin, Loader2 } from "lucide-react";
+import { ArrowLeft, Truck, Check, Lock, Zap, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/CartContext";
-import { useAffiliate } from "@/contexts/AffiliateContext";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice } from "@/data/products";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +16,6 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import CouponInput from "@/components/CouponInput";
 import ShippingTermsDialog from "@/components/ShippingTermsDialog";
 
 declare global {
@@ -100,14 +98,14 @@ const normalizeSavedAddress = (
 const PENDING_PROFILE_SEED_KEY = "pending_profile_seed_v1";
 
 const Checkout = () => {
-  const { items, totalPrice, clearCart, totalItems, bulkDiscountPercent, bulkDiscountAmount } = useCart();
-  const { affiliateCode, appliedCoupon, calculateDiscount, removeCoupon } = useAffiliate();
+  const { items, totalPrice, clearCart, totalItems } = useCart();
+  
   const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("upi");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
   const [isExpressMode, setIsExpressMode] = useState(false);
   const [loadingSavedAddress, setLoadingSavedAddress] = useState(true);
@@ -261,12 +259,6 @@ const Checkout = () => {
     loadSavedAddress();
   }, [user]);
 
-  // Clear coupon if bulk discount is active (they are mutually exclusive)
-  useEffect(() => {
-    if (bulkDiscountPercent > 0 && appliedCoupon) {
-      removeCoupon();
-    }
-  }, [bulkDiscountPercent, appliedCoupon, removeCoupon]);
 
   // Handle express checkout - auto-fill saved address
   const handleExpressCheckout = () => {
@@ -321,13 +313,8 @@ const Checkout = () => {
     }
   };
 
-  // Free shipping for online payment (UPI/Card), coupon with free shipping, or COD orders ≥999 AED
-  const hasFreeShipping = appliedCoupon?.freeShipping || paymentMethod === "upi" || paymentMethod === "card" || totalPrice >= 999;
-  const shipping = hasFreeShipping ? 0 : 79;
-  // Only apply coupon discount if no bulk discount is active
-  const couponDiscount = bulkDiscountPercent > 0 ? 0 : calculateDiscount(totalPrice);
-  const totalDiscount = bulkDiscountAmount + couponDiscount;
-  const orderTotal = totalPrice - totalDiscount + shipping;
+  const shipping = 20;
+  const orderTotal = totalPrice + shipping;
 
   // PIN code lookup hook
   const { isLoading: isPinLoading, lookupPinCode } = usePinCodeLookup();
@@ -396,8 +383,8 @@ const Checkout = () => {
         })),
         payment_method: "cod",
         payment_status: shippingPaid ? "shipping_paid" : "pending",
-        coupon_code: appliedCoupon?.code || null,
-        affiliate_code: affiliateCode || null,
+        coupon_code: null,
+        affiliate_code: null,
       };
 
       const { data, error } = await supabase.functions.invoke('create-order', {
@@ -750,8 +737,8 @@ const Checkout = () => {
               price: item.product.price,
               quantity: item.quantity,
             })),
-            coupon_code: appliedCoupon?.code || null,
-            affiliate_code: affiliateCode || null,
+            coupon_code: null,
+            affiliate_code: null,
           },
         },
       });
@@ -1045,44 +1032,15 @@ const Checkout = () => {
                     Payment Method
                   </h2>
 
-                  <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3 mb-6">
-                    <div className="flex items-center space-x-3 bg-input border border-border rounded-lg p-4 cursor-pointer hover:border-primary transition-colors">
-                      <RadioGroupItem value="upi" id="upi" />
-                      <Label htmlFor="upi" className="flex items-center gap-2 cursor-pointer flex-1">
-                        <Smartphone className="w-5 h-5 text-primary" />
-                        <div className="flex-1">
-                          <span>UPI</span>
-                          <p className="text-xs text-emerald-500 font-medium mt-0.5">
-                            GPay, PhonePe, Paytm, QR Code • FREE Shipping
-                          </p>
-                        </div>
-                      </Label>
+                  <div className="flex items-center space-x-3 bg-input border border-primary rounded-lg p-4">
+                    <Truck className="w-5 h-5 text-primary" />
+                    <div className="flex-1">
+                      <span className="font-medium">Cash on Delivery</span>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Pay when you receive your order • 20 AED shipping
+                      </p>
                     </div>
-                    <div className="flex items-center space-x-3 bg-input border border-border rounded-lg p-4 cursor-pointer hover:border-primary transition-colors">
-                      <RadioGroupItem value="card" id="card" />
-                      <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer flex-1">
-                        <CreditCard className="w-5 h-5 text-primary" />
-                        <div className="flex-1">
-                          <span>Card / Netbanking</span>
-                          <p className="text-xs text-emerald-500 font-medium mt-0.5">
-                            Credit/Debit Cards, Net Banking • FREE Shipping
-                          </p>
-                        </div>
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-input border border-border rounded-lg p-4 opacity-60 cursor-not-allowed">
-                      <RadioGroupItem value="cod" id="cod" disabled />
-                      <Label htmlFor="cod" className="flex items-center gap-2 cursor-not-allowed flex-1">
-                        <Truck className="w-5 h-5 text-muted-foreground" />
-                        <div className="flex-1">
-                          <span className="text-muted-foreground">Cash on Delivery</span>
-                          <p className="text-xs text-amber-500 font-medium mt-0.5">
-                            Coming Soon
-                          </p>
-                        </div>
-                      </Label>
-                    </div>
-                  </RadioGroup>
+                  </div>
 
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
                     <Lock className="w-4 h-4" />
@@ -1117,34 +1075,17 @@ const Checkout = () => {
 
                   <Separator className="my-4" />
 
-                  {/* Coupon Input */}
-                  <CouponInput />
-
-                  <Separator className="my-4" />
-
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between text-muted-foreground">
                       <span>Subtotal ({totalItems} items)</span>
                       <span>{formatPrice(totalPrice)}</span>
                     </div>
-                    {bulkDiscountAmount > 0 && (
-                      <div className="flex justify-between text-emerald-500">
-                        <span>Bulk Discount ({bulkDiscountPercent}%)</span>
-                        <span>-{formatPrice(bulkDiscountAmount)}</span>
-                      </div>
-                    )}
-                    {couponDiscount > 0 && (
-                      <div className="flex justify-between text-primary">
-                        <span>Coupon Discount</span>
-                        <span>-{formatPrice(couponDiscount)}</span>
-                      </div>
-                    )}
                     <div className="flex justify-between text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Truck className="w-4 h-4" />
-                        Shipping {totalPrice >= 999 && <span className="text-primary">(Free!)</span>}
+                        Shipping
                       </span>
-                      <span>{shipping === 0 ? "FREE" : formatPrice(shipping)}</span>
+                      <span>{formatPrice(shipping)}</span>
                     </div>
                   </div>
 
