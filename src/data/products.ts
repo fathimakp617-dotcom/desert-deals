@@ -210,9 +210,5 @@ export const getProductById = (id: string): Product | undefined => {
 };
 
 export const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat("en-AE", {
-    style: "currency",
-    currency: "AED",
-    maximumFractionDigits: 0,
-  }).format(price);
+  return `${Math.round(price)} AED`;
 };
