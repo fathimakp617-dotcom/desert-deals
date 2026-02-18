@@ -423,7 +423,7 @@ const ProductDetail = () => {
                     size="lg"
                     onClick={handleAddToCart}
                     disabled={isSoldOut}
-                    className="flex-1 bg-foreground hover:bg-foreground/90 text-background py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium transition-all duration-300"
+                    className="flex-1 bg-foreground hover:bg-foreground/90 text-background py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium transition-all duration-300 rounded-full"
                   >
                     {isSoldOut ? "SOLD OUT" : "Add to cart"}
                   </Button>
@@ -436,7 +436,7 @@ const ProductDetail = () => {
                     onClick={handleBuyNow}
                     disabled={isSoldOut}
                     variant="outline"
-                    className="flex-1 py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium border-foreground text-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+                    className="flex-1 py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium border-foreground text-foreground hover:bg-foreground hover:text-background transition-all duration-300 rounded-full"
                   >
                     Buy Now
                   </Button>
