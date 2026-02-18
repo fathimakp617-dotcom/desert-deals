@@ -484,7 +484,7 @@ const ProductDetail = () => {
                       </div>
                       <div className="flex justify-between py-2 border-b border-border/20">
                         <span className="text-muted-foreground">Available Sizes</span>
-                        <span className="text-foreground">{product.size}</span>
+                        <span className="text-foreground">EU 36 – 45</span>
                       </div>
                       {product.occasion.length > 0 && (
                         <div className="flex justify-between py-2 border-b border-border/20">
