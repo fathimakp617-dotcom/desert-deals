@@ -100,6 +100,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
   
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
@@ -317,6 +318,7 @@ const Checkout = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (fieldErrors[name]) setFieldErrors((prev) => { const n = { ...prev }; delete n[name]; return n; });
   };
 
   const handlePinCodeBlur = useCallback(async (pinCode: string) => {
@@ -333,8 +335,24 @@ const Checkout = () => {
     }
   }, [lookupPinCode]);
 
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!formData.firstName.trim()) errors.firstName = "Name is required";
+    if (!formData.state) errors.state = "Please select an emirate";
+    if (!formData.phone.trim()) errors.phone = "Phone is required";
+    if (!formData.city.trim()) errors.city = "City is required";
+    if (!formData.email.trim()) errors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Invalid email address";
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) {
+      toast({ title: "Please fill in all required fields", variant: "destructive" });
+      return;
+    }
     await handleCODOrder();
   };
 
@@ -526,8 +544,9 @@ const Checkout = () => {
                     value={formData.firstName}
                     onChange={handleInputChange}
                     required
-                    className="mt-1 bg-card border-border"
+                    className={`mt-1 bg-card ${fieldErrors.firstName ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
                   />
+                  {fieldErrors.firstName && <p className="text-destructive text-xs mt-1">{fieldErrors.firstName}</p>}
                 </div>
 
                 <div>
@@ -539,9 +558,12 @@ const Checkout = () => {
                   <Label htmlFor="state">Emirate *</Label>
                   <Select
                     value={formData.state}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, state: value }))}
+                    onValueChange={(value) => {
+                      setFormData(prev => ({ ...prev, state: value }));
+                      if (fieldErrors.state) setFieldErrors(prev => { const n = { ...prev }; delete n.state; return n; });
+                    }}
                   >
-                    <SelectTrigger className="mt-1 bg-card border-border">
+                    <SelectTrigger className={`mt-1 bg-card ${fieldErrors.state ? "border-destructive ring-1 ring-destructive" : "border-border"}`}>
                       <SelectValue placeholder="Select Emirate" />
                     </SelectTrigger>
                     <SelectContent>
@@ -554,6 +576,7 @@ const Checkout = () => {
                       <SelectItem value="Fujairah">Fujairah</SelectItem>
                     </SelectContent>
                   </Select>
+                  {fieldErrors.state && <p className="text-destructive text-xs mt-1">{fieldErrors.state}</p>}
                 </div>
 
                 <div>
@@ -588,9 +611,11 @@ const Checkout = () => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       required
-                      className="flex-1 bg-card border-border"
+                      className={`flex-1 bg-card ${fieldErrors.phone ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
                     />
                   </div>
+                  {fieldErrors.phone && <p className="text-destructive text-xs mt-1">{fieldErrors.phone}</p>}
+
                 </div>
 
                 <div>
@@ -601,8 +626,9 @@ const Checkout = () => {
                     value={formData.city}
                     onChange={handleInputChange}
                     required
-                    className="mt-1 bg-card border-border"
+                    className={`mt-1 bg-card ${fieldErrors.city ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
                   />
+                  {fieldErrors.city && <p className="text-destructive text-xs mt-1">{fieldErrors.city}</p>}
                 </div>
 
                 <div>
@@ -615,8 +641,9 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     placeholder="your@email.com"
                     required
-                    className="mt-1 bg-card border-border"
+                    className={`mt-1 bg-card ${fieldErrors.email ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
                   />
+                  {fieldErrors.email && <p className="text-destructive text-xs mt-1">{fieldErrors.email}</p>}
                 </div>
               </div>
 
