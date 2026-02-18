@@ -45,26 +45,44 @@ const BrandLogo = memo(({ logo, fallback, name }: { logo: string; fallback: stri
 });
 BrandLogo.displayName = "BrandLogo";
 
-const MobileBrandGrid = memo(({ brands: brandList }: { brands: typeof brands }) => {
+const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scroll = (dir: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: dir === "left" ? -200 : 200, behavior: "smooth" });
+  };
   return (
-    <div className="sm:hidden grid grid-cols-3 gap-2">
-      {brandList.map((brand) => (
-        <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="group">
-          <div className="bg-muted rounded-lg p-3 text-center transition-all duration-300 hover:shadow-md">
-            <div className="flex items-center justify-center mb-2">
-              <div className="w-14 h-14 rounded-lg flex items-center justify-center p-1.5">
-                <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
+    <div className="sm:hidden relative">
+      <button
+        onClick={() => scroll("left")}
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/90 border border-border rounded-full flex items-center justify-center text-foreground shadow-sm"
+      >
+        <ChevronLeft className="w-3.5 h-3.5" />
+      </button>
+      <button
+        onClick={() => scroll("right")}
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/90 border border-border rounded-full flex items-center justify-center text-foreground shadow-sm"
+      >
+        <ChevronRight className="w-3.5 h-3.5" />
+      </button>
+      <div ref={scrollRef} className="flex gap-2 overflow-x-auto no-scrollbar px-5 snap-x snap-mandatory scroll-smooth">
+        {brandList.map((brand) => (
+          <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 w-[90px] snap-start group">
+            <div className="bg-muted rounded-lg p-3 text-center transition-all duration-300 hover:shadow-md">
+              <div className="flex items-center justify-center mb-2">
+                <div className="w-14 h-14 rounded-lg flex items-center justify-center p-1.5">
+                  <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
+                </div>
               </div>
+              <h3 className="text-[11px] font-heading font-semibold text-foreground tracking-tight leading-tight">{brand.name}</h3>
+              <span className="text-[10px] text-muted-foreground block">{brand.count} Products</span>
             </div>
-            <h3 className="text-[11px] font-heading font-semibold text-foreground tracking-tight leading-tight">{brand.name}</h3>
-            <span className="text-[10px] text-muted-foreground block">{brand.count} Products</span>
-          </div>
-        </Link>
-      ))}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 });
-MobileBrandGrid.displayName = "MobileBrandGrid";
+MobileBrandCarousel.displayName = "MobileBrandCarousel";
 
 const BrandCategories = memo(() => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -79,7 +97,7 @@ const BrandCategories = memo(() => {
     <section className="pt-3 pb-6 sm:pt-4 sm:pb-10 bg-background">
       <div className="relative">
         <div className="px-4 sm:hidden">
-          <MobileBrandGrid brands={brands} />
+          <MobileBrandCarousel brands={brands} />
         </div>
 
         {/* Desktop: scrollable row matching reference */}
