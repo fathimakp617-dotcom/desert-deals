@@ -205,9 +205,9 @@ const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6"
+                  className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6"
                 >
-                  <CheckCircle className="w-10 h-10 text-primary" />
+                  <CheckCircle className="w-10 h-10 text-emerald-600" />
                 </motion.div>
 
                 <h2 className="text-2xl font-heading text-emerald-600 mb-2">
