@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { RecaptchaVerifier } from 'firebase/auth';
-import { firebaseAuth, initRecaptcha, sendPhoneOtp, verifyPhoneOtp, signOutFirebase } from '@/lib/firebase';
+import { initRecaptcha, sendPhoneOtp, verifyPhoneOtp, signOutFirebase } from '@/lib/firebase';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UseFirebasePhoneAuthReturn {
@@ -22,7 +21,7 @@ export const useFirebasePhoneAuth = (): UseFirebasePhoneAuthReturn => {
   const [otpSent, setOtpSent] = useState(false);
   const [currentPhoneNumber, setCurrentPhoneNumber] = useState<string>('');
   
-  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+  const recaptchaVerifierRef = useRef<any>(null);
 
   // Cleanup recaptcha on unmount
   useEffect(() => {
@@ -51,8 +50,8 @@ export const useFirebasePhoneAuth = (): UseFirebasePhoneAuthReturn => {
         }
       }
 
-      // Initialize new recaptcha
-      recaptchaVerifierRef.current = initRecaptcha(buttonId);
+      // Initialize new recaptcha (async now)
+      recaptchaVerifierRef.current = await initRecaptcha(buttonId);
 
       const result = await sendPhoneOtp(phoneNumber, recaptchaVerifierRef.current);
       
@@ -97,13 +96,9 @@ export const useFirebasePhoneAuth = (): UseFirebasePhoneAuthReturn => {
       await signOutFirebase();
 
       if (!isNewUser && existingProfiles?.[0]?.user_id) {
-        // Existing user - create a magic link for them
-        // Note: This creates an anonymous session marker; the user still needs to complete Supabase auth
-        // Store the verified phone number for the auth flow
         localStorage.setItem('verified_phone_number', currentPhoneNumber);
         localStorage.setItem('verified_phone_timestamp', Date.now().toString());
       } else {
-        // New user - store phone for signup flow
         localStorage.setItem('verified_phone_number', currentPhoneNumber);
         localStorage.setItem('verified_phone_timestamp', Date.now().toString());
       }
@@ -156,7 +151,6 @@ export const getVerifiedPhoneNumber = (): string | null => {
   const fiveMinutes = 5 * 60 * 1000;
   
   if (elapsed > fiveMinutes) {
-    // Expired - clear storage
     localStorage.removeItem('verified_phone_number');
     localStorage.removeItem('verified_phone_timestamp');
     return null;

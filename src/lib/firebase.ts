@@ -1,5 +1,21 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
+// Lazy-loaded Firebase wrapper – Firebase SDK is only fetched when phone auth is actually needed.
+
+let firebasePromise: Promise<typeof import("firebase/app")> | null = null;
+let authPromise: Promise<typeof import("firebase/auth")> | null = null;
+
+const getFirebaseApp = async () => {
+  if (!firebasePromise) {
+    firebasePromise = import("firebase/app");
+  }
+  return firebasePromise;
+};
+
+const getFirebaseAuth = async () => {
+  if (!authPromise) {
+    authPromise = import("firebase/auth");
+  }
+  return authPromise;
+};
 
 // Firebase configuration - these are public keys safe to store in code
 const firebaseConfig = {
@@ -12,45 +28,60 @@ const firebaseConfig = {
   measurementId: "G-JW7BMQ4TZ6"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const firebaseAuth = getAuth(app);
+let appInstance: any = null;
+let authInstance: any = null;
 
-// Store confirmation result for OTP verification
-let confirmationResult: ConfirmationResult | null = null;
+const ensureInitialized = async () => {
+  if (!appInstance) {
+    const { initializeApp } = await getFirebaseApp();
+    appInstance = initializeApp(firebaseConfig);
+  }
+  if (!authInstance) {
+    const { getAuth } = await getFirebaseAuth();
+    authInstance = getAuth(appInstance);
+  }
+  return { app: appInstance, auth: authInstance };
+};
+
+/**
+ * Get the Firebase Auth instance (lazy-initialized)
+ */
+export const getFirebaseAuthInstance = async () => {
+  const { auth } = await ensureInitialized();
+  return auth;
+};
 
 /**
  * Initialize invisible reCAPTCHA verifier
  */
-export const initRecaptcha = (buttonId: string): RecaptchaVerifier => {
-  const verifier = new RecaptchaVerifier(firebaseAuth, buttonId, {
+export const initRecaptcha = async (buttonId: string) => {
+  const { RecaptchaVerifier } = await getFirebaseAuth();
+  const auth = await getFirebaseAuthInstance();
+  const verifier = new RecaptchaVerifier(auth, buttonId, {
     size: 'invisible',
-    callback: () => {
-      // reCAPTCHA solved - will proceed with submit
-    },
-    'expired-callback': () => {
-      // Response expired, user will need to re-verify
-    }
+    callback: () => {},
+    'expired-callback': () => {},
   });
   return verifier;
 };
 
+// Store confirmation result for OTP verification
+let confirmationResult: any = null;
+
 /**
  * Send OTP to phone number using Firebase Phone Auth
- * @param phoneNumber - Full phone number with country code (e.g., +919876543210)
- * @param recaptchaVerifier - RecaptchaVerifier instance
  */
 export const sendPhoneOtp = async (
-  phoneNumber: string, 
-  recaptchaVerifier: RecaptchaVerifier
+  phoneNumber: string,
+  recaptchaVerifier: any
 ): Promise<{ success: boolean; error?: string }> => {
   try {
-    confirmationResult = await signInWithPhoneNumber(firebaseAuth, phoneNumber, recaptchaVerifier);
+    const { signInWithPhoneNumber } = await getFirebaseAuth();
+    const auth = await getFirebaseAuthInstance();
+    confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
     return { success: true };
   } catch (error: any) {
     console.error("Firebase Phone Auth Error:", error);
-    
-    // Handle specific Firebase errors
     if (error.code === 'auth/invalid-phone-number') {
       return { success: false, error: 'Invalid phone number format' };
     }
@@ -60,34 +91,29 @@ export const sendPhoneOtp = async (
     if (error.code === 'auth/quota-exceeded') {
       return { success: false, error: 'SMS quota exceeded. Please try again later.' };
     }
-    
     return { success: false, error: error.message || 'Failed to send OTP' };
   }
 };
 
 /**
  * Verify the OTP code entered by user
- * @param otp - 6-digit OTP code
  */
 export const verifyPhoneOtp = async (otp: string): Promise<{ success: boolean; error?: string }> => {
   if (!confirmationResult) {
     return { success: false, error: 'No OTP was sent. Please request a new code.' };
   }
-  
   try {
     await confirmationResult.confirm(otp);
-    confirmationResult = null; // Clear after successful verification
+    confirmationResult = null;
     return { success: true };
   } catch (error: any) {
     console.error("Firebase OTP Verification Error:", error);
-    
     if (error.code === 'auth/invalid-verification-code') {
       return { success: false, error: 'Invalid verification code' };
     }
     if (error.code === 'auth/code-expired') {
       return { success: false, error: 'Code has expired. Please request a new one.' };
     }
-    
     return { success: false, error: error.message || 'Failed to verify OTP' };
   }
 };
@@ -97,10 +123,9 @@ export const verifyPhoneOtp = async (otp: string): Promise<{ success: boolean; e
  */
 export const signOutFirebase = async (): Promise<void> => {
   try {
-    await firebaseAuth.signOut();
+    const auth = await getFirebaseAuthInstance();
+    await auth.signOut();
   } catch (error) {
     console.error("Firebase signout error:", error);
   }
 };
-
-export default app;
