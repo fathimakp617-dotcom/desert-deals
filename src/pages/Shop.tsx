@@ -311,14 +311,6 @@ const Shop = () => {
             </div>
           </section>
 
-          {/* Mobile floating filter button */}
-          <button
-            onClick={() => setMobileFilterOpen(true)}
-            className="lg:hidden fixed bottom-20 right-4 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity"
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-            <span className="text-sm font-medium">Filter</span>
-          </button>
 
           <MobileFilterSheet
             open={mobileFilterOpen}
