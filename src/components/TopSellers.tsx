@@ -165,7 +165,7 @@ const TopSellers = memo(() => {
                         </div>
 
                         {/* Stock status - matches product-stock text-green-600 */}
-                        <div className="mt-2">
+                        <div className="mt-2 flex items-center gap-1.5">
                           {soldOut ? (
                             <span className="text-[11px] font-bold text-red-500 uppercase">
                               Out of Stock
@@ -175,6 +175,20 @@ const TopSellers = memo(() => {
                               In Stock
                             </span>
                           )}
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (inWishlist) {
+                                removeFromWishlist(product.id);
+                              } else {
+                                addToWishlist(product);
+                              }
+                            }}
+                            className="w-5 h-5 flex items-center justify-center"
+                          >
+                            <Heart className={`w-3.5 h-3.5 transition-colors ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
+                          </button>
                         </div>
                       </div>
                     </div>
