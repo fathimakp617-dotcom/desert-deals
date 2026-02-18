@@ -19,6 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, Upload, Eye, X, Plus } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+
+const ALL_SIZES = [
+  "EU 36", "EU 37", "EU 38", "EU 39", "EU 40",
+  "EU 41", "EU 42", "EU 43", "EU 44", "EU 45", "EU 46",
+  "Free Size",
+];
 
 export interface ProductFormData {
   id: string;
@@ -46,7 +53,7 @@ export const emptyFormData: ProductFormData = {
   discount_percent: "0",
   stock_quantity: "100",
   category: "sneakers",
-  size: "EU 40-45",
+  size: "",
   image_url: "",
   is_active: true,
   notes_top: "",
@@ -249,7 +256,7 @@ const ProductForm = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="stock_quantity">Stock Quantity</Label>
             <Input
@@ -285,25 +292,29 @@ const ProductForm = ({
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Label htmlFor="size">Size</Label>
-            <Select
-              value={formData.size}
-              onValueChange={(value) => setFormData((prev) => ({ ...prev, size: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="EU 36-40">EU 36-40</SelectItem>
-                <SelectItem value="EU 38-42">EU 38-42</SelectItem>
-                <SelectItem value="EU 40-45">EU 40-45</SelectItem>
-                <SelectItem value="EU 41-46">EU 41-46</SelectItem>
-                <SelectItem value="Free Size">Free Size</SelectItem>
-                <SelectItem value="Set of 2">Set of 2</SelectItem>
-                <SelectItem value="Set of 3">Set of 3</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="col-span-3">
+            <Label>Available Sizes</Label>
+            <div className="flex flex-wrap gap-3 mt-2">
+              {ALL_SIZES.map((size) => {
+                const selected = formData.size.split(",").map(s => s.trim()).filter(Boolean);
+                const isChecked = selected.includes(size);
+                return (
+                  <label key={size} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                    <Checkbox
+                      checked={isChecked}
+                      onCheckedChange={(checked) => {
+                        const current = formData.size.split(",").map(s => s.trim()).filter(Boolean);
+                        const updated = checked
+                          ? [...current, size]
+                          : current.filter(s => s !== size);
+                        setFormData(prev => ({ ...prev, size: updated.join(", ") }));
+                      }}
+                    />
+                    {size}
+                  </label>
+                );
+              })}
+            </div>
           </div>
         </div>
 
