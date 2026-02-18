@@ -179,36 +179,44 @@ const Shop = () => {
                   <span className="text-foreground font-medium">All Shoes</span>
                 </nav>
 
-                {/* Desktop: inline filter controls */}
-                <div className="hidden lg:flex items-center gap-3">
+                {/* Filter controls */}
+                <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setShowFilters(!showFilters)}
+                    onClick={() => {
+                      if (window.innerWidth < 1024) {
+                        setMobileFilterOpen(true);
+                      } else {
+                        setShowFilters(!showFilters);
+                      }
+                    }}
                     className="flex items-center gap-2 text-sm font-medium text-foreground hover:opacity-70 transition-opacity border border-border/50 rounded-lg px-3 py-2"
                   >
                     <Filter className="w-4 h-4" />
                     Filter
                   </button>
 
-                  <div className="flex border border-border/50 rounded-lg overflow-hidden">
-                    <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                      <Grid3X3 className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setViewMode("list")} className={`p-2 transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                      <List className="w-4 h-4" />
-                    </button>
+                  <div className="hidden lg:flex items-center gap-3">
+                    <div className="flex border border-border/50 rounded-lg overflow-hidden">
+                      <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                        <Grid3X3 className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => setViewMode("list")} className={`p-2 transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                        <List className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-40 h-9 bg-card border-border/50 text-sm"><SelectValue placeholder="Sort" /></SelectTrigger>
+                      <SelectContent>
+                        {sortOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {totalCount} items
+                      {isFetching && !isLoading && <Loader2 className="inline-block ml-1 h-3 w-3 animate-spin" />}
+                    </span>
                   </div>
-
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-40 h-9 bg-card border-border/50 text-sm"><SelectValue placeholder="Sort" /></SelectTrigger>
-                    <SelectContent>
-                      {sortOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {totalCount} items
-                    {isFetching && !isLoading && <Loader2 className="inline-block ml-1 h-3 w-3 animate-spin" />}
-                  </span>
                 </div>
               </div>
             </div>
