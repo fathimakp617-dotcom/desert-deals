@@ -289,7 +289,7 @@ const Shop = () => {
               {!isLoading && products.length > 0 && (
                 <div className={
                   viewMode === "grid"
-                    ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4"
+                    ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-1.5 sm:gap-2"
                     : "flex flex-col gap-4"
                 }>
                   {products.map((product) => (
