@@ -59,10 +59,25 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     console.log("Processing contact form submission");
 
+    // Build admin recipients from env
+    const adminOrderEmail = Deno.env.get("ADMIN_ORDER_EMAIL") || "";
+    const adminEmails = Deno.env.get("ADMIN_EMAILS") || "";
+    const allRecipients = [...new Set(
+      [adminOrderEmail, adminEmails]
+        .join(",")
+        .split(",")
+        .map((e) => e.trim())
+        .filter((e) => e.length > 0)
+    )];
+
+    if (allRecipients.length === 0) {
+      allRecipients.push("support@desertsdeals.com");
+    }
+
     // Send notification to admin
     const adminEmailResponse = await resend.emails.send({
       from: "Desert Deal <notifications@desertsdeals.com>",
-      to: ["support@desertsdeals.com"],
+      to: allRecipients,
       subject: `New Contact: ${safeSubject}`,
       html: `
         <!DOCTYPE html>
