@@ -6,11 +6,11 @@
 
 @layer base {
   :root {
-    /* Clean White Theme - Desert Deals inspired */
-    --background: 0 0% 100%; /* white */
+    /* Clean Light Gray Theme - Desert Deals inspired */
+    --background: 0 0% 96%; /* light gray */
     --foreground: 0 0% 10%; /* near black */
 
-    --card: 0 0% 98%;
+    --card: 0 0% 100%; /* white cards */
     --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
@@ -24,17 +24,17 @@
     --secondary: 30 10% 94%; /* light warm gray */
     --secondary-foreground: 0 0% 10%;
 
-    --muted: 0 0% 95%;
+    --muted: 0 0% 92%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 0 0% 95%;
+    --accent: 0 0% 92%;
     --accent-foreground: 0 0% 10%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 0 0% 85%;
+    --input: 0 0% 100%; /* white inputs */
     --ring: 0 0% 10%;
 
     --radius: 0.75rem;
