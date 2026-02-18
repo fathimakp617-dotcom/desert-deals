@@ -66,7 +66,7 @@ const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands
       </button>
       <div ref={scrollRef} className="flex gap-2 overflow-x-auto no-scrollbar px-5 snap-x snap-mandatory scroll-smooth">
         {brandList.map((brand) => (
-          <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 w-[90px] snap-start group">
+          <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 w-[calc(33.333%-6px)] snap-start group">
             <div className="bg-muted rounded-lg p-3 text-center transition-all duration-300 hover:shadow-md">
               <div className="flex items-center justify-center mb-2">
                 <div className="w-14 h-14 rounded-lg flex items-center justify-center p-1.5">
