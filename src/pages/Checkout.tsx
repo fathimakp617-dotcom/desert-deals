@@ -113,9 +113,7 @@ const Checkout = () => {
     address: "",
     city: "",
     state: "",
-    zipCode: "",
     country: "United Arab Emirates",
-    orderNotes: "",
   });
 
   // Track if we've already loaded address to prevent multiple loads
@@ -163,9 +161,7 @@ const Checkout = () => {
                 address: pendingNormalized.address,
                 city: pendingNormalized.city,
                 state: pendingNormalized.state || "",
-                zipCode: pendingNormalized.zipCode || "",
                 country: "United Arab Emirates",
-                orderNotes: "",
               });
               setIsExpressMode(true);
 
@@ -227,9 +223,7 @@ const Checkout = () => {
             address: normalized.address,
             city: normalized.city,
             state: normalized.state || "",
-            zipCode: normalized.zipCode || "",
             country: "United Arab Emirates",
-            orderNotes: "",
           });
           setIsExpressMode(true);
           setLoadingSavedAddress(false);
@@ -299,7 +293,6 @@ const Checkout = () => {
         address: formData.address,
         city: formData.city,
         state: formData.state,
-        zipCode: formData.zipCode,
         country: formData.country,
       };
       
@@ -359,7 +352,6 @@ const Checkout = () => {
           address: formData.address,
           city: formData.city,
           state: formData.state,
-          zipCode: formData.zipCode,
           country: formData.country,
         },
         items: items.map(item => ({
@@ -523,59 +515,21 @@ const Checkout = () => {
             <div className="grid lg:grid-cols-3 gap-12">
               {/* Left Column - Billing Details */}
               <div className="lg:col-span-2 space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">First Name *</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      required
-                      className="mt-1 bg-card border-border"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Last Name *</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      required
-                      className="mt-1 bg-card border-border"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="firstName">Name *</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1 bg-card border-border"
+                  />
                 </div>
 
                 <div>
                   <Label>Country / Region *</Label>
                   <p className="text-foreground font-medium mt-1">United Arab Emirates</p>
-                </div>
-
-                <div>
-                  <Label htmlFor="address">Street address *</Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    placeholder="House number and street name"
-                    required
-                    className="mt-1 bg-card border-border"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="city">Town / City *</Label>
-                  <Input
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    required
-                    className="mt-1 bg-card border-border"
-                  />
                 </div>
 
                 <div>
@@ -613,6 +567,18 @@ const Checkout = () => {
                 </div>
 
                 <div>
+                  <Label htmlFor="city">Town / City *</Label>
+                  <Input
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1 bg-card border-border"
+                  />
+                </div>
+
+                <div>
                   <Label htmlFor="email">Email address *</Label>
                   <Input
                     id="email"
@@ -623,18 +589,6 @@ const Checkout = () => {
                     placeholder="your@email.com"
                     required
                     className="mt-1 bg-card border-border"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="orderNotes">Order notes (optional)</Label>
-                  <textarea
-                    id="orderNotes"
-                    name="orderNotes"
-                    value={formData.orderNotes}
-                    onChange={(e) => setFormData(prev => ({ ...prev, orderNotes: e.target.value }))}
-                    placeholder="Notes about your order, e.g. special notes for delivery."
-                    className="mt-1 w-full min-h-[100px] rounded-md border border-border bg-card px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                 </div>
               </div>
