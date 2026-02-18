@@ -45,34 +45,26 @@ const BrandLogo = memo(({ logo, fallback, name }: { logo: string; fallback: stri
 });
 BrandLogo.displayName = "BrandLogo";
 
-const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands }) => {
+const MobileBrandGrid = memo(({ brands: brandList }: { brands: typeof brands }) => {
   return (
-    <div className="sm:hidden">
-      <div
-        className="flex gap-3 overflow-x-auto pb-3"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        {brandList.map((brand) => (
-          <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 w-[145px] group">
-            <div className="bg-muted rounded-lg p-4 text-center transition-all duration-300 hover:shadow-md">
-              <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">{brand.name}</h3>
-              <span className="text-[11px] text-muted-foreground mt-0.5 block">{brand.count} Products</span>
-              <div className="my-4 flex items-center justify-center">
-                <div className="w-20 h-20 rounded-lg flex items-center justify-center p-2">
-                  <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
-                </div>
+    <div className="sm:hidden grid grid-cols-3 gap-2">
+      {brandList.map((brand) => (
+        <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="group">
+          <div className="bg-muted rounded-lg p-3 text-center transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-center mb-2">
+              <div className="w-14 h-14 rounded-lg flex items-center justify-center p-1.5">
+                <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
               </div>
-              <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
-                View Products
-              </span>
             </div>
-          </Link>
-        ))}
-      </div>
+            <h3 className="text-[11px] font-heading font-semibold text-foreground tracking-tight leading-tight">{brand.name}</h3>
+            <span className="text-[10px] text-muted-foreground block">{brand.count} Products</span>
+          </div>
+        </Link>
+      ))}
     </div>
   );
 });
-MobileBrandCarousel.displayName = "MobileBrandCarousel";
+MobileBrandGrid.displayName = "MobileBrandGrid";
 
 const BrandCategories = memo(() => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -86,7 +78,7 @@ const BrandCategories = memo(() => {
   return (
     <section className="pt-3 pb-6 sm:pt-4 sm:pb-10 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-        <MobileBrandCarousel brands={brands} />
+        <MobileBrandGrid brands={brands} />
 
         <div className="hidden sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {brands.map((brand) => (
