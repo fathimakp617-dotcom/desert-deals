@@ -338,6 +338,7 @@ const Checkout = () => {
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
     if (!formData.firstName.trim()) errors.firstName = "Name is required";
+    if (!formData.address.trim()) errors.address = "Street address is required";
     if (!formData.state) errors.state = "Please select an emirate";
     if (!formData.phone.trim()) errors.phone = "Phone is required";
     if (!formData.city.trim()) errors.city = "City is required";
@@ -547,6 +548,19 @@ const Checkout = () => {
                     className={`mt-1 bg-card ${fieldErrors.firstName ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
                   />
                   {fieldErrors.firstName && <p className="text-destructive text-xs mt-1">{fieldErrors.firstName}</p>}
+                </div>
+
+                <div>
+                  <Label htmlFor="address">Street Address *</Label>
+                  <Input
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    required
+                    className={`mt-1 bg-card ${fieldErrors.address ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
+                  />
+                  {fieldErrors.address && <p className="text-destructive text-xs mt-1">{fieldErrors.address}</p>}
                 </div>
 
                 <div>
