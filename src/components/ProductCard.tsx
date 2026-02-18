@@ -23,7 +23,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
           {imgError ? (
             <ImageOff className="w-8 h-8 text-muted-foreground" />
           ) : (
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" onError={() => setImgError(true)} />
+            <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" onError={(e) => { setImgError(true); (e.target as HTMLImageElement).src = "/images/product-placeholder.jpg"; }} />
           )}
         </Link>
         <div className="flex-1 min-w-0">
@@ -62,7 +62,10 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
               className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
               loading="lazy"
               decoding="async"
-              onError={() => setImgError(true)}
+              onError={(e) => {
+                setImgError(true);
+                (e.target as HTMLImageElement).src = "/images/product-placeholder.jpg";
+              }}
             />
           )}
         </Link>
