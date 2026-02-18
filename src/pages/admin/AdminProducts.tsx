@@ -388,7 +388,7 @@ const AdminProducts = () => {
                     {product.image_url ? (
                       <div className="relative h-16 w-16 rounded overflow-hidden">
                         <img
-                          src={product.image_url}
+                          src={product.image_url.split(",")[0]?.trim()}
                           alt={product.name}
                           className="h-full w-full object-cover"
                         />
