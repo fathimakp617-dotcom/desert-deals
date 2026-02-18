@@ -7,7 +7,8 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
-import { AffiliateProvider } from "@/contexts/AffiliateContext";
+import { CouponProvider } from "@/contexts/CouponContext";
+
 import { AuthProvider } from "@/contexts/AuthContext";
 import CartDrawer from "@/components/CartDrawer";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -91,7 +92,7 @@ const App = () => (
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
-            <AffiliateProvider>
+            <CouponProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
@@ -132,7 +133,7 @@ const App = () => (
                   </Suspense>
                 </BrowserRouter>
               </TooltipProvider>
-            </AffiliateProvider>
+            </CouponProvider>
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>

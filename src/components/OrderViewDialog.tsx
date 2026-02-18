@@ -237,21 +237,13 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
             </div>
           </div>
 
-          {/* Coupons & Affiliates */}
-          {(order.coupon_code || order.affiliate_code) && (
+          {/* Coupons */}
+          {order.coupon_code && (
             <div className="flex flex-wrap gap-3">
-              {order.coupon_code && (
-                <div className="flex items-center gap-2 text-sm bg-green-500/10 text-green-600 px-3 py-1.5 rounded-full">
-                  <Tag className="h-3 w-3" />
-                  Coupon: {order.coupon_code}
-                </div>
-              )}
-              {order.affiliate_code && (
-                <div className="flex items-center gap-2 text-sm bg-purple-500/10 text-purple-600 px-3 py-1.5 rounded-full">
-                  <Tag className="h-3 w-3" />
-                  Affiliate: {order.affiliate_code}
-                </div>
-              )}
+              <div className="flex items-center gap-2 text-sm bg-green-500/10 text-green-600 px-3 py-1.5 rounded-full">
+                <Tag className="h-3 w-3" />
+                Coupon: {order.coupon_code}
+              </div>
             </div>
           )}
 
