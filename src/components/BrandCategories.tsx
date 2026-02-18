@@ -94,7 +94,7 @@ const BrandCategories = memo(() => {
   };
 
   return (
-    <section className="pt-1 pb-6 sm:pt-2 sm:pb-10 bg-background">
+    <section className="pt-3 pb-6 sm:pt-4 sm:pb-10 bg-background">
       <div className="relative">
         <div className="px-4 sm:hidden">
           <MobileBrandCarousel brands={brands} />
