@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Tag, X, Check, Loader2, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAffiliate } from "@/contexts/AffiliateContext";
+import { useCoupon } from "@/contexts/CouponContext";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 
@@ -15,7 +15,7 @@ const CouponInput = () => {
     removeCoupon,
     appliedCoupon,
     isLoading,
-  } = useAffiliate();
+  } = useCoupon();
   const { bulkDiscountPercent } = useCart();
   const [inputValue, setInputValue] = useState(couponCode);
 
@@ -40,13 +40,12 @@ const CouponInput = () => {
     toast.info("Coupon removed");
   };
 
-  // If bulk discount is active, show a message instead of coupon input
   if (isBulkDiscountActive) {
     return (
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Tag className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Coupon / Affiliate Code</span>
+          <span className="text-sm text-muted-foreground">Coupon Code</span>
         </div>
         <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3">
           <Gift className="w-4 h-4 text-emerald-500" />
@@ -62,7 +61,7 @@ const CouponInput = () => {
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <Tag className="w-4 h-4 text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">Coupon / Affiliate Code</span>
+        <span className="text-sm text-muted-foreground">Coupon Code</span>
       </div>
 
       <AnimatePresence mode="wait">

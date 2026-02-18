@@ -19,14 +19,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { 
-  Copy, 
-  Link, 
-  Users, 
-  Wallet, 
   LogOut, 
-  Check, 
+  Check,
   User, 
-  Share2,
   Package,
   Settings,
   Save,
@@ -37,29 +32,16 @@ import {
   X,
   RotateCcw,
   AlertCircle,
-  
   MapPin,
   Home,
   Loader2,
-  Zap
+  Zap,
+  Wallet
 } from "lucide-react";
 import ReturnRequestDialog from "@/components/ReturnRequestDialog";
 
-import WithdrawalRequestDialog from "@/components/WithdrawalRequestDialog";
-import WithdrawalHistory from "@/components/WithdrawalHistory";
 
-interface AffiliateData {
-  id: string;
-  name: string;
-  email: string;
-  code: string;
-  commission_percent: number;
-  coupon_discount_percent: number;
-  total_referrals: number;
-  total_earnings: number;
-  is_active: boolean;
-  created_at: string;
-}
+
 
 interface OrderItem {
   productId: string;
@@ -156,7 +138,6 @@ const normalizeSavedAddressForAccount = (raw: unknown) => {
 };
 
 const Account = () => {
-  const [affiliate, setAffiliate] = useState<AffiliateData | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -166,10 +147,7 @@ const Account = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isSubmittingReturn, setIsSubmittingReturn] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [isCreatingAffiliate, setIsCreatingAffiliate] = useState(false);
-  const [affiliateName, setAffiliateName] = useState("");
-  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
+  
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
   const [profileForm, setProfileForm] = useState({
     first_name: "",
@@ -233,16 +211,8 @@ const Account = () => {
         if (normalized) setAddressForm({ ...normalized, country: normalized.country || "India" });
       }
 
-      // Fetch affiliate data
-      const { data: affiliateData } = await supabase
-        .from("affiliates")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
 
-      if (affiliateData) {
-        setAffiliate(affiliateData);
-      }
+
 
       // Fetch orders
       const { data: ordersData } = await supabase
@@ -404,96 +374,14 @@ const Account = () => {
     }
   };
 
-  const generateAffiliateCode = (name: string) => {
-    const cleanName = name.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4);
-    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-    return `${cleanName}${random}`;
-  };
 
-  const handleCreateAffiliate = async () => {
-    if (!user || !affiliateName.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter your name",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    setIsCreatingAffiliate(true);
-    try {
-      const code = generateAffiliateCode(affiliateName);
-      
-      const { data, error } = await supabase
-        .from("affiliates")
-        .insert({
-          user_id: user.id,
-          name: affiliateName,
-          email: user.email,
-          code: code,
-          commission_percent: 10,
-          coupon_discount_percent: 10,
-          is_active: true,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        if (error.code === "23505") {
-          toast({
-            title: "Error",
-            description: "This affiliate code already exists. Please try again.",
-            variant: "destructive",
-          });
-        } else {
-          throw error;
-        }
-        return;
-      }
-
-      setAffiliate(data);
-      toast({
-        title: "Affiliate Account Created!",
-        description: "You can now start earning commissions.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create affiliate account",
-        variant: "destructive",
-      });
-    } finally {
-      setIsCreatingAffiliate(false);
-    }
-  };
 
   const handleLogout = async () => {
     await signOut();
     navigate("/");
   };
 
-  const getReferralLink = () => {
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/?ref=${affiliate?.code}`;
-  };
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(getReferralLink());
-      setCopied(true);
-      toast({
-        title: "Copied!",
-        description: "Referral link copied to clipboard.",
-      });
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast({
-        title: "Failed to copy",
-        description: "Please copy the link manually.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -689,10 +577,6 @@ const Account = () => {
                   <Package size={16} />
                   <span className="hidden sm:inline">Orders</span>
                 </TabsTrigger>
-                <TabsTrigger value="affiliate" className="gap-2">
-                  <Share2 size={16} />
-                  <span className="hidden sm:inline">Affiliate</span>
-                </TabsTrigger>
                 <TabsTrigger value="settings" className="gap-2">
                   <Settings size={16} />
                   <span className="hidden sm:inline">Settings</span>
@@ -838,28 +722,6 @@ const Account = () => {
                       {orders.reduce((sum, o) => sum + o.total, 0).toLocaleString()} AED
                     </p>
                     <p className="text-xs text-muted-foreground">Total Spent</p>
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="bg-card border border-border rounded-xl p-4 text-center"
-                  >
-                    <Users size={24} className="mx-auto text-blue-500 mb-2" />
-                    <p className="text-2xl font-bold text-foreground">{affiliate?.total_referrals || 0}</p>
-                    <p className="text-xs text-muted-foreground">Referrals</p>
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="bg-card border border-border rounded-xl p-4 text-center"
-                  >
-                    <Wallet size={24} className="mx-auto text-primary mb-2" />
-                    <p className="text-2xl font-bold text-foreground">
-                      {affiliate?.total_earnings?.toLocaleString() || 0} AED
-                    </p>
-                    <p className="text-xs text-muted-foreground">Affiliate Earnings</p>
                   </motion.div>
                 </div>
               </TabsContent>
@@ -1188,258 +1050,8 @@ const Account = () => {
               </TabsContent>
 
 
-              {/* Affiliate Tab */}
-              <TabsContent value="affiliate" className="space-y-6">
-                {affiliate ? (
-                  <>
-                    {/* Referral Link Card */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6"
-                    >
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                          <Link size={20} className="text-primary" />
-                        </div>
-                        <div>
-                          <h2 className="font-semibold text-foreground">Your Referral Link</h2>
-                          <p className="text-sm text-muted-foreground">Share this link to earn commissions</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <div className="flex-1 bg-background/80 backdrop-blur rounded-lg px-4 py-3 font-mono text-sm text-foreground break-all">
-                          {getReferralLink()}
-                        </div>
-                        <Button onClick={copyToClipboard} className="shrink-0">
-                          {copied ? (
-                            <>
-                              <Check size={18} className="mr-2" />
-                              Copied!
-                            </>
-                          ) : (
-                            <>
-                              <Copy size={18} className="mr-2" />
-                              Copy Link
-                            </>
-                          )}
-                        </Button>
-                      </div>
 
-                      <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                        <div className="bg-background/50 rounded-lg px-3 py-2">
-                          <span className="text-muted-foreground">Your Code: </span>
-                          <span className="font-mono font-semibold text-primary">{affiliate.code}</span>
-                        </div>
-                        <div className="bg-background/50 rounded-lg px-3 py-2">
-                          <span className="text-muted-foreground">Discount for referrals: </span>
-                          <span className="font-semibold text-foreground">{affiliate.coupon_discount_percent}% off</span>
-                        </div>
-                      </div>
-                    </motion.div>
 
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="bg-card border border-border rounded-xl p-6"
-                      >
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                            <Users size={20} className="text-blue-500" />
-                          </div>
-                          <span className="text-sm text-muted-foreground">Total Referrals</span>
-                        </div>
-                        <p className="text-3xl font-bold text-foreground">{affiliate.total_referrals}</p>
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="bg-card border border-border rounded-xl p-6"
-                      >
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                            <Wallet size={20} className="text-green-500" />
-                          </div>
-                          <span className="text-sm text-muted-foreground">Total Earnings</span>
-                        </div>
-                        <p className="text-3xl font-bold text-foreground">{affiliate.total_earnings.toLocaleString()} AED</p>
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="bg-card border border-border rounded-xl p-6"
-                      >
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-primary font-bold">{affiliate.commission_percent}%</span>
-                          </div>
-                          <span className="text-sm text-muted-foreground">Commission Rate</span>
-                        </div>
-                        <p className="text-3xl font-bold text-foreground">{affiliate.commission_percent}%</p>
-                      </motion.div>
-                    </div>
-
-                    {/* Withdraw Earnings Card */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.35 }}
-                      className="bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-2xl p-6"
-                    >
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                            <Wallet size={24} className="text-green-500" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-foreground">Available Balance</h3>
-                            <p className="text-2xl font-bold text-green-500">{affiliate.total_earnings.toLocaleString()} AED</p>
-                          </div>
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-3">
-                          <Button 
-                            variant="outline"
-                            className="border-green-500/30 text-green-500 hover:bg-green-500/10"
-                            onClick={() => setWithdrawDialogOpen(true)}
-                            disabled={affiliate.total_earnings < 500}
-                          >
-                            <Wallet size={16} className="mr-2" />
-                            Withdraw Earnings
-                          </Button>
-                        </div>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-4">
-                        Minimum withdrawal: 500 AED • Withdrawals are processed within 3-5 business days
-                      </p>
-                      
-                      {/* Withdrawal Dialog */}
-                      <WithdrawalRequestDialog
-                        open={withdrawDialogOpen}
-                        onOpenChange={setWithdrawDialogOpen}
-                        affiliate={{ id: affiliate.id, total_earnings: affiliate.total_earnings, email: affiliate.email }}
-                        userId={user?.id || ""}
-                        userPhone={profile?.phone}
-                        userEmail={user?.email || ""}
-                        onSuccess={fetchData}
-                      />
-                    </motion.div>
-
-                    {/* Withdrawal History */}
-                    <WithdrawalHistory userId={user?.id || ""} />
-
-                    {/* How it works */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      className="bg-card border border-border rounded-xl p-6"
-                    >
-                      <h3 className="font-semibold text-foreground mb-4">How it works</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="text-center">
-                          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                            <span className="text-primary font-bold">1</span>
-                          </div>
-                          <h4 className="font-medium text-foreground mb-1">Share Your Link</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Share your unique referral link with friends and followers
-                          </p>
-                        </div>
-                        <div className="text-center">
-                          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                            <span className="text-primary font-bold">2</span>
-                          </div>
-                          <h4 className="font-medium text-foreground mb-1">They Get a Discount</h4>
-                          <p className="text-sm text-muted-foreground">
-                            When they shop using your link, they get {affiliate.coupon_discount_percent}% off
-                          </p>
-                        </div>
-                        <div className="text-center">
-                          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                            <span className="text-primary font-bold">3</span>
-                          </div>
-                          <h4 className="font-medium text-foreground mb-1">You Earn Commission</h4>
-                          <p className="text-sm text-muted-foreground">
-                            You earn {affiliate.commission_percent}% commission on every sale
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-card border border-border rounded-xl p-8"
-                  >
-                    <div className="text-center mb-6">
-                      <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                        <Share2 size={32} className="text-primary" />
-                      </div>
-                      <h2 className="text-2xl font-heading font-bold text-foreground mb-2">
-                        Become an Affiliate
-                      </h2>
-                      <p className="text-muted-foreground max-w-md mx-auto">
-                        Join our affiliate program and earn 10% commission on every sale you refer!
-                      </p>
-                    </div>
-
-                    <div className="max-w-sm mx-auto space-y-4">
-                      <div>
-                        <Label htmlFor="affiliateName">Your Name</Label>
-                        <Input
-                          id="affiliateName"
-                          value={affiliateName}
-                          onChange={(e) => setAffiliateName(e.target.value)}
-                          placeholder="Enter your name"
-                          className="mt-1"
-                        />
-                      </div>
-                      <Button 
-                        onClick={handleCreateAffiliate} 
-                        className="w-full"
-                        disabled={isCreatingAffiliate}
-                      >
-                        {isCreatingAffiliate ? (
-                          <span className="flex items-center gap-2">
-                            <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                            Creating...
-                          </span>
-                        ) : (
-                          "Join Affiliate Program"
-                        )}
-                      </Button>
-                    </div>
-
-                    <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                      <div className="p-4 bg-background rounded-lg">
-                        <p className="text-2xl font-bold text-primary">10%</p>
-                        <p className="text-xs text-muted-foreground">Commission</p>
-                      </div>
-                      <div className="p-4 bg-background rounded-lg">
-                        <p className="text-2xl font-bold text-primary">10%</p>
-                        <p className="text-xs text-muted-foreground">Referral Discount</p>
-                      </div>
-                      <div className="p-4 bg-background rounded-lg">
-                        <p className="text-2xl font-bold text-primary">∞</p>
-                        <p className="text-xs text-muted-foreground">Unlimited Earnings</p>
-                      </div>
-                      <div className="p-4 bg-background rounded-lg">
-                        <p className="text-2xl font-bold text-primary">24/7</p>
-                        <p className="text-xs text-muted-foreground">Real-time Tracking</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </TabsContent>
 
               {/* Settings Tab */}
               <TabsContent value="settings" className="space-y-6">
