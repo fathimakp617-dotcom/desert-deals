@@ -19,11 +19,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
 
 interface SavedAddress {
   firstName: string;
@@ -106,7 +101,7 @@ const Checkout = () => {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   
-  const [paymentMethod, setPaymentMethod] = useState("cod");
+  
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
   const [isExpressMode, setIsExpressMode] = useState(false);
   const [loadingSavedAddress, setLoadingSavedAddress] = useState(true);
@@ -344,20 +339,14 @@ const Checkout = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (paymentMethod === "upi" || paymentMethod === "card") {
-      await handleRazorpayPayment(paymentMethod);
-    } else {
-      await handleCODOrder();
-    }
+    await handleCODOrder();
   };
 
   const handleCODOrder = async () => {
-    // For now, allow all COD orders without shipping prepayment
-    // TODO: Enable Razorpay shipping prepayment when ready
-    await createCODOrder(false);
+    await createCODOrder();
   };
 
-  const createCODOrder = async (shippingPaid = false) => {
+  const createCODOrder = async () => {
     setIsProcessing(true);
 
     try {
@@ -380,7 +369,7 @@ const Checkout = () => {
           quantity: item.quantity,
         })),
         payment_method: "cod",
-        payment_status: shippingPaid ? "shipping_paid" : "pending",
+        payment_status: "pending",
         coupon_code: null,
         affiliate_code: null,
       };
@@ -397,9 +386,7 @@ const Checkout = () => {
 
       toast({
         title: "Order Placed Successfully!",
-        description: shippingPaid 
-          ? `Order #${data.order.order_number}. Shipping paid - we'll dispatch your order soon!` 
-          : `Order #${data.order.order_number}. You will receive a confirmation email shortly.`,
+        description: `Order #${data.order.order_number}. You will receive a confirmation email shortly.`,
       });
 
       // Save address for future express checkout
@@ -419,355 +406,8 @@ const Checkout = () => {
     }
   };
 
-  const handleCODShippingPayment = async () => {
-    setIsProcessing(true);
 
-    try {
-      // Create Razorpay order for shipping charge only
-      const { data: orderData, error: orderError } = await supabase.functions.invoke('create-razorpay-order', {
-        body: {
-          amount: shipping,
-          currency: "INR",
-          receipt: `cod_shipping_${Date.now()}`,
-          notes: {
-            customer_email: formData.email,
-            customer_name: `${formData.firstName} ${formData.lastName}`,
-            payment_type: "cod_shipping",
-          },
-        },
-      });
 
-      if (orderError || !orderData?.success) {
-        throw new Error(orderData?.error || "Failed to create shipping payment order");
-      }
-
-      // Load Razorpay script if not loaded
-      if (!window.Razorpay) {
-        await loadRazorpayScript();
-      }
-
-      const options = {
-        key: orderData.key_id,
-        amount: orderData.order.amount,
-        currency: orderData.order.currency,
-        name: "Desert Deal",
-        description: "COD Shipping Charge",
-        image: "https://uyrudydfpbisawgsepxd.supabase.co/storage/v1/object/public/assets/logo.png",
-        order_id: orderData.order.id,
-        handler: async (response: any) => {
-          await verifyCODShippingAndCreateOrder(response);
-        },
-        prefill: {
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          contact: formData.phone,
-          method: "upi",
-        },
-        remember_customer: true,
-        config: {
-          display: {
-            blocks: {
-              upi: {
-                name: "Pay via UPI",
-                instruments: [
-                  { method: "upi", flows: ["qrcode", "collect", "intent"] },
-                  { method: "upi", apps: ["google_pay", "phonepe", "paytm"] },
-                ],
-              },
-              cards: {
-                name: "Card Payment",
-                instruments: [
-                  { method: "card", types: ["credit", "debit"] },
-                ],
-              },
-            },
-            sequence: ["block.upi", "block.cards"],
-            preferences: {
-              show_default_blocks: true,
-            },
-          },
-        },
-        theme: {
-          color: "#a87c39",
-          backdrop_color: "rgba(28, 28, 28, 0.95)",
-          hide_topbar: false,
-        },
-        modal: {
-          confirm_close: true,
-          escape: false,
-          animation: true,
-          backdropclose: false,
-          ondismiss: () => {
-            setIsProcessing(false);
-            toast({
-              title: "Shipping Payment Cancelled",
-              description: "Please pay the shipping charge to place your COD order.",
-              variant: "destructive",
-            });
-          },
-        },
-        retry: {
-          enabled: true,
-          max_count: 3,
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-    } catch (error) {
-      console.error("COD Shipping payment error:", error);
-      toast({
-        title: "Payment Error",
-        description: error instanceof Error ? error.message : "Failed to initiate shipping payment. Please try again.",
-        variant: "destructive",
-      });
-      setIsProcessing(false);
-    }
-  };
-
-  const verifyCODShippingAndCreateOrder = async (response: {
-    razorpay_order_id: string;
-    razorpay_payment_id: string;
-    razorpay_signature: string;
-  }) => {
-    try {
-      // Verify the shipping payment
-      const { data, error } = await supabase.functions.invoke('verify-razorpay-payment', {
-        body: {
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-          is_shipping_only: true, // Flag to indicate this is just shipping verification
-        },
-      });
-
-      if (error || !data?.success) {
-        throw new Error(data?.error || "Shipping payment verification failed");
-      }
-
-      toast({
-        title: "Shipping Paid!",
-        description: "Creating your COD order...",
-      });
-
-      // Now create the COD order with shipping marked as paid
-      await createCODOrder(true);
-    } catch (error) {
-      console.error("Shipping verification error:", error);
-      toast({
-        title: "Payment Verification Failed",
-        description: "Please contact support with your payment details.",
-        variant: "destructive",
-      });
-      setIsProcessing(false);
-    }
-  };
-
-  const handleRazorpayPayment = async (method: "upi" | "card" = "upi") => {
-    setIsProcessing(true);
-
-    try {
-      // Create Razorpay order
-      const { data: orderData, error: orderError } = await supabase.functions.invoke('create-razorpay-order', {
-        body: {
-          amount: orderTotal,
-          currency: "INR",
-          receipt: `receipt_${Date.now()}`,
-          notes: {
-            customer_email: formData.email,
-            customer_name: `${formData.firstName} ${formData.lastName}`,
-          },
-        },
-      });
-
-      if (orderError || !orderData?.success) {
-        throw new Error(orderData?.error || "Failed to create payment order");
-      }
-
-      // Load Razorpay script if not loaded
-      if (!window.Razorpay) {
-        await loadRazorpayScript();
-      }
-
-      const isUPI = method === "upi";
-      const contactDigits = (formData.phone || "").replace(/\D/g, "");
-
-      const options = {
-        key: orderData.key_id,
-        amount: orderData.order.amount,
-        currency: orderData.order.currency,
-        name: "Desert Deal",
-        description: isUPI ? "UPI Payment - Desert Deal" : "Card/Netbanking - Desert Deal",
-        image: "https://uyrudydfpbisawgsepxd.supabase.co/storage/v1/object/public/assets/logo.png",
-        order_id: orderData.order.id,
-        handler: async (response: any) => {
-          await verifyAndCompleteOrder(response);
-        },
-        prefill: {
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          contact: contactDigits,
-        },
-        // Enable saved cards/tokens
-        remember_customer: true,
-        // Keep fallback methods enabled to avoid "no appropriate payment method found".
-        // We only *prioritize* UPI in the UI when the user selects it.
-        method: {
-          upi: true,
-          card: true,
-          netbanking: true,
-          wallet: true,
-          paylater: false,
-        },
-        config: {
-          display: {
-            hide: [{ method: "paylater" }],
-            blocks: {
-              upi: {
-                name: "UPI",
-                instruments: [{ method: "upi" }],
-              },
-              cards: {
-                name: "Cards",
-                instruments: [{ method: "card" }],
-              },
-              banks: {
-                name: "Netbanking",
-                instruments: [{ method: "netbanking" }],
-              },
-            },
-            sequence: isUPI
-              ? ["block.upi", "block.cards", "block.banks"]
-              : ["block.cards", "block.banks", "block.upi"],
-            preferences: {
-              show_default_blocks: false,
-            },
-          },
-        },
-        theme: {
-          color: "#a87c39",
-          backdrop_color: "rgba(28, 28, 28, 0.95)",
-          hide_topbar: false,
-        },
-        modal: {
-          confirm_close: true,
-          escape: false,
-          animation: true,
-          backdropclose: false,
-          ondismiss: () => {
-            setIsProcessing(false);
-            toast({
-              title: "Payment Cancelled",
-              description: "Your payment was cancelled. You can try again.",
-              variant: "destructive",
-            });
-          },
-        },
-        readonly: {
-          contact: false,
-          email: false,
-        },
-        send_sms_hash: true,
-        retry: {
-          enabled: true,
-          max_count: 3,
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.on('payment.failed', (resp: any) => {
-        const msg = resp?.error?.description || resp?.error?.reason || "Payment failed. Please try again.";
-        console.error("Razorpay payment.failed:", resp);
-        toast({
-          title: resp?.error?.code || "Payment Failed",
-          description: msg,
-          variant: "destructive",
-        });
-      });
-      razorpay.open();
-    } catch (error) {
-      console.error("Razorpay error:", error);
-      toast({
-        title: "Payment Error",
-        description: error instanceof Error ? error.message : "Failed to initiate payment. Please try again.",
-        variant: "destructive",
-      });
-      setIsProcessing(false);
-    }
-  };
-
-  const loadRazorpayScript = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load Razorpay'));
-      document.body.appendChild(script);
-    });
-  };
-
-  const verifyAndCompleteOrder = async (response: {
-    razorpay_order_id: string;
-    razorpay_payment_id: string;
-    razorpay_signature: string;
-  }) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('verify-razorpay-payment', {
-        body: {
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-          order_data: {
-            user_id: user?.id || null,
-            customer_name: `${formData.firstName} ${formData.lastName}`,
-            customer_email: formData.email,
-            customer_phone: formData.phone,
-            shipping_address: {
-              address: formData.address,
-              city: formData.city,
-              state: formData.state,
-              zipCode: formData.zipCode,
-              country: formData.country,
-            },
-            items: items.map(item => ({
-              productId: item.product.id,
-              name: item.product.name,
-              price: item.product.price,
-              quantity: item.quantity,
-            })),
-            coupon_code: null,
-            affiliate_code: null,
-          },
-        },
-      });
-
-      if (error || !data?.success) {
-        throw new Error(data?.error || "Payment verification failed");
-      }
-
-      toast({
-        title: "Payment Successful!",
-        description: `Order #${data.order.order_number}. You will receive a confirmation email shortly.`,
-      });
-
-      // Save address for future express checkout
-      await saveAddressToProfile();
-      
-      clearCart();
-      navigate(`/?order=${data.order.order_number}`);
-    } catch (error) {
-      console.error("Verification error:", error);
-      toast({
-        title: "Payment Verification Failed",
-        description: "Please contact support with your payment details.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  // Show loading while checking auth
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background">

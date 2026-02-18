@@ -332,7 +332,7 @@ serve(async (req) => {
     console.log(`Bulk discount: ${bulkDiscountPercent}% on ${totalQuantity} items = ${bulkDiscount}`);
 
     // Validate payment method
-    const validPaymentMethods = ['cod', 'razorpay'];
+    const validPaymentMethods = ['cod'];
     if (!validPaymentMethods.includes(orderRequest.payment_method)) {
       console.error("Invalid payment method:", orderRequest.payment_method);
       return new Response(
@@ -341,9 +341,9 @@ serve(async (req) => {
       );
     }
 
-    // Calculate shipping - flat 20 AED for COD
+    // Calculate shipping - flat 20 AED
     const priceAfterBulk = subtotal - bulkDiscount;
-    const shipping = orderRequest.payment_method === 'razorpay' ? 0 : 20;
+    const shipping = 20;
 
     // Handle coupon discount (only if NO bulk discount applied)
     let couponDiscount = 0;

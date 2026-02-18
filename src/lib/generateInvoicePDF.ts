@@ -233,8 +233,6 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   const paymentLabel =
     data.paymentMethod === "cod"
       ? "Cash on Delivery"
-      : data.paymentMethod === "razorpay"
-      ? "Razorpay"
       : data.paymentMethod;
   doc.text(paymentLabel, pageWidth / 2 + 10, addressY + 20);
 

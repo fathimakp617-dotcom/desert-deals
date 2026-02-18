@@ -82,7 +82,7 @@ const PrivacyPolicy = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-primary">•</span>
-                      Payment information (processed securely via Razorpay)
+                      Payment information (processed securely)
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-primary">•</span>
@@ -164,7 +164,7 @@ const PrivacyPolicy = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Payment processing is handled by Razorpay with PCI-DSS compliance
+                    Payment processing is handled securely
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
@@ -201,7 +201,7 @@ const PrivacyPolicy = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    <strong>Payment Processors:</strong> Razorpay for secure payment processing
+                    <strong>Payment Processing:</strong> Secure payment handling for orders
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
