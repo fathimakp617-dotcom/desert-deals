@@ -35,8 +35,8 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
 
-  // Colors
-  const goldColor: [number, number, number] = [201, 169, 98];
+  // Colors - Clean Desert Deal branding
+  const primaryColor: [number, number, number] = [26, 26, 26]; // near black
   const darkColor: [number, number, number] = [26, 26, 26];
   const grayColor: [number, number, number] = [136, 136, 136];
 
@@ -62,16 +62,16 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
     doc.addImage(logoDataUrl, "PNG", (pageWidth - logoWidth) / 2, 6, logoWidth, logoHeight);
   } catch (error) {
     // Fallback to text if logo fails
-    doc.setTextColor(...goldColor);
+    doc.setTextColor(...primaryColor);
     doc.setFontSize(24);
     doc.setFont("helvetica", "bold");
     doc.text("DESERT DEAL", pageWidth / 2, 18, { align: "center" });
   }
 
-  doc.setTextColor(...goldColor);
+  doc.setTextColor(...primaryColor);
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text("PREMIUM SHOES & ACCESSORIES", pageWidth / 2, 28, { align: "center" });
+  doc.text("PREMIUM FOOTWEAR", pageWidth / 2, 28, { align: "center" });
 
   doc.setTextColor(180, 180, 180);
   doc.setFontSize(8);
@@ -95,7 +95,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   doc.text("Order Number", 20, 88);
   doc.text("Date", pageWidth - 20, 88, { align: "right" });
 
-  doc.setTextColor(...goldColor);
+  doc.setTextColor(...primaryColor);
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
   doc.text(data.orderNumber, 20, 98);
@@ -186,7 +186,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.text("Total:", totalsX, totalsY + 2);
-  doc.setTextColor(...goldColor);
+  doc.setTextColor(...primaryColor);
   doc.text(formatCurrency(data.total), pageWidth - 20, totalsY + 2, {
     align: "right",
   });
@@ -307,6 +307,7 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
   const isPrepaid = order.payment_status === "paid" || order.payment_method !== "cod";
   const totalAmount = Math.round(order.total || 0);
   const itemCount = order.items?.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0) || 0;
+  const paymentLabel = isPrepaid ? `PREPAID : ${formatCurrency(totalAmount)}` : `CASH ON DELIVERY : ${formatCurrency(totalAmount)}`;
 
   let yPos = 50;
 
@@ -324,7 +325,7 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
   yPos += 15;
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
-  doc.text("PREMIUM SHOES", margin, yPos);
+  doc.text("PREMIUM FOOTWEAR", margin, yPos);
 
   // Header divider
   yPos += 12;
@@ -346,7 +347,7 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
 
   yPos += 20;
   doc.setFontSize(16);
-  const paymentLabel = isPrepaid ? `PREPAID : INR ${totalAmount}` : `CASH ON DELIVERY : INR ${totalAmount}`;
+  
   
   // Payment box
   const paymentBoxWidth = doc.getTextWidth(paymentLabel) + 20;
@@ -391,7 +392,7 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
   doc.text(cityState, margin + 10, addrY);
   addrY += 14;
   
-  doc.text(address?.country || "India", margin + 10, addrY);
+  doc.text(address?.country || "UAE", margin + 10, addrY);
   addrY += 14;
   
   doc.text(`PHONE: ${order.customer_phone || "N/A"}`, margin + 10, addrY);
@@ -450,7 +451,7 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
   doc.rect(margin, yPos, contentWidth, 30);
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
-  doc.text(`TOTAL : INR ${totalAmount}`, pageWidth - margin - 10, yPos + 20, { align: "right" });
+  doc.text(`TOTAL : ${formatCurrency(totalAmount)}`, pageWidth - margin - 10, yPos + 20, { align: "right" });
 
   // Return Address Box
   yPos += 45;

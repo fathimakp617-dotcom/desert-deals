@@ -59,65 +59,19 @@ const formatCurrency = (amount: number): string => {
 const generateOrderEmailHTML = (order: OrderConfirmationRequest): string => {
   const itemsHTML = order.items.map(item => `
     <tr>
-      <td style="padding: 12px; border-bottom: 1px solid #eee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <td style="padding: 14px; border-bottom: 1px solid #eee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a;">
         ${item.name}
       </td>
-      <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <td style="padding: 14px; border-bottom: 1px solid #eee; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #555;">
         ${item.quantity}
       </td>
-      <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <td style="padding: 14px; border-bottom: 1px solid #eee; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a; font-weight: 500;">
         ${formatCurrency(item.price * item.quantity)}
       </td>
     </tr>
   `).join('');
 
-  const paymentMethodLabel = order.payment_method === 'cod' ? 'Cash on Delivery' : 'Online Payment';
-
-  // Generate a simple text-based invoice for PDF-like attachment simulation
-  const invoiceText = `
-DESERT DEAL - PREMIUM FOOTWEAR
-================================
-DESERT DEAL
-UAE
-Phone: +971 XX XXX XXXX
-================================
-================================
-
-INVOICE
-
-Order Number: ${order.order_number}
-Date: ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-
-Customer: ${order.customer_name}
-Email: ${order.customer_email}
-
-Shipping Address:
-${getAddressString(order.shipping_address)}
-${order.shipping_address.city}, ${order.shipping_address.state} ${getZipCode(order.shipping_address)}
-${order.shipping_address.country || 'India'}
-
---------------------------------
-ORDER ITEMS
---------------------------------
-${order.items.map(item => `${item.name} x${item.quantity} - ${formatCurrency(item.price * item.quantity)}`).join('\n')}
-
---------------------------------
-Subtotal: ${formatCurrency(order.subtotal)}
-${order.discount > 0 ? `Discount${order.coupon_code ? ` (${order.coupon_code})` : order.affiliate_code ? ` (${order.affiliate_code})` : ''}: -${formatCurrency(order.discount)}` : ''}
-Shipping: ${order.shipping === 0 ? 'FREE' : formatCurrency(order.shipping)}
---------------------------------
-TOTAL: ${formatCurrency(order.total)}
-
-Payment Method: ${paymentMethodLabel}
-
-================================
-Thank you for shopping with Desert Deal!
-For questions: support@desertsdeals.com
-© ${new Date().getFullYear()} Desert Deal
-  `.trim();
-
-  // Base64 encode the invoice text for attachment
-  const invoiceBase64 = btoa(unescape(encodeURIComponent(invoiceText)));
+  const paymentMethodLabel = order.payment_method === 'cod' ? 'Cash on Delivery' : order.payment_method;
 
   return `
     <!DOCTYPE html>
@@ -126,18 +80,18 @@ For questions: support@desertsdeals.com
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body style="margin: 0; padding: 0; background-color: #1c1c1c;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #1c1c1c; padding: 40px 20px;">
+    <body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
         <tr>
           <td align="center">
-            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #242424; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden;">
               <!-- Header -->
               <tr>
-                <td style="background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 100%); padding: 45px 40px; text-align: center; border-bottom: 2px solid #a87c39;">
-                  <h1 style="margin: 0; color: #c7915e; font-family: Georgia, serif; font-size: 32px; letter-spacing: 3px; font-weight: 300;">
+                <td style="background-color: #1a1a1a; padding: 40px; text-align: center;">
+                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; letter-spacing: 4px; font-weight: 600;">
                     DESERT DEAL
                   </h1>
-                  <p style="margin: 10px 0 0; color: #a87c39; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">
+                  <p style="margin: 10px 0 0; color: #999; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">
                     Premium Footwear
                   </p>
                 </td>
@@ -147,155 +101,108 @@ For questions: support@desertsdeals.com
               <tr>
                 <td style="padding: 40px;">
                   <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #a87c39 0%, #c7915e 100%); border-radius: 50%; display: inline-block; line-height: 70px;">
-                      <span style="color: #1c1c1c; font-size: 36px;">✓</span>
+                    <div style="width: 64px; height: 64px; background-color: #1a1a1a; border-radius: 50%; display: inline-block; line-height: 64px;">
+                      <span style="color: #ffffff; font-size: 32px;">✓</span>
                     </div>
                   </div>
                   
-                  <h2 style="margin: 0 0 10px; text-align: center; color: #f5f5f0; font-family: Georgia, serif; font-size: 26px; font-weight: 400;">
+                  <h2 style="margin: 0 0 10px; text-align: center; color: #1a1a1a; font-size: 24px; font-weight: 600;">
                     Thank You for Your Order!
                   </h2>
-                  <p style="margin: 0 0 30px; text-align: center; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px;">
+                  <p style="margin: 0 0 30px; text-align: center; color: #555; font-size: 15px; line-height: 1.6;">
                     Hi ${order.customer_name}, your order has been confirmed.
                   </p>
                   
-                  <!-- Invoice Download Button -->
-                  <div style="text-align: center; margin-bottom: 30px;">
-                    <p style="margin: 0 0 10px; color: #888; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px;">
+                  <div style="text-align: center; margin-bottom: 25px;">
+                    <p style="margin: 0; color: #888; font-size: 13px;">
                       📄 Your invoice is attached to this email
                     </p>
                   </div>
                   
                   <!-- Order Number -->
-                  <div style="background-color: #1c1c1c; border-radius: 8px; padding: 25px; margin-bottom: 30px; text-align: center; border: 1px solid #3d3d3d;">
-                    <p style="margin: 0 0 8px; color: #a87c39; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 2px;">
+                  <div style="background-color: #f5f5f5; border-radius: 8px; padding: 25px; margin-bottom: 30px; text-align: center;">
+                    <p style="margin: 0 0 8px; color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 2px;">
                       Order Number
                     </p>
-                    <p style="margin: 0; color: #c7915e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 22px; font-weight: bold; letter-spacing: 2px;">
+                    <p style="margin: 0; color: #1a1a1a; font-size: 22px; font-weight: 700; letter-spacing: 2px;">
                       ${order.order_number}
                     </p>
                   </div>
                   
                   <!-- Order Items -->
-                  <h3 style="margin: 0 0 18px; color: #c7915e; font-family: Georgia, serif; font-size: 18px; font-weight: 500; letter-spacing: 1px;">
+                  <h3 style="margin: 0 0 15px; color: #1a1a1a; font-size: 16px; font-weight: 600; letter-spacing: 1px;">
                     Order Summary
                   </h3>
-                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px; background: #1c1c1c; border-radius: 6px; overflow: hidden;">
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
                     <thead>
-                      <tr style="background-color: #2d2d2d;">
-                        <th style="padding: 14px; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; color: #a87c39; text-transform: uppercase; letter-spacing: 1px;">
-                          Item
-                        </th>
-                        <th style="padding: 14px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; color: #a87c39; text-transform: uppercase; letter-spacing: 1px;">
-                          Qty
-                        </th>
-                        <th style="padding: 14px; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; color: #a87c39; text-transform: uppercase; letter-spacing: 1px;">
-                          Price
-                        </th>
+                      <tr style="background-color: #1a1a1a;">
+                        <th style="padding: 14px; text-align: left; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Item</th>
+                        <th style="padding: 14px; text-align: center; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Qty</th>
+                        <th style="padding: 14px; text-align: right; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Price</th>
                       </tr>
                     </thead>
                     <tbody>
-                      ${order.items.map(item => `
-                        <tr>
-                          <td style="padding: 14px; border-bottom: 1px solid #3d3d3d; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f5f5f0;">
-                            ${item.name}
-                          </td>
-                          <td style="padding: 14px; border-bottom: 1px solid #3d3d3d; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e0e0e0;">
-                            ${item.quantity}
-                          </td>
-                          <td style="padding: 14px; border-bottom: 1px solid #3d3d3d; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f5f5f0;">
-                            ${formatCurrency(item.price * item.quantity)}
-                          </td>
-                        </tr>
-                      `).join('')}
+                      ${itemsHTML}
                     </tbody>
                   </table>
                   
                   <!-- Order Totals -->
                   <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
                     <tr>
-                      <td style="padding: 10px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #888;">
-                        Subtotal
-                      </td>
-                      <td style="padding: 10px 0; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f5f5f0;">
-                        ${formatCurrency(order.subtotal)}
-                      </td>
+                      <td style="padding: 10px 0; color: #888; font-size: 14px;">Subtotal</td>
+                      <td style="padding: 10px 0; text-align: right; color: #1a1a1a; font-size: 14px;">${formatCurrency(order.subtotal)}</td>
                     </tr>
                     ${order.discount > 0 ? `
                     <tr>
-                      <td style="padding: 10px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #22c55e;">
+                      <td style="padding: 10px 0; color: #22c55e; font-size: 14px;">
                         Discount ${order.coupon_code ? `<span style="color: #888; font-size: 12px;">(${order.coupon_code})</span>` : order.affiliate_code ? `<span style="color: #888; font-size: 12px;">(${order.affiliate_code})</span>` : ''}
                       </td>
-                      <td style="padding: 10px 0; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #22c55e;">
-                        -${formatCurrency(order.discount)}
-                      </td>
+                      <td style="padding: 10px 0; text-align: right; color: #22c55e; font-size: 14px;">-${formatCurrency(order.discount)}</td>
                     </tr>
                     ` : ''}
                     <tr>
-                      <td style="padding: 10px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #888;">
-                        Shipping
-                      </td>
-                      <td style="padding: 10px 0; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f5f5f0;">
-                        ${order.shipping === 0 ? 'FREE' : formatCurrency(order.shipping)}
-                      </td>
+                      <td style="padding: 10px 0; color: #888; font-size: 14px;">Shipping</td>
+                      <td style="padding: 10px 0; text-align: right; color: #1a1a1a; font-size: 14px;">${order.shipping === 0 ? 'FREE' : formatCurrency(order.shipping)}</td>
                     </tr>
                     <tr>
-                      <td style="padding: 15px 0; border-top: 2px solid #a87c39; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: bold; color: #f5f5f0; font-size: 18px;">
-                        Total
-                      </td>
-                      <td style="padding: 15px 0; border-top: 2px solid #a87c39; text-align: right; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: bold; color: #c7915e; font-size: 20px;">
-                        ${formatCurrency(order.total)}
-                      </td>
+                      <td style="padding: 15px 0; border-top: 2px solid #1a1a1a; font-weight: 700; color: #1a1a1a; font-size: 18px;">Total</td>
+                      <td style="padding: 15px 0; border-top: 2px solid #1a1a1a; text-align: right; font-weight: 700; color: #1a1a1a; font-size: 20px;">${formatCurrency(order.total)}</td>
                     </tr>
                   </table>
                   
                   <!-- Shipping Address -->
-                  <div style="background-color: #1c1c1c; border-radius: 8px; padding: 25px; margin-bottom: 20px; border: 1px solid #3d3d3d;">
-                    <h4 style="margin: 0 0 12px; color: #c7915e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">
-                      📍 Shipping Address
-                    </h4>
-                    <p style="margin: 0; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.7;">
+                  <div style="background-color: #f5f5f5; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 12px; color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 2px;">📍 Shipping Address</h4>
+                    <p style="margin: 0; color: #1a1a1a; font-size: 14px; line-height: 1.7;">
                       ${order.customer_name}<br>
                       ${getAddressString(order.shipping_address)}<br>
                       ${order.shipping_address.city}, ${order.shipping_address.state} ${getZipCode(order.shipping_address)}<br>
-                      ${order.shipping_address.country || 'India'}
+                      ${order.shipping_address.country || 'UAE'}
                     </p>
                   </div>
                   
                   <!-- Payment Method -->
-                  <div style="background-color: #1c1c1c; border-radius: 8px; padding: 25px; margin-bottom: 30px; border: 1px solid #3d3d3d;">
-                    <h4 style="margin: 0 0 12px; color: #c7915e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">
-                      💳 Payment Method
-                    </h4>
-                    <p style="margin: 0; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px;">
-                      ${paymentMethodLabel}
-                    </p>
+                  <div style="background-color: #f5f5f5; border-radius: 8px; padding: 25px; margin-bottom: 30px;">
+                    <h4 style="margin: 0 0 12px; color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 2px;">💳 Payment Method</h4>
+                    <p style="margin: 0; color: #1a1a1a; font-size: 14px;">${paymentMethodLabel}</p>
                   </div>
                   
-                  <!-- Footer Message -->
-                  <p style="margin: 0; text-align: center; color: #888; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.6;">
+                  <p style="margin: 0; text-align: center; color: #888; font-size: 14px; line-height: 1.6;">
                     If you have any questions about your order, please contact us at<br>
-                    <a href="mailto:support@desertsdeals.com" style="color: #c7915e; text-decoration: none;">support@desertsdeals.com</a>
+                    <a href="mailto:support@desertsdeals.com" style="color: #1a1a1a; text-decoration: underline; font-weight: 500;">support@desertsdeals.com</a>
                   </p>
                 </td>
               </tr>
               
               <!-- Footer -->
               <tr>
-                <td style="background: linear-gradient(135deg, #1c1c1c 0%, #0f0f0f 100%); padding: 30px; text-align: center; border-top: 1px solid #3d3d3d;">
-                  <p style="margin: 0 0 10px; color: #a87c39; font-family: Georgia, serif; font-size: 14px; letter-spacing: 2px;">
-                    DESERT DEAL
-                  </p>
-                  <p style="margin: 0; color: #666; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px;">
+                <td style="background-color: #1a1a1a; padding: 30px; text-align: center;">
+                  <p style="margin: 0 0 8px; color: #ffffff; font-size: 13px; letter-spacing: 2px; font-weight: 600;">DESERT DEAL</p>
+                  <p style="margin: 0; color: #999; font-size: 11px;">
                     © ${new Date().getFullYear()} Desert Deal. All rights reserved.
                   </p>
-                  <p style="margin: 8px 0 0; color: #555; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 10px;">
-                    Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal<br>
-                    Tirurangadi, Malappuram – 673634, Kerala, India<br>
-                    Phone: +91 99466 47442
-                  </p>
-                  <p style="margin: 8px 0 0; color: #555; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 9px;">
-                    GSTIN: 32AAPCR2931R1ZS | TAN: CHNR06383G
+                  <p style="margin: 8px 0 0; color: #777; font-size: 10px;">
+                    United Arab Emirates | Phone: +971 50 678 4405
                   </p>
                 </td>
               </tr>
@@ -317,378 +224,119 @@ const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint
   
   const { width, height } = page.getSize();
   
-  const formattedDate = new Date().toLocaleDateString('en-IN', { 
+  const formattedDate = new Date().toLocaleDateString('en-US', { 
     day: 'numeric', 
     month: 'long', 
     year: 'numeric' 
   });
   
-  const paymentMethodLabel = order.payment_method === 'cod' ? 'Cash on Delivery' : 'Online Payment';
+  const paymentMethodLabel = order.payment_method === 'cod' ? 'Cash on Delivery' : order.payment_method;
   
   let yPos = height - 50;
   
-  // Header
-  page.drawText('DESERT DEAL', {
-    x: width / 2 - 50,
-    y: yPos,
-    size: 24,
-    font: boldFont,
-    color: rgb(0.79, 0.66, 0.38), // Gold color
-  });
-  
-  yPos -= 20;
-  page.drawText('PREMIUM FOOTWEAR', {
-    x: width / 2 - 55,
-    y: yPos,
-    size: 12,
-    font: font,
-    color: rgb(0.4, 0.4, 0.4),
-  });
-  
-  yPos -= 12;
-  page.drawText('DESERT DEAL', {
-    x: width / 2 - 70,
-    y: yPos,
-    size: 9,
-    font: font,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-  
-  yPos -= 12;
-  page.drawText('Ward No. 21, Door No. 553/1, Kavumpadi, Pallikkal, Tirurangadi', {
-    x: width / 2 - 155,
-    y: yPos,
-    size: 9,
-    font: font,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-  
-  yPos -= 12;
-  page.drawText('Malappuram – 673634, Kerala, India | Ph: +91 99466 47442', {
-    x: width / 2 - 140,
-    y: yPos,
-    size: 9,
-    font: font,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-  
-  yPos -= 12;
-  page.drawText('GSTIN: 32AAPCR2931R1ZS | TAN: CHNR06383G', {
-    x: width / 2 - 100,
-    y: yPos,
-    size: 9,
-    font: font,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-  
-  yPos -= 40;
-  page.drawText('INVOICE', {
-    x: width / 2 - 30,
-    y: yPos,
-    size: 18,
-    font: boldFont,
+  // Header bar
+  page.drawRectangle({
+    x: 0, y: yPos - 10, width, height: 60,
     color: rgb(0.1, 0.1, 0.1),
+  });
+  
+  page.drawText('DESERT DEAL', {
+    x: width / 2 - 55, y: yPos + 8, size: 22, font: boldFont, color: rgb(1, 1, 1),
+  });
+  page.drawText('PREMIUM FOOTWEAR', {
+    x: width / 2 - 50, y: yPos - 8, size: 10, font, color: rgb(0.7, 0.7, 0.7),
+  });
+  
+  yPos -= 30;
+  page.drawText('United Arab Emirates | Phone: +971 50 678 4405', {
+    x: width / 2 - 120, y: yPos - 15, size: 9, font, color: rgb(0.5, 0.5, 0.5),
+  });
+  
+  yPos -= 50;
+  page.drawText('INVOICE', {
+    x: width / 2 - 30, y: yPos, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1),
   });
   
   // Order info
   yPos -= 40;
   page.drawText(`Order Number: ${order.order_number}`, {
-    x: 50,
-    y: yPos,
-    size: 11,
-    font: boldFont,
-    color: rgb(0.1, 0.1, 0.1),
+    x: 50, y: yPos, size: 11, font: boldFont, color: rgb(0.1, 0.1, 0.1),
   });
-  
   page.drawText(`Date: ${formattedDate}`, {
-    x: width - 200,
-    y: yPos,
-    size: 11,
-    font: font,
-    color: rgb(0.3, 0.3, 0.3),
+    x: width - 200, y: yPos, size: 11, font, color: rgb(0.3, 0.3, 0.3),
   });
   
-  // Divider
   yPos -= 20;
-  page.drawLine({
-    start: { x: 50, y: yPos },
-    end: { x: width - 50, y: yPos },
-    thickness: 1,
-    color: rgb(0.8, 0.8, 0.8),
-  });
+  page.drawLine({ start: { x: 50, y: yPos }, end: { x: width - 50, y: yPos }, thickness: 1, color: rgb(0.8, 0.8, 0.8) });
   
   // Bill To / Ship To
   yPos -= 30;
-  page.drawText('BILL TO:', {
-    x: 50,
-    y: yPos,
-    size: 10,
-    font: boldFont,
-    color: rgb(0.4, 0.4, 0.4),
-  });
-  
-  page.drawText('SHIP TO:', {
-    x: width / 2 + 20,
-    y: yPos,
-    size: 10,
-    font: boldFont,
-    color: rgb(0.4, 0.4, 0.4),
-  });
+  page.drawText('BILL TO:', { x: 50, y: yPos, size: 10, font: boldFont, color: rgb(0.4, 0.4, 0.4) });
+  page.drawText('SHIP TO:', { x: width / 2 + 20, y: yPos, size: 10, font: boldFont, color: rgb(0.4, 0.4, 0.4) });
   
   yPos -= 18;
-  page.drawText(order.customer_name, {
-    x: 50,
-    y: yPos,
-    size: 11,
-    font: boldFont,
-    color: rgb(0.1, 0.1, 0.1),
-  });
-  
-  page.drawText(order.customer_name, {
-    x: width / 2 + 20,
-    y: yPos,
-    size: 11,
-    font: boldFont,
-    color: rgb(0.1, 0.1, 0.1),
-  });
+  page.drawText(order.customer_name, { x: 50, y: yPos, size: 11, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
+  page.drawText(order.customer_name, { x: width / 2 + 20, y: yPos, size: 11, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
   
   yPos -= 15;
-  page.drawText(order.customer_email, {
-    x: 50,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.3, 0.3, 0.3),
-  });
-  
-  page.drawText(getAddressString(order.shipping_address), {
-    x: width / 2 + 20,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.3, 0.3, 0.3),
-  });
+  page.drawText(order.customer_email, { x: 50, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
+  page.drawText(getAddressString(order.shipping_address), { x: width / 2 + 20, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
   
   yPos -= 15;
-  const customerPhone = order.customer_phone || 'N/A';
-  page.drawText(`Ph: ${customerPhone}`, {
-    x: 50,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.3, 0.3, 0.3),
-  });
-  
-  page.drawText(`${order.shipping_address.city}, ${order.shipping_address.state} ${getZipCode(order.shipping_address)}`, {
-    x: width / 2 + 20,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.3, 0.3, 0.3),
-  });
+  page.drawText(`Ph: ${order.customer_phone || 'N/A'}`, { x: 50, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
+  page.drawText(`${order.shipping_address.city}, ${order.shipping_address.state} ${getZipCode(order.shipping_address)}`, { x: width / 2 + 20, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
   
   yPos -= 15;
-  page.drawText(order.shipping_address.country || 'India', {
-    x: width / 2 + 20,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.3, 0.3, 0.3),
-  });
+  page.drawText(order.shipping_address.country || 'UAE', { x: width / 2 + 20, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
   
-  // Order Items Header
+  // Items table header
   yPos -= 40;
-  page.drawRectangle({
-    x: 50,
-    y: yPos - 5,
-    width: width - 100,
-    height: 25,
-    color: rgb(0.1, 0.1, 0.1),
-  });
+  page.drawRectangle({ x: 50, y: yPos - 5, width: width - 100, height: 25, color: rgb(0.1, 0.1, 0.1) });
+  page.drawText('Product', { x: 60, y: yPos + 3, size: 10, font: boldFont, color: rgb(1, 1, 1) });
+  page.drawText('Qty', { x: 350, y: yPos + 3, size: 10, font: boldFont, color: rgb(1, 1, 1) });
+  page.drawText('Price', { x: 450, y: yPos + 3, size: 10, font: boldFont, color: rgb(1, 1, 1) });
   
-  page.drawText('Product', {
-    x: 60,
-    y: yPos + 3,
-    size: 10,
-    font: boldFont,
-    color: rgb(1, 1, 1),
-  });
-  
-  page.drawText('Qty', {
-    x: 350,
-    y: yPos + 3,
-    size: 10,
-    font: boldFont,
-    color: rgb(1, 1, 1),
-  });
-  
-  page.drawText('Price', {
-    x: 450,
-    y: yPos + 3,
-    size: 10,
-    font: boldFont,
-    color: rgb(1, 1, 1),
-  });
-  
-  // Order Items
+  // Items
   yPos -= 25;
   for (const item of order.items) {
     yPos -= 20;
-    page.drawText(item.name.substring(0, 40), {
-      x: 60,
-      y: yPos,
-      size: 10,
-      font: font,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-    
-    page.drawText(item.quantity.toString(), {
-      x: 360,
-      y: yPos,
-      size: 10,
-      font: font,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-    
-    page.drawText(`INR ${(item.price * item.quantity).toLocaleString('en-IN')}`, {
-      x: 440,
-      y: yPos,
-      size: 10,
-      font: font,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-    
-    // Item divider
+    page.drawText(item.name.substring(0, 40), { x: 60, y: yPos, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(item.quantity.toString(), { x: 360, y: yPos, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
+    page.drawText(formatCurrency(item.price * item.quantity), { x: 440, y: yPos, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
     yPos -= 8;
-    page.drawLine({
-      start: { x: 50, y: yPos },
-      end: { x: width - 50, y: yPos },
-      thickness: 0.5,
-      color: rgb(0.9, 0.9, 0.9),
-    });
+    page.drawLine({ start: { x: 50, y: yPos }, end: { x: width - 50, y: yPos }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) });
   }
   
-  // Totals section
+  // Totals
   yPos -= 30;
-  page.drawText('Subtotal:', {
-    x: 350,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.3, 0.3, 0.3),
-  });
-  page.drawText(`INR ${order.subtotal.toLocaleString('en-IN')}`, {
-    x: 440,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.2, 0.2, 0.2),
-  });
+  page.drawText('Subtotal:', { x: 350, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
+  page.drawText(formatCurrency(order.subtotal), { x: 440, y: yPos, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
   
   if (order.discount > 0) {
     yPos -= 18;
-    page.drawText('Discount:', {
-      x: 350,
-      y: yPos,
-      size: 10,
-      font: font,
-      color: rgb(0.16, 0.65, 0.27),
-    });
-    page.drawText(`-INR ${order.discount.toLocaleString('en-IN')}`, {
-      x: 440,
-      y: yPos,
-      size: 10,
-      font: font,
-      color: rgb(0.16, 0.65, 0.27),
-    });
+    page.drawText('Discount:', { x: 350, y: yPos, size: 10, font, color: rgb(0.16, 0.65, 0.27) });
+    page.drawText(`-${formatCurrency(order.discount)}`, { x: 440, y: yPos, size: 10, font, color: rgb(0.16, 0.65, 0.27) });
   }
   
   yPos -= 18;
-  page.drawText('Shipping:', {
-    x: 350,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.3, 0.3, 0.3),
-  });
-  page.drawText(order.shipping === 0 ? 'FREE' : `INR ${order.shipping.toLocaleString('en-IN')}`, {
-    x: 440,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.2, 0.2, 0.2),
-  });
+  page.drawText('Shipping:', { x: 350, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
+  page.drawText(order.shipping === 0 ? 'FREE' : formatCurrency(order.shipping), { x: 440, y: yPos, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
   
-  // Total
   yPos -= 25;
-  page.drawRectangle({
-    x: 340,
-    y: yPos - 5,
-    width: 200,
-    height: 25,
-    color: rgb(0.95, 0.95, 0.95),
-  });
+  page.drawRectangle({ x: 340, y: yPos - 5, width: 200, height: 25, color: rgb(0.95, 0.95, 0.95) });
+  page.drawText('TOTAL:', { x: 350, y: yPos + 3, size: 12, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
+  page.drawText(formatCurrency(order.total), { x: 440, y: yPos + 3, size: 12, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
   
-  page.drawText('TOTAL:', {
-    x: 350,
-    y: yPos + 3,
-    size: 12,
-    font: boldFont,
-    color: rgb(0.1, 0.1, 0.1),
-  });
-  page.drawText(`INR ${order.total.toLocaleString('en-IN')}`, {
-    x: 440,
-    y: yPos + 3,
-    size: 12,
-    font: boldFont,
-    color: rgb(0.79, 0.66, 0.38),
-  });
-  
-  // Payment method
   yPos -= 40;
-  page.drawText(`Payment Method: ${paymentMethodLabel}`, {
-    x: 50,
-    y: yPos,
-    size: 10,
-    font: font,
-    color: rgb(0.3, 0.3, 0.3),
-  });
+  page.drawText(`Payment Method: ${paymentMethodLabel}`, { x: 50, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
   
   // Footer
   yPos = 80;
-  page.drawLine({
-    start: { x: 50, y: yPos },
-    end: { x: width - 50, y: yPos },
-    thickness: 1,
-    color: rgb(0.8, 0.8, 0.8),
-  });
-  
+  page.drawLine({ start: { x: 50, y: yPos }, end: { x: width - 50, y: yPos }, thickness: 1, color: rgb(0.8, 0.8, 0.8) });
   yPos -= 20;
-  page.drawText('Thank you for shopping with Desert Deal!', {
-    x: width / 2 - 100,
-    y: yPos,
-    size: 11,
-    font: boldFont,
-    color: rgb(0.3, 0.3, 0.3),
-  });
-  
+  page.drawText('Thank you for shopping with Desert Deal!', { x: width / 2 - 100, y: yPos, size: 11, font: boldFont, color: rgb(0.3, 0.3, 0.3) });
   yPos -= 18;
-  page.drawText('For questions, contact us:', {
-    x: width / 2 - 55,
-    y: yPos,
-    size: 9,
-    font: font,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-  
-  yPos -= 14;
-  page.drawText('Email: support@desertsdeals.com', {
-    x: width / 2 - 150,
-    y: yPos,
-    size: 9,
-    font: font,
-    color: rgb(0.5, 0.5, 0.5),
-  });
+  page.drawText('Email: support@desertsdeals.com | Phone: +971 50 678 4405', { x: width / 2 - 140, y: yPos, size: 9, font, color: rgb(0.5, 0.5, 0.5) });
   
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
@@ -709,7 +357,7 @@ const generateAdminOrderEmailHTML = (order: OrderConfirmationRequest): string =>
     </tr>
   `).join('');
 
-  const paymentMethodLabel = order.payment_method === 'cod' ? 'Cash on Delivery' : 'Online Payment';
+  const paymentMethodLabel = order.payment_method === 'cod' ? 'Cash on Delivery' : order.payment_method;
 
   return `
     <!DOCTYPE html>
@@ -718,15 +366,15 @@ const generateAdminOrderEmailHTML = (order: OrderConfirmationRequest): string =>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body style="margin: 0; padding: 0; background-color: #f0f0f0;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0f0f0; padding: 20px;">
+    <body style="margin: 0; padding: 0; background-color: #f5f5f5;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px;">
         <tr>
           <td align="center">
-            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 2px solid #c9a962;">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e5e5;">
               <!-- Header -->
               <tr>
-                <td style="background-color: #1a1a1a; padding: 20px; text-align: center;">
-                  <h1 style="margin: 0; color: #c9a962; font-family: Arial, sans-serif; font-size: 20px;">
+                <td style="background-color: #1a1a1a; padding: 25px; text-align: center;">
+                  <h1 style="margin: 0; color: #ffffff; font-family: Arial, sans-serif; font-size: 18px; letter-spacing: 2px;">
                     🚚 NEW ORDER - PACK & SHIP
                   </h1>
                 </td>
@@ -735,98 +383,77 @@ const generateAdminOrderEmailHTML = (order: OrderConfirmationRequest): string =>
               <!-- Order Details -->
               <tr>
                 <td style="padding: 30px;">
-                  <div style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                    <h2 style="margin: 0; color: #856404; font-family: Arial, sans-serif; font-size: 18px;">
+                  <div style="background-color: #f5f5f5; border-left: 4px solid #1a1a1a; border-radius: 0 8px 8px 0; padding: 15px; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #1a1a1a; font-family: Arial, sans-serif; font-size: 16px;">
                       ⚠️ Order Ready for Fulfillment
                     </h2>
                   </div>
                   
-                  <!-- Order Number & Date -->
                   <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
                     <tr>
-                      <td style="padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
+                      <td style="padding: 10px; background-color: #f5f5f5; border-radius: 6px;">
                         <strong style="font-family: Arial, sans-serif;">Order Number:</strong>
-                        <span style="color: #c9a962; font-weight: bold; font-family: Arial, sans-serif; font-size: 18px;"> ${order.order_number}</span>
+                        <span style="color: #1a1a1a; font-weight: bold; font-family: Arial, sans-serif; font-size: 18px;"> ${order.order_number}</span>
                       </td>
                     </tr>
                     <tr>
                       <td style="padding: 10px;">
                         <strong style="font-family: Arial, sans-serif;">Order Date:</strong>
-                        <span style="font-family: Arial, sans-serif;"> ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                        <span style="font-family: Arial, sans-serif;"> ${new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                       </td>
                     </tr>
                     <tr>
-                      <td style="padding: 10px; background-color: ${order.payment_method === 'cod' ? '#fff3cd' : '#d4edda'}; border-radius: 4px;">
+                      <td style="padding: 10px; background-color: ${order.payment_method === 'cod' ? '#fff3cd' : '#d4edda'}; border-radius: 6px;">
                         <strong style="font-family: Arial, sans-serif;">Payment:</strong>
                         <span style="font-family: Arial, sans-serif; font-weight: bold; color: ${order.payment_method === 'cod' ? '#856404' : '#155724'};"> ${paymentMethodLabel}</span>
-                        ${order.payment_method === 'cod' ? '<span style="font-family: Arial, sans-serif; color: #856404;"> - Collect ' + Math.round(order.total).toLocaleString() + ' AED</span>' : ''}
+                        ${order.payment_method === 'cod' ? '<span style="font-family: Arial, sans-serif; color: #856404;"> - Collect ' + formatCurrency(order.total) + '</span>' : ''}
                       </td>
                     </tr>
                   </table>
                   
-                  <!-- Customer Info -->
-                  <h3 style="margin: 0 0 10px; color: #1a1a1a; font-family: Arial, sans-serif; font-size: 16px; border-bottom: 2px solid #c9a962; padding-bottom: 5px;">
+                  <h3 style="margin: 0 0 10px; color: #1a1a1a; font-family: Arial, sans-serif; font-size: 15px; border-bottom: 2px solid #1a1a1a; padding-bottom: 5px;">
                     📋 Customer Information
                   </h3>
-                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; background-color: #f8f9fa; border-radius: 4px;">
-                    <tr>
-                      <td style="padding: 10px; font-family: Arial, sans-serif;">
-                        <strong>Name:</strong> ${order.customer_name}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 10px; font-family: Arial, sans-serif;">
-                        <strong>Email:</strong> ${order.customer_email}
-                      </td>
-                    </tr>
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; background-color: #f5f5f5; border-radius: 6px;">
+                    <tr><td style="padding: 10px; font-family: Arial, sans-serif;"><strong>Name:</strong> ${order.customer_name}</td></tr>
+                    <tr><td style="padding: 10px; font-family: Arial, sans-serif;"><strong>Email:</strong> ${order.customer_email}</td></tr>
                   </table>
                   
-                  <!-- Shipping Address -->
-                  <h3 style="margin: 0 0 10px; color: #1a1a1a; font-family: Arial, sans-serif; font-size: 16px; border-bottom: 2px solid #c9a962; padding-bottom: 5px;">
+                  <h3 style="margin: 0 0 10px; color: #1a1a1a; font-family: Arial, sans-serif; font-size: 15px; border-bottom: 2px solid #1a1a1a; padding-bottom: 5px;">
                     📍 Shipping Address
                   </h3>
-                  <div style="background-color: #e7f3ff; border: 1px solid #0066cc; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                  <div style="background-color: #f5f5f5; border-left: 4px solid #1a1a1a; border-radius: 0 8px 8px 0; padding: 15px; margin-bottom: 20px;">
                     <p style="margin: 0; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6;">
                       <strong>${order.customer_name}</strong><br>
                       ${getAddressString(order.shipping_address)}<br>
                       ${order.shipping_address.city}, ${order.shipping_address.state} ${getZipCode(order.shipping_address)}<br>
-                      <strong>${order.shipping_address.country || 'India'}</strong>
+                      <strong>${order.shipping_address.country || 'UAE'}</strong>
                     </p>
                   </div>
                   
-                  <!-- Order Items -->
-                  <h3 style="margin: 0 0 10px; color: #1a1a1a; font-family: Arial, sans-serif; font-size: 16px; border-bottom: 2px solid #c9a962; padding-bottom: 5px;">
+                  <h3 style="margin: 0 0 10px; color: #1a1a1a; font-family: Arial, sans-serif; font-size: 15px; border-bottom: 2px solid #1a1a1a; padding-bottom: 5px;">
                     📦 Items to Pack
                   </h3>
-                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
                     <thead>
                       <tr style="background-color: #1a1a1a;">
-                        <th style="padding: 12px; text-align: left; font-family: Arial, sans-serif; font-size: 12px; color: #c9a962; text-transform: uppercase;">
-                          Product
-                        </th>
-                        <th style="padding: 12px; text-align: center; font-family: Arial, sans-serif; font-size: 12px; color: #c9a962; text-transform: uppercase;">
-                          Qty
-                        </th>
-                        <th style="padding: 12px; text-align: right; font-family: Arial, sans-serif; font-size: 12px; color: #c9a962; text-transform: uppercase;">
-                          Price
-                        </th>
+                        <th style="padding: 12px; text-align: left; font-family: Arial, sans-serif; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Product</th>
+                        <th style="padding: 12px; text-align: center; font-family: Arial, sans-serif; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Qty</th>
+                        <th style="padding: 12px; text-align: right; font-family: Arial, sans-serif; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Price</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      ${itemsHTML}
-                    </tbody>
+                    <tbody>${itemsHTML}</tbody>
                   </table>
                   
-                  <!-- Order Totals -->
-                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; background-color: #f8f9fa; border-radius: 4px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; background-color: #f5f5f5; border-radius: 8px; overflow: hidden;">
                     <tr>
                       <td style="padding: 8px 15px; font-family: Arial, sans-serif;">Subtotal</td>
                       <td style="padding: 8px 15px; text-align: right; font-family: Arial, sans-serif;">${formatCurrency(order.subtotal)}</td>
                     </tr>
                     ${order.discount > 0 ? `
                     <tr>
-                      <td style="padding: 8px 15px; font-family: Arial, sans-serif; color: #28a745;">Discount</td>
-                      <td style="padding: 8px 15px; text-align: right; font-family: Arial, sans-serif; color: #28a745;">-${formatCurrency(order.discount)}</td>
+                      <td style="padding: 8px 15px; font-family: Arial, sans-serif; color: #22c55e;">Discount</td>
+                      <td style="padding: 8px 15px; text-align: right; font-family: Arial, sans-serif; color: #22c55e;">-${formatCurrency(order.discount)}</td>
                     </tr>
                     ` : ''}
                     <tr>
@@ -835,18 +462,15 @@ const generateAdminOrderEmailHTML = (order: OrderConfirmationRequest): string =>
                     </tr>
                     <tr style="background-color: #1a1a1a;">
                       <td style="padding: 12px 15px; font-family: Arial, sans-serif; font-weight: bold; color: #ffffff; font-size: 16px;">TOTAL</td>
-                      <td style="padding: 12px 15px; text-align: right; font-family: Arial, sans-serif; font-weight: bold; color: #c9a962; font-size: 16px;">${formatCurrency(order.total)}</td>
+                      <td style="padding: 12px 15px; text-align: right; font-family: Arial, sans-serif; font-weight: bold; color: #ffffff; font-size: 16px;">${formatCurrency(order.total)}</td>
                     </tr>
                   </table>
                 </td>
               </tr>
               
-              <!-- Footer -->
               <tr>
                 <td style="background-color: #1a1a1a; padding: 15px; text-align: center;">
-                  <p style="margin: 0; color: #888; font-family: Arial, sans-serif; font-size: 12px;">
-                    Desert Deal Order Management System
-                  </p>
+                  <p style="margin: 0; color: #999; font-family: Arial, sans-serif; font-size: 11px;">Desert Deal Order Management System</p>
                 </td>
               </tr>
             </table>
@@ -944,7 +568,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
   
   // Payment Label Box
   yPos -= 25;
-  const paymentLabel = isPrepaid ? `PREPAID : INR ${totalAmount}` : `CASH ON DELIVERY : INR ${totalAmount}`;
+  const paymentLabel = isPrepaid ? `PREPAID : ${formatCurrency(totalAmount)}` : `CASH ON DELIVERY : ${formatCurrency(totalAmount)}`;
   const paymentBoxWidth = paymentLabel.length * 9 + 20;
   
   page.drawRectangle({
@@ -1031,7 +655,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
   });
   
   addrY -= 14;
-  page.drawText(order.shipping_address.country || 'India', {
+  page.drawText(order.shipping_address.country || 'UAE', {
     x: margin + 10,
     y: addrY,
     size: 10,
@@ -1084,7 +708,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
   });
   
   sellerY -= 14;
-  page.drawText('Ward No. 21, Door No. 553/1', {
+  page.drawText('United Arab Emirates', {
     x: sellerX + 10,
     y: sellerY,
     size: 10,
@@ -1093,25 +717,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
   });
   
   sellerY -= 14;
-  page.drawText('Kavumpadi, Pallikkal, Tirurangadi', {
-    x: sellerX + 10,
-    y: sellerY,
-    size: 10,
-    font: font,
-    color: rgb(0, 0, 0),
-  });
-  
-  sellerY -= 14;
-  page.drawText('Malappuram, Kerala – 673634', {
-    x: sellerX + 10,
-    y: sellerY,
-    size: 10,
-    font: font,
-    color: rgb(0, 0, 0),
-  });
-  
-  sellerY -= 14;
-  page.drawText('PHONE: +91 99466 47442', {
+  page.drawText('PHONE: +971 50 678 4405', {
     x: sellerX + 10,
     y: sellerY,
     size: 10,
@@ -1208,7 +814,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
     borderWidth: 2,
   });
   
-  page.drawText(`TOTAL : INR ${totalAmount}`, {
+  page.drawText(`TOTAL : ${formatCurrency(totalAmount)}`, {
     x: width - margin - 130,
     y: yPos - 20,
     size: 12,
@@ -1250,7 +856,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
     color: rgb(0, 0, 0),
   });
   
-  page.drawText('Tirurangadi, Malappuram, Kerala – 673634, PHONE: +91 99466 47442', {
+  page.drawText('United Arab Emirates, PHONE: +971 50 678 4405', {
     x: margin + 70,
     y: yPos - 52,
     size: 9,
@@ -1316,7 +922,7 @@ Shipping Address:
 ${orderData.customer_name}
 ${getAddressString(orderData.shipping_address)}
 ${orderData.shipping_address.city}, ${orderData.shipping_address.state} ${getZipCode(orderData.shipping_address)}
-${orderData.shipping_address.country || 'India'}
+${orderData.shipping_address.country || 'UAE'}
 
 Payment Method: ${orderData.payment_method === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
 
