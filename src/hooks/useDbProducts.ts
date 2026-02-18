@@ -50,11 +50,11 @@ const mapDbToProduct = (db: DbProduct): Product => {
       base: db.notes?.base || staticData?.notes?.base || [],
     },
     ingredients: staticData?.ingredients || [],
-    concentration: staticData?.concentration || "Casual",
-    longevity: staticData?.longevity || "All Day Comfort",
-    sillage: staticData?.sillage || "Standard Fit",
-    season: staticData?.season || ["All Seasons"],
-    occasion: staticData?.occasion || ["Daily Wear"],
+    concentration: staticData?.concentration || "",
+    longevity: staticData?.longevity || "",
+    sillage: staticData?.sillage || "",
+    season: staticData?.season || [],
+    occasion: staticData?.occasion || [],
   };
 };
 
