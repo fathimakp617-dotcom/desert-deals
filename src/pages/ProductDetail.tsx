@@ -402,45 +402,52 @@ const ProductDetail = () => {
                   </motion.div>
                 )}
 
-                {/* Quantity */}
-                <motion.div variants={staggerItem} className="flex items-center border border-border rounded-none w-fit">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 sm:px-4 py-2.5 sm:py-3 text-foreground hover:bg-muted transition-colors text-sm"
-                  >
-                    −
-                  </button>
-                  <span className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm font-medium min-w-[40px] text-center border-x border-border">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 sm:px-4 py-2.5 sm:py-3 text-foreground hover:bg-muted transition-colors text-sm"
-                  >
-                    +
-                  </button>
-                </motion.div>
-
-                {/* Add to Cart + Buy Now + Wishlist */}
+                {/* Quantity + Add to Cart */}
                 <motion.div variants={staggerItem} className="flex gap-2 sm:gap-3">
-                  <button
+                  <div className="flex items-center border border-border rounded-md">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-2 sm:px-3 py-2 sm:py-3 text-foreground hover:bg-muted transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium min-w-[32px] text-center">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-2 sm:px-3 py-2 sm:py-3 text-foreground hover:bg-muted transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <Button
+                    size="lg"
                     onClick={handleAddToCart}
                     disabled={isSoldOut}
-                    className="flex-1 bg-foreground text-background py-3 sm:py-3.5 text-xs sm:text-sm tracking-widest font-medium hover:bg-foreground/90 transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none uppercase"
+                    className="flex-1 bg-foreground hover:bg-foreground/90 text-background py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium transition-all duration-300"
                   >
-                    {isSoldOut ? "SOLD OUT" : "ADD TO CART"}
-                  </button>
-                  <button
+                    {isSoldOut ? "SOLD OUT" : "Add to cart"}
+                  </Button>
+                </motion.div>
+
+                {/* Buy Now + Wishlist */}
+                <motion.div variants={staggerItem} className="flex gap-2 sm:gap-3">
+                  <Button
+                    size="lg"
                     onClick={handleBuyNow}
                     disabled={isSoldOut}
-                    className="flex-1 border border-foreground text-foreground py-3 sm:py-3.5 text-xs sm:text-sm tracking-widest font-medium hover:bg-foreground hover:text-background transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none uppercase"
+                    variant="outline"
+                    className="flex-1 py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium border-foreground text-foreground hover:bg-foreground hover:text-background transition-all duration-300"
                   >
-                    BUY NOW
-                  </button>
-                  <button
+                    Buy Now
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
                     onClick={handleToggleWishlist}
-                    className={`px-4 sm:px-5 py-3 sm:py-3.5 border transition-all duration-300 ${inWishlist ? "bg-primary/10 border-primary" : "border-border hover:border-foreground"}`}
+                    className={`px-4 sm:px-5 py-5 sm:py-6 border-border hover:border-foreground ${inWishlist ? "bg-primary/10 border-primary" : ""}`}
                   >
                     <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${inWishlist ? "fill-primary text-primary" : ""}`} />
-                  </button>
+                  </Button>
                 </motion.div>
 
                 {/* Description - always visible */}
