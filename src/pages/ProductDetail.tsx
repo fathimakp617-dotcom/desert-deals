@@ -352,11 +352,11 @@ const ProductDetail = () => {
 
                 {/* Price & Stock */}
                 <motion.div variants={staggerItem} className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-baseline gap-2 sm:gap-3">
-                    <span className="text-xl sm:text-2xl lg:text-3xl font-heading font-semibold text-foreground">
+                  <div className="flex items-baseline gap-2 sm:gap-3 border border-border/50 rounded-md px-4 py-2.5">
+                    <span className="text-xl sm:text-2xl lg:text-3xl font-light tracking-tight text-foreground">
                       {formatPrice(product.price)}
                     </span>
-                    <span className="text-sm sm:text-lg text-muted-foreground line-through">
+                    <span className="text-sm sm:text-lg font-light text-muted-foreground line-through">
                       {formatPrice(product.originalPrice)}
                     </span>
                   </div>
