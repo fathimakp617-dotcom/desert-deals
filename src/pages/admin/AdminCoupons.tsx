@@ -237,7 +237,7 @@ const AdminCoupons = () => {
       return `${coupon.discount_percent}%`;
     }
     if (coupon.discount_amount) {
-      return `₹${coupon.discount_amount}`;
+      return `${coupon.discount_amount} AED`;
     }
     return "-";
   };
@@ -327,7 +327,7 @@ const AdminCoupons = () => {
                       <TableRow key={coupon.id}>
                         <TableCell className="font-mono font-bold">{coupon.code}</TableCell>
                         <TableCell>{formatDiscount(coupon)}</TableCell>
-                        <TableCell>₹{coupon.min_order_amount || 0}</TableCell>
+                        <TableCell>{coupon.min_order_amount || 0} AED</TableCell>
                         <TableCell>
                           {coupon.current_uses || 0}
                           {coupon.max_uses ? ` / ${coupon.max_uses}` : ""}
@@ -497,7 +497,7 @@ const AdminCoupons = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="discount_amount">Fixed Amount (₹)</Label>
+                <Label htmlFor="discount_amount">Fixed Amount (AED)</Label>
                 <Input
                   id="discount_amount"
                   type="number"
@@ -512,7 +512,7 @@ const AdminCoupons = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="min_order_amount">Min Order (₹)</Label>
+                <Label htmlFor="min_order_amount">Min Order (AED)</Label>
                 <Input
                   id="min_order_amount"
                   type="number"

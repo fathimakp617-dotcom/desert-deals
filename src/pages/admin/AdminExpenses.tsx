@@ -268,7 +268,7 @@ const AdminExpenses = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Amount (₹) *</Label>
+                  <Label>Amount (AED) *</Label>
                   <Input
                     type="number"
                     value={formData.amount}
@@ -312,15 +312,15 @@ const AdminExpenses = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-lg border bg-card">
           <p className="text-sm text-muted-foreground">Total Expenses</p>
-          <p className="text-2xl font-bold text-primary">₹{totalExpenses.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-primary">{totalExpenses.toLocaleString()} AED</p>
         </div>
         <div className="p-4 rounded-lg border bg-card">
           <p className="text-sm text-muted-foreground">This Month</p>
           <p className="text-2xl font-bold">
-            ₹{expenses
+            {expenses
               .filter(e => new Date(e.expense_date).getMonth() === new Date().getMonth())
               .reduce((sum, e) => sum + e.amount, 0)
-              .toLocaleString()}
+              .toLocaleString()} AED
           </p>
         </div>
         <div className="p-4 rounded-lg border bg-card">
@@ -392,7 +392,7 @@ const AdminExpenses = () => {
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">{expense.description}</TableCell>
                     <TableCell>{formatDate(expense.expense_date)}</TableCell>
-                    <TableCell className="text-right font-medium">₹{expense.amount.toLocaleString()}</TableCell>
+                    <TableCell className="text-right font-medium">{expense.amount.toLocaleString()} AED</TableCell>
                     <TableCell className="text-right">
                       <Button
                         size="sm"
