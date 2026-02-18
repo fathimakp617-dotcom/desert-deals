@@ -159,7 +159,7 @@ const Contact = () => {
                 type="submit"
                 size="lg"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-12 sm:px-16 py-5 sm:py-6 text-sm tracking-widest font-medium transition-all duration-300 hover:shadow-[0_0_30px_hsl(35_49%_44%_/_0.4)] disabled:opacity-50"
+                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-12 sm:px-16 py-5 sm:py-6 text-sm tracking-widest font-medium transition-all duration-300 hover:shadow-lg disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>
