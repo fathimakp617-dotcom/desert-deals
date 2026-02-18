@@ -4,7 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 const LOW_STOCK_THRESHOLD = 10;
@@ -225,7 +225,7 @@ serve(async (req) => {
     };
 
     if (!shippingAddress.address || !shippingAddress.city || 
-        !shippingAddress.state || !shippingAddress.zipCode || !shippingAddress.country) {
+        !shippingAddress.state || !shippingAddress.country) {
       console.error("Incomplete shipping address");
       return new Response(
         JSON.stringify({ error: "Complete shipping address is required" }),
@@ -341,9 +341,9 @@ serve(async (req) => {
       );
     }
 
-    // Calculate shipping - FREE for online payment, 79 AED for COD under 999 AED
+    // Calculate shipping - flat 20 AED for COD
     const priceAfterBulk = subtotal - bulkDiscount;
-    const shipping = orderRequest.payment_method === 'razorpay' ? 0 : (priceAfterBulk >= 999 ? 0 : 79);
+    const shipping = orderRequest.payment_method === 'razorpay' ? 0 : 20;
 
     // Handle coupon discount (only if NO bulk discount applied)
     let couponDiscount = 0;

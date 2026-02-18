@@ -77,7 +77,7 @@ const BrandCategories = memo(() => {
 
   return (
     <section className="pt-3 pb-6 sm:pt-4 sm:pb-10 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative">
+      <div className="px-4 sm:px-6 lg:px-12 relative">
         <MobileBrandGrid brands={brands} />
 
         {/* Desktop: scrollable row matching reference */}
