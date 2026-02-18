@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import ShippingTermsDialog from "@/components/ShippingTermsDialog";
+
 
 declare global {
   interface Window {
@@ -105,7 +105,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showTermsDialog, setShowTermsDialog] = useState(false);
+  
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
   const [isExpressMode, setIsExpressMode] = useState(false);
@@ -344,12 +344,6 @@ const Checkout = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Show terms dialog instead of directly processing
-    setShowTermsDialog(true);
-  };
-
-  const handleConfirmOrder = async () => {
-    setShowTermsDialog(false);
     if (paymentMethod === "upi" || paymentMethod === "card") {
       await handleRazorpayPayment(paymentMethod);
     } else {
@@ -1106,14 +1100,6 @@ const Checkout = () => {
             </div>
           </form>
 
-          {/* Shipping Terms Dialog */}
-          <ShippingTermsDialog
-            open={showTermsDialog}
-            onOpenChange={setShowTermsDialog}
-            onConfirm={handleConfirmOrder}
-            paymentMethod={paymentMethod}
-            shippingCharge={shipping}
-          />
         </motion.div>
       </main>
 
