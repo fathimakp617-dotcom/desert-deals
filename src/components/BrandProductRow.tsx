@@ -141,7 +141,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                           {soldOut ? (
                             <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
                           ) : (
-                            <span className="text-[11px] font-bold text-emerald-600 uppercase">In Stock</span>
+                            <span className="text-[11px] font-bold text-green-600 uppercase">In Stock</span>
                           )}
                           <button
                             onClick={(e) => {

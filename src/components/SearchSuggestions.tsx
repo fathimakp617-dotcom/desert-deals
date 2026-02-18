@@ -18,12 +18,16 @@ const SearchSuggestions = ({ query, onSelect, onClose }: SearchSuggestionsProps)
     queryKey: ["search-suggestions", debouncedQuery],
     queryFn: async () => {
       if (!debouncedQuery) return [];
-      const { data, error } = await supabase
+      // Split query into words and search each word to handle extra spaces in product names
+      const words = debouncedQuery.split(/\s+/).filter(Boolean);
+      let query = supabase
         .from("products")
         .select("id, name, price, image_url, category")
-        .eq("is_active", true)
-        .ilike("name", `%${debouncedQuery}%`)
-        .limit(6);
+        .eq("is_active", true);
+      for (const word of words) {
+        query = query.ilike("name", `%${word}%`);
+      }
+      const { data, error } = await query.limit(6);
       if (error) throw error;
       return data || [];
     },
