@@ -120,7 +120,7 @@ const Terms = () => {
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    We accept UPI, Credit/Debit Cards, Net Banking via Razorpay
+                    We accept Cash on Delivery (COD)
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>

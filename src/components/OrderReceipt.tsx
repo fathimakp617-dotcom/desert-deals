@@ -166,7 +166,7 @@ const OrderReceipt = ({
 
         <div class="address-section">
           <h4 style="margin: 0 0 10px; color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Payment Method</h4>
-          <p style="margin: 0;">${paymentMethod === 'cod' ? 'Cash on Delivery' : paymentMethod === 'razorpay' ? 'Razorpay' : paymentMethod}</p>
+          <p style="margin: 0;">${paymentMethod === 'cod' ? 'Cash on Delivery' : paymentMethod}</p>
         </div>
 
         <div class="footer">

@@ -148,7 +148,7 @@ const handler = async (req: Request): Promise<Response> => {
                         </td>
                         <td style="padding: 10px; text-align: right;">
                           <p style="margin: 0 0 8px 0; color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Payment</p>
-                          <p style="margin: 0; color: #e5e5e5; font-size: 14px;">${data.payment_method === 'razorpay' ? 'Online (Razorpay)' : 'Cash on Delivery'}</p>
+                          <p style="margin: 0; color: #e5e5e5; font-size: 14px;">Cash on Delivery</p>
                         </td>
                       </tr>
                     </table>

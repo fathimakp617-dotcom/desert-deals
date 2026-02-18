@@ -1711,7 +1711,7 @@ const Account = () => {
               <div>
                 <h3 className="font-semibold text-foreground mb-3">Payment Method</h3>
                 <p className="text-muted-foreground">
-                  {selectedOrder.payment_method === 'cod' ? 'Cash on Delivery' : 'Online Payment (Razorpay)'}
+                  {selectedOrder.payment_method === 'cod' ? 'Cash on Delivery' : selectedOrder.payment_method}
                 </p>
               </div>
 
