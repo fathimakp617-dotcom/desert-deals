@@ -290,18 +290,20 @@ const ProductDetail = () => {
 
                 {/* Thumbnails */}
                 {product.gallery.length > 1 && (
-                <div className="grid grid-cols-4 gap-2 max-w-md mx-auto lg:max-w-none">
-                  {product.gallery.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedImage(idx)}
-                      className={`w-full aspect-square border-2 overflow-hidden transition-all ${
-                        selectedImage === idx ? "border-primary" : "border-border/50 hover:border-primary/50"
-                      }`}
-                    >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
+                <div className="relative max-w-md mx-auto lg:max-w-none">
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-1">
+                    {product.gallery.map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedImage(idx)}
+                        className={`flex-shrink-0 w-[calc(25%-6px)] aspect-square border-2 overflow-hidden transition-all snap-start ${
+                          selectedImage === idx ? "border-primary" : "border-border/50 hover:border-primary/50"
+                        }`}
+                      >
+                        <img src={img} alt="" className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 )}
               </motion.div>
@@ -315,7 +317,7 @@ const ProductDetail = () => {
               >
                 {/* Product Name */}
                 <div>
-                  <motion.h1 variants={staggerItem} className="text-xl sm:text-2xl lg:text-4xl font-heading tracking-tight break-words">
+                  <motion.h1 variants={staggerItem} className="text-xl sm:text-2xl lg:text-4xl font-heading font-bold tracking-tight break-words">
                     {product.name}
                   </motion.h1>
                 </div>
