@@ -165,22 +165,27 @@ const ProductDetail = () => {
         <meta name="description" content={`${product.name}: ${product.tagline}. ${product.description.slice(0, 120)}... Buy online with free shipping in UAE.`} />
         <meta name="keywords" content={`${product.name}, premium shoes, buy online UAE`} />
         
-        <link rel="canonical" href={`${window.location.origin}/product/${product.id}`} />
+        <link rel="canonical" href={`https://desertsdeals.com/product/${product.id}`} />
         
         <meta property="og:title" content={`${product.name} - ${product.tagline} | Desert Deal`} />
         <meta property="og:description" content={`${product.description.slice(0, 150)}... Shop now!`} />
-        <meta property="og:type" content="product" />
-        <meta property="og:url" content={`${window.location.origin}/product/${product.id}`} />
-        <meta property="og:image" content={`${window.location.origin}${product.image}`} />
+        <meta property="og:type" content="og:product" />
+        <meta property="og:url" content={`https://desertsdeals.com/product/${product.id}`} />
+        <meta property="og:image" content={product.image.startsWith('http') ? product.image : `https://desertsdeals.com${product.image}`} />
         <meta property="og:site_name" content="Desert Deal" />
+        <meta property="og:locale" content="en_AE" />
+        
+        <meta property="product:brand" content={product.category || "Desert Deal"} />
+        <meta property="product:availability" content={isSoldOut ? "out of stock" : "in stock"} />
+        <meta property="product:condition" content="new" />
+        <meta property="product:price:amount" content={product.price.toString()} />
+        <meta property="product:price:currency" content="AED" />
+        <meta property="product:retailer_item_id" content={product.id} />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${product.name} - ${product.tagline} | Desert Deal`} />
         <meta name="twitter:description" content={`${product.description.slice(0, 150)}...`} />
-        <meta name="twitter:image" content={`${window.location.origin}${product.image}`} />
-        
-        <meta property="product:price:amount" content={product.price.toString()} />
-        <meta property="product:price:currency" content="AED" />
+        <meta name="twitter:image" content={product.image.startsWith('http') ? product.image : `https://desertsdeals.com${product.image}`} />
       </Helmet>
       
       <ProductSchema product={product} averageRating={averageRating} totalReviews={totalReviews} />
