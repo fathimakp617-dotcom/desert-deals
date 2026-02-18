@@ -70,14 +70,6 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
           <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-foreground"}`} />
         </button>
 
-        <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Link
-            to={`/product/${product.id}`}
-            className="block w-full bg-foreground text-background text-center text-[11px] font-medium py-2.5"
-          >
-            Select options
-          </Link>
-        </div>
       </div>
 
       {/* Product info - #6: Name bold, stock status, adjusted font sizes */}
