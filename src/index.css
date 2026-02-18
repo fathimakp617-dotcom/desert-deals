@@ -34,7 +34,7 @@
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 85%;
-    --input: 0 0% 100%; /* white inputs */
+    --input: 0 0% 96%; /* match page background */
     --ring: 0 0% 10%;
 
     --radius: 0.75rem;
