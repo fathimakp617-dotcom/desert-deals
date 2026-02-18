@@ -954,15 +954,17 @@ Thank you for shopping with Desert Deal!
     const adminOrderEmailRaw = Deno.env.get("ADMIN_ORDER_EMAIL") || "";
     const shippingEmailsRaw = Deno.env.get("SHIPPING_EMAILS") || "";
     
+    const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+    
     const adminEmails = adminOrderEmailRaw
       .split(",")
       .map((e) => e.trim().toLowerCase())
-      .filter((e) => e.length > 0);
+      .filter((e) => e.length > 0 && isValidEmail(e));
     
     const shippingEmails = shippingEmailsRaw
       .split(",")
       .map((e) => e.trim().toLowerCase())
-      .filter((e) => e.length > 0);
+      .filter((e) => e.length > 0 && isValidEmail(e));
     
     // Combine and deduplicate all recipients
     const allRecipients = [...new Set([...adminEmails, ...shippingEmails])];
