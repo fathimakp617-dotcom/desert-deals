@@ -121,7 +121,7 @@ const BrandCategories = memo(() => {
         >
           {brands.map((brand) => (
           <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 w-[230px] lg:w-[260px] group">
-              <div className="bg-background border border-border/40 rounded-lg p-6 h-full flex flex-col transition-all duration-300 hover:shadow-md hover:border-border">
+              <div className="bg-background border border-border/40 rounded-lg p-6 h-full flex flex-col items-center text-center transition-all duration-300 hover:shadow-md hover:border-border">
                 <h3 className="text-lg font-heading font-bold text-foreground tracking-tight">{brand.name}</h3>
                 <span className="text-sm text-muted-foreground mt-0.5">{brand.count} Products</span>
                 <div className="flex-1 flex items-center justify-center my-6">
@@ -129,7 +129,7 @@ const BrandCategories = memo(() => {
                     <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
                   </div>
                 </div>
-                <span className="text-[11px] font-medium text-foreground border border-border rounded-full px-4 py-1.5 inline-block self-start group-hover:bg-foreground group-hover:text-background transition-colors">
+                <span className="text-[11px] font-medium text-foreground border border-border rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
                   View Products
                 </span>
               </div>
