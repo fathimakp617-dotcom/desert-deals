@@ -125,15 +125,6 @@ const TopSellers = memo(() => {
 
                         </button>
 
-                        {/* Select options button - matches product-cart-button */}
-                        <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Link
-                          to={`/product/${product.id}`}
-                          className="block w-full bg-foreground text-background text-center text-[11px] font-medium py-2.5 hover:bg-foreground/90 transition-colors">
-                          move the boSelect options
-
-                        </Link>
-                        </div>
                       </div>
 
                       {/* Product content - matches product-content-wrapper */}
