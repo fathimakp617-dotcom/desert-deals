@@ -532,7 +532,7 @@ const Checkout = () => {
                       value={formData.firstName}
                       onChange={handleInputChange}
                       required
-                      className="mt-1 bg-input border-border"
+                      className="mt-1 bg-card border-border"
                     />
                   </div>
                   <div>
@@ -543,7 +543,7 @@ const Checkout = () => {
                       value={formData.lastName}
                       onChange={handleInputChange}
                       required
-                      className="mt-1 bg-input border-border"
+                      className="mt-1 bg-card border-border"
                     />
                   </div>
                 </div>
@@ -562,7 +562,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     placeholder="House number and street name"
                     required
-                    className="mt-1 bg-input border-border"
+                    className="mt-1 bg-card border-border"
                   />
                 </div>
 
@@ -574,7 +574,7 @@ const Checkout = () => {
                     value={formData.city}
                     onChange={handleInputChange}
                     required
-                    className="mt-1 bg-input border-border"
+                    className="mt-1 bg-card border-border"
                   />
                 </div>
 
@@ -584,7 +584,7 @@ const Checkout = () => {
                     value={formData.state}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, state: value }))}
                   >
-                    <SelectTrigger className="mt-1 bg-input border-border">
+                    <SelectTrigger className="mt-1 bg-card border-border">
                       <SelectValue placeholder="Select Emirate" />
                     </SelectTrigger>
                     <SelectContent>
@@ -608,7 +608,7 @@ const Checkout = () => {
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
-                    className="mt-1 bg-input border-border"
+                    className="mt-1 bg-card border-border"
                   />
                 </div>
 
@@ -622,7 +622,7 @@ const Checkout = () => {
                     onChange={handleInputChange}
                     placeholder="your@email.com"
                     required
-                    className="mt-1 bg-input border-border"
+                    className="mt-1 bg-card border-border"
                   />
                 </div>
 
@@ -634,7 +634,7 @@ const Checkout = () => {
                     value={formData.orderNotes}
                     onChange={(e) => setFormData(prev => ({ ...prev, orderNotes: e.target.value }))}
                     placeholder="Notes about your order, e.g. special notes for delivery."
-                    className="mt-1 w-full min-h-[100px] rounded-md border border-border bg-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    className="mt-1 w-full min-h-[100px] rounded-md border border-border bg-card px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                 </div>
               </div>
