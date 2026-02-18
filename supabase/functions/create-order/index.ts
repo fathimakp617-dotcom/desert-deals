@@ -224,7 +224,7 @@ serve(async (req) => {
       country: sanitizeName(orderRequest.shipping_address.country || '', 100),
     };
 
-    if (!shippingAddress.address || !shippingAddress.city || 
+    if (!shippingAddress.city || 
         !shippingAddress.state || !shippingAddress.country) {
       console.error("Incomplete shipping address");
       return new Response(
