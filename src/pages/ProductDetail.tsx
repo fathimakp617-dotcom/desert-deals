@@ -529,16 +529,14 @@ const ProductDetail = () => {
                   )}
                 </motion.div>
 
+                {/* Reviews Section */}
+                <motion.div variants={staggerItem} className="pt-6" id="reviews-section">
+                  <h2 className="text-2xl font-heading mb-6">Reviews</h2>
+                  <ProductReviews productId={product.id} />
+                </motion.div>
+
               </motion.div>
             </div>
-          </div>
-        </section>
-
-        {/* Reviews Section */}
-        <section className="py-12 sm:py-16 bg-card/30" id="reviews-section">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <h2 className="text-2xl font-heading mb-6">Reviews</h2>
-            <ProductReviews productId={product.id} />
           </div>
         </section>
 
