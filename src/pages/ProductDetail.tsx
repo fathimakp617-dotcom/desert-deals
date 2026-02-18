@@ -507,22 +507,22 @@ const ProductDetail = () => {
                   </button>
                   {showAdditional && (
                     <div className="pt-2 space-y-2 text-sm">
-                      {product.ingredients.length > 0 && (
+                      {product.materials.length > 0 && (
                         <div className="flex justify-between py-2 border-b border-border/20">
                           <span className="text-muted-foreground">Materials</span>
-                          <span className="text-foreground">{product.ingredients.join(", ")}</span>
+                          <span className="text-foreground">{product.materials.join(", ")}</span>
                         </div>
                       )}
-                      {product.longevity && (
+                      {product.comfort && (
                         <div className="flex justify-between py-2 border-b border-border/20">
                           <span className="text-muted-foreground">Comfort</span>
-                          <span className="text-foreground">{product.longevity}</span>
+                          <span className="text-foreground">{product.comfort}</span>
                         </div>
                       )}
-                      {product.sillage && (
+                      {product.fit && (
                         <div className="flex justify-between py-2 border-b border-border/20">
                           <span className="text-muted-foreground">Fit</span>
-                          <span className="text-foreground">{product.sillage}</span>
+                          <span className="text-foreground">{product.fit}</span>
                         </div>
                       )}
                     </div>

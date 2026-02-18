@@ -21,15 +21,15 @@ export interface Product {
   size: string;
   image: string;
   gallery: string[];
-  notes: {
-    top: string[];
-    heart: string[];
-    base: string[];
+  construction: {
+    upper: string[];
+    midsole: string[];
+    outsole: string[];
   };
-  ingredients: string[];
-  concentration: string;
-  longevity: string;
-  sillage: string;
+  materials: string[];
+  style: string;
+  comfort: string;
+  fit: string;
   season: string[];
   occasion: string[];
 }
@@ -48,11 +48,11 @@ export const products: Product[] = [
     size: "EU 40-45",
     image: airStrideImg,
     gallery: [airStrideImg, airStrideImg, airStrideImg],
-    notes: { top: ["Mesh Upper"], heart: ["EVA Midsole"], base: ["Rubber Outsole"] },
-    ingredients: ["Premium Mesh", "EVA Foam", "Rubber", "Synthetic Leather"],
-    concentration: "Athletic",
-    longevity: "All Day Comfort",
-    sillage: "Lightweight",
+    construction: { upper: ["Mesh Upper"], midsole: ["EVA Midsole"], outsole: ["Rubber Outsole"] },
+    materials: ["Premium Mesh", "EVA Foam", "Rubber", "Synthetic Leather"],
+    style: "Athletic",
+    comfort: "All Day Comfort",
+    fit: "Lightweight",
     season: ["Spring", "Summer", "Fall"],
     occasion: ["Daily Wear", "Walking", "Travel"]
   },
@@ -69,11 +69,11 @@ export const products: Product[] = [
     size: "EU 39-44",
     image: urbanClassicImg,
     gallery: [urbanClassicImg, urbanClassicImg, urbanClassicImg],
-    notes: { top: ["Full-Grain Leather"], heart: ["Cushioned Insole"], base: ["Durable Sole"] },
-    ingredients: ["Full-Grain Leather", "Leather Lining", "Rubber Sole", "Cotton Laces"],
-    concentration: "Casual",
-    longevity: "All Day Comfort",
-    sillage: "Classic Fit",
+    construction: { upper: ["Full-Grain Leather"], midsole: ["Cushioned Insole"], outsole: ["Durable Sole"] },
+    materials: ["Full-Grain Leather", "Leather Lining", "Rubber Sole", "Cotton Laces"],
+    style: "Casual",
+    comfort: "All Day Comfort",
+    fit: "Classic Fit",
     season: ["All Seasons"],
     occasion: ["Office", "Casual", "Dinner"]
   },
@@ -90,11 +90,11 @@ export const products: Product[] = [
     size: "EU 40-46",
     image: sportRunnerImg,
     gallery: [sportRunnerImg, sportRunnerImg, sportRunnerImg],
-    notes: { top: ["Engineered Mesh"], heart: ["Boost Midsole"], base: ["Continental Rubber"] },
-    ingredients: ["Engineered Mesh", "Boost Foam", "Continental Rubber", "Synthetic Overlays"],
-    concentration: "Performance",
-    longevity: "Marathon Ready",
-    sillage: "Responsive",
+    construction: { upper: ["Engineered Mesh"], midsole: ["Boost Midsole"], outsole: ["Continental Rubber"] },
+    materials: ["Engineered Mesh", "Boost Foam", "Continental Rubber", "Synthetic Overlays"],
+    style: "Performance",
+    comfort: "Marathon Ready",
+    fit: "Responsive",
     season: ["All Seasons"],
     occasion: ["Running", "Gym", "Sports"]
   },
@@ -111,11 +111,11 @@ export const products: Product[] = [
     size: "EU 41-46",
     image: slamDunkImg,
     gallery: [slamDunkImg, slamDunkImg, slamDunkImg],
-    notes: { top: ["Leather Upper"], heart: ["Air Cushion"], base: ["Herringbone Traction"] },
-    ingredients: ["Premium Leather", "Air Unit", "Rubber Outsole", "Padded Collar"],
-    concentration: "Athletic",
-    longevity: "Game Ready",
-    sillage: "High Impact",
+    construction: { upper: ["Leather Upper"], midsole: ["Air Cushion"], outsole: ["Herringbone Traction"] },
+    materials: ["Premium Leather", "Air Unit", "Rubber Outsole", "Padded Collar"],
+    style: "Athletic",
+    comfort: "Game Ready",
+    fit: "High Impact",
     season: ["All Seasons"],
     occasion: ["Basketball", "Streetwear", "Casual"]
   },
@@ -132,11 +132,11 @@ export const products: Product[] = [
     size: "EU 39-44",
     image: desertLoaferImg,
     gallery: [desertLoaferImg, desertLoaferImg, desertLoaferImg],
-    notes: { top: ["Italian Calfskin"], heart: ["Leather Lining"], base: ["Blake Stitched Sole"] },
-    ingredients: ["Italian Calfskin", "Leather Lining", "Leather Sole", "Hand-Burnished Finish"],
-    concentration: "Formal",
-    longevity: "All Day Comfort",
-    sillage: "Sophisticated",
+    construction: { upper: ["Italian Calfskin"], midsole: ["Leather Lining"], outsole: ["Blake Stitched Sole"] },
+    materials: ["Italian Calfskin", "Leather Lining", "Leather Sole", "Hand-Burnished Finish"],
+    style: "Formal",
+    comfort: "All Day Comfort",
+    fit: "Sophisticated",
     season: ["All Seasons"],
     occasion: ["Business", "Wedding", "Formal Events"]
   },
@@ -153,11 +153,11 @@ export const products: Product[] = [
     size: "EU 38-44",
     image: cloudSlipImg,
     gallery: [cloudSlipImg, cloudSlipImg, cloudSlipImg],
-    notes: { top: ["Canvas Upper"], heart: ["Memory Foam"], base: ["Vulcanized Rubber"] },
-    ingredients: ["Premium Canvas", "Memory Foam", "Vulcanized Rubber", "Elastic Gore"],
-    concentration: "Casual",
-    longevity: "All Day Comfort",
-    sillage: "Ultra Light",
+    construction: { upper: ["Canvas Upper"], midsole: ["Memory Foam"], outsole: ["Vulcanized Rubber"] },
+    materials: ["Premium Canvas", "Memory Foam", "Vulcanized Rubber", "Elastic Gore"],
+    style: "Casual",
+    comfort: "All Day Comfort",
+    fit: "Ultra Light",
     season: ["Spring", "Summer"],
     occasion: ["Daily Wear", "Beach", "Travel"]
   },
@@ -174,11 +174,11 @@ export const products: Product[] = [
     size: "EU 40-45",
     image: trailBlazerImg,
     gallery: [trailBlazerImg, trailBlazerImg, trailBlazerImg],
-    notes: { top: ["Nubuck Leather"], heart: ["Waterproof Membrane"], base: ["Vibram Outsole"] },
-    ingredients: ["Nubuck Leather", "Gore-Tex Membrane", "Vibram Rubber", "EVA Midsole"],
-    concentration: "Outdoor",
-    longevity: "All Day Support",
-    sillage: "Heavy Duty",
+    construction: { upper: ["Nubuck Leather"], midsole: ["Waterproof Membrane"], outsole: ["Vibram Outsole"] },
+    materials: ["Nubuck Leather", "Gore-Tex Membrane", "Vibram Rubber", "EVA Midsole"],
+    style: "Outdoor",
+    comfort: "All Day Support",
+    fit: "Heavy Duty",
     season: ["All Seasons"],
     occasion: ["Hiking", "Trekking", "Adventure"]
   },
@@ -195,11 +195,11 @@ export const products: Product[] = [
     size: "EU 38-45",
     image: streetCanvasImg,
     gallery: [streetCanvasImg, streetCanvasImg, streetCanvasImg],
-    notes: { top: ["Canvas Upper"], heart: ["Cushioned Insole"], base: ["Vulcanized Rubber"] },
-    ingredients: ["Premium Canvas", "Cotton Lining", "Vulcanized Rubber", "Metal Eyelets"],
-    concentration: "Casual",
-    longevity: "All Day Comfort",
-    sillage: "Lightweight",
+    construction: { upper: ["Canvas Upper"], midsole: ["Cushioned Insole"], outsole: ["Vulcanized Rubber"] },
+    materials: ["Premium Canvas", "Cotton Lining", "Vulcanized Rubber", "Metal Eyelets"],
+    style: "Casual",
+    comfort: "All Day Comfort",
+    fit: "Lightweight",
     season: ["Spring", "Summer", "Fall"],
     occasion: ["Daily Wear", "Streetwear", "School"]
   }

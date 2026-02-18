@@ -44,15 +44,15 @@ const mapDbToProduct = (db: DbProduct): Product => {
     gallery: staticData?.gallery || (db.image_url
       ? db.image_url.split(",").map(u => u.trim()).filter(Boolean)
       : []),
-    notes: {
-      top: db.notes?.top || staticData?.notes?.top || [],
-      heart: db.notes?.middle || staticData?.notes?.heart || [],
-      base: db.notes?.base || staticData?.notes?.base || [],
+    construction: {
+      upper: db.notes?.top || staticData?.construction?.upper || [],
+      midsole: db.notes?.middle || staticData?.construction?.midsole || [],
+      outsole: db.notes?.base || staticData?.construction?.outsole || [],
     },
-    ingredients: staticData?.ingredients || [],
-    concentration: staticData?.concentration || "",
-    longevity: staticData?.longevity || "",
-    sillage: staticData?.sillage || "",
+    materials: staticData?.materials || [],
+    style: staticData?.style || "",
+    comfort: staticData?.comfort || "",
+    fit: staticData?.fit || "",
     season: staticData?.season || [],
     occasion: staticData?.occasion || [],
   };

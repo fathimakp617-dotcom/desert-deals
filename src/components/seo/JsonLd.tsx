@@ -82,7 +82,7 @@ export const ProductSchema = ({ product, averageRating = 0, totalReviews = 0 }: 
         worstRating: 1,
       },
     }),
-    category: product.concentration,
+    category: product.style,
     size: product.size,
   };
 
