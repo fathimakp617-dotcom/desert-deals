@@ -17,12 +17,15 @@ const MobileBottomNav = memo(() => {
     queryKey: ["mobile-search-suggestions", debouncedSearch],
     queryFn: async () => {
       if (!debouncedSearch) return [];
-      const { data, error } = await supabase
+      const words = debouncedSearch.split(/\s+/).filter(Boolean);
+      let query = supabase
         .from("products")
         .select("id, name, price, image_url, category")
-        .eq("is_active", true)
-        .ilike("name", `%${debouncedSearch}%`)
-        .limit(6);
+        .eq("is_active", true);
+      for (const word of words) {
+        query = query.ilike("name", `%${word}%`);
+      }
+      const { data, error } = await query.limit(6);
       if (error) throw error;
       return data || [];
     },
