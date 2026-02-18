@@ -77,8 +77,10 @@ const BrandCategories = memo(() => {
 
   return (
     <section className="pt-3 pb-6 sm:pt-4 sm:pb-10 bg-background">
-      <div className="px-4 sm:px-6 lg:px-12 relative">
-        <MobileBrandGrid brands={brands} />
+      <div className="relative">
+        <div className="px-4 sm:hidden">
+          <MobileBrandGrid brands={brands} />
+        </div>
 
         {/* Desktop: scrollable row matching reference */}
         <button
@@ -96,7 +98,7 @@ const BrandCategories = memo(() => {
 
         <div
           ref={scrollRef}
-          className="hidden sm:flex gap-4 overflow-x-auto sm:mx-8"
+          className="hidden sm:flex gap-4 overflow-x-auto px-10"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {brands.map((brand) => (
