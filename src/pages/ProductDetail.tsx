@@ -290,13 +290,35 @@ const ProductDetail = () => {
 
                 {/* Thumbnails */}
                 {product.gallery.length > 1 && (
-                <div className="relative max-w-md mx-auto lg:max-w-none">
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-1">
+                <div className="relative max-w-md mx-auto lg:max-w-none group/thumbs">
+                  {product.gallery.length > 4 && (
+                    <>
+                      <button
+                        onClick={() => {
+                          const el = document.getElementById('thumb-strip');
+                          if (el) el.scrollBy({ left: -200, behavior: 'smooth' });
+                        }}
+                        className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/90 border border-border rounded-full flex items-center justify-center text-foreground shadow-sm hover:bg-background transition-colors"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          const el = document.getElementById('thumb-strip');
+                          if (el) el.scrollBy({ left: 200, behavior: 'smooth' });
+                        }}
+                        className="absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/90 border border-border rounded-full flex items-center justify-center text-foreground shadow-sm hover:bg-background transition-colors"
+                      >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  )}
+                  <div id="thumb-strip" className="flex gap-2 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-1 scroll-smooth">
                     {product.gallery.map((img, idx) => (
                       <button
                         key={idx}
                         onClick={() => setSelectedImage(idx)}
-                        className={`flex-shrink-0 w-[calc(25%-6px)] aspect-square border-2 overflow-hidden transition-all snap-start ${
+                        className={`flex-shrink-0 w-[calc(25%-6px)] aspect-square border-2 overflow-hidden transition-all snap-start rounded-sm ${
                           selectedImage === idx ? "border-primary" : "border-border/50 hover:border-primary/50"
                         }`}
                       >
