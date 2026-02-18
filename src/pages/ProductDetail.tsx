@@ -353,7 +353,7 @@ const ProductDetail = () => {
                 {/* Price & Stock */}
                 <motion.div variants={staggerItem} className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-baseline gap-2 sm:gap-3">
-                    <span className="text-xl sm:text-2xl lg:text-3xl font-heading text-foreground">
+                    <span className="text-xl sm:text-2xl lg:text-3xl font-heading font-bold text-foreground">
                       {formatPrice(product.price)}
                     </span>
                     <span className="text-sm sm:text-lg text-muted-foreground line-through">
