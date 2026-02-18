@@ -293,7 +293,7 @@ const Shop = () => {
                     : "flex flex-col gap-4"
                 }>
                   {products.map((product) => (
-                    <div key={product.id}>
+                    <div key={product.id} className="h-full">
                       <ProductCard
                         product={product}
                         soldOut={isProductSoldOut(stockMap, product.id)}
