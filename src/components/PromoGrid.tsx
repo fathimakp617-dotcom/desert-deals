@@ -21,7 +21,7 @@ const PromoGrid = () => {
   });
 
   const inStock = product ? product.stock_quantity > 0 : true;
-  const productImage = product?.image_url || promoGrid2;
+  const productImage = product?.image_url?.split(",")[0]?.trim() || promoGrid2;
   const productName = product?.name || "NM 002 Street Runner";
   const productCategory = product?.category || "All Products";
   const productPrice = product?.price ?? 379;

@@ -21,7 +21,7 @@ const NewBalancePromoGrid = () => {
   });
 
   const inStock = product ? product.stock_quantity > 0 : true;
-  const productImage = product?.image_url || newBalanceAd;
+  const productImage = product?.image_url?.split(",")[0]?.trim() || newBalanceAd;
   const productName = product?.name || "New Balance 9060";
   const productCategory = product?.category || "New Balance";
   const productPrice = product?.price ?? 399;
