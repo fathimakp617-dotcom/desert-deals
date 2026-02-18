@@ -33,9 +33,9 @@ interface BulkOrderNotificationRequest {
 }
 
 const formatPrice = (amount: number): string => {
-  return new Intl.NumberFormat("en-IN", {
+  return new Intl.NumberFormat("en-AE", {
     style: "currency",
-    currency: "INR",
+    currency: "AED",
     maximumFractionDigits: 0,
   }).format(amount);
 };

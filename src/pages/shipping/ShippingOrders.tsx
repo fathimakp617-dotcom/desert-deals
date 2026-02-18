@@ -217,9 +217,9 @@ const ShippingOrders = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
+    return new Intl.NumberFormat("en-AE", {
       style: "currency",
-      currency: "INR",
+      currency: "AED",
     }).format(amount);
   };
 
