@@ -513,14 +513,18 @@ const ProductDetail = () => {
                           <span className="text-foreground">{product.ingredients.join(", ")}</span>
                         </div>
                       )}
-                      <div className="flex justify-between py-2 border-b border-border/20">
-                        <span className="text-muted-foreground">Comfort</span>
-                        <span className="text-foreground">{product.longevity}</span>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-border/20">
-                        <span className="text-muted-foreground">Fit</span>
-                        <span className="text-foreground">{product.sillage}</span>
-                      </div>
+                      {product.longevity && (
+                        <div className="flex justify-between py-2 border-b border-border/20">
+                          <span className="text-muted-foreground">Comfort</span>
+                          <span className="text-foreground">{product.longevity}</span>
+                        </div>
+                      )}
+                      {product.sillage && (
+                        <div className="flex justify-between py-2 border-b border-border/20">
+                          <span className="text-muted-foreground">Fit</span>
+                          <span className="text-foreground">{product.sillage}</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </motion.div>
