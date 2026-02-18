@@ -11,13 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2, Upload, Eye, X, Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -25,6 +18,19 @@ const ALL_SIZES = [
   "EU 36", "EU 37", "EU 38", "EU 39", "EU 40",
   "EU 41", "EU 42", "EU 43", "EU 44", "EU 45", "EU 46",
   "Free Size",
+];
+
+const ALL_CATEGORIES = [
+  { value: "sneakers", label: "Sneakers" },
+  { value: "running", label: "Running" },
+  { value: "casual", label: "Casual" },
+  { value: "sports", label: "Sports" },
+  { value: "loafers", label: "Loafers" },
+  { value: "slides", label: "Slides" },
+  { value: "boots", label: "Boots" },
+  { value: "luxury", label: "Luxury" },
+  { value: "combo", label: "Combo" },
+  { value: "accessories", label: "Accessories" },
 ];
 
 export interface ProductFormData {
@@ -52,7 +58,7 @@ export const emptyFormData: ProductFormData = {
   original_price: "",
   discount_percent: "0",
   stock_quantity: "100",
-  category: "sneakers",
+  category: "",
   size: "",
   image_url: "",
   is_active: true,
@@ -95,9 +101,23 @@ const ProductForm = ({
     const discountPct = parseFloat(formData.discount_percent);
     if (!isNaN(origPrice) && origPrice > 0 && !isNaN(discountPct) && discountPct >= 0) {
       const finalPrice = origPrice - (origPrice * discountPct / 100);
-      setFormData((prev) => ({ ...prev, price: Math.round(finalPrice).toString() }));
+      const rounded = Math.round(finalPrice).toString();
+      if (formData.price !== rounded) {
+        setFormData((prev) => ({ ...prev, price: rounded }));
+      }
     }
   }, [formData.original_price, formData.discount_percent]);
+
+  // Auto-calculate discount % when final price is manually changed
+  const handleFinalPriceChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, price: value }));
+    const origPrice = parseFloat(formData.original_price);
+    const finalPrice = parseFloat(value);
+    if (!isNaN(origPrice) && origPrice > 0 && !isNaN(finalPrice) && finalPrice >= 0) {
+      const discPct = ((origPrice - finalPrice) / origPrice) * 100;
+      setFormData((prev) => ({ ...prev, price: value, discount_percent: Math.round(discPct).toString() }));
+    }
+  };
 
   // Parse existing image_url into previews for editing
   useEffect(() => {
@@ -247,51 +267,51 @@ const ProductForm = ({
               id="price"
               type="number"
               min="0"
-              step="0.01"
+              step="1"
               value={formData.price}
-              className="bg-muted/50"
-              readOnly
-              placeholder="Auto-calculated"
+              onChange={(e) => handleFinalPriceChange(e.target.value)}
+              placeholder="Enter or auto-calculated"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="stock_quantity">Stock Quantity</Label>
-            <Input
-              id="stock_quantity"
-              type="number"
-              min="0"
-              value={formData.stock_quantity}
-              onChange={(e) => setFormData((prev) => ({ ...prev, stock_quantity: e.target.value }))}
-              placeholder="100"
-              required
-            />
+        <div>
+          <Label htmlFor="stock_quantity">Stock Quantity</Label>
+          <Input
+            id="stock_quantity"
+            type="number"
+            min="0"
+            value={formData.stock_quantity}
+            onChange={(e) => setFormData((prev) => ({ ...prev, stock_quantity: e.target.value }))}
+            placeholder="100"
+            required
+          />
+        </div>
+
+        <div>
+          <Label>Categories</Label>
+          <div className="flex flex-wrap gap-3 mt-2">
+            {ALL_CATEGORIES.map((cat) => {
+              const selected = formData.category.split(",").map(s => s.trim()).filter(Boolean);
+              const isChecked = selected.includes(cat.value);
+              return (
+                <label key={cat.value} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                  <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={(checked) => {
+                      const current = formData.category.split(",").map(s => s.trim()).filter(Boolean);
+                      const updated = checked
+                        ? [...current, cat.value]
+                        : current.filter(s => s !== cat.value);
+                      setFormData(prev => ({ ...prev, category: updated.join(", ") }));
+                    }}
+                  />
+                  {cat.label}
+                </label>
+              );
+            })}
           </div>
-          <div>
-            <Label htmlFor="category">Category</Label>
-            <Select
-              value={formData.category}
-              onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sneakers">Sneakers</SelectItem>
-                <SelectItem value="running">Running</SelectItem>
-                <SelectItem value="casual">Casual</SelectItem>
-                <SelectItem value="sports">Sports</SelectItem>
-                <SelectItem value="loafers">Loafers</SelectItem>
-                <SelectItem value="slides">Slides</SelectItem>
-                <SelectItem value="boots">Boots</SelectItem>
-                <SelectItem value="luxury">Luxury</SelectItem>
-                <SelectItem value="combo">Combo</SelectItem>
-                <SelectItem value="accessories">Accessories</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        </div>
           <div className="col-span-3">
             <Label>Available Sizes</Label>
             <div className="flex flex-wrap gap-3 mt-2">
@@ -316,7 +336,6 @@ const ProductForm = ({
               })}
             </div>
           </div>
-        </div>
 
         {/* Product Images - Multiple */}
         <div className="space-y-3">
