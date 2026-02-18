@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Upload, Eye, X } from "lucide-react";
+import { Loader2, Upload, Eye, X, Plus } from "lucide-react";
 
 export interface ProductFormData {
   id: string;
@@ -43,10 +43,10 @@ export const emptyFormData: ProductFormData = {
   description: "",
   price: "",
   original_price: "",
-  discount_percent: "50",
+  discount_percent: "0",
   stock_quantity: "100",
-  category: "woody",
-  size: "100ml",
+  category: "sneakers",
+  size: "EU 40-45",
   image_url: "",
   is_active: true,
   notes_top: "",
@@ -77,14 +77,32 @@ const ProductForm = ({
 }: ProductFormProps) => {
   const { toast } = useToast();
   const formFileInputRef = useRef<HTMLInputElement>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
-  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+  const [pendingImageFiles, setPendingImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [previewImageSrc, setPreviewImageSrc] = useState("");
+
+  // Auto-calculate final price when original_price or discount_percent changes
+  useEffect(() => {
+    const origPrice = parseFloat(formData.original_price);
+    const discountPct = parseFloat(formData.discount_percent);
+    if (!isNaN(origPrice) && origPrice > 0 && !isNaN(discountPct) && discountPct >= 0) {
+      const finalPrice = origPrice - (origPrice * discountPct / 100);
+      setFormData((prev) => ({ ...prev, price: Math.round(finalPrice).toString() }));
+    }
+  }, [formData.original_price, formData.discount_percent]);
+
+  // Parse existing image_url into previews for editing
+  useEffect(() => {
+    if (isEditing && formData.image_url && imagePreviews.length === 0 && pendingImageFiles.length === 0) {
+      const existingUrls = formData.image_url.split(",").map(u => u.trim()).filter(Boolean);
+      setImagePreviews(existingUrls);
+    }
+  }, [isEditing, formData.image_url]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
     if (!formData.id.trim()) {
       toast({ title: "Error", description: "Product ID is required", variant: "destructive" });
       return;
@@ -102,7 +120,48 @@ const ProductForm = ({
       return;
     }
 
-    onSubmit(formData, pendingImageFile);
+    // Combine all image URLs (existing URLs from previews that aren't blob URLs + pending files handled separately)
+    const existingUrls = imagePreviews.filter(url => !url.startsWith("blob:"));
+    setFormData(prev => ({ ...prev, image_url: existingUrls.join(", ") }));
+
+    // Pass the first pending file for upload (the edge function handles one at a time)
+    onSubmit({ ...formData, image_url: existingUrls.join(", ") }, pendingImageFiles[0] || null);
+  };
+
+  const handleFilesSelected = (files: FileList | null) => {
+    if (!files) return;
+    const newFiles: File[] = [];
+    const newPreviews: string[] = [];
+
+    Array.from(files).forEach(file => {
+      if (!file.type.startsWith("image/")) {
+        toast({ title: "Error", description: `${file.name} is not an image`, variant: "destructive" });
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: "Error", description: `${file.name} exceeds 5MB limit`, variant: "destructive" });
+        return;
+      }
+      newFiles.push(file);
+      newPreviews.push(URL.createObjectURL(file));
+    });
+
+    setPendingImageFiles(prev => [...prev, ...newFiles]);
+    setImagePreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removeImage = (index: number) => {
+    const url = imagePreviews[index];
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    if (url.startsWith("blob:")) {
+      // Find corresponding pending file index (blob previews come after existing URLs)
+      const blobPreviews = imagePreviews.filter(u => u.startsWith("blob:"));
+      const blobIndex = blobPreviews.indexOf(url);
+      if (blobIndex >= 0) {
+        setPendingImageFiles(prev => prev.filter((_, i) => i !== blobIndex));
+      }
+      URL.revokeObjectURL(url);
+    }
   };
 
   return (
@@ -121,7 +180,7 @@ const ProductForm = ({
                   id: isEditing ? prev.id : generateSlug(e.target.value),
                 }));
               }}
-              placeholder="Air Stride Pro"
+              placeholder="Nike Air Max 90"
               required
             />
           </div>
@@ -131,7 +190,7 @@ const ProductForm = ({
               id="id"
               value={formData.id}
               onChange={(e) => setFormData((prev) => ({ ...prev, id: e.target.value }))}
-              placeholder="air-stride-pro"
+              placeholder="nike-air-max-90"
               required
               disabled={isEditing}
             />
@@ -144,7 +203,7 @@ const ProductForm = ({
             id="description"
             value={formData.description}
             onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-            placeholder="Premium footwear with great comfort..."
+            placeholder="Premium product with great quality..."
             rows={3}
           />
         </div>
@@ -183,9 +242,9 @@ const ProductForm = ({
               min="0"
               step="0.01"
               value={formData.price}
-              onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
-              placeholder="444"
-              required
+              className="bg-muted/50"
+              readOnly
+              placeholder="Auto-calculated"
             />
           </div>
         </div>
@@ -213,11 +272,16 @@ const ProductForm = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="woody">Woody</SelectItem>
-                <SelectItem value="floral">Floral</SelectItem>
-                <SelectItem value="oriental">Oriental</SelectItem>
-                <SelectItem value="fresh">Fresh</SelectItem>
+                <SelectItem value="sneakers">Sneakers</SelectItem>
+                <SelectItem value="running">Running</SelectItem>
+                <SelectItem value="casual">Casual</SelectItem>
+                <SelectItem value="sports">Sports</SelectItem>
+                <SelectItem value="loafers">Loafers</SelectItem>
+                <SelectItem value="slides">Slides</SelectItem>
+                <SelectItem value="boots">Boots</SelectItem>
+                <SelectItem value="luxury">Luxury</SelectItem>
                 <SelectItem value="combo">Combo</SelectItem>
+                <SelectItem value="accessories">Accessories</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -231,11 +295,11 @@ const ProductForm = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="3ml">3ml</SelectItem>
-                <SelectItem value="12ml">12ml</SelectItem>
-                <SelectItem value="50ml">50ml</SelectItem>
-                <SelectItem value="100ml">100ml</SelectItem>
-                <SelectItem value="3ml PER BOTTLE">3ml PER BOTTLE</SelectItem>
+                <SelectItem value="EU 36-40">EU 36-40</SelectItem>
+                <SelectItem value="EU 38-42">EU 38-42</SelectItem>
+                <SelectItem value="EU 40-45">EU 40-45</SelectItem>
+                <SelectItem value="EU 41-46">EU 41-46</SelectItem>
+                <SelectItem value="Free Size">Free Size</SelectItem>
                 <SelectItem value="Set of 2">Set of 2</SelectItem>
                 <SelectItem value="Set of 3">Set of 3</SelectItem>
               </SelectContent>
@@ -243,132 +307,110 @@ const ProductForm = ({
           </div>
         </div>
 
-        {/* Material Notes */}
+        {/* Product Images - Multiple */}
         <div className="space-y-3">
-          <Label className="text-base font-medium">Materials (comma-separated)</Label>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="notes_top" className="text-sm text-muted-foreground">Top Notes</Label>
-              <Input
-                id="notes_top"
-                value={formData.notes_top}
-                onChange={(e) => setFormData((prev) => ({ ...prev, notes_top: e.target.value }))}
-                placeholder="Bergamot, Lemon"
-              />
-            </div>
-            <div>
-              <Label htmlFor="notes_middle" className="text-sm text-muted-foreground">Middle Notes</Label>
-              <Input
-                id="notes_middle"
-                value={formData.notes_middle}
-                onChange={(e) => setFormData((prev) => ({ ...prev, notes_middle: e.target.value }))}
-                placeholder="Jasmine, Rose"
-              />
-            </div>
-            <div>
-              <Label htmlFor="notes_base" className="text-sm text-muted-foreground">Base Notes</Label>
-              <Input
-                id="notes_base"
-                value={formData.notes_base}
-                onChange={(e) => setFormData((prev) => ({ ...prev, notes_base: e.target.value }))}
-                placeholder="Vanilla, Musk"
-              />
-            </div>
-          </div>
-        </div>
+          <Label>Product Images</Label>
 
-        <div className="space-y-3">
-          <Label>Product Image</Label>
+          {/* Image Grid */}
+          {imagePreviews.length > 0 && (
+            <div className="flex flex-wrap gap-3">
+              {imagePreviews.map((url, index) => (
+                <div key={index} className="relative w-24 h-24 rounded-lg overflow-hidden border bg-muted group">
+                  <img
+                    src={url}
+                    alt={`Product image ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreviewImageSrc(url);
+                        setIsImagePreviewOpen(true);
+                      }}
+                      className="p-1.5 bg-white/20 rounded-full hover:bg-white/30"
+                    >
+                      <Eye className="h-3.5 w-3.5 text-white" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="p-1.5 bg-white/20 rounded-full hover:bg-white/30"
+                    >
+                      <X className="h-3.5 w-3.5 text-white" />
+                    </button>
+                  </div>
+                  {index === 0 && (
+                    <span className="absolute top-1 left-1 text-[9px] bg-primary text-primary-foreground px-1 rounded">
+                      Main
+                    </span>
+                  )}
+                </div>
+              ))}
 
-          {/* Image Preview */}
-          {(formData.image_url || imagePreviewUrl) && (
-            <div className="relative w-32 h-32 rounded-lg overflow-hidden border bg-muted group">
-              <img
-                src={imagePreviewUrl || formData.image_url}
-                alt="Product preview"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
-              />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsImagePreviewOpen(true)}
-                  className="p-2 bg-white/20 rounded-full hover:bg-white/30"
-                >
-                  <Eye className="h-4 w-4 text-white" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFormData((prev) => ({ ...prev, image_url: "" }));
-                    setImagePreviewUrl("");
-                    setPendingImageFile(null);
-                  }}
-                  className="p-2 bg-white/20 rounded-full hover:bg-white/30"
-                >
-                  <X className="h-4 w-4 text-white" />
-                </button>
-              </div>
+              {/* Add more button */}
+              <button
+                type="button"
+                onClick={() => formFileInputRef.current?.click()}
+                className="w-24 h-24 rounded-lg border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center hover:border-primary/50 transition-colors"
+              >
+                <Plus className="h-5 w-5 text-muted-foreground" />
+                <span className="text-[10px] text-muted-foreground mt-1">Add</span>
+              </button>
             </div>
           )}
 
-          {/* Upload or URL options */}
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => formFileInputRef.current?.click()}
-              className="flex-1"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Image
-            </Button>
-            <input
-              type="file"
-              ref={formFileInputRef}
-              className="hidden"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  if (!file.type.startsWith("image/")) {
-                    toast({ title: "Error", description: "Please select an image file", variant: "destructive" });
-                    return;
-                  }
-                  if (file.size > 5 * 1024 * 1024) {
-                    toast({ title: "Error", description: "Image must be less than 5MB", variant: "destructive" });
-                    return;
-                  }
-                  const previewUrl = URL.createObjectURL(file);
-                  setImagePreviewUrl(previewUrl);
-                  setPendingImageFile(file);
-                }
-                e.target.value = "";
-              }}
-            />
-          </div>
+          {/* Upload button when no images */}
+          {imagePreviews.length === 0 && (
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => formFileInputRef.current?.click()}
+                className="flex-1"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Images
+              </Button>
+            </div>
+          )}
+
+          <input
+            type="file"
+            ref={formFileInputRef}
+            className="hidden"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              handleFilesSelected(e.target.files);
+              e.target.value = "";
+            }}
+          />
 
           {/* URL input as alternative */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>or enter URL:</span>
+            <span>or enter URLs (comma-separated):</span>
           </div>
           <Input
             id="image_url"
             value={formData.image_url}
             onChange={(e) => {
               setFormData((prev) => ({ ...prev, image_url: e.target.value }));
-              setImagePreviewUrl("");
-              setPendingImageFile(null);
+              // Update previews from URL input
+              const urls = e.target.value.split(",").map(u => u.trim()).filter(Boolean);
+              setImagePreviews(urls);
+              setPendingImageFiles([]);
             }}
-            placeholder="https://example.com/image.jpg"
+            placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
           />
 
-          {pendingImageFile && (
+          {pendingImageFiles.length > 0 && (
             <p className="text-sm text-muted-foreground">
-              📎 {pendingImageFile.name} will be uploaded when you save the product
+              📎 {pendingImageFiles.length} image(s) will be uploaded when you save
             </p>
           )}
         </div>
@@ -400,7 +442,7 @@ const ProductForm = ({
           </DialogHeader>
           <div className="relative">
             <img
-              src={imagePreviewUrl || formData.image_url}
+              src={previewImageSrc}
               alt="Product preview"
               className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
             />
