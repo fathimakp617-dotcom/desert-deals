@@ -450,34 +450,23 @@ const ProductDetail = () => {
                   </Button>
                 </motion.div>
 
-                {/* Description - inline */}
-                <motion.div variants={staggerItem} className="space-y-3 pt-4">
-                  <button
-                    onClick={() => setShowDescription(!showDescription)}
-                    className="flex items-center justify-between w-full text-left border-b border-border/50 pb-3"
-                  >
-                    <span className="text-base font-heading font-semibold underline">Description</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${showDescription ? "rotate-180" : ""}`} />
-                  </button>
-                  {showDescription && (
-                    <div className="pt-2">
-                      <p className="text-muted-foreground leading-relaxed text-sm">
-                        {product.story || product.description}
-                      </p>
-                    </div>
-                  )}
+                {/* Description - always visible */}
+                <motion.div variants={staggerItem} className="space-y-4 pt-4 border-b border-border/50 pb-6">
+                  <h3 className="text-base font-heading font-semibold text-foreground">Description</h3>
+                  <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">
+                    {product.story || product.description}
+                  </p>
                 </motion.div>
 
-                {/* Specification - collapsible */}
-                <motion.div variants={staggerItem} className="space-y-3">
+                {/* Additional Information - collapsible text link */}
+                <motion.div variants={staggerItem} className="space-y-3 border-b border-border/50 pb-4">
                   <button
-                    onClick={() => setShowSpecification(!showSpecification)}
-                    className="flex items-center justify-between w-full text-left border-b border-border/50 pb-3"
+                    onClick={() => setShowAdditional(!showAdditional)}
+                    className="text-base font-heading text-primary hover:underline"
                   >
-                    <span className="text-base font-heading text-muted-foreground">Specification</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${showSpecification ? "rotate-180" : ""}`} />
+                    Additional information
                   </button>
-                  {showSpecification && (
+                  {showAdditional && (
                     <div className="pt-2 space-y-2 text-sm">
                       <div className="flex justify-between py-2 border-b border-border/20">
                         <span className="text-muted-foreground">Category</span>
@@ -493,21 +482,6 @@ const ProductDetail = () => {
                           <span className="text-foreground">{product.occasion.join(", ")}</span>
                         </div>
                       )}
-                    </div>
-                  )}
-                </motion.div>
-
-                {/* Additional Information - collapsible */}
-                <motion.div variants={staggerItem} className="space-y-3">
-                  <button
-                    onClick={() => setShowAdditional(!showAdditional)}
-                    className="flex items-center justify-between w-full text-left border-b border-border/50 pb-3"
-                  >
-                    <span className="text-base font-heading text-muted-foreground">Additional information</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${showAdditional ? "rotate-180" : ""}`} />
-                  </button>
-                  {showAdditional && (
-                    <div className="pt-2 space-y-2 text-sm">
                       {product.materials.length > 0 && (
                         <div className="flex justify-between py-2 border-b border-border/20">
                           <span className="text-muted-foreground">Materials</span>
@@ -530,14 +504,13 @@ const ProductDetail = () => {
                   )}
                 </motion.div>
 
-                {/* Reviews Section - collapsible */}
+                {/* Reviews - collapsible text link */}
                 <motion.div variants={staggerItem} className="space-y-3" id="reviews-section">
                   <button
                     onClick={() => setShowReviews(!showReviews)}
-                    className="flex items-center justify-between w-full text-left border-b border-border/50 pb-3"
+                    className="text-base font-heading text-primary hover:underline"
                   >
-                    <span className="text-base font-heading text-muted-foreground">Reviews</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${showReviews ? "rotate-180" : ""}`} />
+                    Reviews
                   </button>
                   {showReviews && (
                     <div className="pt-2">
