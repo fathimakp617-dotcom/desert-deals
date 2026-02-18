@@ -7,7 +7,7 @@
 @layer base {
   :root {
     /* Clean Light Gray Theme - Desert Deals inspired */
-    --background: 0 0% 96%; /* light gray */
+    --background: 0 0% 100%; /* white */
     --foreground: 0 0% 10%; /* near black */
 
     --card: 0 0% 100%; /* white cards */
