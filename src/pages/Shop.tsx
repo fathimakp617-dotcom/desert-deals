@@ -41,7 +41,7 @@ const sortOptions = [
   { label: "Featured", value: "featured" },
   { label: "Price: Low to High", value: "price-asc" },
   { label: "Price: High to Low", value: "price-desc" },
-  { label: "Name: A-Z", value: "name-asc" },
+  { label: "Popularity", value: "name-asc" },
 ];
 
 const brandSlugToCategory: Record<string, string> = {
