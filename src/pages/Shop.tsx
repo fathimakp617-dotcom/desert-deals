@@ -23,6 +23,7 @@ import { usePaginatedProducts } from "@/hooks/usePaginatedProducts";
 import ProductCard from "@/components/ProductCard";
 import SearchSuggestions from "@/components/SearchSuggestions";
 import MobileFilterSheet from "@/components/MobileFilterSheet";
+import BackToTopButton from "@/components/BackToTopButton";
 
 
 const categories = [
@@ -333,6 +334,7 @@ const Shop = () => {
             hasActiveFilters={!!hasActiveFilters}
           />
 
+          <BackToTopButton />
           <Footer />
           <MobileBottomNav />
         </main>
