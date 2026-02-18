@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { formatPrice, Product } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { Heart } from "lucide-react";
 import { toast } from "sonner";
 
 interface RelatedProductsProps {
@@ -12,6 +14,7 @@ interface RelatedProductsProps {
 
 const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsProps) => {
   const { data: products = [] } = useDbProducts();
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   
   const relatedProducts = products.filter((p) => p.id !== currentProductId);
 
@@ -58,6 +61,23 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                         <span className="text-xs text-muted-foreground line-through">{formatPrice(item.originalPrice)}</span>
                       )}
                       <span className="text-sm text-foreground">{formatPrice(item.price)}</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (isInWishlist(item.id)) {
+                            removeFromWishlist(item.id);
+                          } else {
+                            addToWishlist(item);
+                          }
+                        }}
+                        className="p-0.5"
+                      >
+                        <Heart className={`w-5 h-5 ${isInWishlist(item.id) ? 'fill-black text-black' : 'text-muted-foreground'}`} />
+                      </button>
                     </div>
                   </div>
                 </div>
