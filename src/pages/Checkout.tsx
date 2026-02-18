@@ -340,6 +340,10 @@ const Checkout = () => {
     if (!formData.firstName.trim()) errors.firstName = "Name is required";
     if (!formData.state) errors.state = "Please select an emirate";
     if (!formData.phone.trim()) errors.phone = "Phone is required";
+    else {
+      const digitsOnly = formData.phone.replace(/\D/g, "");
+      if (digitsOnly.length < 9 || digitsOnly.length > 10) errors.phone = "Phone must be 9-10 digits";
+    }
     if (!formData.city.trim()) errors.city = "City is required";
     if (!formData.email.trim()) errors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Invalid email address";
