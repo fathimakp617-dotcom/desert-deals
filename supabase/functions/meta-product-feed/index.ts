@@ -1,0 +1,106 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+const SITE_URL = "https://desertsdeals.com";
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data: products, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const url = new URL(req.url);
+    const format = url.searchParams.get("format") || "xml";
+
+    if (format === "csv") {
+      // Meta Commerce CSV feed
+      const header = "id,title,description,availability,condition,price,link,image_link,brand,google_product_category\n";
+      const rows = (products || []).map((p) => {
+        const imageUrl = p.image_url
+          ? (p.image_url.startsWith("http") ? p.image_url.split(",")[0].trim() : `${SITE_URL}${p.image_url.split(",")[0].trim()}`)
+          : "";
+        const availability = (p.stock_quantity || 0) > 0 ? "in stock" : "out of stock";
+        const price = `${p.price} AED`;
+        const title = (p.name || "").replace(/"/g, '""');
+        const desc = (p.description || "").replace(/"/g, '""').substring(0, 500);
+        const brand = (p.category || "Desert Deal").replace(/"/g, '""');
+
+        return `"${p.id}","${title}","${desc}","${availability}","new","${price}","${SITE_URL}/product/${p.id}","${imageUrl}","${brand}","Apparel & Accessories > Shoes"`;
+      }).join("\n");
+
+      return new Response(header + rows, {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": "inline; filename=product-feed.csv",
+          "Cache-Control": "public, max-age=3600",
+        },
+      });
+    }
+
+    // Default: RSS/XML feed for Meta
+    const items = (products || []).map((p) => {
+      const imageUrl = p.image_url
+        ? (p.image_url.startsWith("http") ? p.image_url.split(",")[0].trim() : `${SITE_URL}${p.image_url.split(",")[0].trim()}`)
+        : "";
+      const availability = (p.stock_quantity || 0) > 0 ? "in stock" : "out of stock";
+      const brand = p.category || "Desert Deal";
+      const desc = (p.description || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const title = (p.name || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+      return `    <item>
+      <g:id>${p.id}</g:id>
+      <g:title>${title}</g:title>
+      <g:description>${desc}</g:description>
+      <g:link>${SITE_URL}/product/${p.id}</g:link>
+      <g:image_link>${imageUrl}</g:image_link>
+      <g:brand>${brand}</g:brand>
+      <g:condition>new</g:condition>
+      <g:availability>${availability}</g:availability>
+      <g:price>${p.price} AED</g:price>
+      <g:google_product_category>Apparel &amp; Accessories &gt; Shoes</g:google_product_category>
+    </item>`;
+    }).join("\n");
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>Desert Deal - Product Feed</title>
+    <link>${SITE_URL}</link>
+    <description>Premium shoes and accessories from Desert Deal UAE</description>
+${items}
+  </channel>
+</rss>`;
+
+    return new Response(xml, {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/xml; charset=utf-8",
+        "Cache-Control": "public, max-age=3600",
+      },
+    });
+  } catch (err) {
+    console.error("Feed error:", err);
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
