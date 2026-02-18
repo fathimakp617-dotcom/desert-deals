@@ -21,14 +21,20 @@ const ALL_SIZES = [
 ];
 
 const ALL_CATEGORIES = [
-  { value: "sneakers", label: "Sneakers" },
-  { value: "running", label: "Running" },
-  { value: "casual", label: "Casual" },
-  { value: "sports", label: "Sports" },
-  { value: "loafers", label: "Loafers" },
-  { value: "slides", label: "Slides" },
-  { value: "boots", label: "Boots" },
-  { value: "luxury", label: "Luxury" },
+  { value: "nike", label: "Nike" },
+  { value: "jordan", label: "Jordan" },
+  { value: "adidas", label: "Adidas" },
+  { value: "new-balance", label: "New Balance" },
+  { value: "asics", label: "Asics" },
+  { value: "on-cloud", label: "On Cloud" },
+  { value: "hoka", label: "Hoka" },
+  { value: "puma", label: "Puma" },
+  { value: "onitsuka-tiger", label: "Onitsuka Tiger" },
+  { value: "loro-piana", label: "Loro Piana" },
+  { value: "louis-vuitton", label: "Louis Vuitton" },
+  { value: "brooks", label: "Brooks" },
+  { value: "hermes", label: "Hermes" },
+  { value: "running", label: "Running Shoes" },
   { value: "combo", label: "Combo" },
   { value: "accessories", label: "Accessories" },
 ];
