@@ -1,6 +1,6 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart } from "lucide-react";
+import { Heart, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/data/products";
 import type { SimpleProduct } from "@/hooks/usePaginatedProducts";
@@ -14,11 +14,17 @@ interface ProductCardProps {
 }
 
 const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, viewMode }: ProductCardProps) => {
+  const [imgError, setImgError] = useState(false);
+  
   if (viewMode === "list") {
     return (
       <div className="flex flex-col md:flex-row gap-4 border border-border/50 bg-card/50 p-4 hover:border-primary/30 transition-colors">
-        <Link to={`/product/${product.id}`} className="w-full md:w-40 h-40 flex-shrink-0 overflow-hidden">
-          <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+        <Link to={`/product/${product.id}`} className="w-full md:w-40 h-40 flex-shrink-0 overflow-hidden bg-muted flex items-center justify-center">
+          {imgError ? (
+            <ImageOff className="w-8 h-8 text-muted-foreground" />
+          ) : (
+            <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" onError={() => setImgError(true)} />
+          )}
         </Link>
         <div className="flex-1 min-w-0">
           <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
@@ -46,14 +52,19 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
   return (
     <div className="group bg-background border border-border/30 rounded-lg overflow-hidden flex flex-col h-full">
       <div className="relative aspect-square bg-muted overflow-hidden flex-shrink-0">
-        <Link to={`/product/${product.id}`}>
-          <img
-            src={product.image}
-            alt={product.name}
-            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
-            loading="lazy"
-            decoding="async"
-          />
+        <Link to={`/product/${product.id}`} className="w-full h-full flex items-center justify-center">
+          {imgError ? (
+            <ImageOff className="w-10 h-10 text-muted-foreground" />
+          ) : (
+            <img
+              src={product.image}
+              alt={product.name}
+              className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
+              loading="lazy"
+              decoding="async"
+              onError={() => setImgError(true)}
+            />
+          )}
         </Link>
 
 
