@@ -210,7 +210,7 @@ const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
                   <CheckCircle className="w-10 h-10 text-primary" />
                 </motion.div>
 
-                <h2 className="text-2xl font-heading text-foreground mb-2">
+                <h2 className="text-2xl font-heading text-emerald-600 mb-2">
                   Order Confirmed!
                 </h2>
                 <p className="text-muted-foreground mb-4">
