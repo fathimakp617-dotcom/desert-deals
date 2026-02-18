@@ -53,6 +53,7 @@ const PromoGrid = () => {
                 alt={productName}
                 className="w-auto h-[120px] sm:h-[150px] md:h-[180px] object-contain transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
+                onError={(e) => { e.currentTarget.src = promoGrid2; }}
               />
             </div>
             <div className="w-full text-left space-y-0.5">
@@ -72,7 +73,7 @@ const PromoGrid = () => {
                   </span>
                 )}
               </div>
-              <p className={`text-[10px] md:text-[11px] font-semibold pt-0.5 ${inStock ? "text-primary" : "text-destructive"}`}>
+              <p className={`text-[10px] md:text-[11px] font-semibold pt-0.5 ${inStock ? "text-green-600" : "text-destructive"}`}>
                 {inStock ? "IN STOCK" : "OUT OF STOCK"}
               </p>
             </div>

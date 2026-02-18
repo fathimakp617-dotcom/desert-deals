@@ -73,7 +73,7 @@ const NewBalancePromoGrid = () => {
                   </span>
                 )}
               </div>
-              <p className={`text-[10px] md:text-[11px] font-semibold pt-0.5 ${inStock ? "text-primary" : "text-destructive"}`}>
+              <p className={`text-[10px] md:text-[11px] font-semibold pt-0.5 ${inStock ? "text-green-600" : "text-destructive"}`}>
                 {inStock ? "IN STOCK" : "OUT OF STOCK"}
               </p>
             </div>
