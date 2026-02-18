@@ -69,7 +69,7 @@ const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands
           <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 w-[calc(33.333%-6px)] snap-start group">
             <div className="bg-muted rounded-lg p-3 text-center transition-all duration-300 hover:shadow-md">
               <div className="flex items-center justify-center mb-2">
-                <div className="w-14 h-14 rounded-lg flex items-center justify-center p-1.5">
+                <div className="w-16 h-16 rounded-lg flex items-center justify-center p-1.5">
                   <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
                 </div>
               </div>
@@ -120,12 +120,12 @@ const BrandCategories = memo(() => {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {brands.map((brand) => (
-            <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 w-[200px] lg:w-[220px] group">
-              <div className="bg-background border border-border/40 rounded-lg p-5 h-full flex flex-col transition-all duration-300 hover:shadow-md hover:border-border">
-                <h3 className="text-base font-heading font-bold text-foreground tracking-tight">{brand.name}</h3>
-                <span className="text-xs text-muted-foreground mt-0.5">{brand.count} Products</span>
-                <div className="flex-1 flex items-center justify-center my-5">
-                  <div className="w-24 h-24 flex items-center justify-center p-2">
+          <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 w-[230px] lg:w-[260px] group">
+              <div className="bg-background border border-border/40 rounded-lg p-6 h-full flex flex-col transition-all duration-300 hover:shadow-md hover:border-border">
+                <h3 className="text-lg font-heading font-bold text-foreground tracking-tight">{brand.name}</h3>
+                <span className="text-sm text-muted-foreground mt-0.5">{brand.count} Products</span>
+                <div className="flex-1 flex items-center justify-center my-6">
+                  <div className="w-32 h-32 flex items-center justify-center p-2">
                     <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
                   </div>
                 </div>
