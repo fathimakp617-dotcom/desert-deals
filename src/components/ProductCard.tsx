@@ -35,7 +35,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
             {soldOut ? (
               <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
             ) : (
-              <span className="text-[11px] font-bold text-emerald-600 uppercase">In Stock</span>
+              <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
             )}
           </div>
         </div>
@@ -98,7 +98,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
           {soldOut ? (
             <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
           ) : (
-            <span className="text-[11px] font-bold text-emerald-600 uppercase">In Stock</span>
+            <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
           )}
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWishlist(product.id); }}

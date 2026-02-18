@@ -361,7 +361,7 @@ const ProductDetail = () => {
                     </span>
                   </div>
                   {!isSoldOut ? (
-                    <span className="text-xs sm:text-sm font-medium text-green-600">In Stock</span>
+                    <span className="text-xs sm:text-sm font-medium text-green-600">IN STOCK</span>
                   ) : (
                     <span className="text-xs sm:text-sm font-medium text-destructive">Sold Out</span>
                   )}
