@@ -47,6 +47,7 @@ const ProductDetail = () => {
   const [showDescription, setShowDescription] = useState(true);
   const [showSpecification, setShowSpecification] = useState(false);
   const [showAdditional, setShowAdditional] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const { addToCart, buyNow } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { data: stockMap } = useProductStock();
@@ -529,10 +530,20 @@ const ProductDetail = () => {
                   )}
                 </motion.div>
 
-                {/* Reviews Section */}
-                <motion.div variants={staggerItem} className="pt-6" id="reviews-section">
-                  <h2 className="text-2xl font-heading mb-6">Reviews</h2>
-                  <ProductReviews productId={product.id} />
+                {/* Reviews Section - collapsible */}
+                <motion.div variants={staggerItem} className="space-y-3" id="reviews-section">
+                  <button
+                    onClick={() => setShowReviews(!showReviews)}
+                    className="flex items-center justify-between w-full text-left border-b border-border/50 pb-3"
+                  >
+                    <span className="text-base font-heading text-muted-foreground">Reviews</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showReviews ? "rotate-180" : ""}`} />
+                  </button>
+                  {showReviews && (
+                    <div className="pt-2">
+                      <ProductReviews productId={product.id} />
+                    </div>
+                  )}
                 </motion.div>
 
               </motion.div>
