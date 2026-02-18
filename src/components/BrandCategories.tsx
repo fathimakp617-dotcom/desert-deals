@@ -77,21 +77,39 @@ const BrandCategories = memo(() => {
 
   return (
     <section className="pt-3 pb-6 sm:pt-4 sm:pb-10 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative">
         <MobileBrandGrid brands={brands} />
 
-        <div className="hidden sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {/* Desktop: scrollable row matching reference */}
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full items-center justify-center text-foreground hover:bg-muted transition-colors shadow-sm hidden sm:flex"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full items-center justify-center text-foreground hover:bg-muted transition-colors shadow-sm hidden sm:flex"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+
+        <div
+          ref={scrollRef}
+          className="hidden sm:flex gap-4 overflow-x-auto sm:mx-8"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           {brands.map((brand) => (
-            <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="group">
-              <div className="bg-muted rounded-lg p-4 text-center transition-all duration-300 hover:shadow-md">
-                <h3 className="text-sm font-heading font-semibold text-foreground tracking-tight leading-tight">{brand.name}</h3>
-                <span className="text-[11px] text-muted-foreground mt-0.5 block">{brand.count} Products</span>
-                <div className="my-4 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-lg flex items-center justify-center p-2">
+            <Link key={brand.slug} to={`/shop?brand=${brand.slug}`} className="flex-shrink-0 w-[200px] lg:w-[220px] group">
+              <div className="bg-background border border-border/40 rounded-lg p-5 h-full flex flex-col transition-all duration-300 hover:shadow-md hover:border-border">
+                <h3 className="text-base font-heading font-bold text-foreground tracking-tight">{brand.name}</h3>
+                <span className="text-xs text-muted-foreground mt-0.5">{brand.count} Products</span>
+                <div className="flex-1 flex items-center justify-center my-5">
+                  <div className="w-24 h-24 flex items-center justify-center p-2">
                     <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
                   </div>
                 </div>
-                <span className="text-[11px] font-medium text-foreground border border-border bg-background rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
+                <span className="text-[11px] font-medium text-foreground border border-border rounded-full px-4 py-1.5 inline-block self-start group-hover:bg-foreground group-hover:text-background transition-colors">
                   View Products
                 </span>
               </div>
