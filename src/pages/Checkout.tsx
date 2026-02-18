@@ -110,6 +110,7 @@ const Checkout = () => {
     firstName: "",
     lastName: "",
     phone: "",
+    countryCode: "+971",
     address: "",
     city: "",
     state: "",
@@ -158,6 +159,7 @@ const Checkout = () => {
                 firstName: pendingNormalized.firstName,
                 lastName: pendingNormalized.lastName,
                 phone: pendingNormalized.phone,
+                countryCode: "+971",
                 address: pendingNormalized.address,
                 city: pendingNormalized.city,
                 state: pendingNormalized.state || "",
@@ -220,6 +222,7 @@ const Checkout = () => {
             firstName: normalized.firstName || data?.first_name || metadata.first_name || "",
             lastName: normalized.lastName || data?.last_name || metadata.last_name || "",
             phone: normalized.phone || data?.phone || "",
+            countryCode: "+971",
             address: normalized.address,
             city: normalized.city,
             state: normalized.state || "",
@@ -347,7 +350,7 @@ const Checkout = () => {
         user_id: user?.id || null,
         customer_name: `${formData.firstName} ${formData.lastName}`,
         customer_email: formData.email,
-        customer_phone: formData.phone,
+        customer_phone: `${formData.countryCode} ${formData.phone}`,
         shipping_address: {
           address: formData.address,
           city: formData.city,
@@ -555,15 +558,39 @@ const Checkout = () => {
 
                 <div>
                   <Label htmlFor="phone">Phone *</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    required
-                    className="mt-1 bg-card border-border"
-                  />
+                  <div className="flex gap-2 mt-1">
+                    <Select
+                      value={formData.countryCode}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, countryCode: value }))}
+                    >
+                      <SelectTrigger className="w-[110px] bg-card border-border">
+                        <SelectValue placeholder="+971" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60">
+                        <SelectItem value="+971">🇦🇪 +971</SelectItem>
+                        <SelectItem value="+966">🇸🇦 +966</SelectItem>
+                        <SelectItem value="+968">🇴🇲 +968</SelectItem>
+                        <SelectItem value="+974">🇶🇦 +974</SelectItem>
+                        <SelectItem value="+973">🇧🇭 +973</SelectItem>
+                        <SelectItem value="+965">🇰🇼 +965</SelectItem>
+                        <SelectItem value="+91">🇮🇳 +91</SelectItem>
+                        <SelectItem value="+92">🇵🇰 +92</SelectItem>
+                        <SelectItem value="+63">🇵🇭 +63</SelectItem>
+                        <SelectItem value="+880">🇧🇩 +880</SelectItem>
+                        <SelectItem value="+44">🇬🇧 +44</SelectItem>
+                        <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="flex-1 bg-card border-border"
+                    />
+                  </div>
                 </div>
 
                 <div>
