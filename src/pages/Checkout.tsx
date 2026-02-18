@@ -700,7 +700,7 @@ const Checkout = () => {
 
                   {/* Shipping */}
                   <div className="flex justify-between text-sm py-3">
-                    <span className="text-foreground font-medium">Shipment 1</span>
+                    <span className="text-foreground font-medium">Delivery Charge</span>
                     <span className="text-foreground">Cash On Delivery: {formatPrice(shipping)}</span>
                   </div>
 
