@@ -76,7 +76,7 @@ const TopSellers = memo(() => {
                 return (
                   <div
                     key={product.id}
-                    className="flex-shrink-0 w-[180px] sm:w-[220px] lg:w-[246px] group"
+                    className="flex-shrink-0 w-[145px] sm:w-[220px] lg:w-[246px] group"
                   >
                     {/* Product card - matches product-wrapper product-background */}
                     <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
