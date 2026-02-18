@@ -172,67 +172,51 @@ const Shop = () => {
 
           <section className="pt-28 pb-2">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-              <nav className="text-sm text-muted-foreground">
-                <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
-                <span className="mx-2">›</span>
-                <span className="text-foreground font-medium">All Shoes</span>
-              </nav>
+              <div className="flex items-center justify-between">
+                <nav className="text-sm text-muted-foreground">
+                  <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+                  <span className="mx-2">›</span>
+                  <span className="text-foreground font-medium">All Shoes</span>
+                </nav>
+
+                {/* Desktop: inline filter controls */}
+                <div className="hidden lg:flex items-center gap-3">
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="flex items-center gap-2 text-sm font-medium text-foreground hover:opacity-70 transition-opacity border border-border/50 rounded-lg px-3 py-2"
+                  >
+                    <Filter className="w-4 h-4" />
+                    Filter
+                  </button>
+
+                  <div className="flex border border-border/50 rounded-lg overflow-hidden">
+                    <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                      <Grid3X3 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setViewMode("list")} className={`p-2 transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                      <List className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-40 h-9 bg-card border-border/50 text-sm"><SelectValue placeholder="Sort" /></SelectTrigger>
+                    <SelectContent>
+                      {sortOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {totalCount} items
+                    {isFetching && !isLoading && <Loader2 className="inline-block ml-1 h-3 w-3 animate-spin" />}
+                  </span>
+                </div>
+              </div>
             </div>
           </section>
 
           {/* Filter & Sort Bar */}
           <section className="py-4">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-
-
-              {/* Desktop: reference-style filter bar */}
-              <div className="hidden lg:flex items-center justify-between mb-6">
-                {/* Left side: Filter toggle + result count */}
-                <div className="flex items-center gap-6">
-                  <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className="flex items-center gap-2 text-sm font-medium text-foreground hover:opacity-70 transition-opacity"
-                  >
-                    <Filter className="w-4 h-4" />
-                    Filter Products
-                  </button>
-                  <span className="text-sm text-muted-foreground">
-                    Showing {products.length > 0 ? page * pageSize + 1 : 0}–{Math.min((page + 1) * pageSize, totalCount)} of {totalCount} results
-                    {isFetching && !isLoading && <Loader2 className="inline-block ml-2 h-3 w-3 animate-spin" />}
-                  </span>
-                </div>
-
-                {/* Right side: View toggle + Sort + Items */}
-                <div className="flex items-center gap-4">
-                  <div className="flex border border-border/50 rounded-lg overflow-hidden">
-                    <button onClick={() => setViewMode("grid")} className={`p-2.5 transition-colors ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                      <Grid3X3 className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setViewMode("list")} className={`p-2.5 transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                      <List className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Sort:</span>
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className="w-44 h-10 bg-card border-border/50 text-sm"><SelectValue placeholder="Sort by latest" /></SelectTrigger>
-                      <SelectContent>
-                        {sortOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <Select value={totalCount.toString()}>
-                    <SelectTrigger className="w-32 h-10 bg-card border-border/50 text-sm">
-                      <SelectValue placeholder={`${totalCount} Items`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={totalCount.toString()}>{totalCount} Items</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
 
               {/* Expandable filter panel */}
               {showFilters && (
