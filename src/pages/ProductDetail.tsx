@@ -217,8 +217,8 @@ const ProductDetail = () => {
 
         {/* Product Hero */}
         <section className="py-4 sm:py-8 lg:py-12">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
+          <div className="mx-auto px-0 lg:px-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
               {/* Image Gallery */}
               <motion.div
                 initial="hidden"
@@ -228,7 +228,7 @@ const ProductDetail = () => {
               >
                 {/* Main Image with swipe & auto-slide */}
                 <div
-                  className="relative w-full max-w-md mx-auto lg:max-w-none aspect-square overflow-hidden border border-border/50 bg-card/50 touch-pan-y"
+                  className="relative w-full aspect-square overflow-hidden bg-card/50 touch-pan-y"
                   onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
                   onTouchEnd={(e) => {
                     const diff = touchStartX.current - e.changedTouches[0].clientX;
@@ -296,7 +296,7 @@ const ProductDetail = () => {
 
                 {/* Thumbnails */}
                 {product.gallery.length > 1 && (
-                <div className="relative max-w-md mx-auto lg:max-w-none group/thumbs">
+                <div className="relative group/thumbs px-2 lg:px-0">
                   {product.gallery.length > 4 && (
                     <>
                       <button
@@ -341,7 +341,7 @@ const ProductDetail = () => {
                 initial="hidden"
                 animate="visible"
                 variants={staggerContainer}
-                className="space-y-4 sm:space-y-5 min-w-0"
+                className="space-y-4 sm:space-y-5 min-w-0 px-4 sm:px-6 lg:px-8 lg:pr-12"
               >
                 {/* Product Name */}
                 <div>
