@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import promoGrid1 from "@/assets/banners/promo-grid-1.webp";
 import promoGrid2 from "@/assets/banners/promo-grid-2.jpeg";
+import nikeMindBg from "@/assets/banners/nike-mind-bg.webp";
 
 const PromoGrid = () => {
   const { data: product } = useQuery({
@@ -44,7 +45,8 @@ const PromoGrid = () => {
         {/* Right product card in grey box */}
         <Link
           to={productLink}
-          className="col-span-1 bg-muted flex flex-col items-center justify-center px-4 py-6 md:px-8 group"
+          className="col-span-1 relative bg-muted flex flex-col items-center justify-center px-4 py-6 md:px-8 group overflow-hidden"
+          style={{ backgroundImage: `url(${nikeMindBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
         >
           <div className="w-full max-w-[200px] flex flex-col items-center">
             <div className="w-full flex items-center justify-center mb-3">
