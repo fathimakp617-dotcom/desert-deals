@@ -541,6 +541,11 @@ const Checkout = () => {
               {/* Left Column - Billing Details */}
               <div className="lg:col-span-2 space-y-6">
                 <div>
+                  <Label>Country / Region *</Label>
+                  <p className="text-foreground font-medium mt-1">United Arab Emirates</p>
+                </div>
+
+                <div>
                   <Label htmlFor="firstName">Name *</Label>
                   <Input
                     id="firstName"
@@ -563,11 +568,6 @@ const Checkout = () => {
                     className="mt-1 bg-card border-border"
                   />
                   {fieldErrors.address && <p className="text-destructive text-xs mt-1">{fieldErrors.address}</p>}
-                </div>
-
-                <div>
-                  <Label>Country / Region *</Label>
-                  <p className="text-foreground font-medium mt-1">United Arab Emirates</p>
                 </div>
 
                 <div>
