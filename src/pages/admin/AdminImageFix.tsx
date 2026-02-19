@@ -79,7 +79,7 @@ const AdminImageFix = () => {
     let totalSuccess = 0;
     let totalFailed = 0;
     let totalProcessed = 0;
-    const BATCH = 3;
+    const BATCH = 10;
 
     try {
       while (!migrationAbortRef.current) {
@@ -113,8 +113,8 @@ const AdminImageFix = () => {
           offset += BATCH;
         }
 
-        // Small delay to avoid rate limiting
-        await new Promise(r => setTimeout(r, 1000));
+        // Short delay between batches
+        await new Promise(r => setTimeout(r, 500));
       }
 
       toast({
@@ -440,7 +440,7 @@ const AdminImageFix = () => {
           <h2 className="font-semibold text-foreground">Backup Images from Domain</h2>
         </div>
         <p className="text-sm text-muted-foreground">
-          Downloads all product images from desertsdeals.com and uploads them to your storage bucket. Processes 3 products at a time.
+          Downloads all product images from desertsdeals.com and uploads them to your storage bucket. Processes 10 products at a time automatically.
         </p>
 
         <div className="flex items-center gap-3">
