@@ -27,7 +27,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight, CheckSquare } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import ProductForm, { emptyFormData, type ProductFormData } from "@/components/admin/ProductForm";
 
 interface Product {
@@ -77,6 +78,10 @@ const AdminProducts = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkEditField, setBulkEditField] = useState<string>("");
+  const [bulkEditValue, setBulkEditValue] = useState<string>("");
+  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],
@@ -284,6 +289,55 @@ const AdminProducts = () => {
     },
   });
 
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({ productIds, updates }: { productIds: string[]; updates: Record<string, unknown> }) => {
+      const session = getAdminSession();
+      if (!session) throw new Error("Not authenticated");
+      const { data, error } = await supabase.functions.invoke("manage-products", {
+        body: { action: "bulk_update", product_ids: productIds, updates, admin_email: session.email, admin_token: session.token },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      setSelectedIds(new Set());
+      setIsBulkDialogOpen(false);
+      setBulkEditField("");
+      setBulkEditValue("");
+      toast({ title: `${data.updated} products updated` });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Bulk update failed", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === paginatedProducts.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(paginatedProducts.map((p) => p.id)));
+    }
+  };
+
+  const handleBulkEdit = () => {
+    if (!bulkEditField || !bulkEditValue.trim()) return;
+    const updates: Record<string, unknown> = {};
+    if (bulkEditField === "size") updates.size = bulkEditValue.trim();
+    if (bulkEditField === "category") updates.category = bulkEditValue.trim();
+    if (bulkEditField === "is_active") updates.is_active = bulkEditValue === "true";
+    if (bulkEditField === "discount_percent") updates.discount_percent = parseInt(bulkEditValue) || 0;
+    bulkUpdateMutation.mutate({ productIds: Array.from(selectedIds), updates });
+  };
+
   const openEditDialog = (product: Product) => {
     setEditingProduct(product);
     setFormData({
@@ -488,11 +542,76 @@ const AdminProducts = () => {
         </div>
       </div>
 
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 p-3 rounded-md border bg-muted/50">
+          <CheckSquare className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium">{selectedIds.size} selected</span>
+          <Select value={bulkEditField} onValueChange={(v) => { setBulkEditField(v); setBulkEditValue(""); }}>
+            <SelectTrigger className="w-[160px] h-8 text-sm">
+              <SelectValue placeholder="Edit field..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="size">Size</SelectItem>
+              <SelectItem value="category">Category</SelectItem>
+              <SelectItem value="is_active">Status</SelectItem>
+              <SelectItem value="discount_percent">Discount %</SelectItem>
+            </SelectContent>
+          </Select>
+          {bulkEditField === "is_active" ? (
+            <Select value={bulkEditValue} onValueChange={setBulkEditValue}>
+              <SelectTrigger className="w-[120px] h-8 text-sm">
+                <SelectValue placeholder="Status..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Active</SelectItem>
+                <SelectItem value="false">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          ) : bulkEditField === "category" ? (
+            <Select value={bulkEditValue} onValueChange={setBulkEditValue}>
+              <SelectTrigger className="w-[160px] h-8 text-sm">
+                <SelectValue placeholder="Category..." />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat} className="capitalize">{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : bulkEditField ? (
+            <Input
+              placeholder={bulkEditField === "size" ? "e.g. EU 36-45" : "e.g. 10"}
+              value={bulkEditValue}
+              onChange={(e) => setBulkEditValue(e.target.value)}
+              className="w-[160px] h-8 text-sm"
+            />
+          ) : null}
+          <Button
+            size="sm"
+            disabled={!bulkEditField || !bulkEditValue.trim() || bulkUpdateMutation.isPending}
+            onClick={handleBulkEdit}
+          >
+            {bulkUpdateMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : null}
+            Apply
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())}>
+            Clear
+          </Button>
+        </div>
+      )}
+
       {/* Products Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
+              <TableHead className="w-[40px]">
+                <Checkbox
+                  checked={paginatedProducts.length > 0 && selectedIds.size === paginatedProducts.length}
+                  onCheckedChange={toggleSelectAll}
+                />
+              </TableHead>
               <TableHead className="w-[50px]"></TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Stock</TableHead>
@@ -505,6 +624,13 @@ const AdminProducts = () => {
           <TableBody>
             {paginatedProducts.map((product) => (
               <TableRow key={product.id} className="group">
+                {/* Checkbox */}
+                <TableCell className="py-2">
+                  <Checkbox
+                    checked={selectedIds.has(product.id)}
+                    onCheckedChange={() => toggleSelect(product.id)}
+                  />
+                </TableCell>
                 {/* Image */}
                 <TableCell className="py-2">
                   <div className="relative">
@@ -652,7 +778,7 @@ const AdminProducts = () => {
             ))}
             {filteredProducts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   {searchQuery || stockFilter !== "all" || categoryFilter !== "all"
                     ? "No products match your filters."
                     : "No products found. Add your first product!"}

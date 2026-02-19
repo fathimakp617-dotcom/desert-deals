@@ -418,6 +418,47 @@ Deno.serve(async (req) => {
         });
       }
 
+      case "bulk_update": {
+        const { product_ids, updates } = body;
+        if (!Array.isArray(product_ids) || product_ids.length === 0) {
+          return new Response(JSON.stringify({ error: "No products selected" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        const updatePayload: Record<string, unknown> = {};
+        if (updates.size !== undefined) updatePayload.size = updates.size;
+        if (updates.category !== undefined) updatePayload.category = updates.category;
+        if (updates.is_active !== undefined) updatePayload.is_active = updates.is_active;
+        if (updates.discount_percent !== undefined) updatePayload.discount_percent = updates.discount_percent;
+
+        if (Object.keys(updatePayload).length === 0) {
+          return new Response(JSON.stringify({ error: "No fields to update" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        const { error: bulkError } = await supabaseClient
+          .from("products")
+          .update(updatePayload)
+          .in("id", product_ids);
+
+        if (bulkError) throw bulkError;
+
+        await supabaseClient.from("activity_logs").insert({
+          actor_email: session.email,
+          actor_role: "admin",
+          action_type: "bulk_update",
+          action_details: { product_ids, updates: updatePayload, count: product_ids.length },
+        });
+
+        return new Response(JSON.stringify({ success: true, updated: product_ids.length }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       case "delete_all": {
         // Delete all products (for replace import)
         const { error: deleteAllError } = await supabaseClient
