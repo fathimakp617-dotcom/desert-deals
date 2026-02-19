@@ -234,7 +234,7 @@ const AdminLayout = () => {
     { title: "Reviews", url: "/admin/reviews", icon: Star },
     { title: "Customers", url: "/admin/customers", icon: Users },
     { title: "Bulk Import", url: "/admin/bulk-import", icon: Upload },
-    { title: "Fix Images", url: "/admin/fix-images", icon: ImageOff },
+    
   ];
 
   const isActive = (path: string) => {
