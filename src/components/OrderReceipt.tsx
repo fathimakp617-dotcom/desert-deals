@@ -8,6 +8,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  productId?: string;
 }
 
 interface OrderReceiptProps {

@@ -12,7 +12,7 @@ interface OrderData {
   order_number: string;
   customer_name: string;
   customer_email: string;
-  items: Array<{ name: string; price: number; quantity: number }>;
+  items: Array<{ name: string; price: number; quantity: number; productId?: string }>;
   subtotal: number;
   discount: number;
   shipping: number;
