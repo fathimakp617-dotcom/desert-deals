@@ -65,6 +65,74 @@ const AdminImageFix = () => {
   const [autoMatching, setAutoMatching] = useState(false);
   const [matchProgress, setMatchProgress] = useState({ matched: 0, unmatched: 0, total: 0, remaining: 0 });
 
+  // Migration state (download from domain -> upload to storage)
+  const [migrating, setMigrating] = useState(false);
+  const [migrationProgress, setMigrationProgress] = useState({ processed: 0, remaining: 0, success: 0, failed: 0 });
+  const migrationAbortRef = useRef(false);
+
+  const startMigration = async () => {
+    setMigrating(true);
+    migrationAbortRef.current = false;
+    setMigrationProgress({ processed: 0, remaining: 0, success: 0, failed: 0 });
+
+    let offset = 0;
+    let totalSuccess = 0;
+    let totalFailed = 0;
+    let totalProcessed = 0;
+    const BATCH = 3;
+
+    try {
+      while (!migrationAbortRef.current) {
+        const res = await supabase.functions.invoke("migrate-product-images", {
+          body: { batch_size: BATCH, offset: 0 },
+        });
+
+        if (res.error) throw new Error(res.error.message || "Migration failed");
+        const data = res.data;
+
+        if (data.done) {
+          setMigrationProgress(prev => ({ ...prev, remaining: 0 }));
+          break;
+        }
+
+        const batchSuccess = data.results?.filter((r: any) => r.status === "success").length || 0;
+        const batchFailed = data.results?.filter((r: any) => r.status !== "success").length || 0;
+        totalSuccess += batchSuccess;
+        totalFailed += batchFailed;
+        totalProcessed += data.processed || 0;
+
+        setMigrationProgress({
+          processed: totalProcessed,
+          remaining: data.remaining || 0,
+          success: totalSuccess,
+          failed: totalFailed,
+        });
+
+        // If no successes and remaining hasn't changed, move offset forward
+        if (batchSuccess === 0) {
+          offset += BATCH;
+        }
+
+        // Small delay to avoid rate limiting
+        await new Promise(r => setTimeout(r, 1000));
+      }
+
+      toast({
+        title: "🚀 Migration complete",
+        description: `${totalSuccess} products migrated, ${totalFailed} failed`,
+      });
+      fetchProducts();
+    } catch (err: any) {
+      toast({ title: "Migration error", description: err.message, variant: "destructive" });
+    } finally {
+      setMigrating(false);
+    }
+  };
+
+  const stopMigration = () => {
+    migrationAbortRef.current = true;
+  };
+
   const { toast } = useToast();
 
   const fetchProducts = async () => {
@@ -363,6 +431,59 @@ const AdminImageFix = () => {
         <p className="text-muted-foreground mt-1">
           {totalCount} products with broken images.
         </p>
+      </div>
+
+      {/* STEP 0: Auto-Migrate from Domain */}
+      <div className="border border-border rounded-xl p-5 bg-card space-y-4">
+        <div className="flex items-center gap-2">
+          <Badge className="text-xs font-semibold bg-primary text-primary-foreground">Migrate</Badge>
+          <h2 className="font-semibold text-foreground">Backup Images from Domain</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Downloads all product images from desertsdeals.com and uploads them to your storage bucket. Processes 3 products at a time.
+        </p>
+
+        <div className="flex items-center gap-3">
+          {!migrating ? (
+            <Button onClick={startMigration} className="gap-2">
+              <Upload className="w-4 h-4" />
+              Start Migration ({totalCount} products)
+            </Button>
+          ) : (
+            <Button variant="destructive" onClick={stopMigration} className="gap-2">
+              Stop Migration
+            </Button>
+          )}
+        </div>
+
+        {(migrating || migrationProgress.processed > 0) && (
+          <div className="space-y-3">
+            <Progress value={migrationProgress.remaining > 0 ? ((migrationProgress.processed) / (migrationProgress.processed + migrationProgress.remaining)) * 100 : 100} className="h-3" />
+            <div className="grid grid-cols-4 gap-3 text-center">
+              <div className="bg-muted rounded-lg p-2">
+                <p className="text-lg font-bold text-foreground">{migrationProgress.processed}</p>
+                <p className="text-[10px] text-muted-foreground">Processed</p>
+              </div>
+              <div className="bg-muted rounded-lg p-2">
+                <p className="text-lg font-bold text-green-600">{migrationProgress.success}</p>
+                <p className="text-[10px] text-muted-foreground">Success</p>
+              </div>
+              <div className="bg-muted rounded-lg p-2">
+                <p className="text-lg font-bold text-red-500">{migrationProgress.failed}</p>
+                <p className="text-[10px] text-muted-foreground">Failed</p>
+              </div>
+              <div className="bg-muted rounded-lg p-2">
+                <p className="text-lg font-bold text-foreground">{migrationProgress.remaining}</p>
+                <p className="text-[10px] text-muted-foreground">Remaining</p>
+              </div>
+            </div>
+            {migrating && (
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <Loader2 className="w-3 h-3 animate-spin" /> Migrating... this may take a while
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* STEP 1: Bulk Upload */}
