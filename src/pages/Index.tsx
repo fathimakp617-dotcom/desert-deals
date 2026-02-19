@@ -114,8 +114,11 @@ const Index = () => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
               <Link to="/shop?brand=adidas" className="block relative rounded-lg overflow-hidden group">
                 <img src={adidasAd} alt="Adidas Shoes" className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover" />
-                <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
-                  <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+                <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14 flex flex-col gap-2 sm:gap-3">
+                  <h3 className="text-white text-xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow-lg">Adidas Collection</h3>
+                  <p className="text-white/80 text-xs sm:text-sm md:text-base max-w-xs sm:max-w-sm drop-shadow">Impossible is nothing. Explore the latest drops.</p>
+                  <span className="inline-block w-fit bg-white text-black text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-white/90 transition-colors mt-1">
                     Shop Now →
                   </span>
                 </div>
