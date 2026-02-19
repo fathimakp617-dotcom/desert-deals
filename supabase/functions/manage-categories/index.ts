@@ -42,18 +42,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check admin role
-    const { data: staff } = await supabaseClient
-      .from("staff_members")
-      .select("role")
-      .eq("email", session.email)
-      .single();
+    // Check admin role - env-based fallback
+    const adminEmails = (Deno.env.get("ADMIN_EMAILS") ?? "").split(",").map(e => e.trim().toLowerCase());
+    const isEnvAdmin = adminEmails.includes(session.email.toLowerCase());
 
-    if (!staff || staff.role !== "admin") {
-      return new Response(JSON.stringify({ error: "Admin access required" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!isEnvAdmin) {
+      const { data: staff } = await supabaseClient
+        .from("staff_members")
+        .select("role")
+        .eq("email", session.email)
+        .single();
+
+      if (!staff || staff.role !== "admin") {
+        return new Response(JSON.stringify({ error: "Admin access required" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     // LIST
