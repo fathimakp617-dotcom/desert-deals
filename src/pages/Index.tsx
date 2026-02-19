@@ -91,7 +91,7 @@ const Index = () => {
           </Suspense>
 
           <Suspense fallback={<SectionLoader />}>
-            <BrandProductRow brand="adidas" title="Adidas Collection" />
+            <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
           </Suspense>
 
           {/* On Cloud Ad Banner */}
@@ -109,7 +109,7 @@ const Index = () => {
           </section>
 
           <Suspense fallback={<SectionLoader />}>
-            <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
+            <BrandProductRow brand="adidas" title="Adidas Collection" />
           </Suspense>
 
           {/* Nike Dunk Low Ad Banner */}
