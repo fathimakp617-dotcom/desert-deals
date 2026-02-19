@@ -103,17 +103,21 @@ const AdminDashboard = () => {
   const [revenueView, setRevenueView] = useState<"all" | "cod" | "online">("all");
   const navigate = useNavigate();
   const hasMountedRef = useRef(false);
+  const isRedirectingRef = useRef(false);
   const { toast } = useToast();
 
   const handleSessionExpiry = useCallback(() => {
+    // Prevent multiple calls causing re-render loops
+    if (isRedirectingRef.current) return;
+    isRedirectingRef.current = true;
     sessionStorage.removeItem("rayn_admin_session");
     toast({
       title: "Session Expired",
       description: "Please log in again to continue.",
       variant: "destructive",
     });
-    // Hard redirect so AdminLayout state resets as well
-    window.location.assign("/admin");
+    // Use navigate instead of window.location.assign to avoid full page reload loops
+    navigate("/admin", { replace: true });
   }, [navigate, toast]);
 
   useEffect(() => {
@@ -210,8 +214,8 @@ const AdminDashboard = () => {
       
       const session = JSON.parse(sessionData);
       
-      // Check if session is expired on client-side
-      if (session.expiry && session.expiry < Date.now()) {
+      // Check if session is expired on client-side (expiry can be ISO string or timestamp)
+      if (session.expiry && new Date(session.expiry) < new Date()) {
         handleSessionExpiry();
         return;
       }
@@ -264,7 +268,7 @@ const AdminDashboard = () => {
       const session = JSON.parse(sessionData);
       
       // Check client-side expiry
-      if (session.expiry && session.expiry < Date.now()) {
+      if (session.expiry && new Date(session.expiry) < new Date()) {
         return; // Let fetchStats handle the session expiry
       }
       
