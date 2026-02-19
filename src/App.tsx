@@ -58,6 +58,7 @@ const AdminReturns = lazy(() => import("./pages/admin/AdminReturns"));
 const AdminReviewsPage = lazy(() => import("./pages/admin/AdminReviewsPage"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminBulkImport = lazy(() => import("./pages/admin/AdminBulkImport"));
+const AdminImageFix = lazy(() => import("./pages/admin/AdminImageFix"));
 
 
 
@@ -127,6 +128,7 @@ const App = () => (
                         <Route path="reviews" element={<AdminReviewsPage />} />
                         <Route path="products" element={<AdminProducts />} />
                         <Route path="bulk-import" element={<AdminBulkImport />} />
+                        <Route path="fix-images" element={<AdminImageFix />} />
                       </Route>
                       <Route path="*" element={<NotFound />} />
                     </Routes>
