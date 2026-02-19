@@ -24,9 +24,10 @@ import ProductCard from "@/components/ProductCard";
 import SearchSuggestions from "@/components/SearchSuggestions";
 import MobileFilterSheet from "@/components/MobileFilterSheet";
 import BackToTopButton from "@/components/BackToTopButton";
+import { useCategories } from "@/hooks/useCategories";
 
 
-const categories = [
+const fallbackCategories = [
   "All", "Nike", "Jordan", "New Balance", "On Cloud", "Asics", "Adidas",
   "Hoka", "Puma", "Louis Vuitton", "Gucci", "Onitsuka Tiger", "Loro Piana",
   "Brooks", "Dior", "Hermes", "Basketball Shoes",
@@ -75,6 +76,10 @@ const Shop = () => {
 
   const { data: stockMap } = useProductStock();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { data: dbCategories } = useCategories();
+  const categories = dbCategories?.length
+    ? ["All", ...dbCategories.map(c => c.label)]
+    : fallbackCategories;
 
   const {
     data,

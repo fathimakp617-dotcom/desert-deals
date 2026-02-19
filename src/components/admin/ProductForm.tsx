@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,7 +22,7 @@ const ALL_SIZES = [
   "Free Size",
 ];
 
-const ALL_CATEGORIES = [
+const FALLBACK_CATEGORIES = [
   { value: "nike", label: "Nike" },
   { value: "jordan", label: "Jordan" },
   { value: "adidas", label: "Adidas" },
@@ -96,6 +97,10 @@ const ProductForm = ({
   onCancel,
 }: ProductFormProps) => {
   const { toast } = useToast();
+  const { data: dbCategories } = useCategories();
+  const ALL_CATEGORIES = dbCategories?.length
+    ? dbCategories.map(c => ({ value: c.value, label: c.label }))
+    : FALLBACK_CATEGORIES;
   const formFileInputRef = useRef<HTMLInputElement>(null);
   const [pendingImageFiles, setPendingImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
