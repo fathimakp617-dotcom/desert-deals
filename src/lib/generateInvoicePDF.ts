@@ -1,10 +1,13 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { supabase } from "@/integrations/supabase/client";
 
 interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  productId?: string;
+  image_url?: string;
 }
 
 interface InvoiceData {
@@ -31,44 +34,114 @@ const formatCurrency = (amount: number): string => {
   return `${Math.round(amount).toLocaleString()} AED`;
 };
 
+/**
+ * Fetch image as base64 data URL. Returns null on failure.
+ */
+const fetchImageAsDataUrl = async (url: string): Promise<string | null> => {
+  try {
+    const response = await fetch(url, { mode: "cors" });
+    if (!response.ok) return null;
+    const blob = await response.blob();
+    return new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => resolve(null as any);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Resolve product image URL from the DB image_url field.
+ * Handles comma-separated URLs (takes first), storage paths, and full URLs.
+ */
+const resolveProductImageUrl = (imageUrl: string | null | undefined): string | null => {
+  if (!imageUrl) return null;
+  const firstImage = imageUrl.split(",")[0].trim();
+  if (!firstImage) return null;
+  
+  if (firstImage.startsWith("http://") || firstImage.startsWith("https://")) {
+    return firstImage;
+  }
+  
+  // It's a storage path — generate public URL
+  const { data } = supabase.storage.from("product-images").getPublicUrl(firstImage);
+  return data?.publicUrl || null;
+};
+
+/**
+ * Fetch product images from the database for the given items.
+ */
+const fetchProductImages = async (items: OrderItem[]): Promise<Map<string, string>> => {
+  const imageMap = new Map<string, string>();
+  
+  const productIds = items
+    .map((item) => item.productId)
+    .filter((id): id is string => !!id);
+  
+  if (productIds.length === 0) return imageMap;
+  
+  try {
+    const { data: products } = await supabase
+      .from("products")
+      .select("id, image_url")
+      .in("id", productIds);
+    
+    if (!products) return imageMap;
+    
+    // Fetch all images in parallel
+    const fetchPromises = products.map(async (product) => {
+      const url = resolveProductImageUrl(product.image_url);
+      if (!url) return;
+      const dataUrl = await fetchImageAsDataUrl(url);
+      if (dataUrl) {
+        imageMap.set(product.id, dataUrl);
+      }
+    });
+    
+    await Promise.all(fetchPromises);
+  } catch {
+    // Silently fail — invoice will render without images
+  }
+  
+  return imageMap;
+};
+
 export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
 
-  // Colors - Clean Desert Deal branding
-  const primaryColor: [number, number, number] = [26, 26, 26]; // near black
+  // Colors
+  const primaryColor: [number, number, number] = [26, 26, 26];
   const darkColor: [number, number, number] = [26, 26, 26];
   const grayColor: [number, number, number] = [136, 136, 136];
 
-  // Header with logo
+  // Fetch logo and product images in parallel
+  const logoUrl = `${window.location.origin}/favicon.png`;
+  const [logoDataUrl, productImages] = await Promise.all([
+    fetchImageAsDataUrl(logoUrl),
+    fetchProductImages(data.items),
+  ]);
+
+  // Header background
   doc.setFillColor(...darkColor);
   doc.rect(0, 0, pageWidth, 58, "F");
 
-  // Try to load and add logo
-  const logoUrl = "https://desert-deals.lovable.app/favicon.png";
-  
-  try {
-    const response = await fetch(logoUrl);
-    const blob = await response.blob();
-    const logoDataUrl = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.readAsDataURL(blob);
-    });
-
-    // Add logo centered at the top
+  // Logo
+  if (logoDataUrl) {
     const logoWidth = 50;
     const logoHeight = 18;
     doc.addImage(logoDataUrl, "PNG", (pageWidth - logoWidth) / 2, 6, logoWidth, logoHeight);
-  } catch (error) {
-    // Fallback to text if logo fails
-    doc.setTextColor(...primaryColor);
+  } else {
+    doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont("helvetica", "bold");
     doc.text("DESERT DEAL", pageWidth / 2, 18, { align: "center" });
   }
 
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(200, 200, 200);
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
   doc.text("PREMIUM FOOTWEAR", pageWidth / 2, 28, { align: "center" });
@@ -109,8 +182,10 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   });
   doc.text(formattedDate, pageWidth - 20, 98, { align: "right" });
 
-  // Items table
+  // Items table with product images
+  const imgSize = 12;
   const tableData = data.items.map((item) => [
+    "", // placeholder for image cell
     item.name,
     item.quantity.toString(),
     formatCurrency(item.price),
@@ -119,7 +194,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
 
   autoTable(doc, {
     startY: 118,
-    head: [["Item", "Qty", "Unit Price", "Total"]],
+    head: [["", "Item", "Qty", "Unit Price", "Total"]],
     body: tableData,
     headStyles: {
       fillColor: darkColor,
@@ -130,17 +205,35 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
     bodyStyles: {
       textColor: darkColor,
       fontSize: 10,
+      minCellHeight: imgSize + 6,
+      valign: "middle",
     },
     alternateRowStyles: {
       fillColor: [248, 248, 248],
     },
     columnStyles: {
-      0: { cellWidth: "auto" },
-      1: { cellWidth: 25, halign: "center" },
-      2: { cellWidth: 35, halign: "right" },
+      0: { cellWidth: imgSize + 8, halign: "center" },
+      1: { cellWidth: "auto" },
+      2: { cellWidth: 20, halign: "center" },
       3: { cellWidth: 35, halign: "right" },
+      4: { cellWidth: 35, halign: "right" },
     },
     margin: { left: 15, right: 15 },
+    didDrawCell: (cellData) => {
+      if (cellData.section === "body" && cellData.column.index === 0) {
+        const item = data.items[cellData.row.index];
+        const imgDataUrl = item.productId ? productImages.get(item.productId) : null;
+        if (imgDataUrl) {
+          try {
+            const x = cellData.cell.x + (cellData.cell.width - imgSize) / 2;
+            const y = cellData.cell.y + (cellData.cell.height - imgSize) / 2;
+            doc.addImage(imgDataUrl, "JPEG", x, y, imgSize, imgSize);
+          } catch {
+            // Skip image on error
+          }
+        }
+      }
+    },
   });
 
   // Get the Y position after the table
@@ -154,29 +247,20 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   doc.setFontSize(10);
   doc.text("Subtotal:", totalsX, totalsY);
   doc.setTextColor(...darkColor);
-  doc.text(formatCurrency(data.subtotal), pageWidth - 20, totalsY, {
-    align: "right",
-  });
+  doc.text(formatCurrency(data.subtotal), pageWidth - 20, totalsY, { align: "right" });
 
   if (data.discount > 0) {
     totalsY += 8;
     doc.setTextColor(34, 197, 94);
     doc.text("Discount:", totalsX, totalsY);
-    doc.text(`-${formatCurrency(data.discount)}`, pageWidth - 20, totalsY, {
-      align: "right",
-    });
+    doc.text(`-${formatCurrency(data.discount)}`, pageWidth - 20, totalsY, { align: "right" });
   }
 
   totalsY += 8;
   doc.setTextColor(...grayColor);
   doc.text("Shipping:", totalsX, totalsY);
   doc.setTextColor(...darkColor);
-  doc.text(
-    data.shipping === 0 ? "FREE" : formatCurrency(data.shipping),
-    pageWidth - 20,
-    totalsY,
-    { align: "right" }
-  );
+  doc.text(data.shipping === 0 ? "FREE" : formatCurrency(data.shipping), pageWidth - 20, totalsY, { align: "right" });
 
   totalsY += 12;
   doc.setDrawColor(...darkColor);
@@ -187,9 +271,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   doc.setFont("helvetica", "bold");
   doc.text("Total:", totalsX, totalsY + 2);
   doc.setTextColor(...primaryColor);
-  doc.text(formatCurrency(data.total), pageWidth - 20, totalsY + 2, {
-    align: "right",
-  });
+  doc.text(formatCurrency(data.total), pageWidth - 20, totalsY + 2, { align: "right" });
 
   // Shipping Address
   const addressY = totalsY + 25;
@@ -214,15 +296,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
 
   // Payment Method
   doc.setFillColor(248, 248, 248);
-  doc.roundedRect(
-    pageWidth / 2 + 5,
-    addressY,
-    (pageWidth - 40) / 2,
-    45,
-    3,
-    3,
-    "F"
-  );
+  doc.roundedRect(pageWidth / 2 + 5, addressY, (pageWidth - 40) / 2, 45, 3, 3, "F");
 
   doc.setTextColor(...grayColor);
   doc.setFontSize(9);
@@ -230,10 +304,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
 
   doc.setTextColor(...darkColor);
   doc.setFontSize(10);
-  const paymentLabel =
-    data.paymentMethod === "cod"
-      ? "Cash on Delivery"
-      : data.paymentMethod;
+  const paymentLabel = data.paymentMethod === "cod" ? "Cash on Delivery" : data.paymentMethod;
   doc.text(paymentLabel, pageWidth / 2 + 10, addressY + 20);
 
   doc.setTextColor(...grayColor);
@@ -248,9 +319,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
 
   doc.setTextColor(...grayColor);
   doc.setFontSize(9);
-  doc.text("Thank you for shopping with Desert Deal!", pageWidth / 2, footerY + 8, {
-    align: "center",
-  });
+  doc.text("Thank you for shopping with Desert Deal!", pageWidth / 2, footerY + 8, { align: "center" });
   doc.text(
     "For questions, contact: support@desertsdeals.com | Ph: +971 50 678 4405",
     pageWidth / 2,
@@ -347,7 +416,6 @@ export const generateShippingLabelPDF = async (order: ShippingLabelOrder): Promi
 
   yPos += 20;
   doc.setFontSize(16);
-  
   
   // Payment box
   const paymentBoxWidth = doc.getTextWidth(paymentLabel) + 20;
