@@ -130,9 +130,15 @@ const AdminImageFix = () => {
       const batch = bulkFiles.slice(i, i + BATCH_SIZE);
       const promises = batch.map(async (file) => {
         try {
+          // Sanitize filename: replace special/unicode chars with dashes
+          const sanitizedName = file.name
+            .replace(/[^\x20-\x7E]/g, '-')  // Remove non-ASCII (™, etc.)
+            .replace(/[^a-zA-Z0-9._-]/g, '-') // Keep only safe chars
+            .replace(/-+/g, '-')              // Collapse multiple dashes
+            .replace(/^-|-$/g, '');           // Trim leading/trailing dashes
           const { error } = await supabase.storage
             .from("product-images")
-            .upload(file.name, file, { contentType: file.type, upsert: true });
+            .upload(sanitizedName || file.name, file, { contentType: file.type, upsert: true });
           if (error) throw error;
         } catch (err: any) {
           errors.push(`${file.name}: ${err.message}`);
