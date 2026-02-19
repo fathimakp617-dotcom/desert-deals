@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Loader2, Upload, Eye, X, Plus } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import RichTextEditor from "./RichTextEditor";
 
 const ALL_SIZES = [
   "EU 36", "EU 37", "EU 38", "EU 39", "EU 40",
@@ -231,13 +232,11 @@ const ProductForm = ({
         </div>
 
         <div>
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
+          <Label>Description</Label>
+          <RichTextEditor
             value={formData.description}
-            onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+            onChange={(val) => setFormData((prev) => ({ ...prev, description: val }))}
             placeholder="Premium product with great quality..."
-            rows={3}
           />
         </div>
 
