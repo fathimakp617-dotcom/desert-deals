@@ -25,7 +25,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
 
   return (
     <section className="py-10 sm:py-14">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+      <div className="px-4 sm:px-6 lg:px-8">
         <h2 className="text-xl sm:text-2xl font-heading font-bold tracking-tight mb-6">
           Related products
         </h2>
