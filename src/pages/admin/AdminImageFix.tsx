@@ -160,56 +160,90 @@ const AdminImageFix = () => {
     });
   };
 
-  // === AUTO-MATCH ===
+  // === AUTO-MATCH (runs entirely in frontend, no edge function) ===
   const startAutoMatch = async () => {
-    const session = getAdminSession();
-    if (!session) {
-      toast({ title: "Session expired", variant: "destructive" });
-      return;
-    }
-
     setAutoMatching(true);
     setMatchProgress({ matched: 0, unmatched: 0, total: 0, remaining: totalCount });
 
-    let offset = 0;
-    let totalMatched = 0;
-    let totalUnmatched = 0;
-
     try {
+      // Step 1: List ALL files in storage bucket (handle pagination + folders)
+      const storageMap = new Map<string, string>(); // lowercase filename -> public URL
+      const listAll = async (prefix = "") => {
+        const { data, error } = await supabase.storage
+          .from("product-images")
+          .list(prefix, { limit: 1000, sortBy: { column: "name", order: "asc" } });
+        if (error || !data) return;
+        for (const item of data) {
+          const path = prefix ? `${prefix}/${item.name}` : item.name;
+          if (item.id === null || item.metadata === null) {
+            await listAll(path); // folder
+          } else {
+            const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
+            storageMap.set(item.name.toLowerCase(), urlData.publicUrl);
+          }
+        }
+      };
+      await listAll();
+      console.log(`Storage files found: ${storageMap.size}`);
+
+      // Step 2: Fetch all broken products in batches
+      let offset = 0;
+      let totalMatched = 0;
+      let totalUnmatched = 0;
+      const BATCH = 50;
+
       while (true) {
-        const { data, error } = await supabase.functions.invoke("auto-match-images", {
-          body: {
-            admin_email: session.email,
-            admin_token: session.token,
-            batch_size: 20,
-            offset: 0, // always 0 since matched products drop out of the query
-          },
-        });
+        const { data: products, error: fetchErr, count } = await supabase
+          .from("products")
+          .select("id, name, image_url", { count: "exact" })
+          .like("image_url", "%desertsdeals.com%")
+          .eq("is_active", true)
+          .order("created_at", { ascending: true })
+          .range(offset, offset + BATCH - 1);
 
-        if (error) throw error;
+        if (fetchErr) throw fetchErr;
+        if (!products || products.length === 0) break;
 
-        totalMatched += data.matched || 0;
-        totalUnmatched += data.unmatched || 0;
+        for (const product of products) {
+          const urls = (product.image_url || "").split(",").map((u: string) => u.trim()).filter(Boolean);
+          const newUrls: string[] = [];
+          const seen = new Set<string>();
 
-        setMatchProgress({
-          matched: totalMatched,
-          unmatched: totalUnmatched,
-          total: totalMatched + totalUnmatched,
-          remaining: data.remaining || 0,
-        });
+          for (const url of urls) {
+            if (url.includes("supabase")) { newUrls.push(url); continue; }
+            const filename = url.split("/").pop()?.split("?")[0]?.toLowerCase();
+            if (!filename || seen.has(filename)) continue;
+            seen.add(filename);
+            const match = storageMap.get(filename);
+            if (match) newUrls.push(match);
+          }
 
-        if (data.done || data.remaining === 0) break;
-        // Safety: if nothing was matched in this batch, break to avoid infinite loop
-        if (data.matched === 0 && data.unmatched === data.processed) break;
+          if (newUrls.length > 0) {
+            const { error: upErr } = await supabase
+              .from("products")
+              .update({ image_url: newUrls.join(", ") })
+              .eq("id", product.id);
+            if (!upErr) totalMatched++;
+            else totalUnmatched++;
+          } else {
+            totalUnmatched++;
+          }
+        }
 
-        offset += 20;
+        const remaining = Math.max(0, (count || 0) - products.length);
+        setMatchProgress({ matched: totalMatched, unmatched: totalUnmatched, total: totalMatched + totalUnmatched, remaining });
+
+        if (products.length < BATCH) break;
+        // Since matched products change their URL, re-query from offset 0
+        // But unmatched ones stay, so if nothing matched we move forward
+        if (totalMatched === 0) offset += BATCH;
+        else offset = 0; // reset since matched ones drop out
       }
 
       toast({
         title: "🎯 Auto-match complete",
         description: `${totalMatched} products matched, ${totalUnmatched} still need manual fix`,
       });
-
       fetchProducts();
     } catch (err: any) {
       toast({ title: "Auto-match error", description: err.message, variant: "destructive" });
