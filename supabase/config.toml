@@ -1,1 +1,4 @@
 project_id = "ttgsrrlhqvtnmtlkvlyi"
+
+[functions.auto-match-images]
+verify_jwt = false
