@@ -345,7 +345,7 @@ const ProductDetail = () => {
               >
                 {/* Product Name */}
                 <div>
-                  <motion.h1 variants={staggerItem} className="text-xl sm:text-2xl lg:text-4xl font-normal tracking-tight break-words">
+                  <motion.h1 variants={staggerItem} className="text-xl sm:text-2xl lg:text-4xl font-medium tracking-tight break-words">
                     {product.name}
                   </motion.h1>
                 </div>
