@@ -15,30 +15,7 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { admin_email, admin_token, batch_size = 20, offset = 0 } = await req.json().catch(() => ({}));
-
-    // Validate admin session
-    if (!admin_email || !admin_token) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const { data: session } = await supabase
-      .from("staff_sessions")
-      .select("email")
-      .eq("session_token", admin_token)
-      .eq("email", admin_email)
-      .gt("expires_at", new Date().toISOString())
-      .maybeSingle();
-
-    if (!session) {
-      return new Response(JSON.stringify({ error: "Invalid session" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const { batch_size = 50, offset = 0 } = await req.json().catch(() => ({}));
 
     // Step 1: List ALL files in the product-images bucket (flat + folders)
     const storageFiles = new Map<string, string>(); // filename -> public URL
