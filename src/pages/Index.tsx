@@ -7,6 +7,7 @@ import PageTransition from "@/components/PageTransition";
 import { OrganizationSchema, LocalBusinessSchema, WebsiteSchema, FAQSchema } from "@/components/seo/JsonLd";
 import onCloudAd from "@/assets/banners/on-cloud-ad.webp";
 import nikeDunkAd from "@/assets/banners/nike-dunk-low-ad.webp";
+import adidasAd from "@/assets/banners/adidas-ad.jpeg";
 
 
 // Lazy load below-fold components - exact page order from HTML
@@ -107,6 +108,20 @@ const Index = () => {
           <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
           </Suspense>
+
+          {/* Adidas Ad Banner */}
+          <section className="bg-background">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
+              <Link to="/shop?brand=adidas" className="block relative rounded-lg overflow-hidden group">
+                <img src={adidasAd} alt="Adidas Shoes" className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover" />
+                <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
+                  <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+                    Shop Now →
+                  </span>
+                </div>
+              </Link>
+            </div>
+          </section>
 
           <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="adidas" title="Adidas Collection" />
