@@ -5,12 +5,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-/**
- * Try to fetch an image from multiple sources:
- * 1. Original URL
- * 2. Wayback Machine CDN (if_/ prefix for raw files)
- * 3. Wayback Machine (im_/ prefix for images)
- */
 async function fetchImageWithFallbacks(url: string): Promise<{ data: ArrayBuffer; contentType: string } | null> {
   const sources = [
     url,
@@ -23,20 +17,17 @@ async function fetchImageWithFallbacks(url: string): Promise<{ data: ArrayBuffer
     try {
       const response = await fetch(src, {
         headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(15000),
         redirect: "follow",
       });
 
       if (!response.ok) continue;
 
       const contentType = response.headers.get("content-type") || "";
-      // Make sure we got an actual image, not an HTML error page
       if (contentType.startsWith("text/html")) continue;
       if (!contentType.startsWith("image/")) {
-        // Some servers don't set content-type properly, check first bytes
         const data = await response.arrayBuffer();
         const firstBytes = new Uint8Array(data.slice(0, 4));
-        // Check for JPEG (FFD8), PNG (89504E47), WEBP (52494646), GIF (47494638)
         const isImage =
           (firstBytes[0] === 0xFF && firstBytes[1] === 0xD8) ||
           (firstBytes[0] === 0x89 && firstBytes[1] === 0x50) ||
@@ -49,7 +40,7 @@ async function fetchImageWithFallbacks(url: string): Promise<{ data: ArrayBuffer
       }
 
       const data = await response.arrayBuffer();
-      if (data.byteLength < 1000) continue; // Skip tiny/empty responses
+      if (data.byteLength < 1000) continue;
       return { data, contentType };
     } catch {
       continue;
@@ -68,20 +59,20 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { batch_size = 3, offset = 0 } = await req.json().catch(() => ({}));
+    const { batch_size = 3, auto_continue = false } = await req.json().catch(() => ({}));
 
-    // Fetch products with external image URLs
+    // Fetch products with external image URLs (always offset 0 since we update them)
     const { data: products, error: fetchError } = await supabase
       .from("products")
       .select("id, name, image_url")
       .like("image_url", "%desertsdeals.com%")
       .eq("is_active", true)
       .order("created_at", { ascending: true })
-      .range(offset, offset + batch_size - 1);
+      .range(0, batch_size - 1);
 
     if (fetchError) throw fetchError;
     if (!products || products.length === 0) {
-      return new Response(JSON.stringify({ done: true, message: "No more products to process", offset }), {
+      return new Response(JSON.stringify({ done: true, message: "All products migrated!", remaining: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -96,7 +87,6 @@ Deno.serve(async (req) => {
       for (let i = 0; i < urls.length; i++) {
         const url = urls[i];
 
-        // Skip if already in our storage
         if (url.includes(supabaseUrl)) {
           newUrls.push(url);
           continue;
@@ -106,18 +96,15 @@ Deno.serve(async (req) => {
           const result = await fetchImageWithFallbacks(url);
 
           if (!result) {
-            errors.push(`All sources failed for: ${url.split("/").pop()}`);
-            // Don't keep broken URL
+            errors.push(`Failed: ${url.split("/").pop()}`);
             continue;
           }
 
-          // Determine file extension
           const originalFilename = url.split("/").pop()?.split("?")[0] || `image-${i}`;
           const ext = originalFilename.includes(".") ? originalFilename.split(".").pop() : "jpg";
           const filename = `${Date.now()}-${i}.${ext}`;
           const storagePath = `${product.id}/${filename}`;
 
-          // Upload to storage
           const { error: uploadError } = await supabase.storage
             .from("product-images")
             .upload(storagePath, result.data, {
@@ -130,7 +117,6 @@ Deno.serve(async (req) => {
             continue;
           }
 
-          // Get public URL
           const { data: publicUrlData } = supabase.storage
             .from("product-images")
             .getPublicUrl(storagePath);
@@ -142,7 +128,7 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Update product - only if we have at least one URL
+      // Update product immediately (incremental save)
       if (newUrls.length > 0) {
         const { error: updateError } = await supabase
           .from("products")
@@ -158,7 +144,6 @@ Deno.serve(async (req) => {
           errors: errors.length > 0 ? errors : undefined,
         });
       } else {
-        // No images recovered at all - leave original URLs
         results.push({
           id: product.id,
           name: product.name,
@@ -177,12 +162,29 @@ Deno.serve(async (req) => {
       .like("image_url", "%desertsdeals.com%")
       .eq("is_active", true);
 
+    const remaining = count || 0;
+
+    // Self-chain: if auto_continue and there are more products, trigger next batch
+    if (auto_continue && remaining > 0) {
+      const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || "";
+      EdgeRuntime.waitUntil(
+        fetch(`${supabaseUrl}/functions/v1/migrate-product-images`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${anonKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ batch_size, auto_continue: true }),
+        })
+      );
+    }
+
     return new Response(
       JSON.stringify({
-        done: false,
+        done: remaining === 0,
         processed: results.length,
-        next_offset: offset + batch_size,
-        remaining: count || 0,
+        remaining,
+        auto_continuing: auto_continue && remaining > 0,
         results,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
