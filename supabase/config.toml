@@ -2,3 +2,135 @@ project_id = "ttgsrrlhqvtnmtlkvlyi"
 
 [functions.auto-match-images]
 verify_jwt = false
+
+[functions.cancel-order]
+verify_jwt = false
+
+[functions.check-admin-access]
+verify_jwt = false
+
+[functions.check-rate-limit]
+verify_jwt = false
+
+[functions.check-staff-email]
+verify_jwt = false
+
+[functions.create-manual-order]
+verify_jwt = false
+
+[functions.create-order]
+verify_jwt = false
+
+[functions.delete-admin-order]
+verify_jwt = false
+
+[functions.delete-customer-orders]
+verify_jwt = false
+
+[functions.delete-test-user]
+verify_jwt = false
+
+[functions.generate-loyalty-coupon]
+verify_jwt = false
+
+[functions.get-activity-logs]
+verify_jwt = false
+
+[functions.get-admin-affiliates]
+verify_jwt = false
+
+[functions.get-admin-customers]
+verify_jwt = false
+
+[functions.get-admin-orders]
+verify_jwt = false
+
+[functions.get-admin-reviews]
+verify_jwt = false
+
+[functions.get-admin-stats]
+verify_jwt = false
+
+[functions.get-shipping-account]
+verify_jwt = false
+
+[functions.get-staff-list]
+verify_jwt = false
+
+[functions.import-woocommerce]
+verify_jwt = false
+
+[functions.manage-affiliate]
+verify_jwt = false
+
+[functions.manage-coupons]
+verify_jwt = false
+
+[functions.manage-expenses]
+verify_jwt = false
+
+[functions.manage-products]
+verify_jwt = false
+
+[functions.manage-reviews]
+verify_jwt = false
+
+[functions.manage-staff]
+verify_jwt = false
+
+[functions.manage-withdrawals]
+verify_jwt = false
+
+[functions.mark-cash-received]
+verify_jwt = false
+
+[functions.meta-product-feed]
+verify_jwt = false
+
+[functions.migrate-product-images]
+verify_jwt = false
+
+[functions.request-return]
+verify_jwt = false
+
+[functions.resend-order-email]
+verify_jwt = false
+
+[functions.send-bulk-order-notification]
+verify_jwt = false
+
+[functions.send-contact-email]
+verify_jwt = false
+
+[functions.send-email-otp]
+verify_jwt = false
+
+[functions.send-order-confirmation]
+verify_jwt = false
+
+[functions.send-password-otp]
+verify_jwt = false
+
+[functions.send-password-reset]
+verify_jwt = false
+
+[functions.send-staff-notification]
+verify_jwt = false
+
+[functions.send-status-update]
+verify_jwt = false
+
+[functions.update-order-status]
+verify_jwt = false
+
+[functions.update-return-status]
+verify_jwt = false
+
+[functions.update-staff-name]
+verify_jwt = false
+
+[functions.verify-admin-password]
+verify_jwt = false
+
+[functions.verify-custom-otp]
+verify_jwt = false
