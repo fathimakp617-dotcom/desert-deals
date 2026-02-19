@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import ProductForm, { emptyFormData, type ProductFormData } from "@/components/admin/ProductForm";
 
 interface Product {
@@ -43,6 +50,8 @@ interface Product {
   created_at: string;
 }
 
+const ITEMS_PER_PAGE = 20;
+
 const getAdminSession = () => {
   const stored = sessionStorage.getItem("rayn_admin_session");
   if (!stored) return null;
@@ -63,6 +72,11 @@ const AdminProducts = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProductFormData>(emptyFormData);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [stockFilter, setStockFilter] = useState<string>("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],
@@ -79,6 +93,50 @@ const AdminProducts = () => {
     },
   });
 
+  // Derive categories from products
+  const categories = useMemo(() => {
+    if (!products) return [];
+    const cats = new Set(products.map((p) => p.category).filter(Boolean));
+    return Array.from(cats).sort();
+  }, [products]);
+
+  // Filtered & searched products
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+    let result = products;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) => p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q)
+      );
+    }
+
+    if (stockFilter === "instock") result = result.filter((p) => p.stock_quantity > 0);
+    else if (stockFilter === "outofstock") result = result.filter((p) => p.stock_quantity === 0);
+    else if (stockFilter === "lowstock") result = result.filter((p) => p.stock_quantity > 0 && p.stock_quantity <= 10);
+
+    if (categoryFilter !== "all") result = result.filter((p) => p.category === categoryFilter);
+
+    if (statusFilter === "active") result = result.filter((p) => p.is_active);
+    else if (statusFilter === "inactive") result = result.filter((p) => !p.is_active);
+
+    return result;
+  }, [products, searchQuery, stockFilter, categoryFilter, statusFilter]);
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  // Reset page when filters change
+  const handleFilterChange = (setter: (v: string) => void) => (value: string) => {
+    setter(value);
+    setCurrentPage(1);
+  };
+
+  // ... keep existing code (uploadImageMutation, buildProductPayload, createMutation, updateMutation, deleteMutation, updateStockMutation, openEditDialog, handleFormSubmit, handleCancel, handleImageUpload)
   const uploadImageMutation = useMutation({
     mutationFn: async ({ productId, file }: { productId: string; file: File }) => {
       const session = getAdminSession();
@@ -289,8 +347,11 @@ const AdminProducts = () => {
     );
   }
 
+  const activeCount = products?.filter((p) => p.is_active).length || 0;
+  const inactiveCount = products?.filter((p) => !p.is_active).length || 0;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Hidden file input for table image uploads */}
       <input
         type="file"
@@ -306,13 +367,9 @@ const AdminProducts = () => {
         }}
       />
 
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-heading font-bold">Products</h1>
-          <p className="text-muted-foreground">
-            Manage your product inventory and stock ({products?.length || 0} products)
-          </p>
-        </div>
+        <h1 className="text-2xl font-heading font-bold">Products</h1>
         <Dialog
           open={isAddDialogOpen}
           onOpenChange={(open) => {
@@ -323,7 +380,7 @@ const AdminProducts = () => {
           <DialogTrigger asChild>
             <Button onClick={() => setFormData(emptyFormData)}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Product
+              Add new product
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -367,26 +424,92 @@ const AdminProducts = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Status tabs */}
+      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+        <button
+          onClick={() => handleFilterChange(setStatusFilter)("all")}
+          className={`hover:text-foreground transition-colors ${statusFilter === "all" ? "text-foreground font-medium" : ""}`}
+        >
+          All ({products?.length || 0})
+        </button>
+        <span>|</span>
+        <button
+          onClick={() => handleFilterChange(setStatusFilter)("active")}
+          className={`hover:text-foreground transition-colors ${statusFilter === "active" ? "text-foreground font-medium" : ""}`}
+        >
+          Active ({activeCount})
+        </button>
+        <span>|</span>
+        <button
+          onClick={() => handleFilterChange(setStatusFilter)("inactive")}
+          className={`hover:text-foreground transition-colors ${statusFilter === "inactive" ? "text-foreground font-medium" : ""}`}
+        >
+          Inactive ({inactiveCount})
+        </button>
+      </div>
+
+      {/* Filters row */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Select value={categoryFilter} onValueChange={handleFilterChange(setCategoryFilter)}>
+          <SelectTrigger className="w-[180px] h-9 text-sm">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All categories</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat} className="capitalize">{cat}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={stockFilter} onValueChange={handleFilterChange(setStockFilter)}>
+          <SelectTrigger className="w-[180px] h-9 text-sm">
+            <SelectValue placeholder="Filter by stock" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All stock</SelectItem>
+            <SelectItem value="instock">In stock</SelectItem>
+            <SelectItem value="outofstock">Out of stock</SelectItem>
+            <SelectItem value="lowstock">Low stock</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="ml-auto flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">{filteredProducts.length} items</span>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search products"
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              className="pl-9 h-9 w-[200px] text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Products Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Image</TableHead>
-              <TableHead>Product</TableHead>
-              <TableHead>Price</TableHead>
+            <TableRow className="bg-muted/50">
+              <TableHead className="w-[50px]"></TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Stock</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Categories</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="text-right w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products?.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell>
-                  <div className="relative group">
+            {paginatedProducts.map((product) => (
+              <TableRow key={product.id} className="group">
+                {/* Image */}
+                <TableCell className="py-2">
+                  <div className="relative">
                     {product.image_url ? (
-                      <div className="relative h-16 w-16 rounded overflow-hidden">
+                      <div className="relative h-12 w-12 rounded overflow-hidden">
                         <img
                           src={product.image_url.split(",")[0]?.trim()}
                           alt={product.name}
@@ -397,12 +520,12 @@ const AdminProducts = () => {
                             setUploadingFor(product.id);
                             fileInputRef.current?.click();
                           }}
-                          className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                          className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                         >
                           {uploadingFor === product.id && uploadImageMutation.isPending ? (
-                            <Loader2 className="h-5 w-5 text-white animate-spin" />
+                            <Loader2 className="h-4 w-4 text-background animate-spin" />
                           ) : (
-                            <Upload className="h-5 w-5 text-white" />
+                            <Upload className="h-4 w-4 text-background" />
                           )}
                         </button>
                       </div>
@@ -412,52 +535,55 @@ const AdminProducts = () => {
                           setUploadingFor(product.id);
                           fileInputRef.current?.click();
                         }}
-                        className="h-16 w-16 rounded bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+                        className="h-12 w-12 rounded bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
                       >
                         {uploadingFor === product.id && uploadImageMutation.isPending ? (
-                          <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" />
+                          <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" />
                         ) : (
-                          <div className="text-center">
-                            <Image className="h-5 w-5 text-muted-foreground mx-auto" />
-                            <span className="text-[10px] text-muted-foreground">Upload</span>
-                          </div>
+                          <Image className="h-4 w-4 text-muted-foreground" />
                         )}
                       </button>
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{product.name}</div>
-                    <div className="text-sm text-muted-foreground">{product.id}</div>
-                    {product.notes?.top?.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {product.notes.top.slice(0, 2).map((note) => (
-                          <span key={note} className="text-xs px-1.5 py-0.5 bg-muted rounded">
-                            {note}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+
+                {/* Name */}
+                <TableCell className="py-2">
+                  <button
+                    onClick={() => openEditDialog(product)}
+                    className="text-sm font-medium text-primary hover:underline text-left"
+                  >
+                    {product.name}
+                  </button>
+                  <div className="text-xs text-muted-foreground mt-0.5">ID: {product.id}</div>
+                  <div className="hidden group-hover:flex items-center gap-2 mt-1 text-xs">
+                    <button onClick={() => openEditDialog(product)} className="text-primary hover:underline">Edit</button>
+                    <span className="text-muted-foreground">|</span>
+                    <button
+                      onClick={() => {
+                        if (confirm("Are you sure you want to delete this product?")) {
+                          deleteMutation.mutate(product.id);
+                        }
+                      }}
+                      className="text-destructive hover:underline"
+                    >
+                      Trash
+                    </button>
+                    <span className="text-muted-foreground">|</span>
+                    <a href={`/product/${product.id}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">View</a>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div>
-                    <span className="font-medium">{product.price} AED</span>
-                    {product.original_price && (
-                      <span className="ml-2 text-sm text-muted-foreground line-through">
-                        {product.original_price} AED
-                      </span>
-                    )}
-                  </div>
-                  {product.discount_percent > 0 && (
-                    <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold mt-1 bg-secondary text-secondary-foreground">
-                      {product.discount_percent}% OFF
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell>
+
+                {/* Stock */}
+                <TableCell className="py-2">
                   <div className="flex items-center gap-2">
+                    {product.stock_quantity > 10 ? (
+                      <span className="text-sm font-medium text-green-600">In stock</span>
+                    ) : product.stock_quantity > 0 ? (
+                      <span className="text-sm font-medium text-orange-600">Low stock ({product.stock_quantity})</span>
+                    ) : (
+                      <span className="text-sm font-medium text-destructive">Out of stock</span>
+                    )}
                     <Input
                       type="number"
                       defaultValue={product.stock_quantity}
@@ -468,72 +594,103 @@ const AdminProducts = () => {
                         }
                       }}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          (e.target as HTMLInputElement).blur();
-                        }
+                        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                       }}
-                      className="w-20 h-8"
+                      className="w-16 h-7 text-xs"
                     />
-                    {product.stock_quantity === 0 && (
-                      <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-destructive text-destructive-foreground gap-1">
-                        <AlertCircle className="h-3 w-3" />
-                        Sold Out
-                      </span>
-                    )}
-                    {product.stock_quantity > 0 && product.stock_quantity <= 10 && (
-                      <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold text-orange-600 border-orange-600">
-                        Low Stock
-                      </span>
-                    )}
                   </div>
                 </TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                      product.is_active
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground"
-                    }`}
-                  >
-                    {product.is_active ? "Active" : "Inactive"}
-                  </span>
+
+                {/* Price */}
+                <TableCell className="py-2">
+                  {product.original_price > 0 && product.original_price !== product.price && (
+                    <span className="text-xs text-muted-foreground line-through block">{product.original_price} AED</span>
+                  )}
+                  <span className="text-sm font-medium">{product.price} AED</span>
                 </TableCell>
-                <TableCell>
-                  <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize">
-                    {product.category}
-                  </span>
+
+                {/* Categories */}
+                <TableCell className="py-2">
+                  <span className="text-sm capitalize">{product.category || "—"}</span>
                 </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button size="icon" variant="ghost" onClick={() => openEditDialog(product)}>
-                      <Pencil className="h-4 w-4" />
+
+                {/* Date */}
+                <TableCell className="py-2">
+                  <div className="text-sm">
+                    {product.is_active ? "Published" : "Draft"}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(product.created_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    })}
+                  </div>
+                </TableCell>
+
+                {/* Actions */}
+                <TableCell className="text-right py-2">
+                  <div className="flex justify-end gap-1">
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEditDialog(product)}>
+                      <Pencil className="h-3.5 w-3.5" />
                     </Button>
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="text-destructive hover:text-destructive"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
                       onClick={() => {
                         if (confirm("Are you sure you want to delete this product?")) {
                           deleteMutation.mutate(product.id);
                         }
                       }}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </TableCell>
               </TableRow>
             ))}
-            {(!products || products.length === 0) && (
+            {filteredProducts.length === 0 && (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                  No products found. Add your first product!
+                  {searchQuery || stockFilter !== "all" || categoryFilter !== "all"
+                    ? "No products match your filters."
+                    : "No products found. Add your first product!"}
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
