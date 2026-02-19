@@ -90,10 +90,6 @@ const Index = () => {
             <PromoGrid />
           </Suspense>
 
-          <Suspense fallback={<SectionLoader />}>
-            <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
-          </Suspense>
-
           {/* On Cloud Ad Banner */}
           <section className="bg-background">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
@@ -107,6 +103,10 @@ const Index = () => {
               </Link>
             </div>
           </section>
+
+          <Suspense fallback={<SectionLoader />}>
+            <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
+          </Suspense>
 
           <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="adidas" title="Adidas Collection" />
