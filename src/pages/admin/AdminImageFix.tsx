@@ -79,7 +79,7 @@ const AdminImageFix = () => {
     let totalSuccess = 0;
     let totalFailed = 0;
     let totalProcessed = 0;
-    const BATCH = 10;
+    const BATCH = 3;
 
     try {
       while (!migrationAbortRef.current) {
@@ -114,7 +114,7 @@ const AdminImageFix = () => {
         }
 
         // Short delay between batches
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 200));
       }
 
       toast({
