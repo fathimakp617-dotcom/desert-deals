@@ -17,7 +17,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, User, RotateCcw, Star, ShoppingBag, Upload, ImageOff } from "lucide-react";
+import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, User, RotateCcw, Star, ShoppingBag, Upload, ImageOff, Tags } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ADMIN_SESSION_KEY = "rayn_admin_session";
@@ -234,7 +234,7 @@ const AdminLayout = () => {
     { title: "Reviews", url: "/admin/reviews", icon: Star },
     { title: "Customers", url: "/admin/customers", icon: Users },
     { title: "Bulk Import", url: "/admin/bulk-import", icon: Upload },
-    
+    { title: "Categories", url: "/admin/categories", icon: Tags },
   ];
 
   const isActive = (path: string) => {
