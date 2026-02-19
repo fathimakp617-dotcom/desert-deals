@@ -31,16 +31,7 @@ const PromoGrid = () => {
 
   return (
     <section className="w-full">
-      <div className="grid grid-cols-2 md:grid-cols-3 h-[280px] sm:h-[350px] md:h-[420px]">
-        {/* Large left image - spans 2 columns on desktop, 1 on mobile */}
-        <Link to="/shop" className="col-span-1 md:col-span-2 overflow-hidden group">
-          <img
-            src={promoGrid1}
-            alt="Nike Mind Collection"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-        </Link>
+      <div className="grid grid-cols-1 h-[280px] sm:h-[350px] md:h-[420px]">
 
         {/* Right product card in grey box */}
         <Link
