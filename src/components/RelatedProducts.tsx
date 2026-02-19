@@ -1,11 +1,9 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { formatPrice, Product } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
-import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
-import { Heart } from "lucide-react";
-import { toast } from "sonner";
+import { Heart, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface RelatedProductsProps {
   currentProductId: string;
@@ -15,28 +13,48 @@ interface RelatedProductsProps {
 const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsProps) => {
   const { data: products = [] } = useDbProducts();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
-  
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   const relatedProducts = products.filter((p) => p.id !== currentProductId);
 
   if (relatedProducts.length === 0) return null;
 
+  const scroll = (dir: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: dir === "left" ? -300 : 300, behavior: "smooth" });
+  };
+
   return (
     <section className="py-10 sm:py-14">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-        <h2 className="text-lg sm:text-xl font-heading font-semibold tracking-tight mb-6">
-          You May Also Like
+        <h2 className="text-xl sm:text-2xl font-heading font-bold tracking-tight mb-6">
+          Related products
         </h2>
 
-        {/* 2-column grid on mobile, 6-column on desktop (#2, #5) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
-          {relatedProducts.slice(0, 12).map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05, duration: 0.3 }}
-            >
-              <Link to={`/product/${item.id}`} className="group block">
+        <div className="relative group/scroll">
+          {/* Scroll arrows */}
+          <button
+            onClick={() => scroll("left")}
+            className="absolute -left-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => scroll("right")}
+            className="absolute -right-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+
+          <div
+            ref={scrollRef}
+            className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-2"
+          >
+            {relatedProducts.slice(0, 12).map((item) => (
+              <Link
+                key={item.id}
+                to={`/product/${item.id}`}
+                className="group flex-shrink-0 w-[145px] sm:w-[200px] lg:w-[220px]"
+              >
                 <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
                   <div className="relative aspect-square bg-muted overflow-hidden">
                     <img
@@ -45,45 +63,35 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="block w-full bg-foreground text-background text-center text-[11px] font-medium py-2.5">
-                        Select options
-                      </span>
-                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (isInWishlist(item.id)) removeFromWishlist(item.id);
+                        else addToWishlist(item);
+                      }}
+                      className="absolute top-2 right-2 p-1"
+                    >
+                      <Heart className={`w-5 h-5 ${isInWishlist(item.id) ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
+                    </button>
                   </div>
-                  <div className="p-3 bg-muted rounded-b-lg">
-                    <span className="text-[10px] text-muted-foreground">{item.category}</span>
-                    <h3 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 mb-1 leading-snug">
+                  <div className="p-3">
+                    <span className="text-[10px] text-muted-foreground uppercase">{item.category}</span>
+                    <h3 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 min-h-[2.5em] leading-snug mt-0.5">
                       {item.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                    <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                      <span className="text-sm font-medium text-foreground">{formatPrice(item.price)}</span>
                       {item.originalPrice > item.price && (
                         <span className="text-xs text-muted-foreground line-through">{formatPrice(item.originalPrice)}</span>
                       )}
-                      <span className="text-sm text-foreground">{formatPrice(item.price)}</span>
                     </div>
-                    <div className="flex items-center justify-between mt-1.5">
-                      <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (isInWishlist(item.id)) {
-                            removeFromWishlist(item.id);
-                          } else {
-                            addToWishlist(item);
-                          }
-                        }}
-                        className="p-0.5"
-                      >
-                        <Heart className={`w-5 h-5 ${isInWishlist(item.id) ? 'fill-black text-black' : 'text-muted-foreground'}`} />
-                      </button>
-                    </div>
+                    <span className="text-[11px] font-bold text-emerald-600 uppercase mt-1 block">IN STOCK</span>
                   </div>
                 </div>
               </Link>
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
