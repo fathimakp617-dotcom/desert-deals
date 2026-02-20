@@ -129,7 +129,7 @@ const generateOrderEmailHTML = (order: OrderConfirmationRequest): string => {
                 <td style="background-color: #1a1a1a; padding: 30px 40px; text-align: center;">
                   <img src="${LOGO_URL}" alt="Desert Deal" style="height: 50px; margin-bottom: 8px;" />
                   <p style="margin: 0; color: #999; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">
-                    Premium Footwear
+                    Premium Collection
                   </p>
                 </td>
               </tr>
