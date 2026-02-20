@@ -28,6 +28,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight, CheckSquare, Copy, Download } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import ProductForm, { emptyFormData, type ProductFormData } from "@/components/admin/ProductForm";
 
@@ -309,6 +319,34 @@ const AdminProducts = () => {
     },
     onError: (error: Error) => {
       toast({ title: "Bulk update failed", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (productIds: string[]) => {
+      const session = getAdminSession();
+      if (!session) throw new Error("Not authenticated");
+      let deleted = 0;
+      for (const id of productIds) {
+        const { error } = await supabase.functions.invoke("manage-products", {
+          body: { action: "delete", product: { id }, admin_email: session.email, admin_token: session.token },
+        });
+        if (error) throw error;
+        deleted++;
+      }
+      return { deleted };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      setSelectedIds(new Set());
+      setIsBulkDeleteOpen(false);
+      toast({ title: `${data.deleted} products deleted` });
+    },
+    onError: (error: Error) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      toast({ title: "Bulk delete failed", description: error.message, variant: "destructive" });
     },
   });
 
@@ -668,11 +706,38 @@ const AdminProducts = () => {
             <Download className="h-3.5 w-3.5 mr-1" />
             Export CSV
           </Button>
+          <Button size="sm" variant="destructive" onClick={() => setIsBulkDeleteOpen(true)}>
+            <Trash2 className="h-3.5 w-3.5 mr-1" />
+            Delete ({selectedIds.size})
+          </Button>
           <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())}>
             Clear
           </Button>
         </div>
       )}
+
+      {/* Bulk Delete Confirmation */}
+      <AlertDialog open={isBulkDeleteOpen} onOpenChange={setIsBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {selectedIds.size} products?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. All selected products and their images will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkDeleteMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={bulkDeleteMutation.isPending}
+              onClick={() => bulkDeleteMutation.mutate(Array.from(selectedIds))}
+            >
+              {bulkDeleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Products Table */}
       <div className="rounded-md border">
