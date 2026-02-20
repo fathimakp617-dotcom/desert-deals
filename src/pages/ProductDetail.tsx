@@ -20,6 +20,7 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useProductStock, isProductSoldOut, getProductStock } from "@/hooks/useProductStock";
 import { fadeInUp, fadeInLeft, staggerContainer, staggerItem } from "@/lib/animations";
 import { toast } from "sonner";
+import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 
 import { supabase } from "@/integrations/supabase/client";
 import { ProductSchema, BreadcrumbSchema } from "@/components/seo/JsonLd";
@@ -54,6 +55,20 @@ const ProductDetail = () => {
   
   const isSoldOut = isProductSoldOut(stockMap, id || "");
   const stockQuantity = getProductStock(stockMap, id || "");
+
+  // Track Meta Pixel ViewContent once per product
+  const viewContentFired = useRef(false);
+  useEffect(() => {
+    if (product && !viewContentFired.current) {
+      viewContentFired.current = true;
+      trackViewContent({
+        content_ids: [product.id],
+        content_name: product.name,
+        value: product.price,
+        currency: "AED",
+      });
+    }
+  }, [product]);
 
   useEffect(() => {
     if (id) {
@@ -109,6 +124,11 @@ const ProductDetail = () => {
       return;
     }
     addToCart(product, quantity, `EU ${selectedSize}`);
+    trackAddToCart({
+      content_ids: [product.id],
+      value: product.price * quantity,
+      currency: "AED",
+    });
     toast.success(`${product.name} added to cart`, {
       description: `Size: EU ${selectedSize} · Quantity: ${quantity}`,
     });

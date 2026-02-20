@@ -5,6 +5,7 @@ import { CheckCircle, X, Download, Mail, RefreshCw, Gift, Copy, Check } from "lu
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { trackPurchase } from "@/lib/metaPixel";
 
 import OrderReceipt from "./OrderReceipt";
 
@@ -46,12 +47,29 @@ const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isResending, setIsResending] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [purchaseTracked, setPurchaseTracked] = useState(false);
 
   useEffect(() => {
     if (orderNumber) {
       fetchOrderData();
     }
   }, [orderNumber]);
+
+  // Fire Purchase pixel event exactly once when order data loads
+  useEffect(() => {
+    if (orderData && !purchaseTracked) {
+      setPurchaseTracked(true);
+      const contentIds = orderData.items
+        .map((item) => item.productId)
+        .filter(Boolean) as string[];
+      trackPurchase({
+        order_id: orderData.order_number,
+        value: orderData.total,
+        currency: "AED",
+        content_ids: contentIds,
+      });
+    }
+  }, [orderData, purchaseTracked]);
 
   const fetchOrderData = async () => {
     if (!orderNumber) return;
