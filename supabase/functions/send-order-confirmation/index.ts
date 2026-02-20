@@ -59,7 +59,7 @@ const formatCurrency = (amount: number): string => {
 };
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
-const LOGO_URL = `${SUPABASE_URL}/storage/v1/object/public/product-images/brand/desert-deal-logo.png`;
+const LOGO_URL = `${SUPABASE_URL}/storage/v1/object/public/product-images/brand/desert-deal-logo-dark.png`;
 
 const getProductImageUrl = (item: OrderItem): string => {
   if (item.image_url) {
