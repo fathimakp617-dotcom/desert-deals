@@ -420,12 +420,14 @@ const AdminProducts = () => {
     setIsAddDialogOpen(true);
   };
 
-  const handleFormSubmit = (fd: ProductFormData, pendingImageFile: File | null) => {
+  const handleFormSubmit = (fd: ProductFormData, pendingImageFiles: File[] | null) => {
     const productId = editingProduct ? editingProduct.id : fd.id;
 
-    const afterSuccess = () => {
-      if (pendingImageFile && productId) {
-        uploadImageMutation.mutate({ productId, file: pendingImageFile });
+    const afterSuccess = async () => {
+      if (pendingImageFiles && pendingImageFiles.length > 0 && productId) {
+        for (const file of pendingImageFiles) {
+          await uploadImageMutation.mutateAsync({ productId, file });
+        }
       }
     };
 

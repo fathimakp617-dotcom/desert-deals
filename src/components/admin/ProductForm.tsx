@@ -80,7 +80,7 @@ interface ProductFormProps {
   setFormData: React.Dispatch<React.SetStateAction<ProductFormData>>;
   isEditing: boolean;
   isSubmitting: boolean;
-  onSubmit: (formData: ProductFormData, pendingImageFile: File | null) => void;
+  onSubmit: (formData: ProductFormData, pendingImageFiles: File[] | null) => void;
   onCancel: () => void;
 }
 
