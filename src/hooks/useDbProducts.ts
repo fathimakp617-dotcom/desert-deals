@@ -41,9 +41,9 @@ const mapDbToProduct = (db: DbProduct): Product => {
     category: db.category || "Unisex",
     size: db.size || "EU 40-45",
     image: db.image_url ? db.image_url.split(",")[0].trim() : (staticData?.image || ""),
-    gallery: staticData?.gallery || (db.image_url
+    gallery: db.image_url
       ? db.image_url.split(",").map(u => u.trim()).filter(Boolean)
-      : []),
+      : (staticData?.gallery || []),
     construction: {
       upper: db.notes?.top || staticData?.construction?.upper || [],
       midsole: db.notes?.middle || staticData?.construction?.midsole || [],
