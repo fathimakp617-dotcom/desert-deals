@@ -1,8 +1,9 @@
-import { useState, memo, useEffect, useCallback, useRef } from "react";
+import { useState, memo, useEffect, useCallback, useRef, useMemo } from "react";
 import { Menu, X, ShoppingBag, Heart, User, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useCategories } from "@/hooks/useCategories";
 import logoImg from "@/assets/logo.png";
 import SearchSuggestions from "@/components/SearchSuggestions";
 
@@ -12,31 +13,10 @@ const announcements = [
   "Free Shipping on All Orders →",
 ];
 
-const topLinks = [
-  { name: "All Shoes", href: "/shop" },
-  { name: "Nike", href: "/shop?brand=nike" },
-  { name: "Running Shoes", href: "/shop?brand=running" },
-  { name: "On Cloud", href: "/shop?brand=on-cloud" },
-  { name: "All Products", href: "/shop" },
-  { name: "Jordan", href: "/shop?brand=jordan" },
-  { name: "New Balance", href: "/shop?brand=new-balance" },
-  { name: "Asics", href: "/shop?brand=asics" },
-  { name: "Adidas", href: "/shop?brand=adidas" },
-  { name: "Hoka", href: "/shop?brand=hoka" },
-  { name: "Onitsuka Tiger", href: "/shop?brand=onitsuka-tiger" },
-];
-
-const bottomLinks = [
-  { name: "Puma", href: "/shop?brand=puma" },
-  { name: "Loro Piana", href: "/shop?brand=loro-piana" },
-  { name: "Louis Vuitton", href: "/shop?brand=louis-vuitton" },
-  { name: "Brooks", href: "/shop?brand=brooks" },
-  { name: "Hermes", href: "/shop?brand=hermes" },
+const staticBottomLinks = [
   { name: "About Us", href: "/#about" },
   { name: "Reviews", href: "/#collection" },
 ];
-
-const allLinks = [...topLinks, ...bottomLinks];
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,6 +31,28 @@ const Navbar = memo(() => {
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
   const navigate = useNavigate();
+
+  const { data: categories = [] } = useCategories();
+
+  const { topLinks, bottomLinks, allLinks } = useMemo(() => {
+    const activeCategories = categories.filter((c) => c.is_active);
+    const categoryLinks = activeCategories.map((c) => ({
+      name: c.label,
+      href: `/shop?brand=${c.value}`,
+    }));
+
+    // Split: first half in top row, rest + static links in bottom row
+    const splitAt = Math.min(Math.ceil(categoryLinks.length / 2), 11);
+    const top = [
+      { name: "All Shoes", href: "/shop" },
+      ...categoryLinks.slice(0, splitAt),
+    ];
+    const bottom = [
+      ...categoryLinks.slice(splitAt),
+      ...staticBottomLinks,
+    ];
+    return { topLinks: top, bottomLinks: bottom, allLinks: [...top, ...bottom] };
+  }, [categories]);
 
   useEffect(() => {
     if (logoRef.current) {
