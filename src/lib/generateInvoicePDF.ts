@@ -115,11 +115,11 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   const ph = doc.internal.pageSize.getHeight();
   const m = 16; // margin
 
-  // Brand colors
+  // Brand colors - company black/white theme
   const black: [number, number, number] = [15, 15, 15];
-  const gold: [number, number, number] = [201, 169, 98];
+  const brand: [number, number, number] = [26, 26, 26]; // near-black brand color
   const gray: [number, number, number] = [120, 120, 120];
-  const lightBg: [number, number, number] = [250, 249, 247];
+  const lightBg: [number, number, number] = [248, 248, 248];
   const white: [number, number, number] = [255, 255, 255];
 
   // Fetch logo and product images
@@ -129,8 +129,8 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
     fetchProductImages(data.items),
   ]);
 
-  // === TOP GOLD ACCENT BAR ===
-  doc.setFillColor(...gold);
+  // === TOP ACCENT BAR ===
+  doc.setFillColor(...brand);
   doc.rect(0, 0, pw, 4, "F");
 
   // === HEADER SECTION ===
@@ -147,14 +147,14 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   }
 
   // "INVOICE" on right
-  doc.setTextColor(...gold);
+  doc.setTextColor(...brand);
   doc.setFontSize(28);
   doc.setFont("helvetica", "bold");
   doc.text("INVOICE", pw - m, y + 8, { align: "right" });
 
   // Thin line under header
   y = 36;
-  doc.setDrawColor(...gold);
+  doc.setDrawColor(...brand);
   doc.setLineWidth(0.5);
   doc.line(m, y, pw - m, y);
 
@@ -233,7 +233,7 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
     theme: "plain",
     headStyles: {
       fillColor: white,
-      textColor: gold,
+      textColor: brand,
       fontStyle: "bold",
       fontSize: 8,
       cellPadding: { top: 4, bottom: 4, left: 3, right: 3 },
@@ -259,9 +259,8 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
     tableLineColor: [230, 230, 230],
     tableLineWidth: 0.2,
     didDrawCell: (cellData) => {
-      // Draw bottom border on header row
       if (cellData.section === "head") {
-        doc.setDrawColor(...gold);
+        doc.setDrawColor(...brand);
         doc.setLineWidth(0.8);
         doc.line(
           cellData.cell.x,
@@ -270,7 +269,6 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
           cellData.cell.y + cellData.cell.height
         );
       }
-      // Draw product images
       if (cellData.section === "body" && cellData.column.index === 0) {
         const item = data.items[cellData.row.index];
         const imgDataUrl = item.productId ? productImages.get(item.productId) : null;
@@ -289,7 +287,6 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   let ty = (doc as any).lastAutoTable.finalY + 8;
   const totalsLeft = pw - m - 75;
 
-  // Subtotal
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...gray);
@@ -297,7 +294,6 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   doc.setTextColor(...black);
   doc.text(formatCurrency(data.subtotal), pw - m, ty, { align: "right" });
 
-  // Discount
   if (data.discount > 0) {
     ty += 7;
     doc.setTextColor(34, 197, 94);
@@ -305,16 +301,15 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
     doc.text(`-${formatCurrency(data.discount)}`, pw - m, ty, { align: "right" });
   }
 
-  // Shipping
   ty += 7;
   doc.setTextColor(...gray);
   doc.text("Shipping", totalsLeft, ty);
   doc.setTextColor(...black);
   doc.text(data.shipping === 0 ? "FREE" : formatCurrency(data.shipping), pw - m, ty, { align: "right" });
 
-  // Gold divider
+  // Divider
   ty += 6;
-  doc.setDrawColor(...gold);
+  doc.setDrawColor(...brand);
   doc.setLineWidth(0.8);
   doc.line(totalsLeft - 4, ty, pw - m, ty);
 
@@ -322,13 +317,12 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   ty += 8;
   doc.setFontSize(13);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(...gold);
+  doc.setTextColor(...brand);
   doc.text("TOTAL", totalsLeft, ty);
   doc.text(formatCurrency(data.total), pw - m, ty, { align: "right" });
 
   // === FOOTER ===
-  // Gold bar at bottom
-  doc.setFillColor(...gold);
+  doc.setFillColor(...brand);
   doc.rect(0, ph - 28, pw, 28, "F");
 
   doc.setTextColor(...white);
