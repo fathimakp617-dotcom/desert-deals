@@ -744,7 +744,9 @@ const AdminOrders = () => {
                       <div className={`text-sm ${isCancelled ? "line-through" : ""}`}>
                         {order.items.map((item, idx) => (
                           <p key={idx} className="text-muted-foreground">
-                            {item.name} <span className="text-foreground font-medium">×{item.quantity}</span>
+                            {item.name}
+                            {item.selectedSize && <span className="text-xs text-primary ml-1">({item.selectedSize})</span>}
+                            {' '}<span className="text-foreground font-medium">×{item.quantity}</span>
                           </p>
                         ))}
                       </div>
@@ -1024,7 +1026,11 @@ const AdminOrders = () => {
                 <div className="space-y-2">
                   {selectedOrder.items.map((item, index) => (
                     <div key={index} className="flex justify-between text-sm p-2 bg-muted/30 rounded">
-                      <span>{item.name} x{item.quantity}</span>
+                      <span>
+                        {item.name}
+                        {item.selectedSize && <span className="text-xs text-primary ml-1">({item.selectedSize})</span>}
+                        {' '}x{item.quantity}
+                      </span>
                       <span className="font-medium">{formatCurrency(item.price * item.quantity)}</span>
                     </div>
                   ))}
