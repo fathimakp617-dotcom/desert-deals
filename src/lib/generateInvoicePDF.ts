@@ -111,227 +111,239 @@ const fetchProductImages = async (items: OrderItem[]): Promise<Map<string, strin
 
 export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
+  const m = 16; // margin
 
-  // Colors
-  const primaryColor: [number, number, number] = [26, 26, 26];
-  const darkColor: [number, number, number] = [26, 26, 26];
-  const grayColor: [number, number, number] = [136, 136, 136];
+  // Brand colors
+  const black: [number, number, number] = [15, 15, 15];
+  const gold: [number, number, number] = [201, 169, 98];
+  const gray: [number, number, number] = [120, 120, 120];
+  const lightBg: [number, number, number] = [250, 249, 247];
+  const white: [number, number, number] = [255, 255, 255];
 
-  // Fetch logo and product images in parallel
+  // Fetch logo and product images
   const logoUrl = `${window.location.origin}/favicon.png`;
   const [logoDataUrl, productImages] = await Promise.all([
     fetchImageAsDataUrl(logoUrl),
     fetchProductImages(data.items),
   ]);
 
-  // Header background
-  doc.setFillColor(...darkColor);
-  doc.rect(0, 0, pageWidth, 58, "F");
+  // === TOP GOLD ACCENT BAR ===
+  doc.setFillColor(...gold);
+  doc.rect(0, 0, pw, 4, "F");
 
-  // Logo
+  // === HEADER SECTION ===
+  let y = 16;
+
+  // Logo on left
   if (logoDataUrl) {
-    const logoWidth = 50;
-    const logoHeight = 18;
-    doc.addImage(logoDataUrl, "PNG", (pageWidth - logoWidth) / 2, 6, logoWidth, logoHeight);
+    doc.addImage(logoDataUrl, "PNG", m, y - 4, 36, 14);
   } else {
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
+    doc.setTextColor(...black);
+    doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.text("DESERT DEAL", pageWidth / 2, 18, { align: "center" });
+    doc.text("DESERT DEAL", m, y + 6);
   }
 
-  doc.setTextColor(200, 200, 200);
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text("PREMIUM FOOTWEAR", pageWidth / 2, 28, { align: "center" });
+  // "INVOICE" on right
+  doc.setTextColor(...gold);
+  doc.setFontSize(28);
+  doc.setFont("helvetica", "bold");
+  doc.text("INVOICE", pw - m, y + 8, { align: "right" });
 
-  doc.setTextColor(180, 180, 180);
+  // Thin line under header
+  y = 36;
+  doc.setDrawColor(...gold);
+  doc.setLineWidth(0.5);
+  doc.line(m, y, pw - m, y);
+
+  // === ORDER INFO ROW ===
+  y = 44;
   doc.setFontSize(8);
-  doc.text("DESERT DEAL", pageWidth / 2, 36, { align: "center" });
-  doc.text("United Arab Emirates", pageWidth / 2, 43, { align: "center" });
-  doc.text("Ph: +971 50 678 4405", pageWidth / 2, 50, { align: "center" });
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...gray);
 
-  // Invoice title
-  doc.setTextColor(...darkColor);
-  doc.setFontSize(18);
+  // Left column - Bill To
+  doc.text("BILL TO", m, y);
+  y += 5;
+  doc.setTextColor(...black);
+  doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
-  doc.text("INVOICE", pageWidth / 2, 70, { align: "center" });
+  doc.text(data.customerName, m, y + 4);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(...gray);
+  doc.text(data.customerEmail, m, y + 10);
+  doc.text(data.shippingAddress.address, m, y + 16);
+  doc.text(
+    `${data.shippingAddress.city}, ${data.shippingAddress.state} ${data.shippingAddress.zipCode}`,
+    m, y + 22
+  );
+  doc.text(data.shippingAddress.country, m, y + 28);
 
-  // Order info box
-  doc.setFillColor(248, 248, 248);
-  doc.roundedRect(15, 78, pageWidth - 30, 30, 3, 3, "F");
+  // Right column - Invoice details
+  const rx = pw - m;
+  doc.setTextColor(...gray);
+  doc.setFontSize(8);
+  doc.text("INVOICE NO.", rx, 44, { align: "right" });
+  doc.setTextColor(...black);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.text(data.orderNumber, rx, 49, { align: "right" });
 
-  doc.setTextColor(...grayColor);
+  doc.setTextColor(...gray);
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "normal");
+  doc.text("DATE", rx, 58, { align: "right" });
+  doc.setTextColor(...black);
   doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
-  doc.text("Order Number", 20, 88);
-  doc.text("Date", pageWidth - 20, 88, { align: "right" });
-
-  doc.setTextColor(...primaryColor);
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text(data.orderNumber, 20, 98);
-
-  doc.setTextColor(...darkColor);
-  doc.setFont("helvetica", "normal");
   const formattedDate = new Date(data.orderDate).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+    day: "numeric", month: "long", year: "numeric",
   });
-  doc.text(formattedDate, pageWidth - 20, 98, { align: "right" });
+  doc.text(formattedDate, rx, 63, { align: "right" });
 
-  // Items table with product images
-  const imgSize = 12;
-  const tableData = data.items.map((item) => [
-    "", // placeholder for image cell
-    item.name,
-    item.quantity.toString(),
-    formatCurrency(item.price),
-    formatCurrency(item.price * item.quantity),
-  ]);
+  doc.setTextColor(...gray);
+  doc.setFontSize(8);
+  doc.text("PAYMENT", rx, 72, { align: "right" });
+  doc.setTextColor(...black);
+  doc.setFontSize(9);
+  const paymentLabel = data.paymentMethod === "cod" ? "Cash on Delivery" : data.paymentMethod;
+  doc.text(paymentLabel, rx, 77, { align: "right" });
+
+  // === ITEMS TABLE ===
+  y = 90;
+  const imgSize = 10;
+
+  const tableData = data.items.map((item) => {
+    const sizeText = (item as any).selectedSize ? ` (${(item as any).selectedSize})` : "";
+    return [
+      "", // image placeholder
+      `${item.name}${sizeText}`,
+      item.quantity.toString(),
+      formatCurrency(item.price),
+      formatCurrency(item.price * item.quantity),
+    ];
+  });
 
   autoTable(doc, {
-    startY: 118,
-    head: [["", "Item", "Qty", "Unit Price", "Total"]],
+    startY: y,
+    head: [["", "ITEM DESCRIPTION", "QTY", "PRICE", "AMOUNT"]],
     body: tableData,
+    theme: "plain",
     headStyles: {
-      fillColor: darkColor,
-      textColor: [255, 255, 255],
+      fillColor: white,
+      textColor: gold,
       fontStyle: "bold",
-      fontSize: 10,
+      fontSize: 8,
+      cellPadding: { top: 4, bottom: 4, left: 3, right: 3 },
     },
     bodyStyles: {
-      textColor: darkColor,
-      fontSize: 10,
+      textColor: black,
+      fontSize: 9,
       minCellHeight: imgSize + 6,
       valign: "middle",
+      cellPadding: { top: 3, bottom: 3, left: 3, right: 3 },
     },
     alternateRowStyles: {
-      fillColor: [248, 248, 248],
+      fillColor: lightBg,
     },
     columnStyles: {
-      0: { cellWidth: imgSize + 8, halign: "center" },
+      0: { cellWidth: imgSize + 6, halign: "center" },
       1: { cellWidth: "auto" },
-      2: { cellWidth: 20, halign: "center" },
-      3: { cellWidth: 35, halign: "right" },
-      4: { cellWidth: 35, halign: "right" },
+      2: { cellWidth: 18, halign: "center" },
+      3: { cellWidth: 32, halign: "right" },
+      4: { cellWidth: 32, halign: "right" },
     },
-    margin: { left: 15, right: 15 },
+    margin: { left: m, right: m },
+    tableLineColor: [230, 230, 230],
+    tableLineWidth: 0.2,
     didDrawCell: (cellData) => {
+      // Draw bottom border on header row
+      if (cellData.section === "head") {
+        doc.setDrawColor(...gold);
+        doc.setLineWidth(0.8);
+        doc.line(
+          cellData.cell.x,
+          cellData.cell.y + cellData.cell.height,
+          cellData.cell.x + cellData.cell.width,
+          cellData.cell.y + cellData.cell.height
+        );
+      }
+      // Draw product images
       if (cellData.section === "body" && cellData.column.index === 0) {
         const item = data.items[cellData.row.index];
         const imgDataUrl = item.productId ? productImages.get(item.productId) : null;
         if (imgDataUrl) {
           try {
             const x = cellData.cell.x + (cellData.cell.width - imgSize) / 2;
-            const y = cellData.cell.y + (cellData.cell.height - imgSize) / 2;
-            doc.addImage(imgDataUrl, "JPEG", x, y, imgSize, imgSize);
-          } catch {
-            // Skip image on error
-          }
+            const cy = cellData.cell.y + (cellData.cell.height - imgSize) / 2;
+            doc.addImage(imgDataUrl, "JPEG", x, cy, imgSize, imgSize);
+          } catch { /* skip */ }
         }
       }
     },
   });
 
-  // Get the Y position after the table
-  const finalY = (doc as any).lastAutoTable.finalY + 10;
+  // === TOTALS ===
+  let ty = (doc as any).lastAutoTable.finalY + 8;
+  const totalsLeft = pw - m - 75;
 
-  // Totals section
-  const totalsX = pageWidth - 80;
-  let totalsY = finalY;
-
-  doc.setTextColor(...grayColor);
-  doc.setFontSize(10);
-  doc.text("Subtotal:", totalsX, totalsY);
-  doc.setTextColor(...darkColor);
-  doc.text(formatCurrency(data.subtotal), pageWidth - 20, totalsY, { align: "right" });
-
-  if (data.discount > 0) {
-    totalsY += 8;
-    doc.setTextColor(34, 197, 94);
-    doc.text("Discount:", totalsX, totalsY);
-    doc.text(`-${formatCurrency(data.discount)}`, pageWidth - 20, totalsY, { align: "right" });
-  }
-
-  totalsY += 8;
-  doc.setTextColor(...grayColor);
-  doc.text("Shipping:", totalsX, totalsY);
-  doc.setTextColor(...darkColor);
-  doc.text(data.shipping === 0 ? "FREE" : formatCurrency(data.shipping), pageWidth - 20, totalsY, { align: "right" });
-
-  totalsY += 12;
-  doc.setDrawColor(...darkColor);
-  doc.line(totalsX - 5, totalsY - 4, pageWidth - 15, totalsY - 4);
-
-  doc.setTextColor(...darkColor);
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("Total:", totalsX, totalsY + 2);
-  doc.setTextColor(...primaryColor);
-  doc.text(formatCurrency(data.total), pageWidth - 20, totalsY + 2, { align: "right" });
-
-  // Shipping Address
-  const addressY = totalsY + 25;
-  doc.setFillColor(248, 248, 248);
-  doc.roundedRect(15, addressY, (pageWidth - 40) / 2, 45, 3, 3, "F");
-
-  doc.setTextColor(...grayColor);
+  // Subtotal
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  doc.text("SHIPPING ADDRESS", 20, addressY + 10);
+  doc.setTextColor(...gray);
+  doc.text("Subtotal", totalsLeft, ty);
+  doc.setTextColor(...black);
+  doc.text(formatCurrency(data.subtotal), pw - m, ty, { align: "right" });
 
-  doc.setTextColor(...darkColor);
-  doc.setFontSize(10);
-  doc.text(data.customerName, 20, addressY + 20);
-  doc.text(data.shippingAddress.address, 20, addressY + 27);
-  doc.text(
-    `${data.shippingAddress.city}, ${data.shippingAddress.state} ${data.shippingAddress.zipCode}`,
-    20,
-    addressY + 34
-  );
-  doc.text(data.shippingAddress.country, 20, addressY + 41);
+  // Discount
+  if (data.discount > 0) {
+    ty += 7;
+    doc.setTextColor(34, 197, 94);
+    doc.text("Discount", totalsLeft, ty);
+    doc.text(`-${formatCurrency(data.discount)}`, pw - m, ty, { align: "right" });
+  }
 
-  // Payment Method
-  doc.setFillColor(248, 248, 248);
-  doc.roundedRect(pageWidth / 2 + 5, addressY, (pageWidth - 40) / 2, 45, 3, 3, "F");
+  // Shipping
+  ty += 7;
+  doc.setTextColor(...gray);
+  doc.text("Shipping", totalsLeft, ty);
+  doc.setTextColor(...black);
+  doc.text(data.shipping === 0 ? "FREE" : formatCurrency(data.shipping), pw - m, ty, { align: "right" });
 
-  doc.setTextColor(...grayColor);
-  doc.setFontSize(9);
-  doc.text("PAYMENT METHOD", pageWidth / 2 + 10, addressY + 10);
+  // Gold divider
+  ty += 6;
+  doc.setDrawColor(...gold);
+  doc.setLineWidth(0.8);
+  doc.line(totalsLeft - 4, ty, pw - m, ty);
 
-  doc.setTextColor(...darkColor);
-  doc.setFontSize(10);
-  const paymentLabel = data.paymentMethod === "cod" ? "Cash on Delivery" : data.paymentMethod;
-  doc.text(paymentLabel, pageWidth / 2 + 10, addressY + 20);
+  // Total
+  ty += 8;
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...gold);
+  doc.text("TOTAL", totalsLeft, ty);
+  doc.text(formatCurrency(data.total), pw - m, ty, { align: "right" });
 
-  doc.setTextColor(...grayColor);
-  doc.text("Customer Email", pageWidth / 2 + 10, addressY + 32);
-  doc.setTextColor(...darkColor);
-  doc.text(data.customerEmail, pageWidth / 2 + 10, addressY + 40);
+  // === FOOTER ===
+  // Gold bar at bottom
+  doc.setFillColor(...gold);
+  doc.rect(0, ph - 28, pw, 28, "F");
 
-  // Footer
-  const footerY = addressY + 60;
-  doc.setDrawColor(230, 230, 230);
-  doc.line(15, footerY, pageWidth - 15, footerY);
-
-  doc.setTextColor(...grayColor);
-  doc.setFontSize(9);
-  doc.text("Thank you for shopping with Desert Deal!", pageWidth / 2, footerY + 8, { align: "center" });
-  doc.text(
-    "For questions, contact: support@desertsdeals.com | Ph: +971 50 678 4405",
-    pageWidth / 2,
-    footerY + 16,
-    { align: "center" }
-  );
+  doc.setTextColor(...white);
   doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  doc.text("DESERT DEAL", pw / 2, ph - 20, { align: "center" });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7);
   doc.text(
-    `© ${new Date().getFullYear()} Desert Deal. All rights reserved.`,
-    pageWidth / 2,
-    footerY + 24,
-    { align: "center" }
+    "support@desertsdeals.com  |  +971 50 678 4405  |  United Arab Emirates",
+    pw / 2, ph - 13, { align: "center" }
+  );
+  doc.text(
+    `Thank you for your purchase!  ©${new Date().getFullYear()} Desert Deal`,
+    pw / 2, ph - 7, { align: "center" }
   );
 
   return doc;
