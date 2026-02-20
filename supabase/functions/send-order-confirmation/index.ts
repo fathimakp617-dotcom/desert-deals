@@ -58,6 +58,17 @@ const formatCurrency = (amount: number): string => {
   return `${Math.round(amount).toLocaleString()} AED`;
 };
 
+/** Convert Uint8Array to base64 without stack overflow */
+const arrayToBase64 = (bytes: Uint8Array): string => {
+  let binary = '';
+  const chunkSize = 8192;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+};
+
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const LOGO_URL = `${SUPABASE_URL}/storage/v1/object/public/product-images/brand/desert-deal-logo.png`;
 
@@ -1006,7 +1017,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Generate PDF invoice for customer
     console.log("Generating PDF invoice...");
     const invoicePdf = await generateInvoicePDF(orderData);
-    const invoicePdfBase64 = btoa(String.fromCharCode(...invoicePdf));
+    const invoicePdfBase64 = arrayToBase64(invoicePdf);
     console.log("PDF invoice generated, size:", invoicePdf.length);
 
     // Generate plain text version for email
@@ -1082,7 +1093,7 @@ Thank you for shopping with Desert Deal!
         // Generate shipping label PDF
         console.log("Generating shipping label PDF...");
         const shippingLabelPdf = await generateShippingLabelPDF(orderData);
-        const shippingLabelBase64 = btoa(String.fromCharCode(...shippingLabelPdf));
+        const shippingLabelBase64 = arrayToBase64(shippingLabelPdf);
         console.log("Shipping label PDF generated, size:", shippingLabelPdf.length);
 
         const adminPlainText = `New Order Received!
