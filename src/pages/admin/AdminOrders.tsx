@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, Search, RefreshCw, Truck, Package, CheckCircle, X, Clock, Loader2, Download, FileText, Calendar, Trash2, AlertTriangle, ChevronRight, Check, Printer, Phone } from "lucide-react";
-import { generateShippingLabelPDF } from "@/lib/generateInvoicePDF";
+import { generateShippingLabelPDF, downloadInvoicePDF } from "@/lib/generateInvoicePDF";
 import OrderViewDialog from "@/components/OrderViewDialog";
 import ShippingSlipDialog from "@/components/ShippingSlipDialog";
 import BulkShippingSlipPrint from "@/components/BulkShippingSlipPrint";
@@ -190,6 +190,40 @@ const AdminOrders = () => {
         description: "Failed to generate shipping label",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleDownloadInvoice = async (order: Order) => {
+    try {
+      const addr = order.shipping_address as ShippingAddress;
+      await downloadInvoicePDF({
+        orderNumber: order.order_number,
+        customerName: order.customer_name,
+        customerEmail: order.customer_email,
+        items: order.items.map(item => ({
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          productId: item.productId,
+          selectedSize: item.selectedSize,
+        })) as any,
+        subtotal: order.subtotal,
+        discount: order.discount || 0,
+        shipping: order.shipping || 0,
+        total: order.total,
+        shippingAddress: {
+          address: addr?.address || '',
+          city: addr?.city || '',
+          state: addr?.state || '',
+          zipCode: addr?.zipCode || (addr as any)?.pincode || '',
+          country: addr?.country || 'UAE',
+        },
+        paymentMethod: order.payment_method,
+        orderDate: order.created_at,
+      });
+      toast({ title: "Downloaded", description: `Invoice for ${order.order_number} saved` });
+    } catch {
+      toast({ title: "Error", description: "Failed to generate invoice", variant: "destructive" });
     }
   };
 
@@ -829,10 +863,18 @@ const AdminOrders = () => {
                         <Button 
                           variant="ghost" 
                           size="sm"
+                          onClick={() => handleDownloadInvoice(order)}
+                          title="Download invoice"
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
                           onClick={() => handleGenerateLabel(order)}
                           title="Download shipping label"
                         >
-                          <FileText className="h-4 w-4" />
+                          <Download className="h-4 w-4" />
                         </Button>
                         <Button 
                           variant="ghost" 
