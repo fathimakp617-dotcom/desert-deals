@@ -28,7 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, Search, RefreshCw, Truck, Package, CheckCircle, X, Clock, Loader2, Download, FileText, Calendar, Trash2, AlertTriangle, ChevronRight, Check, Printer, Phone } from "lucide-react";
+import { Eye, Search, RefreshCw, Truck, Package, CheckCircle, X, Clock, Loader2, Download, FileText, Calendar, Trash2, AlertTriangle, ChevronRight, Check, Printer, Phone, MessageCircle } from "lucide-react";
 import { generateShippingLabelPDF, downloadInvoicePDF } from "@/lib/generateInvoicePDF";
 import OrderViewDialog from "@/components/OrderViewDialog";
 import ShippingSlipDialog from "@/components/ShippingSlipDialog";
@@ -868,6 +868,23 @@ const AdminOrders = () => {
                         >
                           <FileText className="h-4 w-4" />
                         </Button>
+                        {order.customer_phone && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              const phone = order.customer_phone!.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
+                              const message = encodeURIComponent(
+                                `Hi ${order.customer_name},\n\nThank you for your order *${order.order_number}* from Desert Deal!\n\nOrder Total: *${formatCurrency(order.total)}*\nPayment: Cash on Delivery\n\nWe'll update you once your order is shipped. 🚚`
+                              );
+                              window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                            }}
+                            title="Chat on WhatsApp"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button 
                           variant="ghost" 
                           size="sm"
