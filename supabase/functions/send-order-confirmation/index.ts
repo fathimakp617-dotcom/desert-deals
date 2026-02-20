@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { PDFDocument, StandardFonts, rgb } from "https://esm.sh/pdf-lib@1.17.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -14,6 +15,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  image_url?: string;
 }
 
 interface ShippingAddress {
@@ -59,15 +61,42 @@ const formatCurrency = (amount: number): string => {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const LOGO_URL = `${SUPABASE_URL}/storage/v1/object/public/product-images/brand/desert-deal-logo.png`;
 
-const getProductImageUrl = (productId: string): string => {
-  return `${SUPABASE_URL}/storage/v1/object/public/product-images/${productId}.webp`;
+const getProductImageUrl = (item: OrderItem): string => {
+  if (item.image_url) {
+    // Use first image from comma-separated list
+    const firstImg = item.image_url.split(",")[0].trim();
+    if (firstImg.startsWith("http")) return firstImg;
+    return `${SUPABASE_URL}/storage/v1/object/public/product-images/${firstImg}`;
+  }
+  return `${SUPABASE_URL}/storage/v1/object/public/product-images/${item.productId}.webp`;
+};
+
+/** Fetches product image URLs from DB and enriches order items */
+const enrichItemsWithImages = async (items: OrderItem[]): Promise<OrderItem[]> => {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const sb = createClient(supabaseUrl, serviceKey);
+    const ids = items.map(i => i.productId);
+    const { data } = await sb.from("products").select("id, image_url").in("id", ids);
+    if (data) {
+      const imgMap = new Map(data.map((p: any) => [p.id, p.image_url]));
+      return items.map(item => ({
+        ...item,
+        image_url: (imgMap.get(item.productId) as string) || item.image_url || "",
+      }));
+    }
+  } catch (e) {
+    console.error("Failed to enrich items with images:", e);
+  }
+  return items;
 };
 
 const generateOrderEmailHTML = (order: OrderConfirmationRequest): string => {
   const itemsHTML = order.items.map(item => `
     <tr>
       <td style="padding: 14px; border-bottom: 1px solid #eee; width: 60px;">
-        <img src="${getProductImageUrl(item.productId)}" alt="${item.name}" style="width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;" />
+        <img src="${getProductImageUrl(item)}" alt="${item.name}" style="width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;" />
       </td>
       <td style="padding: 14px; border-bottom: 1px solid #eee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a;">
         ${item.name}
@@ -257,7 +286,7 @@ const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint
   // Fetch logo and product images in parallel
   const logoPromise = fetchImageBytes(LOGO_URL);
   const productImagePromises = order.items.map(item =>
-    fetchImageBytes(getProductImageUrl(item.productId))
+    fetchImageBytes(getProductImageUrl(item))
   );
   const [logoResult, ...productImageResults] = await Promise.all([logoPromise, ...productImagePromises]);
 
@@ -415,7 +444,7 @@ const generateAdminOrderEmailHTML = (order: OrderConfirmationRequest): string =>
   const itemsHTML = order.items.map(item => `
     <tr>
       <td style="padding: 12px; border-bottom: 1px solid #ddd; width: 50px;">
-        <img src="${getProductImageUrl(item.productId)}" alt="${item.name}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;" />
+        <img src="${getProductImageUrl(item)}" alt="${item.name}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;" />
       </td>
       <td style="padding: 12px; border-bottom: 1px solid #ddd; font-family: Arial, sans-serif;">
         ${item.name}
@@ -968,6 +997,9 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const orderData: OrderConfirmationRequest = await req.json();
+    
+    // Enrich order items with actual product image URLs from DB
+    orderData.items = await enrichItemsWithImages(orderData.items);
     
     console.log("Sending order confirmation for order:", orderData.order_number);
 
