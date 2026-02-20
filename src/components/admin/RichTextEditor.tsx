@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -33,10 +33,21 @@ const FONT_SIZE_OPTIONS = [
 
 const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) => {
   const editorRef = useRef<HTMLDivElement>(null);
+  const isInternalChange = useRef(false);
   const [showPreview, setShowPreview] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const imageInputRef = useRef<HTMLInputElement>(null);
+
+  // Only set innerHTML from outside when value changes externally (not from typing)
+  useEffect(() => {
+    if (editorRef.current && !isInternalChange.current) {
+      if (editorRef.current.innerHTML !== value) {
+        editorRef.current.innerHTML = value || "";
+      }
+    }
+    isInternalChange.current = false;
+  }, [value]);
 
   const execCommand = useCallback((command: string, value?: string) => {
     editorRef.current?.focus();
@@ -46,6 +57,7 @@ const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) =
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
+      isInternalChange.current = true;
       onChange(editorRef.current.innerHTML);
     }
   }, [onChange]);
@@ -244,7 +256,6 @@ const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) =
           suppressContentEditableWarning
           onInput={handleInput}
           onBlur={handleInput}
-          dangerouslySetInnerHTML={{ __html: value }}
           data-placeholder={placeholder}
           className="min-h-[200px] max-h-[400px] overflow-y-auto p-3 text-sm outline-none [&:empty]:before:content-[attr(data-placeholder)] [&:empty]:before:text-muted-foreground [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded [&_a]:text-primary [&_a]:underline"
         />
