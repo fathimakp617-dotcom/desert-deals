@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, Search, RefreshCw, Truck, Package, CheckCircle, X, Clock, Loader2, Download, FileText, Calendar, Trash2, AlertTriangle, ChevronRight, Check, Printer, Phone, MessageCircle } from "lucide-react";
-import { generateShippingLabelPDF, downloadInvoicePDF } from "@/lib/generateInvoicePDF";
+import { generateShippingLabelPDF, downloadInvoicePDF, generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import OrderViewDialog from "@/components/OrderViewDialog";
 import ShippingSlipDialog from "@/components/ShippingSlipDialog";
 import BulkShippingSlipPrint from "@/components/BulkShippingSlipPrint";
@@ -872,14 +872,60 @@ const AdminOrders = () => {
                           <Button 
                             variant="ghost" 
                             size="sm"
-                            onClick={() => {
-                              const phone = order.customer_phone!.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
-                              const message = encodeURIComponent(
-                                `Hi ${order.customer_name},\n\nThank you for your order *${order.order_number}* from Desert Deal!\n\nOrder Total: *${formatCurrency(order.total)}*\nPayment: Cash on Delivery\n\nWe'll update you once your order is shipped. 🚚`
-                              );
-                              window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                            onClick={async () => {
+                              try {
+                                toast({ title: "Generating invoice...", description: "Preparing PDF for WhatsApp" });
+                                const addr = order.shipping_address as ShippingAddress;
+                                const doc = await generateInvoicePDF({
+                                  orderNumber: order.order_number,
+                                  customerName: order.customer_name,
+                                  customerEmail: order.customer_email,
+                                  items: order.items.map(item => ({
+                                    name: item.name,
+                                    price: item.price,
+                                    quantity: item.quantity,
+                                    productId: item.productId,
+                                    selectedSize: item.selectedSize,
+                                  })) as any,
+                                  subtotal: order.subtotal,
+                                  discount: order.discount || 0,
+                                  shipping: order.shipping || 0,
+                                  total: order.total,
+                                  shippingAddress: {
+                                    address: addr?.address || '',
+                                    city: addr?.city || '',
+                                    state: addr?.state || '',
+                                    zipCode: addr?.zipCode || (addr as any)?.pincode || '',
+                                    country: addr?.country || 'UAE',
+                                  },
+                                  paymentMethod: order.payment_method,
+                                  orderDate: order.created_at,
+                                });
+                                const pdfBlob = doc.output('blob');
+                                const fileName = `invoices/invoice-${order.order_number}.pdf`;
+                                const { error: uploadError } = await supabase.storage
+                                  .from('product-images')
+                                  .upload(fileName, pdfBlob, { contentType: 'application/pdf', upsert: true });
+                                if (uploadError) throw uploadError;
+                                const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+                                const invoiceUrl = urlData?.publicUrl || '';
+
+                                const phone = order.customer_phone!.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
+                                const message = encodeURIComponent(
+                                  `Hi ${order.customer_name},\n\nThank you for your order *${order.order_number}* from Desert Deal!\n\nOrder Total: *${formatCurrency(order.total)}*\nPayment: ${order.payment_method === 'cod' ? 'Cash on Delivery' : order.payment_method}\n\n📄 *Invoice:* ${invoiceUrl}\n\nWe'll update you once your order is shipped. 🚚`
+                                );
+                                window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                              } catch {
+                                toast({ title: "Error", description: "Failed to generate invoice for WhatsApp", variant: "destructive" });
+                                // Fallback: open WhatsApp without invoice
+                                const phone = order.customer_phone!.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
+                                const message = encodeURIComponent(
+                                  `Hi ${order.customer_name},\n\nThank you for your order *${order.order_number}* from Desert Deal!\n\nOrder Total: *${formatCurrency(order.total)}*\nPayment: Cash on Delivery\n\nWe'll update you once your order is shipped. 🚚`
+                                );
+                                window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                              }
                             }}
-                            title="Chat on WhatsApp"
+                            title="Chat on WhatsApp with Invoice"
                             className="text-green-600 hover:text-green-700 hover:bg-green-50"
                           >
                             <MessageCircle className="h-4 w-4" />
