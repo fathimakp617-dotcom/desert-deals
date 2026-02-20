@@ -164,8 +164,8 @@ const ProductForm = ({
     const existingUrls = imagePreviews.filter(url => !url.startsWith("blob:"));
     setFormData(prev => ({ ...prev, image_url: existingUrls.join(", ") }));
 
-    // Pass the first pending file for upload (the edge function handles one at a time)
-    onSubmit({ ...formData, image_url: existingUrls.join(", ") }, pendingImageFiles[0] || null);
+    // Pass all pending files for upload
+    onSubmit({ ...formData, image_url: existingUrls.join(", ") }, pendingImageFiles.length > 0 ? pendingImageFiles : null);
   };
 
   const handleFilesSelected = (files: FileList | null) => {
