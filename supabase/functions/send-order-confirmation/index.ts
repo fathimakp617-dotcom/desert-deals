@@ -56,9 +56,19 @@ const formatCurrency = (amount: number): string => {
   return `${Math.round(amount).toLocaleString()} AED`;
 };
 
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
+const LOGO_URL = `${SUPABASE_URL}/storage/v1/object/public/product-images/brand/desert-deal-logo.png`;
+
+const getProductImageUrl = (productId: string): string => {
+  return `${SUPABASE_URL}/storage/v1/object/public/product-images/${productId}.webp`;
+};
+
 const generateOrderEmailHTML = (order: OrderConfirmationRequest): string => {
   const itemsHTML = order.items.map(item => `
     <tr>
+      <td style="padding: 14px; border-bottom: 1px solid #eee; width: 60px;">
+        <img src="${getProductImageUrl(item.productId)}" alt="${item.name}" style="width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;" />
+      </td>
       <td style="padding: 14px; border-bottom: 1px solid #eee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a;">
         ${item.name}
       </td>
@@ -87,11 +97,9 @@ const generateOrderEmailHTML = (order: OrderConfirmationRequest): string => {
             <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden;">
               <!-- Header -->
               <tr>
-                <td style="background-color: #1a1a1a; padding: 40px; text-align: center;">
-                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; letter-spacing: 4px; font-weight: 600;">
-                    DESERT DEAL
-                  </h1>
-                  <p style="margin: 10px 0 0; color: #999; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">
+                <td style="background-color: #1a1a1a; padding: 30px 40px; text-align: center;">
+                  <img src="${LOGO_URL}" alt="Desert Deal" style="height: 50px; margin-bottom: 8px;" />
+                  <p style="margin: 0; color: #999; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">
                     Premium Footwear
                   </p>
                 </td>
@@ -136,6 +144,7 @@ const generateOrderEmailHTML = (order: OrderConfirmationRequest): string => {
                   <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
                     <thead>
                       <tr style="background-color: #1a1a1a;">
+                        <th style="padding: 14px; width: 60px;"></th>
                         <th style="padding: 14px; text-align: left; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Item</th>
                         <th style="padding: 14px; text-align: center; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Qty</th>
                         <th style="padding: 14px; text-align: right; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Price</th>
@@ -345,6 +354,9 @@ const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint
 const generateAdminOrderEmailHTML = (order: OrderConfirmationRequest): string => {
   const itemsHTML = order.items.map(item => `
     <tr>
+      <td style="padding: 12px; border-bottom: 1px solid #ddd; width: 50px;">
+        <img src="${getProductImageUrl(item.productId)}" alt="${item.name}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;" />
+      </td>
       <td style="padding: 12px; border-bottom: 1px solid #ddd; font-family: Arial, sans-serif;">
         ${item.name}
       </td>
@@ -437,6 +449,7 @@ const generateAdminOrderEmailHTML = (order: OrderConfirmationRequest): string =>
                   <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
                     <thead>
                       <tr style="background-color: #1a1a1a;">
+                        <th style="padding: 12px; width: 50px;"></th>
                         <th style="padding: 12px; text-align: left; font-family: Arial, sans-serif; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Product</th>
                         <th style="padding: 12px; text-align: center; font-family: Arial, sans-serif; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Qty</th>
                         <th style="padding: 12px; text-align: right; font-family: Arial, sans-serif; font-size: 11px; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">Price</th>
