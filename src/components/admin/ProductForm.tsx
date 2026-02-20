@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Upload, Eye, X, Plus } from "lucide-react";
+import { Loader2, Upload, Eye, X, Plus, ExternalLink } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import RichTextEditor from "./RichTextEditor";
 
@@ -67,7 +67,7 @@ export const emptyFormData: ProductFormData = {
   discount_percent: "0",
   stock_quantity: "100",
   category: "",
-  size: "",
+  size: ALL_SIZES.join(", "),
   image_url: "",
   is_active: true,
   notes_top: "",
@@ -106,6 +106,7 @@ const ProductForm = ({
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
   const [previewImageSrc, setPreviewImageSrc] = useState("");
+  const [isProductPreviewOpen, setIsProductPreviewOpen] = useState(false);
 
   // Auto-calculate final price when original_price or discount_percent changes
   useEffect(() => {
@@ -467,6 +468,14 @@ const ProductForm = ({
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setIsProductPreviewOpen(true)}
+          >
+            <Eye className="mr-2 h-4 w-4" />
+            Preview
+          </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isEditing ? "Update Product" : "Add Product"}
@@ -486,6 +495,100 @@ const ProductForm = ({
               alt="Product preview"
               className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
             />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Product Preview Dialog */}
+      <Dialog open={isProductPreviewOpen} onOpenChange={setIsProductPreviewOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Product Preview</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Image */}
+            <div className="aspect-square w-full bg-muted rounded-lg overflow-hidden">
+              {imagePreviews.length > 0 ? (
+                <img
+                  src={imagePreviews[0]}
+                  alt={formData.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+                  No image
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnails */}
+            {imagePreviews.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto">
+                {imagePreviews.map((url, i) => (
+                  <div key={i} className="w-16 h-16 flex-shrink-0 rounded border overflow-hidden">
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Info */}
+            <div className="space-y-2">
+              <h2 className="text-xl font-medium">{formData.name || "Product Name"}</h2>
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl font-light">
+                  AED {formData.price || "0"}
+                </span>
+                {formData.original_price && (
+                  <span className="text-lg text-muted-foreground line-through">
+                    AED {formData.original_price}
+                  </span>
+                )}
+                {parseInt(formData.discount_percent) > 0 && (
+                  <span className="text-sm font-medium text-green-600">
+                    {formData.discount_percent}% OFF
+                  </span>
+                )}
+              </div>
+              <span className="text-sm font-medium text-green-600">IN STOCK</span>
+            </div>
+
+            {/* Sizes */}
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Size</p>
+              <div className="flex flex-wrap gap-1.5">
+                {formData.size.split(",").map(s => s.trim()).filter(Boolean).map((size) => (
+                  <span
+                    key={size}
+                    className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-xs font-medium"
+                  >
+                    {size.replace(/^EU\s*/i, "")}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Description */}
+            {formData.description && (
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Description</p>
+                <div
+                  className="text-sm text-muted-foreground prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: formData.description }}
+                />
+              </div>
+            )}
+
+            {/* Categories */}
+            {formData.category && (
+              <div className="flex flex-wrap gap-1.5">
+                {formData.category.split(",").map(c => c.trim()).filter(Boolean).map(cat => (
+                  <span key={cat} className="text-xs bg-muted px-2 py-1 rounded-full capitalize">
+                    {cat}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
