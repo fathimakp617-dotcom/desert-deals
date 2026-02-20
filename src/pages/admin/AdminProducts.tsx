@@ -428,6 +428,8 @@ const AdminProducts = () => {
         for (const file of pendingImageFiles) {
           await uploadImageMutation.mutateAsync({ productId, file });
         }
+        // Force refetch after all images are uploaded
+        queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       }
     };
 
