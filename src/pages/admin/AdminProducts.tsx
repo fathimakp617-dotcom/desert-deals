@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight, CheckSquare, Copy } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight, CheckSquare, Copy, Download } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import ProductForm, { emptyFormData, type ProductFormData } from "@/components/admin/ProductForm";
 
@@ -328,6 +328,46 @@ const AdminProducts = () => {
     }
   };
 
+  const selectAllFiltered = () => {
+    setSelectedIds(new Set(filteredProducts.map((p) => p.id)));
+  };
+
+  const exportSelectedToCSV = () => {
+    const selected = (products || []).filter((p) => selectedIds.has(p.id));
+    if (selected.length === 0) return;
+
+    const headers = ["ID", "Name", "Description", "Price", "Original Price", "Discount %", "Stock", "Category", "Size", "Image URL", "Status", "Created At"];
+    const csvRows = [
+      headers.join(","),
+      ...selected.map((p) =>
+        [
+          `"${p.id}"`,
+          `"${(p.name || "").replace(/"/g, '""')}"`,
+          `"${(p.description || "").replace(/"/g, '""').replace(/\n/g, " ")}"`,
+          p.price,
+          p.original_price || "",
+          p.discount_percent || 0,
+          p.stock_quantity,
+          `"${p.category || ""}"`,
+          `"${p.size || ""}"`,
+          `"${p.image_url || ""}"`,
+          p.is_active ? "Active" : "Inactive",
+          `"${p.created_at}"`,
+        ].join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvRows], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `products_export_${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({ title: "Export Complete", description: `${selected.length} products exported to CSV` });
+  };
+
   const handleBulkEdit = () => {
     if (!bulkEditField || !bulkEditValue.trim()) return;
     const updates: Record<string, unknown> = {};
@@ -616,6 +656,13 @@ const AdminProducts = () => {
           >
             {bulkUpdateMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : null}
             Apply
+          </Button>
+          <Button size="sm" variant="outline" onClick={selectAllFiltered}>
+            Select All ({filteredProducts.length})
+          </Button>
+          <Button size="sm" variant="outline" onClick={exportSelectedToCSV}>
+            <Download className="h-3.5 w-3.5 mr-1" />
+            Export CSV
           </Button>
           <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())}>
             Clear
