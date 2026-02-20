@@ -140,6 +140,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  selectedSize?: string | null;
 }
 
 interface ShippingAddress {
@@ -323,6 +324,7 @@ serve(async (req) => {
         name: sanitizeName(item.name || product.name || '', 100),
         price: serverPrice,
         quantity: quantity,
+        selectedSize: item.selectedSize || null,
       });
     }
 
