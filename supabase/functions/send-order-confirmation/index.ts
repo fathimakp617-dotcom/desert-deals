@@ -268,174 +268,172 @@ const fetchImageBytes = async (url: string): Promise<{ bytes: Uint8Array; type: 
 
 const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint8Array> => {
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // A4 size
-  
+  const page = pdfDoc.addPage([595, 842]); // A4
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  
   const { width, height } = page.getSize();
-  
-  const formattedDate = new Date().toLocaleDateString('en-US', { 
-    day: 'numeric', 
-    month: 'long', 
-    year: 'numeric' 
-  });
-  
+  const m = 45; // margin
+
+  // Brand colors
+  const brand = rgb(0.1, 0.1, 0.1);
+  const black = rgb(0.06, 0.06, 0.06);
+  const gray = rgb(0.47, 0.47, 0.47);
+  const lightGray = rgb(0.9, 0.9, 0.9);
+  const bgLight = rgb(0.97, 0.97, 0.97);
+  const white = rgb(1, 1, 1);
+  const green = rgb(0.13, 0.77, 0.37);
+
+  const formattedDate = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
   const paymentMethodLabel = order.payment_method === 'cod' ? 'Cash on Delivery' : order.payment_method;
-  
+
   // Fetch logo and product images in parallel
   const logoPromise = fetchImageBytes(LOGO_URL);
-  const productImagePromises = order.items.map(item =>
-    fetchImageBytes(getProductImageUrl(item))
-  );
+  const productImagePromises = order.items.map(item => fetchImageBytes(getProductImageUrl(item)));
   const [logoResult, ...productImageResults] = await Promise.all([logoPromise, ...productImagePromises]);
 
-  let yPos = height - 50;
-  
-  // Header bar
-  page.drawRectangle({
-    x: 0, y: yPos - 10, width, height: 60,
-    color: rgb(0.1, 0.1, 0.1),
-  });
-  
-  // Embed logo if available
+  // === TOP ACCENT BAR ===
+  page.drawRectangle({ x: 0, y: height - 11, width, height: 11, color: brand });
+
+  let y = height - 45;
+
+  // === HEADER: Logo left, INVOICE right ===
   if (logoResult) {
     try {
       const logoImage = logoResult.type === "png"
         ? await pdfDoc.embedPng(logoResult.bytes)
         : await pdfDoc.embedJpg(logoResult.bytes);
       const logoDims = logoImage.scale(1);
-      const logoH = 36;
+      const logoH = 32;
       const logoW = (logoDims.width / logoDims.height) * logoH;
-      page.drawImage(logoImage, {
-        x: width / 2 - logoW / 2, y: yPos - 6, width: logoW, height: logoH,
-      });
+      page.drawImage(logoImage, { x: m, y: y - 8, width: logoW, height: logoH });
     } catch {
-      // Fallback to text
-      page.drawText('DESERT DEAL', {
-        x: width / 2 - 55, y: yPos + 8, size: 22, font: boldFont, color: rgb(1, 1, 1),
-      });
+      page.drawText('DESERT DEAL', { x: m, y: y + 6, size: 18, font: boldFont, color: black });
     }
   } else {
-    page.drawText('DESERT DEAL', {
-      x: width / 2 - 55, y: yPos + 8, size: 22, font: boldFont, color: rgb(1, 1, 1),
-    });
+    page.drawText('DESERT DEAL', { x: m, y: y + 6, size: 18, font: boldFont, color: black });
   }
-  
-  yPos -= 30;
-  page.drawText('United Arab Emirates | Phone: +971 50 678 4405', {
-    x: width / 2 - 120, y: yPos - 15, size: 9, font, color: rgb(0.5, 0.5, 0.5),
-  });
-  
-  yPos -= 50;
-  page.drawText('INVOICE', {
-    x: width / 2 - 30, y: yPos, size: 18, font: boldFont, color: rgb(0.1, 0.1, 0.1),
-  });
-  
-  // Order info
-  yPos -= 40;
-  page.drawText(`Order Number: ${order.order_number}`, {
-    x: 50, y: yPos, size: 11, font: boldFont, color: rgb(0.1, 0.1, 0.1),
-  });
-  page.drawText(`Date: ${formattedDate}`, {
-    x: width - 200, y: yPos, size: 11, font, color: rgb(0.3, 0.3, 0.3),
-  });
-  
-  yPos -= 20;
-  page.drawLine({ start: { x: 50, y: yPos }, end: { x: width - 50, y: yPos }, thickness: 1, color: rgb(0.8, 0.8, 0.8) });
-  
-  // Bill To / Ship To
-  yPos -= 30;
-  page.drawText('BILL TO:', { x: 50, y: yPos, size: 10, font: boldFont, color: rgb(0.4, 0.4, 0.4) });
-  page.drawText('SHIP TO:', { x: width / 2 + 20, y: yPos, size: 10, font: boldFont, color: rgb(0.4, 0.4, 0.4) });
-  
-  yPos -= 18;
-  page.drawText(order.customer_name, { x: 50, y: yPos, size: 11, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-  page.drawText(order.customer_name, { x: width / 2 + 20, y: yPos, size: 11, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-  
-  yPos -= 15;
-  page.drawText(order.customer_email, { x: 50, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
-  page.drawText(getAddressString(order.shipping_address), { x: width / 2 + 20, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
-  
-  yPos -= 15;
-  page.drawText(`Ph: ${order.customer_phone || 'N/A'}`, { x: 50, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
-  page.drawText(`${order.shipping_address.city}, ${order.shipping_address.state} ${getZipCode(order.shipping_address)}`, { x: width / 2 + 20, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
-  
-  yPos -= 15;
-  page.drawText(order.shipping_address.country || 'UAE', { x: width / 2 + 20, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
-  
-  // Items table header
-  yPos -= 40;
-  page.drawRectangle({ x: 50, y: yPos - 5, width: width - 100, height: 25, color: rgb(0.1, 0.1, 0.1) });
-  page.drawText('', { x: 60, y: yPos + 3, size: 10, font: boldFont, color: rgb(1, 1, 1) });
-  page.drawText('Product', { x: 110, y: yPos + 3, size: 10, font: boldFont, color: rgb(1, 1, 1) });
-  page.drawText('Qty', { x: 380, y: yPos + 3, size: 10, font: boldFont, color: rgb(1, 1, 1) });
-  page.drawText('Price', { x: 460, y: yPos + 3, size: 10, font: boldFont, color: rgb(1, 1, 1) });
-  
-  // Items with product images
-  yPos -= 25;
-  const imgSize = 40;
+
+  page.drawText('INVOICE', { x: width - m - 100, y: y + 4, size: 28, font: boldFont, color: brand });
+
+  // Header line
+  y -= 18;
+  page.drawLine({ start: { x: m, y }, end: { x: width - m, y }, thickness: 1.2, color: brand });
+
+  // === BILL TO (left) & INVOICE DETAILS (right) ===
+  y -= 22;
+  page.drawText('BILL TO', { x: m, y, size: 8, font, color: gray });
+
+  // Right column labels
+  page.drawText('INVOICE NO.', { x: width - m - 80, y, size: 8, font, color: gray });
+
+  y -= 12;
+  page.drawText(order.customer_name, { x: m, y, size: 11, font: boldFont, color: black });
+  page.drawText(order.order_number, { x: width - m - 80, y, size: 11, font: boldFont, color: black });
+
+  y -= 14;
+  page.drawText(order.customer_email, { x: m, y, size: 8, font, color: gray });
+  page.drawText('DATE', { x: width - m - 80, y: y + 2, size: 8, font, color: gray });
+
+  y -= 12;
+  page.drawText(getAddressString(order.shipping_address), { x: m, y, size: 8, font, color: gray });
+  page.drawText(formattedDate, { x: width - m - 80, y: y + 2, size: 9, font, color: black });
+
+  y -= 12;
+  page.drawText(`${order.shipping_address.city}, ${order.shipping_address.state} ${getZipCode(order.shipping_address)}`, { x: m, y, size: 8, font, color: gray });
+  page.drawText('PAYMENT', { x: width - m - 80, y: y + 2, size: 8, font, color: gray });
+
+  y -= 12;
+  page.drawText(order.shipping_address.country || 'UAE', { x: m, y, size: 8, font, color: gray });
+  page.drawText(paymentMethodLabel, { x: width - m - 80, y: y + 2, size: 9, font, color: black });
+
+  // === ITEMS TABLE ===
+  y -= 30;
+  const colImg = m;
+  const colName = m + 45;
+  const colQty = 380;
+  const colPrice = 430;
+  const colAmount = width - m - 5;
+  const imgSize = 28;
+
+  // Table header
+  page.drawText('ITEM DESCRIPTION', { x: colName, y, size: 8, font: boldFont, color: brand });
+  page.drawText('QTY', { x: colQty, y, size: 8, font: boldFont, color: brand });
+  page.drawText('PRICE', { x: colPrice, y, size: 8, font: boldFont, color: brand });
+  page.drawText('AMOUNT', { x: colAmount - 30, y, size: 8, font: boldFont, color: brand });
+
+  y -= 6;
+  page.drawLine({ start: { x: m, y }, end: { x: width - m, y }, thickness: 1.5, color: brand });
+
+  // Table rows
   for (let i = 0; i < order.items.length; i++) {
     const item = order.items[i];
-    const rowH = imgSize + 8;
-    yPos -= rowH;
-    
-    // Try to embed product image
+    const rowH = imgSize + 10;
+    y -= rowH;
+
+    // Alternate row background
+    if (i % 2 === 1) {
+      page.drawRectangle({ x: m - 5, y: y - 4, width: width - 2 * m + 10, height: rowH, color: bgLight });
+    }
+
+    // Product image
     const imgResult = productImageResults[i];
     if (imgResult) {
       try {
         const img = imgResult.type === "png"
           ? await pdfDoc.embedPng(imgResult.bytes)
           : await pdfDoc.embedJpg(imgResult.bytes);
-        page.drawImage(img, {
-          x: 60, y: yPos - 2, width: imgSize, height: imgSize,
-        });
+        page.drawImage(img, { x: colImg, y: y - 2, width: imgSize, height: imgSize });
       } catch {
-        // Draw placeholder rectangle
-        page.drawRectangle({ x: 60, y: yPos - 2, width: imgSize, height: imgSize, color: rgb(0.93, 0.93, 0.93) });
+        page.drawRectangle({ x: colImg, y: y - 2, width: imgSize, height: imgSize, color: lightGray });
       }
     } else {
-      page.drawRectangle({ x: 60, y: yPos - 2, width: imgSize, height: imgSize, color: rgb(0.93, 0.93, 0.93) });
+      page.drawRectangle({ x: colImg, y: y - 2, width: imgSize, height: imgSize, color: lightGray });
     }
-    
-    page.drawText(item.name.substring(0, 35), { x: 110, y: yPos + imgSize / 2 - 4, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
-    page.drawText(item.quantity.toString(), { x: 390, y: yPos + imgSize / 2 - 4, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
-    page.drawText(formatCurrency(item.price * item.quantity), { x: 450, y: yPos + imgSize / 2 - 4, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
-    
-    page.drawLine({ start: { x: 50, y: yPos - 4 }, end: { x: width - 50, y: yPos - 4 }, thickness: 0.5, color: rgb(0.9, 0.9, 0.9) });
+
+    const sizeText = (item as any).selectedSize ? ` (${(item as any).selectedSize})` : "";
+    page.drawText(`${item.name.substring(0, 35)}${sizeText}`, { x: colName, y: y + imgSize / 2 - 4, size: 9, font, color: black });
+    page.drawText(item.quantity.toString(), { x: colQty + 5, y: y + imgSize / 2 - 4, size: 9, font, color: black });
+    page.drawText(formatCurrency(item.price), { x: colPrice - 5, y: y + imgSize / 2 - 4, size: 9, font, color: black });
+    page.drawText(formatCurrency(item.price * item.quantity), { x: colAmount - 35, y: y + imgSize / 2 - 4, size: 9, font, color: black });
   }
-  
-  // Totals
-  yPos -= 30;
-  page.drawText('Subtotal:', { x: 370, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
-  page.drawText(formatCurrency(order.subtotal), { x: 450, y: yPos, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
-  
+
+  // === TOTALS ===
+  y -= 20;
+  const tl = 370; // totals left x
+
+  page.drawText('Subtotal', { x: tl, y, size: 9, font, color: gray });
+  page.drawText(formatCurrency(order.subtotal), { x: colAmount - 35, y, size: 9, font, color: black });
+
   if (order.discount > 0) {
-    yPos -= 18;
-    page.drawText('Discount:', { x: 370, y: yPos, size: 10, font, color: rgb(0.16, 0.65, 0.27) });
-    page.drawText(`-${formatCurrency(order.discount)}`, { x: 450, y: yPos, size: 10, font, color: rgb(0.16, 0.65, 0.27) });
+    y -= 16;
+    page.drawText('Discount', { x: tl, y, size: 9, font, color: green });
+    page.drawText(`-${formatCurrency(order.discount)}`, { x: colAmount - 35, y, size: 9, font, color: green });
   }
-  
-  yPos -= 18;
-  page.drawText('Shipping:', { x: 370, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
-  page.drawText(order.shipping === 0 ? 'FREE' : formatCurrency(order.shipping), { x: 450, y: yPos, size: 10, font, color: rgb(0.2, 0.2, 0.2) });
-  
-  yPos -= 25;
-  page.drawRectangle({ x: 360, y: yPos - 5, width: 185, height: 25, color: rgb(0.95, 0.95, 0.95) });
-  page.drawText('TOTAL:', { x: 370, y: yPos + 3, size: 12, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-  page.drawText(formatCurrency(order.total), { x: 450, y: yPos + 3, size: 12, font: boldFont, color: rgb(0.1, 0.1, 0.1) });
-  
-  yPos -= 40;
-  page.drawText(`Payment Method: ${paymentMethodLabel}`, { x: 50, y: yPos, size: 10, font, color: rgb(0.3, 0.3, 0.3) });
-  
-  // Footer
-  yPos = 80;
-  page.drawLine({ start: { x: 50, y: yPos }, end: { x: width - 50, y: yPos }, thickness: 1, color: rgb(0.8, 0.8, 0.8) });
-  yPos -= 20;
-  page.drawText('Thank you for shopping with Desert Deal!', { x: width / 2 - 100, y: yPos, size: 11, font: boldFont, color: rgb(0.3, 0.3, 0.3) });
-  yPos -= 18;
-  page.drawText('Email: support@desertsdeals.com | Phone: +971 50 678 4405', { x: width / 2 - 140, y: yPos, size: 9, font, color: rgb(0.5, 0.5, 0.5) });
-  
+
+  y -= 16;
+  page.drawText('Shipping', { x: tl, y, size: 9, font, color: gray });
+  page.drawText(order.shipping === 0 ? 'FREE' : formatCurrency(order.shipping), { x: colAmount - 35, y, size: 9, font, color: black });
+
+  // Divider
+  y -= 10;
+  page.drawLine({ start: { x: tl - 5, y }, end: { x: width - m, y }, thickness: 1.5, color: brand });
+
+  // Total
+  y -= 18;
+  page.drawText('TOTAL', { x: tl, y, size: 14, font: boldFont, color: brand });
+  page.drawText(formatCurrency(order.total), { x: colAmount - 45, y, size: 14, font: boldFont, color: brand });
+
+  // === FOOTER BAR ===
+  page.drawRectangle({ x: 0, y: 0, width, height: 70, color: brand });
+
+  page.drawText('DESERT DEAL', { x: width / 2 - 35, y: 48, size: 10, font: boldFont, color: white });
+  page.drawText('support@desertsdeals.com  |  +971 50 678 4405  |  United Arab Emirates', {
+    x: width / 2 - 155, y: 33, size: 8, font, color: rgb(0.75, 0.75, 0.75),
+  });
+  page.drawText(`Thank you for your purchase!  ©${new Date().getFullYear()} Desert Deal`, {
+    x: width / 2 - 115, y: 18, size: 8, font, color: rgb(0.75, 0.75, 0.75),
+  });
+
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
 };
