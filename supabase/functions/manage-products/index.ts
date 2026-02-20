@@ -181,10 +181,22 @@ Deno.serve(async (req) => {
 
         const imageUrl = urlData.publicUrl;
 
-        // Update product with new image URL
+        // Append new image URL to existing ones
+        const { data: existingProduct } = await supabaseClient
+          .from("products")
+          .select("image_url")
+          .eq("id", imageData.productId)
+          .single();
+
+        const existingUrls = existingProduct?.image_url
+          ? existingProduct.image_url.split(",").map((u: string) => u.trim()).filter(Boolean)
+          : [];
+        existingUrls.push(imageUrl);
+        const combinedImageUrl = existingUrls.join(", ");
+
         const { error: updateError } = await supabaseClient
           .from("products")
-          .update({ image_url: imageUrl })
+          .update({ image_url: combinedImageUrl })
           .eq("id", imageData.productId);
 
         if (updateError) throw updateError;
