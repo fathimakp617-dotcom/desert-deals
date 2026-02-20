@@ -4,6 +4,7 @@ import { Product } from "@/data/products";
 export interface CartItem {
   product: Product;
   quantity: number;
+  selectedSize?: string;
 }
 
 // Bulk discount tiers
@@ -35,11 +36,11 @@ export const getNextBulkTier = (totalQuantity: number): { neededQty: number; dis
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, quantity?: number, selectedSize?: string) => void;
+  removeFromCart: (productId: string, selectedSize?: string) => void;
+  updateQuantity: (productId: string, quantity: number, selectedSize?: string) => void;
   clearCart: () => void;
-  buyNow: (product: Product, quantity?: number) => void;
+  buyNow: (product: Product, quantity?: number, selectedSize?: string) => void;
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -62,33 +63,35 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("cart", JSON.stringify(items));
   }, [items]);
 
-  const addToCart = (product: Product, quantity = 1) => {
+  const getCartKey = (productId: string, size?: string) => `${productId}__${size || ''}`;
+
+  const addToCart = (product: Product, quantity = 1, selectedSize?: string) => {
     setItems((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
+      const existing = prev.find((item) => item.product.id === product.id && item.selectedSize === selectedSize);
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id
+          item.product.id === product.id && item.selectedSize === selectedSize
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prev, { product, quantity }];
+      return [...prev, { product, quantity, selectedSize }];
     });
     setIsOpen(true);
   };
 
-  const removeFromCart = (productId: string) => {
-    setItems((prev) => prev.filter((item) => item.product.id !== productId));
+  const removeFromCart = (productId: string, selectedSize?: string) => {
+    setItems((prev) => prev.filter((item) => !(item.product.id === productId && item.selectedSize === selectedSize)));
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number, selectedSize?: string) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(productId, selectedSize);
       return;
     }
     setItems((prev) =>
       prev.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
+        item.product.id === productId && item.selectedSize === selectedSize ? { ...item, quantity } : item
       )
     );
   };
@@ -97,8 +100,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
-  const buyNow = (product: Product, quantity = 1) => {
-    setItems([{ product, quantity }]);
+  const buyNow = (product: Product, quantity = 1, selectedSize?: string) => {
+    setItems([{ product, quantity, selectedSize }]);
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);

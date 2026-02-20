@@ -53,7 +53,7 @@ const Cart = memo(() => {
                 <div className="divide-y divide-border">
                   {items.map((item) => (
                     <div
-                      key={item.product.id}
+                      key={`${item.product.id}-${item.selectedSize || ''}`}
                       className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 py-6 items-center"
                     >
                       {/* Product */}
@@ -65,9 +65,14 @@ const Cart = memo(() => {
                             className="w-full h-full object-cover"
                           />
                         </Link>
-                        <Link to={`/product/${item.product.id}`} className="text-sm font-medium text-foreground hover:text-primary transition-colors">
-                          {item.product.name}
-                        </Link>
+                        <div>
+                          <Link to={`/product/${item.product.id}`} className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+                            {item.product.name}
+                          </Link>
+                          {item.selectedSize && (
+                            <p className="text-xs text-muted-foreground mt-0.5">Size: {item.selectedSize}</p>
+                          )}
+                        </div>
                       </div>
 
                       {/* Price */}
@@ -80,14 +85,14 @@ const Cart = memo(() => {
                       <div>
                         <div className="inline-flex items-center border border-border rounded-md">
                           <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.selectedSize)}
                             className="p-2 text-foreground hover:bg-muted transition-colors"
                           >
                             <ChevronLeft className="w-4 h-4" />
                           </button>
                           <span className="px-3 text-sm font-medium min-w-[32px] text-center">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.selectedSize)}
                             className="p-2 text-foreground hover:bg-muted transition-colors"
                           >
                             <ChevronRight className="w-4 h-4" />
@@ -103,7 +108,7 @@ const Cart = memo(() => {
 
                       {/* Remove */}
                       <button
-                        onClick={() => removeFromCart(item.product.id)}
+                        onClick={() => removeFromCart(item.product.id, item.selectedSize)}
                         className="p-1 text-muted-foreground hover:text-destructive transition-colors justify-self-end"
                       >
                         <X className="w-4 h-4" />

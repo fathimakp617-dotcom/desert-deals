@@ -25,6 +25,7 @@ interface OrderItem {
   product_name?: string;
   price: number;
   quantity: number;
+  selectedSize?: string | null;
 }
 
 interface ShippingAddress {
@@ -229,6 +230,9 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
                 >
                   <div>
                     <span className="font-medium">{item.name || item.product_name || "Product"}</span>
+                    {item.selectedSize && (
+                      <span className="text-xs text-muted-foreground ml-2">({item.selectedSize})</span>
+                    )}
                     <span className="text-muted-foreground ml-2">×{item.quantity}</span>
                   </div>
                   <span className="font-medium">{formatCurrency(item.price * item.quantity)}</span>

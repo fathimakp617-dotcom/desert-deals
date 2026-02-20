@@ -108,9 +108,9 @@ const ProductDetail = () => {
       toast.error("Please select a size first");
       return;
     }
-    addToCart(product, quantity);
+    addToCart(product, quantity, `EU ${selectedSize}`);
     toast.success(`${product.name} added to cart`, {
-      description: `Size: ${selectedSize} · Quantity: ${quantity}`,
+      description: `Size: EU ${selectedSize} · Quantity: ${quantity}`,
     });
   };
 
@@ -123,7 +123,7 @@ const ProductDetail = () => {
       toast.error("Please select a size first");
       return;
     }
-    buyNow(product, quantity);
+    buyNow(product, quantity, `EU ${selectedSize}`);
     navigate("/checkout");
   };
 

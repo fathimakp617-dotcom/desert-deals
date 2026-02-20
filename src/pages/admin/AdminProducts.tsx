@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight, CheckSquare } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight, CheckSquare, Copy } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import ProductForm, { emptyFormData, type ProductFormData } from "@/components/admin/ProductForm";
 
@@ -358,6 +358,28 @@ const AdminProducts = () => {
     });
   };
 
+  const handleDuplicate = (product: Product) => {
+    const newId = `${product.id}-copy-${Date.now().toString(36)}`;
+    setFormData({
+      id: newId,
+      name: `${product.name} (Copy)`,
+      description: product.description || "",
+      price: product.price.toString(),
+      original_price: product.original_price?.toString() || "",
+      discount_percent: product.discount_percent?.toString() || "0",
+      stock_quantity: product.stock_quantity.toString(),
+      category: product.category || "sneakers",
+      size: product.size || "EU 40-45",
+      image_url: product.image_url || "",
+      is_active: product.is_active,
+      notes_top: product.notes?.top?.join(", ") || "",
+      notes_middle: product.notes?.middle?.join(", ") || "",
+      notes_base: product.notes?.base?.join(", ") || "",
+    });
+    setEditingProduct(null);
+    setIsAddDialogOpen(true);
+  };
+
   const handleFormSubmit = (fd: ProductFormData, pendingImageFile: File | null) => {
     const productId = editingProduct ? editingProduct.id : fd.id;
 
@@ -685,6 +707,8 @@ const AdminProducts = () => {
                   <div className="hidden group-hover:flex items-center gap-2 mt-1 text-xs">
                     <button onClick={() => openEditDialog(product)} className="text-primary hover:underline">Edit</button>
                     <span className="text-muted-foreground">|</span>
+                    <button onClick={() => handleDuplicate(product)} className="text-primary hover:underline">Duplicate</button>
+                    <span className="text-muted-foreground">|</span>
                     <button
                       onClick={() => {
                         if (confirm("Are you sure you want to delete this product?")) {
@@ -757,8 +781,11 @@ const AdminProducts = () => {
                 {/* Actions */}
                 <TableCell className="text-right py-2">
                   <div className="flex justify-end gap-1">
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEditDialog(product)}>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEditDialog(product)} title="Edit">
                       <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleDuplicate(product)} title="Duplicate">
+                      <Copy className="h-3.5 w-3.5" />
                     </Button>
                     <Button
                       size="icon"
@@ -769,6 +796,7 @@ const AdminProducts = () => {
                           deleteMutation.mutate(product.id);
                         }
                       }}
+                      title="Delete"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

@@ -58,7 +58,7 @@ const CartDrawer = memo(() => {
             </div>
           ) : (
             items.map((item) => (
-              <div key={item.product.id} className="flex gap-3 p-3 bg-muted/50 rounded-lg">
+              <div key={`${item.product.id}-${item.selectedSize || ''}`} className="flex gap-3 p-3 bg-muted/50 rounded-lg">
                 <Link
                   to={`/product/${item.product.id}`}
                   onClick={closeCart}
@@ -78,25 +78,28 @@ const CartDrawer = memo(() => {
                   >
                     {item.product.name}
                   </Link>
+                  {item.selectedSize && (
+                    <p className="text-xs text-muted-foreground">Size: {item.selectedSize}</p>
+                  )}
                   <p className="text-sm text-primary font-bold mt-1">
                     {formatPrice(item.product.price)}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <button
-                      onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
+                      onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1), item.selectedSize)}
                       className="w-6 h-6 flex items-center justify-center rounded border border-border hover:bg-muted"
                     >
                       <Minus className="w-3 h-3" />
                     </button>
                     <span className="text-sm w-6 text-center">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.selectedSize)}
                       className="w-6 h-6 flex items-center justify-center rounded border border-border hover:bg-muted"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
                     <button
-                      onClick={() => removeFromCart(item.product.id)}
+                      onClick={() => removeFromCart(item.product.id, item.selectedSize)}
                       className="ml-auto p-1 text-muted-foreground hover:text-destructive transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />

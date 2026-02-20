@@ -384,6 +384,7 @@ const Checkout = () => {
           name: item.product.name,
           price: item.product.price,
           quantity: item.quantity,
+          selectedSize: item.selectedSize || null,
         })),
         payment_method: "cod",
         payment_status: "pending",
@@ -678,8 +679,10 @@ const Checkout = () => {
                       <div key={item.product.id} className="flex justify-between text-sm">
                         <span className="text-muted-foreground flex-1 pr-4">
                           {item.product.name}
-                          <br />
-                          <span className="text-xs">× {item.quantity}</span>
+                          {item.selectedSize && (
+                            <span className="text-xs block text-muted-foreground/70">Size: {item.selectedSize}</span>
+                          )}
+                          <span className="text-xs block">× {item.quantity}</span>
                         </span>
                         <span className="text-foreground whitespace-nowrap">
                           {formatPrice(item.product.price * item.quantity)}
