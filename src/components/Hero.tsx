@@ -55,20 +55,6 @@ const Hero = memo(() => {
         {/* Light black gradient overlay at top */}
         <div className="absolute inset-x-0 top-0 h-24 sm:h-32 bg-gradient-to-b from-black/40 to-transparent z-10 pointer-events-none rounded-t-xl sm:rounded-t-2xl" />
 
-        <button
-          onClick={(e) => { e.stopPropagation(); prevSlide(); }}
-          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 text-foreground bg-background/80 hover:bg-background rounded-full p-2 transition-colors shadow"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); nextSlide(); }}
-          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 text-foreground bg-background/80 hover:bg-background rounded-full p-2 transition-colors shadow"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
-        </button>
 
         <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 z-10 flex justify-center gap-2">
           {slides.map((_, index) => (
