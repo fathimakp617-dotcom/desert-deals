@@ -371,7 +371,10 @@ const ProductDetail = () => {
                 <motion.div variants={staggerItem} className="space-y-2">
                   <p className="text-xs sm:text-sm text-muted-foreground">Size <span className="text-destructive">*</span></p>
                   <div className="flex flex-wrap gap-1.5">
-                    {[36, 37, 38, 39, 40, 41, 42, 43, 44, 45].map((size) => (
+                    {(product.size
+                      ? product.size.split(",").map(s => s.trim().replace(/^EU\s*/i, "")).filter(Boolean).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b)
+                      : [36, 37, 38, 39, 40, 41, 42, 43, 44, 45]
+                    ).map((size) => (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
