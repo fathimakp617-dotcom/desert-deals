@@ -66,7 +66,7 @@ const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string
               const inWishlist = isInWishlist(product.id);
               return (
                 <div key={product.id} className="flex-shrink-0 w-[145px] sm:w-[220px] lg:w-[246px] group">
-                  <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
+                  <div className="bg-background border border-border/30 rounded-lg overflow-hidden flex flex-col h-full">
                     <div className="relative aspect-square bg-muted overflow-hidden">
                       <Link to={`/product/${product.id}`}>
                         <img
@@ -87,9 +87,9 @@ const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string
                         <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-foreground"}`} />
                       </button>
                     </div>
-                    <div className="p-3 sm:p-4 bg-muted rounded-b-lg">
+                    <div className="p-3 sm:p-4 bg-muted rounded-b-lg flex-1 flex flex-col">
                       <Link to={`/product/${product.id}`}>
-                        <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors">
+                        <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors min-h-[2.5em]">
                           {product.name}
                         </h2>
                       </Link>
