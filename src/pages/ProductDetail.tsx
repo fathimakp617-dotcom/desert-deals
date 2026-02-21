@@ -26,6 +26,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductSchema, BreadcrumbSchema } from "@/components/seo/JsonLd";
 import { useProductSoldCount } from "@/hooks/useProductSoldCount";
 
+/** Displays a realistic fluctuating viewer count seeded by product ID */
+const LiveViewerCount = ({ productId }: { productId: string }) => {
+  const getBase = (id: string) => {
+    let h = 0;
+    for (let i = 0; i < id.length; i++) h = ((h << 5) - h + id.charCodeAt(i)) | 0;
+    return (Math.abs(h) % 8) + 2; // 2-9 base
+  };
+  const [count, setCount] = useState(getBase(productId));
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const base = getBase(productId);
+      const delta = Math.floor(Math.random() * 3) - 1; // -1, 0, or +1
+      setCount((c) => Math.max(2, Math.min(base + 5, c + delta)));
+    }, 4000 + Math.random() * 3000);
+    return () => clearInterval(interval);
+  }, [productId]);
+  return <span className="font-bold text-foreground">{count}</span>;
+};
 
 import BuyNowOverlay from "@/components/BuyNowOverlay";
 
@@ -370,6 +388,17 @@ const ProductDetail = () => {
                 variants={staggerContainer}
                 className="space-y-4 sm:space-y-5 min-w-0 px-4 sm:px-6 lg:px-8 lg:pr-12"
               >
+                {/* Live viewers */}
+                <motion.div variants={staggerItem} className="flex items-center gap-2">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    <LiveViewerCount productId={product.id} /> People are currently viewing this product.
+                  </span>
+                </motion.div>
+
                 {/* Product Name */}
                 <div>
                   <motion.h1 variants={staggerItem} className="text-xl sm:text-2xl lg:text-4xl font-medium tracking-tight break-words">
