@@ -58,7 +58,7 @@ const ProductDetail = () => {
   }, [product]);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
-  const [showDescription, setShowDescription] = useState(true);
+  const [showDescription, setShowDescription] = useState(false);
   const [showSpecification, setShowSpecification] = useState(false);
   const [showAdditional, setShowAdditional] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
@@ -567,21 +567,31 @@ const ProductDetail = () => {
                   </div>
                 </motion.div>
 
-                {/* Description - always visible */}
-                <motion.div variants={staggerItem} className="space-y-4 pt-4 border-b border-border/50 pb-6">
-                  <h3 className="text-base font-heading font-semibold text-foreground">Description</h3>
-                  {(() => {
-                    const desc = product.story || product.description || "";
-                    const isHtml = /<[a-z][\s\S]*>/i.test(desc);
-                    return isHtml ? (
-                      <div
-                        className="text-muted-foreground leading-relaxed text-xs prose prose-xs max-w-none [&_img]:rounded-lg [&_img]:w-[160px] [&_img]:h-auto [&_img]:inline-block [&_img]:m-1 [&_p]:text-xs [&_p]:mb-2 [&_span]:text-xs"
-                        dangerouslySetInnerHTML={{ __html: desc }}
-                      />
-                    ) : (
-                      <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{desc}</p>
-                    );
-                  })()}
+                {/* Description - collapsible */}
+                <motion.div variants={staggerItem} className="space-y-3 border-b border-border/50 pb-4">
+                  <button
+                    onClick={() => setShowDescription(!showDescription)}
+                    className="text-base font-heading font-semibold text-foreground flex items-center justify-between w-full"
+                  >
+                    Description
+                    <span className="text-muted-foreground text-sm">{showDescription ? "−" : "+"}</span>
+                  </button>
+                  {showDescription && (
+                    <div className="pt-2">
+                      {(() => {
+                        const desc = product.story || product.description || "";
+                        const isHtml = /<[a-z][\s\S]*>/i.test(desc);
+                        return isHtml ? (
+                          <div
+                            className="text-muted-foreground leading-relaxed text-xs prose prose-xs max-w-none [&_img]:rounded-lg [&_img]:w-[160px] [&_img]:h-auto [&_img]:inline-block [&_img]:m-1 [&_p]:text-xs [&_p]:mb-2 [&_span]:text-xs"
+                            dangerouslySetInnerHTML={{ __html: desc }}
+                          />
+                        ) : (
+                          <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{desc}</p>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </motion.div>
 
                 {/* Additional Information - collapsible text link */}
