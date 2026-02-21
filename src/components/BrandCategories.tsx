@@ -129,7 +129,7 @@ const BrandCategories = memo(() => {
                     <BrandLogo logo={brand.logo} fallback={brand.fallback} name={brand.name} />
                   </div>
                 </div>
-                <span className="text-[11px] font-medium text-foreground border border-border rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
+                <span className="text-[11px] font-medium text-foreground bg-background border border-border rounded-full px-4 py-1.5 inline-block group-hover:bg-foreground group-hover:text-background transition-colors">
                   View Products
                 </span>
               </div>
