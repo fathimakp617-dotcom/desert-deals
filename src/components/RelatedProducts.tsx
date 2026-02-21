@@ -65,6 +65,23 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                     />
                   </div>
                   <div className="p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-0.5">
+                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                        <span className="text-[10px] text-muted-foreground">4.5</span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (isInWishlist(item.id)) removeFromWishlist(item.id);
+                          else addToWishlist(item);
+                        }}
+                        className="p-0"
+                      >
+                        <Heart className={`w-4 h-4 ${isInWishlist(item.id) ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
+                      </button>
+                    </div>
                     <span className="text-[10px] text-muted-foreground uppercase">{item.category}</span>
                     <h3 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 min-h-[2.5em] leading-snug mt-0.5">
                       {item.name}
@@ -75,26 +92,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                         <span className="text-xs text-muted-foreground line-through">{formatPrice(item.originalPrice)}</span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between mt-1.5">
-                      <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex items-center gap-0.5">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-[10px] text-muted-foreground">4.5</span>
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (isInWishlist(item.id)) removeFromWishlist(item.id);
-                            else addToWishlist(item);
-                          }}
-                          className="p-0"
-                        >
-                          <Heart className={`w-4 h-4 ${isInWishlist(item.id) ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
-                        </button>
-                      </div>
-                    </div>
+                    <span className="text-[11px] font-bold text-emerald-600 uppercase mt-1 block">IN STOCK</span>
                   </div>
                 </div>
               </Link>

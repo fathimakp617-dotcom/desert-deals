@@ -103,6 +103,22 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                         )}
                       </div>
                       <div className="p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-0.5">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            <span className="text-[10px] text-muted-foreground">4.5</span>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              inWishlist ? removeFromWishlist(product.id) : addToWishlist(product);
+                            }}
+                            className="p-0"
+                          >
+                            <Heart className={`w-4 h-4 ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
+                          </button>
+                        </div>
                         <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
                         <h2 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 min-h-[2.5em] leading-snug mt-0.5">
                           {product.name}
@@ -113,29 +129,11 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                             <span className="text-xs text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
                           )}
                         </div>
-                        <div className="flex items-center justify-between mt-1.5">
-                          {soldOut ? (
-                            <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
-                          ) : (
-                            <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
-                          )}
-                          <div className="flex items-center gap-1.5">
-                            <div className="flex items-center gap-0.5">
-                              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                              <span className="text-[10px] text-muted-foreground">4.5</span>
-                            </div>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                inWishlist ? removeFromWishlist(product.id) : addToWishlist(product);
-                              }}
-                              className="p-0"
-                            >
-                              <Heart className={`w-4 h-4 ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
-                            </button>
-                          </div>
-                        </div>
+                        {soldOut ? (
+                          <span className="text-[11px] font-bold text-red-500 uppercase mt-1 block">Out of Stock</span>
+                        ) : (
+                          <span className="text-[11px] font-bold text-emerald-600 uppercase mt-1 block">IN STOCK</span>
+                        )}
                       </div>
                     </div>
                   </Link>
