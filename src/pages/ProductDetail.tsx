@@ -27,7 +27,7 @@ import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 
 import { supabase } from "@/integrations/supabase/client";
 import { ProductSchema, BreadcrumbSchema } from "@/components/seo/JsonLd";
-import { useProductSoldCount } from "@/hooks/useProductSoldCount";
+
 
 /** Displays a realistic fluctuating viewer count seeded by product ID */
 const LiveViewerCount = ({ productId }: { productId: string }) => {
@@ -87,7 +87,7 @@ const ProductDetail = () => {
   
   const isSoldOut = isProductSoldOut(stockMap, id || "");
   const stockQuantity = getProductStock(stockMap, id || "");
-  const { data: soldCount = 0 } = useProductSoldCount(id);
+  
 
   // Track Meta Pixel ViewContent + recently viewed
   const viewContentFired = useRef(false);
@@ -434,15 +434,6 @@ const ProductDetail = () => {
                   )}
                 </motion.div>
 
-                {/* Sold count badge */}
-                {soldCount > 0 && (
-                  <motion.div variants={staggerItem} className="flex items-center gap-1.5">
-                    <span className="text-lg">🔥</span>
-                    <span className="text-sm font-semibold text-orange-600">
-                      Sold Out {soldCount} {soldCount === 1 ? "Time" : "Times"}
-                    </span>
-                  </motion.div>
-                )}
 
                 {/* Rating stars - matching review section style */}
                 {totalReviews > 0 && (
