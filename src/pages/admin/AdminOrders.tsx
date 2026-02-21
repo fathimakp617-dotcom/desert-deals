@@ -1055,15 +1055,14 @@ const AdminOrders = () => {
 
                                 const phone = order.customer_phone!.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
                                 const message = encodeURIComponent(
-                                  `Hi ${order.customer_name},\n\nThank you for your order *${order.order_number}* from Desert Deal!\n\nOrder Total: *${formatCurrency(order.total)}*\nPayment: ${order.payment_method === 'cod' ? 'Cash on Delivery' : order.payment_method}\n\n📄 *Invoice:* ${invoiceUrl}\n\nWe'll update you once your order is shipped. 🚚`
+                                  `*Order Received ✅*\n\nThank you for your order with Desert Deal!\n\nTo proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.\n\n📦 *Delivery Timings:*\nWe deliver from Monday to Saturday, between 8 AM and 8 PM.\n🚫 No deliveries on Sundays.\n\n🕒 *Please Note:*\nSome areas have direct delivery service between 9 AM and 9 PM.\nIn certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.\n\nIf you have any confusion or need to double-check, feel free to visit our official website:\n👉 https://desertsdeals.com/\n\n📄 *Invoice:* ${invoiceUrl}\n\nOnce we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.\n\nWe look forward to your reply.\n\nThank you for choosing Desert Deal!`
                                 );
                                 window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
                               } catch {
                                 toast({ title: "Error", description: "Failed to generate invoice for WhatsApp", variant: "destructive" });
-                                // Fallback: open WhatsApp without invoice
                                 const phone = order.customer_phone!.replace(/[\s\-\(\)]/g, '').replace(/^\+/, '');
                                 const message = encodeURIComponent(
-                                  `Hi ${order.customer_name},\n\nThank you for your order *${order.order_number}* from Desert Deal!\n\nOrder Total: *${formatCurrency(order.total)}*\nPayment: Cash on Delivery\n\nWe'll update you once your order is shipped. 🚚`
+                                  `*Order Received ✅*\n\nThank you for your order with Desert Deal!\n\nTo proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.\n\n📦 *Delivery Timings:*\nWe deliver from Monday to Saturday, between 8 AM and 8 PM.\n🚫 No deliveries on Sundays.\n\n🕒 *Please Note:*\nSome areas have direct delivery service between 9 AM and 9 PM.\nIn certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.\n\nIf you have any confusion or need to double-check, feel free to visit our official website:\n👉 https://desertsdeals.com/\n\nOnce we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.\n\nWe look forward to your reply.\n\nThank you for choosing Desert Deal!`
                                 );
                                 window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
                               }
