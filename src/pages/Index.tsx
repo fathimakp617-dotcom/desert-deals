@@ -55,7 +55,6 @@ const Index = () => {
 
       <Suspense fallback={null}>
         <OrderSuccessModal />
-        <CookieConsent />
       </Suspense>
 
       <PageTransition>
