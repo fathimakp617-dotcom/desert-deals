@@ -125,26 +125,40 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
         canvas.toBlob((b) => resolve(b!), "image/png")
       );
 
-      // Upload to storage for a shareable link
+      const phone = order.customer_phone.replace(/[^0-9]/g, '');
+      const message = `*Order Received ✅*\n\nThank you for your order with Desert Deal!\n\nTo proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.\n\n📦 *Delivery Timings:*\nWe deliver from Monday to Saturday, between 8 AM and 8 PM.\n🚫 No deliveries on Sundays.\n\n🕒 *Please Note:*\nSome areas have direct delivery service between 9 AM and 9 PM.\nIn certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.\n\nIf you have any confusion or need to double-check, feel free to visit our official website:\n👉 https://desertsdeals.com/\n\nOnce we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.\n\nWe look forward to your reply.\n\nThank you for choosing Desert Deal!`;
+
+      // Mobile: try Web Share API to share actual image file
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile && navigator.canShare) {
+        const file = new File([blob], `order-${order.order_number}.png`, { type: "image/png" });
+        const shareData = { text: message, files: [file] };
+        if (navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+          setIsSharing(false);
+          return;
+        }
+      }
+
+      // Desktop fallback: upload image and share URL via wa.me
       const fileName = `order-${order.order_number}-${Date.now()}.png`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("order-images")
         .upload(fileName, blob, { contentType: "image/png", upsert: true });
 
-      const phone = order.customer_phone.replace(/[^0-9]/g, '');
-      
       if (!uploadError && uploadData) {
         const { data: urlData } = supabase.storage.from("order-images").getPublicUrl(fileName);
         const imageUrl = urlData?.publicUrl || '';
-        const message = `*Order Received ✅*\n\nThank you for your order with Desert Deal!\n\nTo proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.\n\n📦 *Delivery Timings:*\nWe deliver from Monday to Saturday, between 8 AM and 8 PM.\n🚫 No deliveries on Sundays.\n\n🕒 *Please Note:*\nSome areas have direct delivery service between 9 AM and 9 PM.\nIn certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.\n\nIf you have any confusion or need to double-check, feel free to visit our official website:\n👉 https://desertsdeals.com/\n\n🖼️ *Order Details:* ${imageUrl}\n\nOnce we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.\n\nWe look forward to your reply.\n\nThank you for choosing Desert Deal!`;
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        const messageWithImage = message + `\n\n🖼️ *Order Details:* ${imageUrl}`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(messageWithImage)}`, '_blank');
       } else {
-        // Fallback: just send text
-        const message = `*Order Received ✅*\n\nThank you for your order with Desert Deal!\n\nTo proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.\n\n📦 *Delivery Timings:*\nWe deliver from Monday to Saturday, between 8 AM and 8 PM.\n🚫 No deliveries on Sundays.\n\n🕒 *Please Note:*\nSome areas have direct delivery service between 9 AM and 9 PM.\nIn certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.\n\nIf you have any confusion or need to double-check, feel free to visit our official website:\n👉 https://desertsdeals.com/\n\nOnce we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.\n\nWe look forward to your reply.\n\nThank you for choosing Desert Deal!`;
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
       }
     } catch (err) {
-      console.error("Share failed:", err);
+      // If user cancelled share dialog, ignore
+      if ((err as Error)?.name !== 'AbortError') {
+        console.error("Share failed:", err);
+      }
     } finally {
       setIsSharing(false);
     }
