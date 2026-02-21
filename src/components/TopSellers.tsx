@@ -79,7 +79,7 @@ const TopSellers = memo(() => {
                   className="flex-shrink-0 w-[145px] sm:w-[220px] lg:w-[246px] group">
 
                     {/* Product card - matches product-wrapper product-background */}
-                    <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
+                    <div className="bg-background border border-border/30 rounded-lg overflow-hidden flex flex-col h-full">
                       {/* Product thumbnail */}
                       <div className="relative aspect-square bg-muted overflow-hidden">
                         <Link to={`/product/${product.id}`}>
@@ -128,7 +128,7 @@ const TopSellers = memo(() => {
                       </div>
 
                       {/* Product content - matches product-content-wrapper */}
-                      <div className="p-3 sm:p-4 bg-muted rounded-b-lg">
+                      <div className="p-3 sm:p-4 bg-muted rounded-b-lg flex-1 flex flex-col">
                         {/* Brand tags - matches product-brand */}
                         <div className="flex flex-wrap gap-1 mb-1.5">
                           <span className="text-[10px] text-muted-foreground">
@@ -138,7 +138,7 @@ const TopSellers = memo(() => {
 
                         {/* Product title - matches product-title */}
                         <Link to={`/product/${product.id}`}>
-                          <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors">
+                          <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors min-h-[2.5em]">
                             {product.name}
                           </h2>
                         </Link>
@@ -156,7 +156,7 @@ const TopSellers = memo(() => {
                         </div>
 
                         {/* Stock status - matches product-stock text-green-600 */}
-                        <div className="mt-2 flex items-center gap-1.5">
+                        <div className="mt-auto pt-1.5 flex items-center gap-1.5">
                           {soldOut ?
                         <span className="text-[11px] font-bold text-red-500 uppercase">
                               Out of Stock
