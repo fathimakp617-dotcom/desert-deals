@@ -1,20 +1,108 @@
-import { memo } from "react";
+import { memo, useState, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ShoppingBag, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
-import { formatPrice } from "@/data/products";
+import { formatPrice, Product } from "@/data/products";
+import { useDbProducts } from "@/hooks/useDbProducts";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FeaturesBar from "@/components/FeaturesBar";
 import PageTransition from "@/components/PageTransition";
+import { toast } from "sonner";
+
+const DEFAULT_SIZES = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
+
+const getSizes = (product: Product): number[] => {
+  if (product.size) {
+    const parsed = product.size.split(",").map(s => s.trim().replace(/^EU\s*/i, "")).filter(Boolean).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
+    if (parsed.length > 0) return parsed;
+  }
+  return DEFAULT_SIZES;
+};
+
+/** Cross-sell card with inline size picker */
+const CrossSellCard = ({ product, onAdd }: { product: Product; onAdd: (product: Product, size: number) => void }) => {
+  const [selectedSize, setSelectedSize] = useState<number | null>(null);
+  const sizes = getSizes(product);
+
+  return (
+    <div className="flex-shrink-0 w-[200px] sm:w-[220px] border border-border rounded-lg p-3 bg-background snap-start">
+      <Link to={`/product/${product.id}`} className="block">
+        <div className="aspect-square bg-muted rounded-md overflow-hidden mb-2">
+          <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+        </div>
+        <p className="text-xs font-semibold text-foreground line-clamp-2 uppercase leading-tight min-h-[2.4em]">
+          {product.name}
+        </p>
+        <div className="flex items-center gap-1.5 mt-1">
+          <span className="text-sm font-bold text-foreground">{formatPrice(product.price)}</span>
+          {product.originalPrice > product.price && (
+            <span className="text-[10px] text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
+          )}
+        </div>
+      </Link>
+
+      {/* Size selector */}
+      <div className="mt-2">
+        <p className="text-[10px] text-muted-foreground mb-1">Select Size</p>
+        <div className="flex flex-wrap gap-1">
+          {sizes.map((size) => (
+            <button
+              key={size}
+              onClick={() => setSelectedSize(size)}
+              className={`w-7 h-7 rounded-full border text-[10px] font-medium transition-all ${
+                selectedSize === size
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border hover:border-foreground text-foreground"
+              }`}
+            >
+              {size}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <button
+        onClick={() => {
+          if (!selectedSize) {
+            toast.error("Please select a size");
+            return;
+          }
+          onAdd(product, selectedSize);
+          toast.success(`${product.name} added!`);
+        }}
+        className="flex items-center gap-1 text-xs text-primary hover:underline mt-2 font-medium"
+      >
+        <Plus className="w-3 h-3" />
+        Add to Cart
+      </button>
+    </div>
+  );
+};
 
 const Cart = memo(() => {
-  const { items, updateQuantity, removeFromCart, totalPrice } = useCart();
+  const { items, updateQuantity, removeFromCart, totalPrice, addToCart } = useCart();
+  const { data: allProducts = [] } = useDbProducts();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const subtotal = totalPrice;
   const shipping = 20;
   const total = subtotal + shipping;
+
+  // Cross-sell: products not in cart
+  const cartIds = useMemo(() => new Set(items.map(i => i.product.id)), [items]);
+  const crossSellProducts = useMemo(() => {
+    return allProducts.filter(p => !cartIds.has(p.id)).slice(0, 10);
+  }, [allProducts, cartIds]);
+
+  const scroll = (dir: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: dir === "left" ? -240 : 240, behavior: "smooth" });
+  };
+
+  const handleCrossSellAdd = (product: Product, size: number) => {
+    addToCart(product, 1, `EU ${size}`);
+  };
 
   return (
     <PageTransition>
@@ -117,6 +205,29 @@ const Cart = memo(() => {
                   ))}
                 </div>
 
+                {/* Cross-sell section */}
+                {crossSellProducts.length > 0 && (
+                  <div className="mt-10 pt-8 border-t border-border">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-base sm:text-lg font-heading font-bold tracking-tight">You May Also Like</h3>
+                      {crossSellProducts.length > 3 && (
+                        <div className="hidden sm:flex gap-1">
+                          <button onClick={() => scroll("left")} className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => scroll("right")} className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2 snap-x">
+                      {crossSellProducts.map((product) => (
+                        <CrossSellCard key={product.id} product={product} onAdd={handleCrossSellAdd} />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Cart Totals Sidebar */}
