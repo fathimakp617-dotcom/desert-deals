@@ -95,7 +95,7 @@ const Navbar = memo(() => {
   return (
     <>
       {/* Announcement Bar */}
-      <div className="fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2">
+      <div className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={prevAnnouncement}
@@ -118,7 +118,7 @@ const Navbar = memo(() => {
       </div>
 
       {/* Main Header */}
-      <header className={`fixed top-9 left-0 right-0 z-50 bg-background border-b border-border transition-shadow duration-300 ${scrolled ? "shadow-md" : ""}`}>
+      <header className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <div className="flex items-center h-14 sm:h-16 relative">
             <div className="lg:hidden flex items-center">
