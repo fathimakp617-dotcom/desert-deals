@@ -668,11 +668,7 @@ const ProductDetail = () => {
           </div>
         </section>
 
-        {/* Frequently Bought Together */}
-        <FrequentlyBoughtTogether currentProduct={product} />
-
-        {/* Related Products */}
-        <RelatedProducts currentProductId={product.id} currentCategory={product.category} />
+        {/* Cross-selling paused */}
 
         <Footer />
         <MobileBottomNav />
