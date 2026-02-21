@@ -183,7 +183,7 @@ const AdminManualOrder = () => {
 
   // Financials
   const [discount, setDiscount] = useState(0);
-  const [shipping, setShipping] = useState(0);
+  const shipping = 20; // Fixed 20 AED delivery charge
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const total = subtotal - discount + shipping;
@@ -453,7 +453,7 @@ const AdminManualOrder = () => {
     setOrderStatus("pending");
     setItems([{ id: crypto.randomUUID(), name: "", price: 0, quantity: 1, productId: "", selectedSize: "", image_url: "" }]);
     setDiscount(0);
-    setShipping(0);
+    // shipping is fixed at 20 AED
     setSavedOrderId(null);
     setQuickFillText("");
   };
@@ -832,15 +832,10 @@ const AdminManualOrder = () => {
                       />
                     </div>
                     <div className="w-24">
-                      {index === 0 && <Label className="text-xs text-muted-foreground">Price (AED)</Label>}
-                      <Input
-                        type="number"
-                        min={0}
-                        value={item.price || ""}
-                        onChange={(e) => updateItem(item.id, "price", Number(e.target.value))}
-                        placeholder="0"
-                        className="mt-1"
-                      />
+                      {index === 0 && <Label className="text-xs text-muted-foreground">Price</Label>}
+                      <p className="mt-1 text-sm font-medium py-2 px-3 bg-muted rounded-md">
+                        {item.price > 0 ? `${item.price} AED` : "—"}
+                      </p>
                     </div>
                     <div className="w-16">
                       {index === 0 && <Label className="text-xs text-muted-foreground">Qty</Label>}
@@ -907,16 +902,9 @@ const AdminManualOrder = () => {
                   className="flex-1"
                 />
               </div>
-              <div className="flex items-center gap-3">
-                <Label className="text-sm text-muted-foreground w-20">Shipping</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={shipping || ""}
-                  onChange={(e) => setShipping(Number(e.target.value))}
-                  placeholder="0"
-                  className="flex-1"
-                />
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Delivery Charge</span>
+                <span className="font-medium">20 AED</span>
               </div>
               <div className="border-t border-border pt-3 flex justify-between text-lg font-bold">
                 <span>Total</span>
