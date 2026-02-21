@@ -195,7 +195,41 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
               {order.customer_phone && (
                 <div className="flex items-center gap-2 text-sm">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{order.customer_phone}</span>
+                  <a
+                    href={`https://wa.me/${order.customer_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+`Order Received ✅
+
+Thank you for your order with Desert Deal!
+
+To proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.
+
+📦 Delivery Timings:
+
+We deliver from Monday to Saturday, between 8 AM and 8 PM.
+
+🚫 No deliveries on Sundays.
+
+🕒 Please Note:
+
+Some areas have direct delivery service between 9 AM and 9 PM.
+
+In certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.
+
+If you have any confusion or need to double-check, feel free to visit our official website:
+
+👉 https://desertsdeals.com/
+
+Once we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.
+
+We look forward to your reply.
+
+Thank you for choosing Desert Deal!`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline cursor-pointer"
+                  >
+                    {order.customer_phone}
+                  </a>
                 </div>
               )}
             </div>
