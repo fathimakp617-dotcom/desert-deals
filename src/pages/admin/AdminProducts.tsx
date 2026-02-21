@@ -463,6 +463,32 @@ const AdminProducts = () => {
 
   const handleBulkEdit = () => {
     if (!bulkEditField || !bulkEditValue.trim()) return;
+    
+    if (bulkEditField === "add_category") {
+      // Append category to existing categories for each selected product
+      const categoriesToAdd = bulkEditValue.trim();
+      const productIds = Array.from(selectedIds);
+      const selectedProducts = (products || []).filter(p => productIds.includes(p.id));
+      
+      // Update each product by appending the new category
+      const updates: { id: string; category: string }[] = selectedProducts.map(p => {
+        const existing = (p.category || "").split(",").map(c => c.trim()).filter(Boolean);
+        const toAdd = categoriesToAdd.split(",").map(c => c.trim()).filter(Boolean);
+        const merged = [...new Set([...existing, ...toAdd])];
+        return { id: p.id, category: merged.join(", ") };
+      });
+      
+      // Use individual updates for each product
+      Promise.all(
+        updates.map(u => 
+          bulkUpdateMutation.mutateAsync({ productIds: [u.id], updates: { category: u.category } })
+        )
+      ).then(() => {
+        toast({ title: "Categories added", description: `Added to ${updates.length} products` });
+      });
+      return;
+    }
+    
     const updates: Record<string, unknown> = {};
     if (bulkEditField === "size") updates.size = bulkEditValue.trim();
     if (bulkEditField === "category") updates.category = bulkEditValue.trim();
@@ -810,7 +836,8 @@ const AdminProducts = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="size">Size</SelectItem>
-              <SelectItem value="category">Category</SelectItem>
+              <SelectItem value="category">Replace Category</SelectItem>
+              <SelectItem value="add_category">Add Category</SelectItem>
               <SelectItem value="is_active">Status</SelectItem>
               <SelectItem value="discount_percent">Discount %</SelectItem>
             </SelectContent>
@@ -825,7 +852,7 @@ const AdminProducts = () => {
                 <SelectItem value="false">Inactive</SelectItem>
               </SelectContent>
             </Select>
-          ) : bulkEditField === "category" ? (
+          ) : bulkEditField === "category" || bulkEditField === "add_category" ? (
             <Select value={bulkEditValue} onValueChange={setBulkEditValue}>
               <SelectTrigger className="w-[160px] h-8 text-sm">
                 <SelectValue placeholder="Category..." />
