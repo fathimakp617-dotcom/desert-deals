@@ -178,15 +178,28 @@ const Shop = () => {
 
           <section className="pt-40 lg:pt-44 pb-2">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-              <div className="flex items-center justify-between">
-                <nav className="text-sm text-muted-foreground">
-                  <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
-                  <span className="mx-2">›</span>
-                  <span className="text-foreground font-medium">All Shoes</span>
-                </nav>
+              {/* Breadcrumb */}
+              <nav className="text-sm text-muted-foreground mb-6">
+                <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+                <span className="mx-2">›</span>
+                <Link to="/shop" className="hover:text-foreground transition-colors">Shop</Link>
+                {selectedCategory !== "All" && (
+                  <>
+                    <span className="mx-2">›</span>
+                    <span className="text-foreground font-medium">{selectedCategory}</span>
+                  </>
+                )}
+                {debouncedSearch && (
+                  <>
+                    <span className="mx-2">›</span>
+                    <span className="text-foreground font-medium">Search results for "{debouncedSearch}"</span>
+                  </>
+                )}
+              </nav>
 
-                {/* Filter controls */}
-                <div className="flex items-center gap-3">
+              {/* Filter + Sort row */}
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
                   <button
                     onClick={() => {
                       if (window.innerWidth < 1024) {
@@ -195,33 +208,36 @@ const Shop = () => {
                         setShowFilters(!showFilters);
                       }
                     }}
-                    className="flex items-center gap-2 text-sm font-medium text-foreground hover:opacity-70 transition-opacity border border-border/50 rounded-lg px-3 py-2"
+                    className="flex items-center gap-2 text-sm font-medium text-foreground hover:opacity-70 transition-opacity"
                   >
                     <Filter className="w-4 h-4" />
                     Filter
                   </button>
 
-                  <div className="hidden lg:flex items-center gap-3">
-                    <div className="flex border border-border/50 rounded-lg overflow-hidden">
-                      <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                        <Grid3X3 className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => setViewMode("list")} className={`p-2 transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                        <List className="w-4 h-4" />
-                      </button>
-                    </div>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {totalCount} items
+                    {isFetching && !isLoading && <Loader2 className="inline-block ml-1 h-3 w-3 animate-spin" />}
+                  </span>
+                </div>
 
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className="w-40 h-9 bg-card border-border/50 text-sm"><SelectValue placeholder="Sort" /></SelectTrigger>
-                      <SelectContent>
-                        {sortOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground hidden sm:inline">Sort:</span>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-[180px] h-10 bg-card border-border/50 rounded-full text-sm">
+                      <SelectValue placeholder="Sort" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      {sortOptions.map((opt) => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
 
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {totalCount} items
-                      {isFetching && !isLoading && <Loader2 className="inline-block ml-1 h-3 w-3 animate-spin" />}
-                    </span>
+                  <div className="hidden lg:flex border border-border/50 rounded-lg overflow-hidden">
+                    <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                      <Grid3X3 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setViewMode("list")} className={`p-2 transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                      <List className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </div>
