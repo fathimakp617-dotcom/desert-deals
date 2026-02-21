@@ -134,3 +134,12 @@ verify_jwt = false
 
 [functions.verify-custom-otp]
 verify_jwt = false
+
+[functions.track-pageview]
+verify_jwt = false
+
+[functions.get-analytics]
+verify_jwt = false
+
+[functions.manage-blocked-countries]
+verify_jwt = false

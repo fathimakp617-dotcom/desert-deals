@@ -17,7 +17,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, User, RotateCcw, Star, ShoppingBag, Upload, ImageOff, Tags } from "lucide-react";
+import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, User, RotateCcw, Star, ShoppingBag, Upload, ImageOff, Tags, BarChart3 } from "lucide-react";
 import InstallAppBanner from "@/components/InstallAppBanner";
 import { motion } from "framer-motion";
 
@@ -248,6 +248,7 @@ const AdminLayout = () => {
     { title: "Returns", url: "/admin/returns", icon: RotateCcw },
     { title: "Reviews", url: "/admin/reviews", icon: Star },
     { title: "Customers", url: "/admin/customers", icon: Users },
+    { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
     { title: "Bulk Import", url: "/admin/bulk-import", icon: Upload },
     { title: "Categories", url: "/admin/categories", icon: Tags },
   ];
