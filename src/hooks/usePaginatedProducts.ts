@@ -128,6 +128,12 @@ export const usePaginatedProducts = (options: UsePaginatedProductsOptions) => {
         case "name-asc":
           q = q.order("name", { ascending: true });
           break;
+        case "latest":
+          q = q.order("created_at", { ascending: false });
+          break;
+        case "rating":
+          q = q.order("created_at", { ascending: false });
+          break;
         default:
           q = q.order("created_at", { ascending: false });
       }

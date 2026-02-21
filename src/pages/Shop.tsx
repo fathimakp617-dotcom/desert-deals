@@ -40,10 +40,12 @@ const priceRanges = [
   { label: "Above AED 500", min: 500, max: Infinity },
 ];
 const sortOptions = [
-  { label: "Featured", value: "featured" },
-  { label: "Price: Low to High", value: "price-asc" },
-  { label: "Price: High to Low", value: "price-desc" },
-  { label: "Popularity", value: "name-asc" },
+  { label: "Relevance", value: "featured" },
+  { label: "Sort by popularity", value: "name-asc" },
+  { label: "Sort by average rating", value: "rating" },
+  { label: "Sort by latest", value: "latest" },
+  { label: "Sort by price: low to high", value: "price-asc" },
+  { label: "Sort by price: high to low", value: "price-desc" },
 ];
 
 const brandSlugToCategory: Record<string, string> = {
