@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const clearAdminSession = () => {
   sessionStorage.removeItem("rayn_admin_session");
+  window.dispatchEvent(new CustomEvent("admin-session-expired"));
 };
 
 const isSessionExpiredError = (err: unknown) => {

@@ -58,6 +58,20 @@ const AdminLayout = () => {
     setIsChecking(false);
   }, []);
 
+  // Listen for session expiry events from useAdminData hooks
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setAdminSession(null);
+      toast({
+        title: "Session Expired",
+        description: "Please log in again.",
+        variant: "destructive",
+      });
+    };
+    window.addEventListener("admin-session-expired", handleSessionExpired);
+    return () => window.removeEventListener("admin-session-expired", handleSessionExpired);
+  }, [toast]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
