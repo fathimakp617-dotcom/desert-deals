@@ -129,7 +129,7 @@ const Cart = memo(() => {
 
   return (
     <PageTransition>
-      <main className="min-h-screen bg-background">
+      <main className="min-h-screen bg-background overflow-x-hidden">
         <Navbar />
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-16">
@@ -150,7 +150,7 @@ const Cart = memo(() => {
           ) : (
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Cart Table */}
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 {/* Table Header */}
                 <div className="hidden sm:grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 pb-4 border-b border-border text-sm text-muted-foreground">
                   <span>Product</span>
@@ -230,7 +230,7 @@ const Cart = memo(() => {
 
                 {/* Cross-sell section */}
                 {crossSellProducts.length > 0 && (
-                  <div className="mt-10 pt-8 border-t border-border">
+                  <div className="mt-10 pt-8 border-t border-border overflow-hidden">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-base sm:text-lg font-heading font-bold tracking-tight">You May Also Like</h3>
                       {crossSellProducts.length > 3 && (
