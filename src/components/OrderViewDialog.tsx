@@ -355,7 +355,7 @@ Thank you for choosing Desert Deal!`)}`}
                 <span className="text-muted-foreground">Subtotal</span>
                 <span>{formatCurrency(order.subtotal)}</span>
               </div>
-              {order.discount && order.discount > 0 && (
+              {order.discount != null && order.discount > 0 && (
                 <div className="flex justify-between text-sm text-green-600">
                   <span>Discount</span>
                   <span>-{formatCurrency(order.discount)}</span>
