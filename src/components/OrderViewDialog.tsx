@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import {
   Tag,
   ExternalLink
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface OrderItem {
   productId?: string;
@@ -66,6 +68,31 @@ interface OrderViewDialogProps {
 }
 
 const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) => {
+  const [productImages, setProductImages] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!order || !open) return;
+    const productIds = order.items
+      .map((item) => item.productId)
+      .filter(Boolean) as string[];
+    if (productIds.length === 0) return;
+
+    supabase
+      .from("products")
+      .select("id, image_url")
+      .in("id", productIds)
+      .then(({ data }) => {
+        if (!data) return;
+        const map: Record<string, string> = {};
+        data.forEach((p) => {
+          if (p.image_url) {
+            map[p.id] = p.image_url.split(",")[0].trim();
+          }
+        });
+        setProductImages(map);
+      });
+  }, [order, open]);
+
   if (!order) return null;
 
   const formatCurrency = (amount: number) => {
@@ -261,16 +288,28 @@ Thank you for choosing Desert Deal!`)}`}
               {order.items.map((item, index) => (
                 <div 
                   key={index} 
-                  className="flex justify-between items-center text-sm p-3 bg-muted/30 rounded-lg"
+                  className="flex items-center gap-3 text-sm p-3 bg-muted/30 rounded-lg"
                 >
-                  <div>
+                  {item.productId && productImages[item.productId] ? (
+                    <img
+                      src={productImages[item.productId]}
+                      alt={item.name || item.product_name || "Product"}
+                      className="h-12 w-12 rounded-md object-cover border border-border flex-shrink-0"
+                      onError={(e) => { e.currentTarget.src = "/images/product-placeholder.jpg"; }}
+                    />
+                  ) : (
+                    <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
+                      <Package className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
                     <span className="font-medium">{item.name || item.product_name || "Product"}</span>
                     {item.selectedSize && (
                       <span className="text-xs text-muted-foreground ml-2">({item.selectedSize})</span>
                     )}
                     <span className="text-muted-foreground ml-2">×{item.quantity}</span>
                   </div>
-                  <span className="font-medium">{formatCurrency(item.price * item.quantity)}</span>
+                  <span className="font-medium flex-shrink-0">{formatCurrency(item.price * item.quantity)}</span>
                 </div>
               ))}
             </div>
