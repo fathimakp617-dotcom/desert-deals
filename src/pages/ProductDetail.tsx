@@ -394,32 +394,32 @@ const ProductDetail = () => {
                   )}
                 </motion.div>
 
-                {/* Sold count + reviews badge */}
-                <motion.div variants={staggerItem} className="flex items-center gap-4 flex-wrap">
-                  {soldCount > 0 && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-lg">🔥</span>
-                      <span className="text-sm font-semibold text-orange-600">
-                        Sold Out {soldCount} {soldCount === 1 ? "Time" : "Times"}
-                      </span>
+                {/* Sold count badge */}
+                {soldCount > 0 && (
+                  <motion.div variants={staggerItem} className="flex items-center gap-1.5">
+                    <span className="text-lg">🔥</span>
+                    <span className="text-sm font-semibold text-orange-600">
+                      Sold Out {soldCount} {soldCount === 1 ? "Time" : "Times"}
+                    </span>
+                  </motion.div>
+                )}
+
+                {/* Rating stars - matching review section style */}
+                {totalReviews > 0 && (
+                  <motion.div variants={staggerItem} className="flex items-center gap-3">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star
+                          key={s}
+                          className={`w-5 h-5 ${s <= Math.round(averageRating) ? "fill-primary text-primary" : "text-muted-foreground/30"} transition-colors`}
+                        />
+                      ))}
                     </div>
-                  )}
-                  {totalReviews > 0 && (
-                    <div className="flex items-center gap-1.5">
-                      <div className="flex items-center gap-0.5">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <Star
-                            key={s}
-                            className={`w-4 h-4 ${s <= Math.round(averageRating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        ({totalReviews})
-                      </span>
-                    </div>
-                  )}
-                </motion.div>
+                    <span className="text-sm text-muted-foreground">
+                      {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? "review" : "reviews"})
+                    </span>
+                  </motion.div>
+                )}
 
                 {/* Size Selector */}
                 <motion.div variants={staggerItem} className="space-y-2">
