@@ -63,9 +63,9 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
-                    <div className="absolute top-2 right-2 flex items-center gap-0.5 bg-black/60 backdrop-blur-sm text-white px-1.5 py-0.5 rounded-full z-10">
+                    <div className="absolute top-2 right-2 flex items-center gap-0.5 bg-muted/80 backdrop-blur-sm px-1.5 py-0.5 rounded-full z-10">
                       <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      <span className="text-[10px] font-semibold">{(3.7 + (Math.abs([...item.id].reduce((a,c)=>((a<<5)-a+c.charCodeAt(0))|0,0)) % 13) * 0.1).toFixed(1)}</span>
+                      <span className="text-[10px] font-semibold text-foreground">{(3.7 + (Math.abs([...item.id].reduce((a,c)=>((a<<5)-a+c.charCodeAt(0))|0,0)) % 13) * 0.1).toFixed(1)}</span>
                     </div>
                   </div>
                   <div className="p-3">
