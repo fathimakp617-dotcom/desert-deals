@@ -61,7 +61,7 @@ const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminBulkImport = lazy(() => import("./pages/admin/AdminBulkImport"));
 const AdminImageFix = lazy(() => import("./pages/admin/AdminImageFix"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
-
+const AdminManualOrder = lazy(() => import("./pages/admin/AdminManualOrder"));
 
 
 // Minimal loading fallback
@@ -133,6 +133,7 @@ const App = () => (
                         <Route path="bulk-import" element={<AdminBulkImport />} />
                         <Route path="categories" element={<AdminCategories />} />
                         <Route path="fix-images" element={<AdminImageFix />} />
+                        <Route path="manual-order" element={<AdminManualOrder />} />
                       </Route>
                       <Route path="*" element={<NotFound />} />
                     </Routes>
