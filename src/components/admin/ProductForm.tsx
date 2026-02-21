@@ -25,6 +25,7 @@ const ALL_SIZES = [
 ];
 
 const FALLBACK_CATEGORIES = [
+  { value: "all-shoes", label: "All Shoes" },
   { value: "nike", label: "Nike" },
   { value: "jordan", label: "Jordan" },
   { value: "adidas", label: "Adidas" },
