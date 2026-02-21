@@ -166,7 +166,7 @@ const Navbar = memo(() => {
           </div>
 
           {/* Desktop nav – bottom row centered */}
-          <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 pt-2">
+          <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 pt-0.5">
             {bottomLinks.map((link) => (
               <Link
                 key={link.name}
