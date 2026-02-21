@@ -41,20 +41,27 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check if admin
-    const { data: staff } = await supabaseClient
-      .from("staff_members")
-      .select("role")
-      .eq("email", session.email)
-      .single();
+    // Check if admin (staff_members table OR env-based admin)
+    const adminEmails = (Deno.env.get("ADMIN_EMAILS") || "").split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+    const isEnvAdmin = adminEmails.includes(session.email.toLowerCase());
 
-    if (!staff || staff.role !== "admin") {
-      console.error("Access denied for:", session.email);
-      return new Response(JSON.stringify({ error: "Admin access required" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!isEnvAdmin) {
+      const { data: staff } = await supabaseClient
+        .from("staff_members")
+        .select("role")
+        .eq("email", session.email)
+        .single();
+
+      if (!staff || staff.role !== "admin") {
+        console.error("Access denied for:", session.email);
+        return new Response(JSON.stringify({ error: "Admin access required" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
+
+    console.log("Admin access granted for:", session.email);
 
     const body = await req.json();
     console.log("Creating manual order:", body.order_number);
