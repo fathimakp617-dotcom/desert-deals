@@ -38,16 +38,16 @@ const Navbar = memo(() => {
       href: `/shop?brand=${c.value}`,
     }));
 
-    const splitAt = Math.min(Math.ceil(categoryLinks.length / 2), 11);
-    const top = [
+    const allNavLinks = [
       { name: "All Shoes", href: "/shop" },
-      ...categoryLinks.slice(0, splitAt),
-    ];
-    const bottom = [
-      ...categoryLinks.slice(splitAt),
+      ...categoryLinks,
       ...staticBottomLinks,
     ];
-    return { topLinks: top, bottomLinks: bottom, allLinks: [...top, ...bottom] };
+    // Fill first row as much as possible (up to 10), rest goes to second row
+    const splitAt = Math.min(10, allNavLinks.length);
+    const top = allNavLinks.slice(0, splitAt);
+    const bottom = allNavLinks.slice(splitAt);
+    return { topLinks: top, bottomLinks: bottom, allLinks: allNavLinks };
   }, [categories]);
 
   const nextAnnouncement = useCallback(() => {
@@ -130,7 +130,7 @@ const Navbar = memo(() => {
             </Link>
 
             {/* Desktop nav – top row centered between logo and icons */}
-            <div className="hidden lg:flex items-center justify-center gap-x-5 flex-1 overflow-x-auto no-scrollbar">
+            <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 flex-1 overflow-x-auto no-scrollbar">
               {topLinks.map((link) => (
                 <Link
                   key={link.name}
@@ -166,7 +166,7 @@ const Navbar = memo(() => {
           </div>
 
           {/* Desktop nav – bottom row centered */}
-          <div className="hidden lg:flex items-center justify-center gap-x-5 pb-2">
+          <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 pb-2">
             {bottomLinks.map((link) => (
               <Link
                 key={link.name}
