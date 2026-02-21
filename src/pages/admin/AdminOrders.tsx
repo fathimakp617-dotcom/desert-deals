@@ -1292,7 +1292,7 @@ const AdminOrders = () => {
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>{formatCurrency(selectedOrder.subtotal)}</span>
                   </div>
-                  {selectedOrder.discount && selectedOrder.discount > 0 && (
+                  {selectedOrder.discount != null && selectedOrder.discount > 0 && (
                     <div className="flex justify-between text-green-500">
                       <span>Discount</span>
                       <span>-{formatCurrency(selectedOrder.discount)}</span>
