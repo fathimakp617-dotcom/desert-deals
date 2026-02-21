@@ -5,6 +5,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCategories } from "@/hooks/useCategories";
 import SearchSuggestions from "@/components/SearchSuggestions";
+import headerLogo from "@/assets/desert-deal-logo-header.png";
 
 const announcements = [
   "Ramadan Sale Live Now - Up To 75% Off →",
@@ -124,9 +125,7 @@ const Navbar = memo(() => {
               to="/"
               className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:mr-8"
             >
-              <span className="text-xl sm:text-2xl font-heading font-extrabold tracking-wider text-foreground uppercase whitespace-nowrap">
-                Desert Deal
-              </span>
+              <img src={headerLogo} alt="Desert Deal" className="h-6 sm:h-8 w-auto" />
             </Link>
 
             {/* Desktop nav – top row centered between logo and icons */}
