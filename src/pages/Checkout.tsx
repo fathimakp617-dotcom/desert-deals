@@ -540,127 +540,176 @@ const Checkout = () => {
           <form onSubmit={handleSubmit}>
             <div className="grid lg:grid-cols-3 gap-12">
               {/* Left Column - Billing Details */}
-              <div className="lg:col-span-2 space-y-6">
-                <div>
-                  <Label>Country / Region *</Label>
-                  <p className="text-foreground font-medium mt-1">United Arab Emirates</p>
+              <div className="lg:col-span-2 space-y-8">
+                {/* Contact Section */}
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="email">Email or phone number *</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Enter an email or phone number"
+                      required
+                      className={`mt-1 bg-card ${fieldErrors.email ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
+                    />
+                    {fieldErrors.email && <p className="text-destructive text-xs mt-1">{fieldErrors.email}</p>}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="email-updates"
+                      defaultChecked
+                      className="accent-primary w-4 h-4"
+                    />
+                    <Label htmlFor="email-updates" className="text-sm text-foreground cursor-pointer font-normal">
+                      Get order updates & offers via Email
+                    </Label>
+                  </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="firstName">Name *</Label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    required
-                    className={`mt-1 bg-card ${fieldErrors.firstName ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
-                  />
-                  {fieldErrors.firstName && <p className="text-destructive text-xs mt-1">{fieldErrors.firstName}</p>}
-                </div>
+                <Separator />
 
-                <div>
-                  <Label htmlFor="address">Street Address</Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="mt-1 bg-card border-border"
-                  />
-                  {fieldErrors.address && <p className="text-destructive text-xs mt-1">{fieldErrors.address}</p>}
-                </div>
+                {/* Delivery Section */}
+                <div className="space-y-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">Delivery</h2>
+                    <p className="text-sm text-muted-foreground mt-1">This will also be used as your billing address for this order.</p>
+                  </div>
 
-                <div>
-                  <Label htmlFor="state">Emirate *</Label>
-                  <Select
-                    value={formData.state}
-                    onValueChange={(value) => {
-                      setFormData(prev => ({ ...prev, state: value }));
-                      if (fieldErrors.state) setFieldErrors(prev => { const n = { ...prev }; delete n.state; return n; });
-                    }}
-                  >
-                    <SelectTrigger className={`mt-1 bg-card ${fieldErrors.state ? "border-destructive ring-1 ring-destructive" : "border-border"}`}>
-                      <SelectValue placeholder="Select Emirate" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
-                      <SelectItem value="Dubai">Dubai</SelectItem>
-                      <SelectItem value="Sharjah">Sharjah</SelectItem>
-                      <SelectItem value="Ajman">Ajman</SelectItem>
-                      <SelectItem value="Umm Al Quwain">Umm Al Quwain</SelectItem>
-                      <SelectItem value="Ras Al Khaimah">Ras Al Khaimah</SelectItem>
-                      <SelectItem value="Fujairah">Fujairah</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {fieldErrors.state && <p className="text-destructive text-xs mt-1">{fieldErrors.state}</p>}
-                </div>
-
-                <div>
-                  <Label htmlFor="phone">Phone *</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Select
-                      value={formData.countryCode}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, countryCode: value }))}
-                    >
-                      <SelectTrigger className="w-[110px] bg-card border-border">
-                        <SelectValue placeholder="+971" />
+                  {/* Country/Region */}
+                  <div>
+                    <Label>Country/Region</Label>
+                    <Select value="UAE" disabled>
+                      <SelectTrigger className="mt-1 bg-card border-border">
+                        <SelectValue>United Arab Emirates</SelectValue>
                       </SelectTrigger>
-                      <SelectContent className="max-h-60">
-                        <SelectItem value="+971">🇦🇪 +971</SelectItem>
-                        <SelectItem value="+966">🇸🇦 +966</SelectItem>
-                        <SelectItem value="+968">🇴🇲 +968</SelectItem>
-                        <SelectItem value="+974">🇶🇦 +974</SelectItem>
-                        <SelectItem value="+973">🇧🇭 +973</SelectItem>
-                        <SelectItem value="+965">🇰🇼 +965</SelectItem>
-                        <SelectItem value="+91">🇮🇳 +91</SelectItem>
-                        <SelectItem value="+92">🇵🇰 +92</SelectItem>
-                        <SelectItem value="+63">🇵🇭 +63</SelectItem>
-                        <SelectItem value="+880">🇧🇩 +880</SelectItem>
-                        <SelectItem value="+44">🇬🇧 +44</SelectItem>
-                        <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                      <SelectContent>
+                        <SelectItem value="UAE">United Arab Emirates</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
-                      className={`flex-1 bg-card ${fieldErrors.phone ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
-                    />
                   </div>
-                  {fieldErrors.phone && <p className="text-destructive text-xs mt-1">{fieldErrors.phone}</p>}
 
-                </div>
+                  {/* First name & Last name side by side */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        placeholder="First name"
+                        required
+                        className={`bg-card ${fieldErrors.firstName ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
+                      />
+                      {fieldErrors.firstName && <p className="text-destructive text-xs mt-1">Enter a first name</p>}
+                    </div>
+                    <div>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        placeholder="Last name"
+                        className={`bg-card ${fieldErrors.lastName ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
+                      />
+                      {fieldErrors.lastName && <p className="text-destructive text-xs mt-1">Enter a last name</p>}
+                    </div>
+                  </div>
 
-                <div>
-                  <Label htmlFor="city">Town / City *</Label>
-                  <Input
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    required
-                    className={`mt-1 bg-card ${fieldErrors.city ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
-                  />
-                  {fieldErrors.city && <p className="text-destructive text-xs mt-1">{fieldErrors.city}</p>}
-                </div>
+                  {/* Address */}
+                  <div>
+                    <Input
+                      id="address"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      placeholder="Address"
+                      className={`bg-card ${fieldErrors.address ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
+                    />
+                    {fieldErrors.address && <p className="text-destructive text-xs mt-1">Enter an address</p>}
+                  </div>
 
-                <div>
-                  <Label htmlFor="email">Email address *</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="your@email.com"
-                    required
-                    className={`mt-1 bg-card ${fieldErrors.email ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
-                  />
-                  {fieldErrors.email && <p className="text-destructive text-xs mt-1">{fieldErrors.email}</p>}
+                  {/* City */}
+                  <div>
+                    <Input
+                      id="city"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      placeholder="City"
+                      required
+                      className={`bg-card ${fieldErrors.city ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
+                    />
+                    {fieldErrors.city && <p className="text-destructive text-xs mt-1">Enter a city</p>}
+                  </div>
+
+                  {/* Emirate */}
+                  <div>
+                    <Select
+                      value={formData.state}
+                      onValueChange={(value) => {
+                        setFormData(prev => ({ ...prev, state: value }));
+                        if (fieldErrors.state) setFieldErrors(prev => { const n = { ...prev }; delete n.state; return n; });
+                      }}
+                    >
+                      <SelectTrigger className={`bg-card ${fieldErrors.state ? "border-destructive ring-1 ring-destructive" : "border-border"}`}>
+                        <SelectValue placeholder="Emirate" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
+                        <SelectItem value="Dubai">Dubai</SelectItem>
+                        <SelectItem value="Sharjah">Sharjah</SelectItem>
+                        <SelectItem value="Ajman">Ajman</SelectItem>
+                        <SelectItem value="Umm Al Quwain">Umm Al Quwain</SelectItem>
+                        <SelectItem value="Ras Al Khaimah">Ras Al Khaimah</SelectItem>
+                        <SelectItem value="Fujairah">Fujairah</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {fieldErrors.state && <p className="text-destructive text-xs mt-1">Select an emirate</p>}
+                  </div>
+
+                  {/* Phone */}
+                  <div>
+                    <div className="flex gap-2">
+                      <Select
+                        value={formData.countryCode}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, countryCode: value }))}
+                      >
+                        <SelectTrigger className="w-[110px] bg-card border-border">
+                          <SelectValue placeholder="+971" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          <SelectItem value="+971">🇦🇪 +971</SelectItem>
+                          <SelectItem value="+966">🇸🇦 +966</SelectItem>
+                          <SelectItem value="+968">🇴🇲 +968</SelectItem>
+                          <SelectItem value="+974">🇶🇦 +974</SelectItem>
+                          <SelectItem value="+973">🇧🇭 +973</SelectItem>
+                          <SelectItem value="+965">🇰🇼 +965</SelectItem>
+                          <SelectItem value="+91">🇮🇳 +91</SelectItem>
+                          <SelectItem value="+92">🇵🇰 +92</SelectItem>
+                          <SelectItem value="+63">🇵🇭 +63</SelectItem>
+                          <SelectItem value="+880">🇧🇩 +880</SelectItem>
+                          <SelectItem value="+44">🇬🇧 +44</SelectItem>
+                          <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="Phone"
+                        required
+                        className={`flex-1 bg-card ${fieldErrors.phone ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
+                      />
+                    </div>
+                    {fieldErrors.phone && <p className="text-destructive text-xs mt-1">{fieldErrors.phone}</p>}
+                  </div>
                 </div>
               </div>
 
