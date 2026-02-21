@@ -516,6 +516,16 @@ const AdminProducts = () => {
   const handleFormSubmit = (fd: ProductFormData, pendingImageFiles: File[] | null) => {
     const productId = editingProduct ? editingProduct.id : fd.id;
 
+    // Check for duplicate ID when creating (not editing)
+    if (!editingProduct && products) {
+      const allProducts = [...products, ...(trashedProducts || [])];
+      const exists = allProducts.some(p => p.id === fd.id);
+      if (exists) {
+        toast({ title: "Duplicate Product ID", description: `A product with ID "${fd.id}" already exists. Please use a different name or ID.`, variant: "destructive" });
+        return;
+      }
+    }
+
     const afterSuccess = async () => {
       if (pendingImageFiles && pendingImageFiles.length > 0 && productId) {
         for (const file of pendingImageFiles) {
