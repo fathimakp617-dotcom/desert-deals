@@ -13,9 +13,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Upload, Eye, X, Plus, ExternalLink } from "lucide-react";
+import { Loader2, Upload, Eye, X, Plus, ExternalLink, GripVertical } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import RichTextEditor from "./RichTextEditor";
+import { cn } from "@/lib/utils";
 
 const ALL_SIZES = [
   "EU 36", "EU 37", "EU 38", "EU 39", "EU 40",
@@ -108,6 +109,8 @@ const ProductForm = ({
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
   const [previewImageSrc, setPreviewImageSrc] = useState("");
   const [isProductPreviewOpen, setIsProductPreviewOpen] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Track which field the user is actively editing to avoid circular updates
   const lastEditedField = useRef<"discount" | "price" | "original" | null>(null);
@@ -202,7 +205,6 @@ const ProductForm = ({
     const url = imagePreviews[index];
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
     if (url.startsWith("blob:")) {
-      // Find corresponding pending file index (blob previews come after existing URLs)
       const blobPreviews = imagePreviews.filter(u => u.startsWith("blob:"));
       const blobIndex = blobPreviews.indexOf(url);
       if (blobIndex >= 0) {
@@ -210,6 +212,45 @@ const ProductForm = ({
       }
       URL.revokeObjectURL(url);
     }
+  };
+
+  const handleDragStart = (index: number) => {
+    setDragIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === dropIndex) {
+      setDragIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    // Reorder previews
+    const newPreviews = [...imagePreviews];
+    const [movedPreview] = newPreviews.splice(dragIndex, 1);
+    newPreviews.splice(dropIndex, 0, movedPreview);
+    setImagePreviews(newPreviews);
+
+    // Reorder pending files to match (map blob URLs to files)
+    const blobOrder = newPreviews.filter(u => u.startsWith("blob:"));
+    const oldBlobOrder = imagePreviews.filter(u => u.startsWith("blob:"));
+    if (blobOrder.length > 0 && oldBlobOrder.length > 0) {
+      const oldFiles = [...pendingImageFiles];
+      const newFiles = blobOrder.map(blobUrl => {
+        const oldIdx = oldBlobOrder.indexOf(blobUrl);
+        return oldFiles[oldIdx];
+      }).filter(Boolean);
+      setPendingImageFiles(newFiles);
+    }
+
+    setDragIndex(null);
+    setDragOverIndex(null);
   };
 
   return (
@@ -375,13 +416,30 @@ const ProductForm = ({
 
           {/* Image Grid */}
           {imagePreviews.length > 0 && (
+            <>
+            <p className="text-xs text-muted-foreground">Drag images to reorder. First image = main product image.</p>
             <div className="flex flex-wrap gap-3">
               {imagePreviews.map((url, index) => (
-                <div key={index} className="relative w-24 h-24 rounded-lg overflow-hidden border bg-muted group">
+                <div
+                  key={url + index}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDrop={(e) => handleDrop(e, index)}
+                  onDragEnd={() => { setDragIndex(null); setDragOverIndex(null); }}
+                  className={cn(
+                    "relative w-24 h-24 rounded-lg overflow-hidden border bg-muted group cursor-grab active:cursor-grabbing transition-all",
+                    dragIndex === index && "opacity-40 scale-95",
+                    dragOverIndex === index && dragIndex !== index && "ring-2 ring-primary"
+                  )}
+                >
+                  <div className="absolute top-1 right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <GripVertical className="h-4 w-4 text-white drop-shadow-md" />
+                  </div>
                   <img
                     src={url}
                     alt={`Product image ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover pointer-events-none"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
@@ -423,6 +481,7 @@ const ProductForm = ({
                 <span className="text-[10px] text-muted-foreground mt-1">Add</span>
               </button>
             </div>
+            </>
           )}
 
           {/* Upload button when no images */}
