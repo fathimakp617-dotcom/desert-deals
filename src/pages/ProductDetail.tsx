@@ -673,6 +673,7 @@ const ProductDetail = () => {
 
         {/* Brand Product Rows */}
         <div className="border-t border-border mt-4">
+          <RelatedProducts currentProductId={product.id} currentCategory={product.category} />
           <RecentlyViewedProducts currentProductId={product.id} />
           <BrandProductRow brand="Nike" title="Nike" />
           <BrandProductRow brand="Adidas" title="Adidas" />
