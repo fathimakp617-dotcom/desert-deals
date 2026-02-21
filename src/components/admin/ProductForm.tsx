@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Slider } from "@/components/ui/slider";
 import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -262,15 +263,25 @@ const ProductForm = ({
           </div>
           <div>
             <Label htmlFor="discount_percent">Discount %</Label>
-            <Input
-              id="discount_percent"
-              type="number"
-              min="0"
-              max="100"
-              value={formData.discount_percent}
-              onChange={(e) => setFormData((prev) => ({ ...prev, discount_percent: e.target.value }))}
-              placeholder="50"
-            />
+            <div className="flex items-center gap-2 mt-1">
+              <Slider
+                min={0}
+                max={90}
+                step={5}
+                value={[parseInt(formData.discount_percent) || 0]}
+                onValueChange={([val]) => setFormData((prev) => ({ ...prev, discount_percent: val.toString() }))}
+                className="flex-1"
+              />
+              <Input
+                id="discount_percent"
+                type="number"
+                min="0"
+                max="100"
+                value={formData.discount_percent}
+                onChange={(e) => setFormData((prev) => ({ ...prev, discount_percent: e.target.value }))}
+                className="w-20 text-center"
+              />
+            </div>
           </div>
           <div>
             <Label htmlFor="price">Final Price (AED)</Label>
@@ -281,7 +292,7 @@ const ProductForm = ({
               step="1"
               value={formData.price}
               onChange={(e) => handleFinalPriceChange(e.target.value)}
-              placeholder="Enter or auto-calculated"
+              placeholder="Auto-calculated"
             />
           </div>
         </div>
