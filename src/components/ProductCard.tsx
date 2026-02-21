@@ -1,15 +1,10 @@
-import { memo, useState, useMemo } from "react";
+import { memo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, ImageOff, Star } from "lucide-react";
+import { Heart, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/data/products";
 import type { SimpleProduct } from "@/hooks/usePaginatedProducts";
 
-const getProductRating = (id: string): number => {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
-  return +(3.7 + (Math.abs(hash) % 13) * 0.1).toFixed(1);
-};
 
 interface ProductCardProps {
   product: SimpleProduct;
@@ -21,7 +16,6 @@ interface ProductCardProps {
 
 const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, viewMode }: ProductCardProps) => {
   const [imgError, setImgError] = useState(false);
-  const rating = useMemo(() => getProductRating(product.id), [product.id]);
 
   if (viewMode === "list") {
     return (
@@ -78,10 +72,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
         </Link>
 
 
-        <div className="absolute top-2 right-2 flex items-center gap-0.5 bg-muted/80 backdrop-blur-sm px-1.5 py-0.5 rounded-full z-10">
-          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-          <span className="text-[10px] font-semibold text-foreground">{rating}</span>
-        </div>
+
 
         {soldOut && (
           <div className="absolute top-2 left-2">
