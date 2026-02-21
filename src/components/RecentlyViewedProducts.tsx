@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Star } from "lucide-react";
 import { formatPrice, Product } from "@/data/products";
 import { useWishlist } from "@/contexts/WishlistContext";
 
@@ -88,6 +88,9 @@ const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string
                     </div>
                     <div className="p-3">
                       <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
+                      <div className="flex gap-0.5 mt-1">
+                        {[1,2,3,4,5].map(s => <Star key={s} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}
+                      </div>
                       <h2 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 min-h-[2.5em] leading-snug mt-0.5">
                         {product.name}
                       </h2>
