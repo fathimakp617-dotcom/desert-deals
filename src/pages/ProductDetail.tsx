@@ -182,7 +182,7 @@ const ProductDetail = () => {
   };
 
   const handleShare = async () => {
-    const shareUrl = window.location.href;
+    const shareUrl = `https://desertsdeals.com/product/${product.id}`;
     const shareText = `✨ Check out ${product.name} from Desert Deal!\n\n${product.tagline}\n\n💰 Price: ${formatPrice(product.price)}\n\n🔗 `;
     
     if (navigator.share) {
