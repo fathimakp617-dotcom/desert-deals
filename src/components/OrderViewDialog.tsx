@@ -128,32 +128,33 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
       const phone = order.customer_phone.replace(/[^0-9]/g, '');
       const message = `*Order Received ✅*\n\nThank you for your order with Desert Deal!\n\nTo proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.\n\n📦 *Delivery Timings:*\nWe deliver from Monday to Saturday, between 8 AM and 8 PM.\n🚫 No deliveries on Sundays.\n\n🕒 *Please Note:*\nSome areas have direct delivery service between 9 AM and 9 PM.\nIn certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.\n\nIf you have any confusion or need to double-check, feel free to visit our official website:\n👉 https://desertsdeals.com/\n\nOnce we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.\n\nWe look forward to your reply.\n\nThank you for choosing Desert Deal!`;
 
-      // Mobile: try Web Share API to share actual image file
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      if (isMobile && navigator.canShare) {
-        const file = new File([blob], `order-${order.order_number}.png`, { type: "image/png" });
-        const shareData = { text: message, files: [file] };
-        if (navigator.canShare(shareData)) {
-          await navigator.share(shareData);
-          setIsSharing(false);
-          return;
-        }
-      }
-
-      // Desktop fallback: upload image and share URL via wa.me
+      // Upload image to storage for a shareable link
       const fileName = `order-${order.order_number}-${Date.now()}.png`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("order-images")
         .upload(fileName, blob, { contentType: "image/png", upsert: true });
 
+      let imageUrl = '';
       if (!uploadError && uploadData) {
         const { data: urlData } = supabase.storage.from("order-images").getPublicUrl(fileName);
-        const imageUrl = urlData?.publicUrl || '';
-        const messageWithImage = message + `\n\n🖼️ *Order Details:* ${imageUrl}`;
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(messageWithImage)}`, '_blank');
-      } else {
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        imageUrl = urlData?.publicUrl || '';
       }
+
+      // On mobile, also download the image so user can attach it in WhatsApp
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        const link = document.createElement("a");
+        link.download = `order-${order.order_number}.png`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+      }
+
+      // Always redirect to customer's WhatsApp via wa.me
+      const messageWithImage = imageUrl
+        ? message + `\n\n🖼️ *Order Details:* ${imageUrl}`
+        : message;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(messageWithImage)}`, '_blank');
     } catch (err) {
       // If user cancelled share dialog, ignore
       if ((err as Error)?.name !== 'AbortError') {
