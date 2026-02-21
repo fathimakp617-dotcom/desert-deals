@@ -176,7 +176,7 @@ const Shop = () => {
         <main className="min-h-screen bg-background relative z-10 pb-16 md:pb-0">
           <Navbar />
 
-          <section className="pt-28 pb-2">
+          <section className="pt-40 lg:pt-44 pb-2">
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
               <div className="flex items-center justify-between">
                 <nav className="text-sm text-muted-foreground">
