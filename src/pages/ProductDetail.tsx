@@ -59,6 +59,13 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const touchStartX = useRef(0);
 
+  // Reset size & quantity when navigating to a different product
+  useEffect(() => {
+    setSelectedSize(null);
+    setQuantity(1);
+    setSelectedImage(0);
+  }, [id]);
+
   // Auto-slide images every 10 seconds
   useEffect(() => {
     if (!product || product.gallery.length <= 1) return;

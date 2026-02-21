@@ -56,32 +56,38 @@ const CartDrawer = memo(() => {
         <div className="flex-1 overflow-y-auto p-5 pt-10">
           {/* Added to cart confirmation */}
           {lastItem && (
-            <>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                  <Check className="w-3 h-3 text-primary-foreground" />
-                </div>
-                <span className="font-heading text-sm text-primary">Added to your cart</span>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                <Check className="w-3 h-3 text-primary-foreground" />
               </div>
-
-              <div className="flex gap-3 p-3 border border-border rounded-lg mb-6">
-                <Link to={`/product/${lastItem.product.id}`} onClick={closeCart} className="w-16 h-16 flex-shrink-0">
-                  <img src={lastItem.product.image} alt={lastItem.product.name} className="w-full h-full object-cover rounded-md" />
-                </Link>
-                <div className="flex-1 min-w-0">
-                  <Link to={`/product/${lastItem.product.id}`} onClick={closeCart} className="text-sm font-medium text-foreground line-clamp-2 hover:underline">
-                    {lastItem.product.name}
-                  </Link>
-                  {lastItem.selectedSize && (
-                    <p className="text-xs text-muted-foreground mt-0.5">Size: {lastItem.selectedSize}</p>
-                  )}
-                </div>
-                <span className="text-sm font-bold text-primary whitespace-nowrap">{formatPrice(lastItem.product.price)}</span>
-              </div>
-            </>
+              <span className="font-heading text-sm text-primary">Added to your cart</span>
+            </div>
           )}
 
-          {/* Cross-selling paused */}
+          {/* All cart items */}
+          <div className="space-y-3">
+            {items.map((item) => (
+              <div key={`${item.product.id}-${item.selectedSize || ''}`} className="flex gap-3 p-3 border border-border rounded-lg">
+                <Link to={`/product/${item.product.id}`} onClick={closeCart} className="w-16 h-16 flex-shrink-0">
+                  <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover rounded-md" />
+                </Link>
+                <div className="flex-1 min-w-0">
+                  <Link to={`/product/${item.product.id}`} onClick={closeCart} className="text-sm font-medium text-foreground line-clamp-2 hover:underline">
+                    {item.product.name}
+                  </Link>
+                  {item.selectedSize && (
+                    <p className="text-xs text-muted-foreground mt-0.5">Size: {item.selectedSize}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity}</p>
+                </div>
+                <span className="text-sm font-bold text-primary whitespace-nowrap">{formatPrice(item.product.price * item.quantity)}</span>
+              </div>
+            ))}
+          </div>
+
+          {items.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-8">Your cart is empty</p>
+          )}
         </div>
 
         {/* Footer buttons */}
