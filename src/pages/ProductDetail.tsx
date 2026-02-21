@@ -13,6 +13,7 @@ import ProductReviews from "@/components/ProductReviews";
 import RelatedProducts from "@/components/RelatedProducts";
 import FrequentlyBoughtTogether from "@/components/FrequentlyBoughtTogether";
 import BrandProductRow from "@/components/BrandProductRow";
+import RecentlyViewedProducts, { addToRecentlyViewed } from "@/components/RecentlyViewedProducts";
 
 import PageTransition from "@/components/PageTransition";
 import { formatPrice } from "@/data/products";
@@ -81,7 +82,7 @@ const ProductDetail = () => {
   const stockQuantity = getProductStock(stockMap, id || "");
   const { data: soldCount = 0 } = useProductSoldCount(id);
 
-  // Track Meta Pixel ViewContent once per product
+  // Track Meta Pixel ViewContent + recently viewed
   const viewContentFired = useRef(false);
   useEffect(() => {
     if (product && !viewContentFired.current) {
@@ -92,6 +93,7 @@ const ProductDetail = () => {
         value: product.price,
         currency: "AED",
       });
+      addToRecentlyViewed(product);
     }
   }, [product]);
 
@@ -671,14 +673,12 @@ const ProductDetail = () => {
 
         {/* Brand Product Rows */}
         <div className="border-t border-border mt-4">
+          <RecentlyViewedProducts currentProductId={product.id} />
           <BrandProductRow brand="Nike" title="Nike" />
-          <BrandProductRow brand="Jordan" title="Jordan" />
           <BrandProductRow brand="Adidas" title="Adidas" />
           <BrandProductRow brand="New Balance" title="New Balance" />
           <BrandProductRow brand="On Cloud" title="On Cloud" />
           <BrandProductRow brand="Asics" title="Asics" />
-          <BrandProductRow brand="Hoka" title="Hoka" />
-          <BrandProductRow brand="Puma" title="Puma" />
           <BrandProductRow brand="Onitsuka Tiger" title="Onitsuka Tiger" />
           <BrandProductRow brand="Loro Piana" title="Loro Piana" />
           <BrandProductRow brand="" title="All Products" shopLink="/shop" />
