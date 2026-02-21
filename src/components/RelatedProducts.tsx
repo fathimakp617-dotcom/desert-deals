@@ -63,13 +63,24 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
+                    <div className="absolute top-2 right-2 flex items-center gap-0.5 bg-black/60 backdrop-blur-sm text-white px-1.5 py-0.5 rounded-full z-10">
+                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                      <span className="text-[10px] font-semibold">{(3.7 + (Math.abs([...item.id].reduce((a,c)=>((a<<5)-a+c.charCodeAt(0))|0,0)) % 13) * 0.1).toFixed(1)}</span>
+                    </div>
                   </div>
                   <div className="p-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-0.5">
-                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                        <span className="text-[10px] text-muted-foreground">4.5</span>
-                      </div>
+                    <span className="text-[10px] text-muted-foreground uppercase">{item.category}</span>
+                    <h3 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 min-h-[2.5em] leading-snug mt-0.5">
+                      {item.name}
+                    </h3>
+                    <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                      <span className="text-sm font-medium text-foreground">{formatPrice(item.price)}</span>
+                      {item.originalPrice > item.price && (
+                        <span className="text-xs text-muted-foreground line-through">{formatPrice(item.originalPrice)}</span>
+                      )}
+                    </div>
+                    <div className="mt-1.5 flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
                       <button
                         onClick={(e) => {
                           e.preventDefault();
@@ -82,17 +93,6 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                         <Heart className={`w-4 h-4 ${isInWishlist(item.id) ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
                       </button>
                     </div>
-                    <span className="text-[10px] text-muted-foreground uppercase">{item.category}</span>
-                    <h3 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 min-h-[2.5em] leading-snug mt-0.5">
-                      {item.name}
-                    </h3>
-                    <div className="flex items-center gap-1.5 flex-wrap mt-1">
-                      <span className="text-sm font-medium text-foreground">{formatPrice(item.price)}</span>
-                      {item.originalPrice > item.price && (
-                        <span className="text-xs text-muted-foreground line-through">{formatPrice(item.originalPrice)}</span>
-                      )}
-                    </div>
-                    <span className="text-[11px] font-bold text-emerald-600 uppercase mt-1 block">IN STOCK</span>
                   </div>
                 </div>
               </Link>
