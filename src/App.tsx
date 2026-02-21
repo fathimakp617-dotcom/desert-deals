@@ -10,6 +10,7 @@ import { WishlistProvider } from "@/contexts/WishlistContext";
 import { CouponProvider } from "@/contexts/CouponContext";
 
 import { AuthProvider } from "@/contexts/AuthContext";
+import { DirectionProvider } from "@/contexts/DirectionContext";
 import CartDrawer from "@/components/CartDrawer";
 import ScrollToTop from "@/components/ScrollToTop";
 
@@ -91,6 +92,7 @@ const queryClient = new QueryClient({
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
+      <DirectionProvider>
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
@@ -141,6 +143,7 @@ const App = () => (
           </WishlistProvider>
         </CartProvider>
       </AuthProvider>
+      </DirectionProvider>
     </QueryClientProvider>
   </HelmetProvider>
 );
