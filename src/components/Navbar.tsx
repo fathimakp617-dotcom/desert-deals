@@ -109,7 +109,7 @@ const Navbar = memo(() => {
 
       {/* Main Header */}
       <header className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-3">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-4">
           {/* Single row: Logo left | Nav center | Icons right */}
           <div className="flex items-center relative">
             {/* Mobile hamburger */}
