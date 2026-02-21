@@ -357,14 +357,41 @@ const AdminManualOrder = () => {
   };
 
 
-  // Standalone save handler
+  // Standalone save handler — also sends invoice email if email is provided
   const handleSaveOrder = async () => {
     if (!validate()) return;
     setIsSaving(true);
     try {
       const saved = await saveOrderToDb();
-      if (saved) {
-        toast({ title: "Order Saved ✅", description: `Order ${orderNumber} saved to database` });
+      if (!saved) return;
+
+      toast({ title: "Order Saved ✅", description: `Order ${orderNumber} saved to database` });
+
+      // Auto-send invoice email if customer email is valid
+      if (customerEmail && customerEmail.includes("@")) {
+        const order = getOrderData();
+        try {
+          const { error } = await supabase.functions.invoke("send-order-confirmation", {
+            body: {
+              order_number: order.order_number,
+              customer_name: order.customer_name,
+              customer_email: order.customer_email,
+              customer_phone: order.customer_phone,
+              items: order.items,
+              subtotal: order.subtotal,
+              discount,
+              shipping,
+              total: order.total,
+              shipping_address: order.shipping_address,
+              payment_method: order.payment_method,
+            },
+          });
+          if (error) throw error;
+          toast({ title: "Invoice Emailed ✅", description: `Invoice sent to ${customerEmail}` });
+        } catch (emailErr: any) {
+          console.error("Auto email error:", emailErr);
+          toast({ title: "Email Failed", description: emailErr.message || "Order saved but email failed", variant: "destructive" });
+        }
       }
     } finally {
       setIsSaving(false);
