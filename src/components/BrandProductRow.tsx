@@ -42,7 +42,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
 
   return (
     <section className="py-2 sm:py-3 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+      <div className="px-4 sm:px-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm sm:text-base font-heading font-semibold text-foreground">
             {title}
