@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, Search, RefreshCw, Truck, Package, CheckCircle, X, Clock, Loader2, Download, FileText, Calendar, Trash2, AlertTriangle, ChevronRight, Check, Printer, Phone, MessageCircle, Plus } from "lucide-react";
+import AdminManualOrder from "./AdminManualOrder";
 import { generateShippingLabelPDF, downloadInvoicePDF, generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import OrderViewDialog from "@/components/OrderViewDialog";
 import ShippingSlipDialog from "@/components/ShippingSlipDialog";
@@ -72,6 +73,7 @@ const AdminOrders = () => {
   const [showBulkSlipPrint, setShowBulkSlipPrint] = useState(false);
   const [bulkAction, setBulkAction] = useState<string | null>(null);
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+  const [manualOrderOpen, setManualOrderOpen] = useState(false);
   const { toast } = useToast();
 
   // Handle expired admin session (avoid blank/error loops)
@@ -702,7 +704,7 @@ const AdminOrders = () => {
           <p className="text-muted-foreground">Manage customer orders</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => navigate("/admin/manual-order")} size="sm">
+          <Button onClick={() => setManualOrderOpen(true)} size="sm">
             <Plus className="h-4 w-4 mr-2" />
             Add Order
           </Button>
@@ -1423,6 +1425,16 @@ const AdminOrders = () => {
         open={showBulkSlipPrint}
         onOpenChange={setShowBulkSlipPrint}
       />
+
+      {/* Manual Order Dialog */}
+      <Dialog open={manualOrderOpen} onOpenChange={setManualOrderOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create Manual Order</DialogTitle>
+          </DialogHeader>
+          <AdminManualOrder />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
