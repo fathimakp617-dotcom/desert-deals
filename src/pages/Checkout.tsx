@@ -610,6 +610,19 @@ const Checkout = () => {
                 </div>
 
                 <div>
+                  <Label htmlFor="city">Town / City *</Label>
+                  <Input
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    
+                    className={`mt-1 bg-card ${fieldErrors.city ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
+                  />
+                  {fieldErrors.city && <p className="text-destructive text-sm mt-1 font-medium">{fieldErrors.city}</p>}
+                </div>
+
+                <div>
                   <Label htmlFor="phone">Phone *</Label>
                   <div className="flex gap-2 mt-1">
                     <Select
@@ -645,19 +658,6 @@ const Checkout = () => {
                     />
                   </div>
                   {fieldErrors.phone && <p className="text-destructive text-sm mt-1 font-medium">{fieldErrors.phone}</p>}
-                </div>
-
-                <div>
-                  <Label htmlFor="city">Town / City *</Label>
-                  <Input
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    
-                    className={`mt-1 bg-card ${fieldErrors.city ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
-                  />
-                  {fieldErrors.city && <p className="text-destructive text-sm mt-1 font-medium">{fieldErrors.city}</p>}
                 </div>
 
                 <div>
