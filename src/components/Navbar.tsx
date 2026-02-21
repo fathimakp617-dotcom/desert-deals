@@ -44,7 +44,7 @@ const Navbar = memo(() => {
       ...staticBottomLinks,
     ];
     // Fill first row as much as possible (up to 10), rest goes to second row
-    const splitAt = Math.min(10, allNavLinks.length);
+    const splitAt = Math.min(12, allNavLinks.length);
     const top = allNavLinks.slice(0, splitAt);
     const bottom = allNavLinks.slice(splitAt);
     return { topLinks: top, bottomLinks: bottom, allLinks: allNavLinks };
@@ -122,7 +122,7 @@ const Navbar = memo(() => {
             {/* Logo – text-based like reference */}
             <Link
               to="/"
-              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0"
+              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:mr-8"
             >
               <span className="text-xl sm:text-2xl font-heading font-extrabold tracking-wider text-foreground uppercase whitespace-nowrap">
                 Desert Deal
