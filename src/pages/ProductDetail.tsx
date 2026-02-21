@@ -411,7 +411,7 @@ const ProductDetail = () => {
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Star
                           key={s}
-                          className={`w-5 h-5 ${s <= Math.round(averageRating) ? "fill-primary text-primary" : "text-muted-foreground/30"} transition-colors`}
+                          className={`w-5 h-5 ${s <= Math.floor(averageRating) ? "fill-primary text-primary" : s <= averageRating ? "fill-primary/50 text-primary/50" : "text-muted-foreground/30"} transition-colors`}
                         />
                       ))}
                     </div>
