@@ -27,7 +27,7 @@ const TopSellers = memo(() => {
 
   return (
     <section id="collection" className="py-6 sm:py-10 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+      <div className="px-4 sm:px-6 lg:px-12">
         {/* Module header - matches site-module-header with tabs */}
         <div className="flex items-center justify-between mb-6 border-b border-border pb-3">
           <div className="flex items-center gap-6">
