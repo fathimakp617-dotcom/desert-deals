@@ -449,9 +449,9 @@ const ProductDetail = () => {
                   <motion.div variants={staggerItem} className="flex items-center gap-3">
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <Star
+                         <Star
                           key={s}
-                          className={`w-5 h-5 ${s <= Math.floor(averageRating) ? "fill-primary text-primary" : s <= averageRating ? "fill-primary/50 text-primary/50" : "text-muted-foreground/30"} transition-colors`}
+                          className={`w-5 h-5 ${s <= Math.floor(averageRating) ? "fill-yellow-400 text-yellow-400" : s <= averageRating ? "fill-yellow-400/50 text-yellow-400/50" : "text-muted-foreground/30"} transition-colors`}
                         />
                       ))}
                     </div>
