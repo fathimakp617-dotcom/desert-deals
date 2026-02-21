@@ -28,7 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, Search, RefreshCw, Truck, Package, CheckCircle, X, Clock, Loader2, Download, FileText, Calendar, Trash2, AlertTriangle, ChevronRight, Check, Printer, Phone, MessageCircle } from "lucide-react";
+import { Eye, Search, RefreshCw, Truck, Package, CheckCircle, X, Clock, Loader2, Download, FileText, Calendar, Trash2, AlertTriangle, ChevronRight, Check, Printer, Phone, MessageCircle, Plus } from "lucide-react";
 import { generateShippingLabelPDF, downloadInvoicePDF, generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import OrderViewDialog from "@/components/OrderViewDialog";
 import ShippingSlipDialog from "@/components/ShippingSlipDialog";
@@ -702,6 +702,10 @@ const AdminOrders = () => {
           <p className="text-muted-foreground">Manage customer orders</p>
         </div>
         <div className="flex gap-2">
+          <Button onClick={() => navigate("/admin/manual-order")} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Order
+          </Button>
           <Button onClick={downloadShippingAddresses} variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Export Addresses
