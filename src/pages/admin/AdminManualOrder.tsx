@@ -27,10 +27,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, FileText, Package, Download, Loader2, ChevronDown, Check, Sparkles } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { downloadInvoicePDF, generateShippingLabelPDF } from "@/lib/generateInvoicePDF";
-import { products as catalogProducts, formatPrice } from "@/data/products";
+import { formatPrice } from "@/data/products";
 import { cn } from "@/lib/utils";
 import { usePinCodeLookup } from "@/hooks/usePinCodeLookup";
 import { supabase } from "@/integrations/supabase/client";
+import { useDbProducts } from "@/hooks/useDbProducts";
 
 interface ManualItem {
   id: string;
@@ -53,10 +54,12 @@ const ProductCombobox = ({
   value,
   onSelect,
   onChange,
+  products,
 }: {
   value: string;
   onSelect: (product: { name: string; price: number }) => void;
   onChange: (name: string) => void;
+  products: { id: string; name: string; price: number; size: string }[];
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -81,7 +84,7 @@ const ProductCombobox = ({
           <CommandList>
             <CommandEmpty>No product found.</CommandEmpty>
             <CommandGroup heading="Catalog Products">
-              {catalogProducts.map((product) => (
+              {products.map((product) => (
                 <CommandItem
                   key={product.id}
                   value={product.name}
@@ -114,6 +117,7 @@ const ProductCombobox = ({
 
 const AdminManualOrder = () => {
   const { toast } = useToast();
+  const { data: dbProducts = [] } = useDbProducts();
   const [isGenerating, setIsGenerating] = useState<"invoice" | "label" | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [savedOrderId, setSavedOrderId] = useState<string | null>(null);
@@ -754,6 +758,7 @@ const AdminManualOrder = () => {
                     {index === 0 && <Label className="text-xs text-muted-foreground">Product Name</Label>}
                     <ProductCombobox
                       value={item.name}
+                      products={dbProducts.map(p => ({ id: p.id, name: p.name, price: p.price, size: p.size || "" }))}
                       onSelect={(product) => {
                         setItems(items.map((i) =>
                           i.id === item.id
