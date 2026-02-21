@@ -136,7 +136,7 @@ const AdminManualOrder = () => {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zipCode, setZipCode] = useState("");
-  const [country, setCountry] = useState("India");
+  const [country, setCountry] = useState("United Arab Emirates");
   const [postOffice, setPostOffice] = useState("");
 
   // PIN code auto-lookup
@@ -191,7 +191,7 @@ const AdminManualOrder = () => {
       toast({ title: "Error", description: "Customer name is required", variant: "destructive" });
       return false;
     }
-    if (!address.trim() || !city.trim() || !state.trim() || !zipCode.trim()) {
+    if (!address.trim() || !city.trim() || !state.trim()) {
       toast({ title: "Error", description: "Complete shipping address is required", variant: "destructive" });
       return false;
     }
@@ -351,7 +351,7 @@ const AdminManualOrder = () => {
     setCity("");
     setState("");
     setZipCode("");
-    setCountry("India");
+    setCountry("United Arab Emirates");
     setPostOffice("");
     setPaymentMethod("cod");
     setPaymentStatus("pending");
@@ -640,28 +640,16 @@ const AdminManualOrder = () => {
                   className="mt-1"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="customerPhone">Phone</Label>
-                  <Input
-                    id="customerPhone"
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    placeholder="+91 98765 43210"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="customerEmail">Email</Label>
-                  <Input
-                    id="customerEmail"
-                    type="email"
-                    value={customerEmail}
-                    onChange={(e) => setCustomerEmail(e.target.value)}
-                    placeholder="Optional"
-                    className="mt-1"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="customerEmail">Email (Optional)</Label>
+                <Input
+                  id="customerEmail"
+                  type="email"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  placeholder="Optional"
+                  className="mt-1"
+                />
               </div>
             </CardContent>
           </Card>
@@ -673,7 +661,12 @@ const AdminManualOrder = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="address">Address *</Label>
+                <Label>Country / Region</Label>
+                <p className="text-foreground font-medium mt-1">United Arab Emirates</p>
+              </div>
+
+              <div>
+                <Label htmlFor="address">Street Address</Label>
                 <Input
                   id="address"
                   value={address}
@@ -682,58 +675,44 @@ const AdminManualOrder = () => {
                   className="mt-1"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="city">City *</Label>
-                  <Input
-                    id="city"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="state">State *</Label>
-                  <Input
-                    id="state"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
+
+              <div>
+                <Label htmlFor="state">Emirate *</Label>
+                <Select value={state} onValueChange={setState}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select Emirate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
+                    <SelectItem value="Dubai">Dubai</SelectItem>
+                    <SelectItem value="Sharjah">Sharjah</SelectItem>
+                    <SelectItem value="Ajman">Ajman</SelectItem>
+                    <SelectItem value="Umm Al Quwain">Umm Al Quwain</SelectItem>
+                    <SelectItem value="Ras Al Khaimah">Ras Al Khaimah</SelectItem>
+                    <SelectItem value="Fujairah">Fujairah</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="zipCode">PIN Code *</Label>
-                  <div className="relative">
-                    <Input
-                      id="zipCode"
-                      value={zipCode}
-                      onChange={(e) => handlePinCodeChange(e.target.value)}
-                      placeholder="6-digit PIN"
-                      maxLength={6}
-                      className={cn("mt-1", isPinLoading && "animate-pulse")}
-                    />
-                    {isPinLoading && (
-                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 mt-0.5 h-4 w-4 animate-spin text-muted-foreground" />
-                    )}
-                  </div>
-                  {postOffice && (
-                    <p className="text-xs text-primary mt-1 flex items-center gap-1">
-                      <Check className="h-3 w-3" />
-                      {postOffice}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="country">Country</Label>
-                  <Input
-                    id="country"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
+
+              <div>
+                <Label htmlFor="city">Town / City *</Label>
+                <Input
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="customerPhone">Phone *</Label>
+                <Input
+                  id="customerPhone"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  placeholder="+971 XX XXX XXXX"
+                  className="mt-1"
+                />
               </div>
             </CardContent>
           </Card>
