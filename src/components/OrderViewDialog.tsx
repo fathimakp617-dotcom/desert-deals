@@ -112,9 +112,18 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
 
   const [isSharing, setIsSharing] = useState(false);
 
-  const handleShareWhatsApp = useCallback(async () => {
+  const handleShareWhatsApp = useCallback(async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (!contentRef.current || !order || !order.customer_phone) return;
     setIsSharing(true);
+
+    const phone = order.customer_phone.replace(/[^0-9]/g, '');
+    const message = `*Order Received ✅*\n\nThank you for your order with Desert Deal!\n\nTo proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.\n\n📦 *Delivery Timings:*\nWe deliver from Monday to Saturday, between 8 AM and 8 PM.\n🚫 No deliveries on Sundays.\n\n🕒 *Please Note:*\nSome areas have direct delivery service between 9 AM and 9 PM.\nIn certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.\n\nIf you have any confusion or need to double-check, feel free to visit our official website:\n👉 https://desertsdeals.com/\n\nOnce we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.\n\nWe look forward to your reply.\n\nThank you for choosing Desert Deal!`;
+
+    // Pre-open WhatsApp window BEFORE async work to avoid popup blocker
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    const whatsappWindow = window.open(whatsappUrl, '_blank');
+
     try {
       const canvas = await html2canvas(contentRef.current, {
         backgroundColor: "#ffffff",
@@ -125,9 +134,6 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
         canvas.toBlob((b) => resolve(b!), "image/png")
       );
 
-      const phone = order.customer_phone.replace(/[^0-9]/g, '');
-      const message = `*Order Received ✅*\n\nThank you for your order with Desert Deal!\n\nTo proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.\n\n📦 *Delivery Timings:*\nWe deliver from Monday to Saturday, between 8 AM and 8 PM.\n🚫 No deliveries on Sundays.\n\n🕒 *Please Note:*\nSome areas have direct delivery service between 9 AM and 9 PM.\nIn certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.\n\nIf you have any confusion or need to double-check, feel free to visit our official website:\n👉 https://desertsdeals.com/\n\nOnce we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.\n\nWe look forward to your reply.\n\nThank you for choosing Desert Deal!`;
-
       // Download the image so user can attach it manually in WhatsApp
       const link = document.createElement("a");
       link.download = `order-${order.order_number}.png`;
@@ -135,8 +141,10 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
       link.click();
       URL.revokeObjectURL(link.href);
 
-      // Redirect to customer's WhatsApp with just the text message
-      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+      // If popup was blocked, try again with location
+      if (!whatsappWindow || whatsappWindow.closed) {
+        window.location.href = whatsappUrl;
+      }
     } catch (err) {
       // If user cancelled share dialog, ignore
       if ((err as Error)?.name !== 'AbortError') {
@@ -238,7 +246,7 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
                   <p className="text-xs" style={{ color: '#666' }}>{order.customer_phone}</p>
                     <button
                     type="button"
-                    onClick={handleShareWhatsApp}
+                    onClick={(e) => handleShareWhatsApp(e)}
                     disabled={isSharing}
                     className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full transition-colors disabled:opacity-50"
                     style={{ background: '#dcfce7', color: '#16a34a' }}
