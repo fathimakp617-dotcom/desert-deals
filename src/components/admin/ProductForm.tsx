@@ -109,8 +109,12 @@ const ProductForm = ({
   const [previewImageSrc, setPreviewImageSrc] = useState("");
   const [isProductPreviewOpen, setIsProductPreviewOpen] = useState(false);
 
+  // Track which field the user is actively editing to avoid circular updates
+  const lastEditedField = useRef<"discount" | "price" | "original" | null>(null);
+
   // Auto-calculate final price when original_price or discount_percent changes
   useEffect(() => {
+    if (lastEditedField.current === "price") return;
     const origPrice = parseFloat(formData.original_price);
     const discountPct = parseFloat(formData.discount_percent);
     if (!isNaN(origPrice) && origPrice > 0 && !isNaN(discountPct) && discountPct >= 0) {
@@ -122,16 +126,19 @@ const ProductForm = ({
     }
   }, [formData.original_price, formData.discount_percent]);
 
-  // Auto-calculate discount % when final price is manually changed
-  const handleFinalPriceChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, price: value }));
+  // Auto-calculate discount % when final price or original price changes (and user is editing price)
+  useEffect(() => {
+    if (lastEditedField.current !== "price" && lastEditedField.current !== "original") return;
     const origPrice = parseFloat(formData.original_price);
-    const finalPrice = parseFloat(value);
+    const finalPrice = parseFloat(formData.price);
     if (!isNaN(origPrice) && origPrice > 0 && !isNaN(finalPrice) && finalPrice >= 0) {
       const discPct = ((origPrice - finalPrice) / origPrice) * 100;
-      setFormData((prev) => ({ ...prev, price: value, discount_percent: Math.round(discPct).toString() }));
+      const rounded = Math.max(0, Math.round(discPct)).toString();
+      if (formData.discount_percent !== rounded) {
+        setFormData((prev) => ({ ...prev, discount_percent: rounded }));
+      }
     }
-  };
+  }, [formData.price, formData.original_price]);
 
   // Parse existing image_url into previews for editing
   useEffect(() => {
@@ -256,6 +263,7 @@ const ProductForm = ({
               min="0"
               step="0.01"
               value={formData.original_price}
+              onFocus={() => { lastEditedField.current = "original"; }}
               onChange={(e) => setFormData((prev) => ({ ...prev, original_price: e.target.value }))}
               placeholder="888"
               required
@@ -269,7 +277,7 @@ const ProductForm = ({
                 max={90}
                 step={5}
                 value={[parseInt(formData.discount_percent) || 0]}
-                onValueChange={([val]) => setFormData((prev) => ({ ...prev, discount_percent: val.toString() }))}
+                onValueChange={([val]) => { lastEditedField.current = "discount"; setFormData((prev) => ({ ...prev, discount_percent: val.toString() })); }}
                 className="flex-1"
               />
               <Input
@@ -278,6 +286,7 @@ const ProductForm = ({
                 min="0"
                 max="100"
                 value={formData.discount_percent}
+                onFocus={() => { lastEditedField.current = "discount"; }}
                 onChange={(e) => setFormData((prev) => ({ ...prev, discount_percent: e.target.value }))}
                 className="w-20 text-center"
               />
@@ -291,7 +300,8 @@ const ProductForm = ({
               min="0"
               step="1"
               value={formData.price}
-              onChange={(e) => handleFinalPriceChange(e.target.value)}
+              onFocus={() => { lastEditedField.current = "price"; }}
+              onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
               placeholder="Auto-calculated"
             />
           </div>
