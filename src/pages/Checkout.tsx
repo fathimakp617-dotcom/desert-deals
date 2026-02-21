@@ -347,7 +347,20 @@ const Checkout = () => {
     if (!formData.city.trim()) errors.city = "City is required";
     if (!formData.email.trim()) errors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Invalid email address";
+    
+    // Check terms checkbox
+    const termsCheckbox = document.getElementById('terms-checkout') as HTMLInputElement;
+    if (termsCheckbox && !termsCheckbox.checked) errors.terms = "You must agree to the terms and conditions";
+    
     setFieldErrors(errors);
+    
+    // Scroll to first error field
+    if (Object.keys(errors).length > 0) {
+      const firstErrorKey = Object.keys(errors)[0];
+      const el = document.getElementById(firstErrorKey);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
     return Object.keys(errors).length === 0;
   };
 
@@ -537,7 +550,7 @@ const Checkout = () => {
             </motion.div>
           )}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <div className="grid lg:grid-cols-3 gap-12">
               {/* Left Column - Billing Details */}
               <div className="lg:col-span-2 space-y-6">
@@ -553,7 +566,7 @@ const Checkout = () => {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    required
+                    
                     className={`mt-1 bg-card ${fieldErrors.firstName ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
                   />
                   {fieldErrors.firstName && <p className="text-destructive text-sm mt-1 font-medium">{fieldErrors.firstName}</p>}
@@ -627,7 +640,7 @@ const Checkout = () => {
                       type="tel"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      required
+                      
                       className={`flex-1 bg-card ${fieldErrors.phone ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
                     />
                   </div>
@@ -641,7 +654,7 @@ const Checkout = () => {
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
-                    required
+                    
                     className={`mt-1 bg-card ${fieldErrors.city ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
                   />
                   {fieldErrors.city && <p className="text-destructive text-sm mt-1 font-medium">{fieldErrors.city}</p>}
@@ -656,7 +669,7 @@ const Checkout = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="your@email.com"
-                    required
+                    
                     className={`mt-1 bg-card ${fieldErrors.email ? "border-destructive ring-1 ring-destructive" : "border-border"}`}
                   />
                   {fieldErrors.email && <p className="text-destructive text-sm mt-1 font-medium">{fieldErrors.email}</p>}
@@ -726,19 +739,24 @@ const Checkout = () => {
                   <p className="text-sm text-muted-foreground mb-6 ml-7">Pay with cash upon delivery.</p>
 
                   {/* Terms checkbox */}
-                  <div className="flex items-start gap-2 mb-6">
-                    <input
-                      type="checkbox"
-                      id="terms-checkout"
-                      required
-                      className="mt-1 accent-primary"
-                    />
-                    <Label htmlFor="terms-checkout" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                      I have read and agree to the website{" "}
-                      <Link to="/terms" target="_blank" className="text-primary hover:underline">
-                        terms and conditions
-                      </Link>{" "}*
-                    </Label>
+                  <div className="mb-6">
+                    <div className="flex items-start gap-2">
+                      <input
+                        type="checkbox"
+                        id="terms-checkout"
+                        className={`mt-1 accent-primary ${fieldErrors.terms ? "outline outline-2 outline-destructive" : ""}`}
+                        onChange={() => {
+                          if (fieldErrors.terms) setFieldErrors(prev => { const n = { ...prev }; delete n.terms; return n; });
+                        }}
+                      />
+                      <Label htmlFor="terms-checkout" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+                        I have read and agree to the website{" "}
+                        <Link to="/terms" target="_blank" className="text-primary hover:underline">
+                          terms and conditions
+                        </Link>{" "}*
+                      </Label>
+                    </div>
+                    {fieldErrors.terms && <p className="text-destructive text-sm mt-1 font-medium">{fieldErrors.terms}</p>}
                   </div>
 
                   {/* Place Order Button */}
