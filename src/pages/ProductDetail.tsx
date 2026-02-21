@@ -612,7 +612,7 @@ const ProductDetail = () => {
                     const isHtml = /<[a-z][\s\S]*>/i.test(desc);
                     return isHtml ? (
                       <div
-                        className="text-muted-foreground leading-relaxed text-sm prose prose-sm max-w-none [&_img]:rounded-lg [&_img]:max-w-full [&_img]:h-auto"
+                        className="text-muted-foreground leading-relaxed text-xs prose prose-xs max-w-none [&_img]:rounded-lg [&_img]:max-w-[280px] [&_img]:h-auto [&_p]:text-xs [&_p]:mb-2 [&_span]:text-xs"
                         dangerouslySetInnerHTML={{ __html: desc }}
                       />
                     ) : (
