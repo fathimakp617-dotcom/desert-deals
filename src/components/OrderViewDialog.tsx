@@ -231,7 +231,7 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
           </div>
 
           {/* Two Column: Customer + Shipping */}
-          <div className="px-6 py-4 grid grid-cols-2 gap-6 border-b" style={{ borderColor: '#f0f0f0' }}>
+          <div className="px-6 py-4 space-y-4 border-b" style={{ borderColor: '#f0f0f0' }}>
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#999' }}>Customer</p>
               <p className="text-sm font-medium">{order.customer_name}</p>
