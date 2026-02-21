@@ -39,18 +39,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check if admin or shipping staff
-    const { data: staff } = await supabaseClient
-      .from("staff_members")
-      .select("role")
-      .eq("email", session.email)
-      .single();
+    // Check if admin via env or staff_members
+    const adminEmails = (Deno.env.get("ADMIN_EMAILS") || "").split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+    const isEnvAdmin = adminEmails.includes(session.email.toLowerCase());
 
-    if (!staff || !["admin", "shipping"].includes(staff.role)) {
-      return new Response(JSON.stringify({ error: "Access denied" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!isEnvAdmin) {
+      const { data: staff } = await supabaseClient
+        .from("staff_members")
+        .select("role")
+        .eq("email", session.email)
+        .single();
+
+      if (!staff || !["admin", "shipping"].includes(staff.role)) {
+        return new Response(JSON.stringify({ error: "Access denied" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     // Fetch all reviews
