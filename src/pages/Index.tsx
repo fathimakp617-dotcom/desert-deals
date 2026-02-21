@@ -77,17 +77,8 @@ const Index = () => {
           
           <Suspense fallback={<SectionLoader />}>
             <BrandCategories />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
             <PromoBanner />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
             <TopSellers />
-          </Suspense>
-          
-          <Suspense fallback={<SectionLoader />}>
             <PromoGrid />
           </Suspense>
 
@@ -107,7 +98,7 @@ const Index = () => {
 
           <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
-          </Suspense>
+          
 
           {/* Adidas Ad Banner */}
           <section className="bg-background">
@@ -126,9 +117,7 @@ const Index = () => {
             </div>
           </section>
 
-          <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="adidas" title="Adidas Collection" />
-          </Suspense>
 
           {/* Nike Dunk Low Ad Banner */}
           <section className="bg-background">
@@ -144,27 +133,11 @@ const Index = () => {
             </div>
           </section>
 
-          <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="nike" title="Nike Collection" />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
             <NewBalancePromoGrid />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
             <BrandProductRow brand="new balance" title="New Balance Collection" />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
             <Testimonials />
-          </Suspense>
-
-          <Suspense fallback={<SectionLoader />}>
             <FeaturesBar />
-          </Suspense>
-          
-          <Suspense fallback={<SectionLoader />}>
             <Footer />
           </Suspense>
 
