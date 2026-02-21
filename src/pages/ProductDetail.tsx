@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import ProductReviews from "@/components/ProductReviews";
 import RelatedProducts from "@/components/RelatedProducts";
+import FrequentlyBoughtTogether from "@/components/FrequentlyBoughtTogether";
 
 import PageTransition from "@/components/PageTransition";
 import { formatPrice } from "@/data/products";
@@ -666,6 +667,9 @@ const ProductDetail = () => {
             </div>
           </div>
         </section>
+
+        {/* Frequently Bought Together */}
+        <FrequentlyBoughtTogether currentProduct={product} />
 
         {/* Related Products */}
         <RelatedProducts currentProductId={product.id} currentCategory={product.category} />
