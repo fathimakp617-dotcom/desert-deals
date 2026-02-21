@@ -24,7 +24,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, FileText, Package, Download, Loader2, ChevronDown, Check, Sparkles } from "lucide-react";
+import { Plus, Trash2, FileText, Package, Download, Loader2, ChevronDown, Check, Sparkles, Save, Mail } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { downloadInvoicePDF, generateShippingLabelPDF } from "@/lib/generateInvoicePDF";
 import { formatPrice } from "@/data/products";
@@ -38,6 +38,9 @@ interface ManualItem {
   name: string;
   price: number;
   quantity: number;
+  productId: string;
+  selectedSize: string;
+  image_url: string;
 }
 
 const generateManualOrderNumber = () => {
@@ -57,11 +60,16 @@ const ProductCombobox = ({
   products,
 }: {
   value: string;
-  onSelect: (product: { name: string; price: number }) => void;
+  onSelect: (product: { id: string; name: string; price: number; image_url: string; size: string }) => void;
   onChange: (name: string) => void;
-  products: { id: string; name: string; price: number; size: string }[];
+  products: { id: string; name: string; price: number; size: string; image_url: string }[];
 }) => {
   const [open, setOpen] = useState(false);
+
+  const getFirstImageUrl = (imageUrl: string) => {
+    if (!imageUrl) return "";
+    return imageUrl.split(",")[0].trim();
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -78,7 +86,7 @@ const ProductCombobox = ({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[280px] p-0" align="start">
+      <PopoverContent className="w-[340px] p-0" align="start">
         <Command>
           <CommandInput placeholder="Search products..." />
           <CommandList>
@@ -89,20 +97,27 @@ const ProductCombobox = ({
                   key={product.id}
                   value={product.name}
                   onSelect={() => {
-                    onSelect({ name: product.name, price: product.price });
+                    onSelect(product);
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-4 w-4 shrink-0",
                       value === product.name ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{product.name}</span>
+                  {getFirstImageUrl(product.image_url) && (
+                    <img
+                      src={getFirstImageUrl(product.image_url)}
+                      alt={product.name}
+                      className="w-10 h-10 object-cover rounded mr-2 shrink-0"
+                    />
+                  )}
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-medium truncate">{product.name}</span>
                     <span className="text-xs text-muted-foreground">
-                      {product.size} • {formatPrice(product.price)}
+                      {formatPrice(product.price)}
                     </span>
                   </div>
                 </CommandItem>
@@ -163,7 +178,7 @@ const AdminManualOrder = () => {
 
   // Items
   const [items, setItems] = useState<ManualItem[]>([
-    { id: crypto.randomUUID(), name: "", price: 0, quantity: 1 },
+    { id: crypto.randomUUID(), name: "", price: 0, quantity: 1, productId: "", selectedSize: "", image_url: "" },
   ]);
 
   // Financials
@@ -174,7 +189,7 @@ const AdminManualOrder = () => {
   const total = subtotal - discount + shipping;
 
   const addItem = () => {
-    setItems([...items, { id: crypto.randomUUID(), name: "", price: 0, quantity: 1 }]);
+    setItems([...items, { id: crypto.randomUUID(), name: "", price: 0, quantity: 1, productId: "", selectedSize: "", image_url: "" }]);
   };
 
   const removeItem = (id: string) => {
@@ -220,7 +235,8 @@ const AdminManualOrder = () => {
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        productId: "",
+        productId: item.productId || "",
+        selectedSize: item.selectedSize || "",
       })),
     };
   };
@@ -341,6 +357,58 @@ const AdminManualOrder = () => {
   };
 
 
+  // Standalone save handler
+  const handleSaveOrder = async () => {
+    if (!validate()) return;
+    setIsSaving(true);
+    try {
+      const saved = await saveOrderToDb();
+      if (saved) {
+        toast({ title: "Order Saved ✅", description: `Order ${orderNumber} saved to database` });
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Send invoice via email
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const handleSendInvoiceEmail = async () => {
+    if (!validate()) return;
+    if (!customerEmail || !customerEmail.includes("@")) {
+      toast({ title: "Email Required", description: "Please add customer email to send invoice", variant: "destructive" });
+      return;
+    }
+    setIsSendingEmail(true);
+    try {
+      // Save first if not saved
+      await saveOrderToDb();
+      const order = getOrderData();
+      const { error } = await supabase.functions.invoke("send-order-confirmation", {
+        body: {
+          order_number: order.order_number,
+          customer_name: order.customer_name,
+          customer_email: order.customer_email,
+          customer_phone: order.customer_phone,
+          items: order.items,
+          subtotal: order.subtotal,
+          discount,
+          shipping,
+          total: order.total,
+          shipping_address: order.shipping_address,
+          payment_method: order.payment_method,
+        },
+      });
+      if (error) throw error;
+      toast({ title: "Invoice Sent ✅", description: `Invoice emailed to ${customerEmail}` });
+    } catch (error: any) {
+      console.error("Email send error:", error);
+      toast({ title: "Email Failed", description: error.message || "Failed to send invoice email", variant: "destructive" });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
   const handleReset = () => {
     setOrderNumber(generateManualOrderNumber());
     setOrderDate(new Date().toISOString().split("T")[0]);
@@ -356,7 +424,7 @@ const AdminManualOrder = () => {
     setPaymentMethod("cod");
     setPaymentStatus("pending");
     setOrderStatus("pending");
-    setItems([{ id: crypto.randomUUID(), name: "", price: 0, quantity: 1 }]);
+    setItems([{ id: crypto.randomUUID(), name: "", price: 0, quantity: 1, productId: "", selectedSize: "", image_url: "" }]);
     setDiscount(0);
     setShipping(0);
     setSavedOrderId(null);
@@ -707,55 +775,87 @@ const AdminManualOrder = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {items.map((item, index) => (
-                <div key={item.id} className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    {index === 0 && <Label className="text-xs text-muted-foreground">Product Name</Label>}
-                    <ProductCombobox
-                      value={item.name}
-                      products={dbProducts.map(p => ({ id: p.id, name: p.name, price: p.price, size: p.size || "" }))}
-                      onSelect={(product) => {
-                        setItems(items.map((i) =>
-                          i.id === item.id
-                            ? { ...i, name: product.name, price: product.price }
-                            : i
-                        ));
-                      }}
-                      onChange={(name) => updateItem(item.id, "name", name)}
-                    />
+              {items.map((item, index) => {
+                const selectedProduct = dbProducts.find(p => p.id === item.productId);
+                const availableSizes = selectedProduct?.size?.split(",").map(s => s.trim()).filter(Boolean) || [];
+                const firstImageUrl = item.image_url ? item.image_url.split(",")[0].trim() : "";
+
+                return (
+                <div key={item.id} className="space-y-2 pb-3 border-b border-border last:border-0">
+                  <div className="flex gap-2 items-end">
+                    {/* Product image thumbnail */}
+                    {firstImageUrl && (
+                      <div className="w-12 h-12 shrink-0 rounded overflow-hidden border border-border">
+                        <img src={firstImageUrl} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      {index === 0 && <Label className="text-xs text-muted-foreground">Product Name</Label>}
+                      <ProductCombobox
+                        value={item.name}
+                        products={dbProducts.map(p => ({ id: p.id, name: p.name, price: p.price, size: p.size || "", image_url: p.image || "" }))}
+                        onSelect={(product) => {
+                          setItems(items.map((i) =>
+                            i.id === item.id
+                              ? { ...i, name: product.name, price: product.price, productId: product.id, image_url: product.image_url, selectedSize: "" }
+                              : i
+                          ));
+                        }}
+                        onChange={(name) => updateItem(item.id, "name", name)}
+                      />
+                    </div>
+                    <div className="w-24">
+                      {index === 0 && <Label className="text-xs text-muted-foreground">Price (AED)</Label>}
+                      <Input
+                        type="number"
+                        min={0}
+                        value={item.price || ""}
+                        onChange={(e) => updateItem(item.id, "price", Number(e.target.value))}
+                        placeholder="0"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="w-16">
+                      {index === 0 && <Label className="text-xs text-muted-foreground">Qty</Label>}
+                      <Input
+                        type="number"
+                        min={1}
+                        value={item.quantity}
+                        onChange={(e) => updateItem(item.id, "quantity", Math.max(1, Number(e.target.value)))}
+                        className="mt-1"
+                      />
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeItem(item.id)}
+                      disabled={items.length === 1}
+                      className="shrink-0"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                   </div>
-                  <div className="w-24">
-                    {index === 0 && <Label className="text-xs text-muted-foreground">Price (AED)</Label>}
-                    <Input
-                      type="number"
-                      min={0}
-                      value={item.price || ""}
-                      onChange={(e) => updateItem(item.id, "price", Number(e.target.value))}
-                      placeholder="0"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div className="w-16">
-                    {index === 0 && <Label className="text-xs text-muted-foreground">Qty</Label>}
-                    <Input
-                      type="number"
-                      min={1}
-                      value={item.quantity}
-                      onChange={(e) => updateItem(item.id, "quantity", Math.max(1, Number(e.target.value)))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeItem(item.id)}
-                    disabled={items.length === 1}
-                    className="shrink-0"
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                  {/* Size selector */}
+                  {availableSizes.length > 0 && (
+                    <div className="pl-14">
+                      <Label className="text-xs text-muted-foreground">Size</Label>
+                      <Select value={item.selectedSize} onValueChange={(size) => {
+                        setItems(items.map(i => i.id === item.id ? { ...i, selectedSize: size } : i));
+                      }}>
+                        <SelectTrigger className="mt-1 h-8 w-40">
+                          <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableSizes.map(size => (
+                            <SelectItem key={size} value={size}>{size}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </CardContent>
           </Card>
 
@@ -809,6 +909,37 @@ const AdminManualOrder = () => {
               )}
             </CardHeader>
             <CardContent className="space-y-3">
+              {/* Save Order Button */}
+              <Button
+                className="w-full"
+                onClick={handleSaveOrder}
+                disabled={isSaving || !!savedOrderId}
+              >
+                {isSaving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                {savedOrderId ? "Order Saved ✅" : "Save Order to Database"}
+              </Button>
+
+              {/* Email Invoice Button */}
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={handleSendInvoiceEmail}
+                disabled={isSendingEmail || !customerEmail}
+              >
+                {isSendingEmail ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Mail className="mr-2 h-4 w-4" />
+                )}
+                {customerEmail ? `Email Invoice to ${customerEmail}` : "Add email to send invoice"}
+              </Button>
+
+              <div className="border-t border-border pt-3" />
+
               <Button
                 className="w-full"
                 variant="outline"
