@@ -553,12 +553,17 @@ const AdminProducts = () => {
     }
 
     const afterSuccess = async () => {
-      if (pendingImageFiles && pendingImageFiles.length > 0 && productId) {
-        for (const file of pendingImageFiles) {
-          await uploadImageMutation.mutateAsync({ productId, file });
+      try {
+        if (pendingImageFiles && pendingImageFiles.length > 0 && productId) {
+          for (const file of pendingImageFiles) {
+            await uploadImageMutation.mutateAsync({ productId, file });
+          }
+          // Force refetch after all images are uploaded
+          queryClient.invalidateQueries({ queryKey: ["admin-products"] });
         }
-        // Force refetch after all images are uploaded
-        queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      } catch (error) {
+        console.error("Error uploading images:", error);
+        toast({ title: "Product saved but image upload failed", description: error instanceof Error ? error.message : "Unknown error", variant: "destructive" });
       }
     };
 
