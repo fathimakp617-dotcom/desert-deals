@@ -292,6 +292,7 @@ const ProductForm = ({
             value={formData.description}
             onChange={(val) => setFormData((prev) => ({ ...prev, description: val }))}
             placeholder="Premium product with great quality..."
+            productId={formData.id}
           />
         </div>
 

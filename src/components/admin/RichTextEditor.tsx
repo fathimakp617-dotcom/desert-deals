@@ -5,14 +5,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   Bold, Italic, Underline, Link, Image, List, ListOrdered,
   AlignLeft, AlignCenter, AlignRight, Eye, Code, Heading1,
-  Heading2, Heading3, Strikethrough, Type,
+  Heading2, Heading3, Strikethrough, Type, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  productId?: string;
 }
 
 const FONT_OPTIONS = [
@@ -31,15 +34,16 @@ const FONT_SIZE_OPTIONS = [
   { label: "X-Large", value: "7" },
 ];
 
-const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) => {
+const RichTextEditor = ({ value, onChange, placeholder, productId }: RichTextEditorProps) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const isInternalChange = useRef(false);
   const [showPreview, setShowPreview] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
-  // Only set innerHTML from outside when value changes externally (not from typing)
   useEffect(() => {
     if (editorRef.current && !isInternalChange.current) {
       if (editorRef.current.innerHTML !== value) {
@@ -76,15 +80,36 @@ const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) =
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      execCommand("insertImage", reader.result as string);
-    };
-    reader.readAsDataURL(file);
+
+    const folder = productId || "description";
+    const fileName = `${folder}/desc-${Date.now()}-${file.name}`;
+
+    setIsUploading(true);
+    try {
+      const { error } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, file, { cacheControl: "3600", upsert: false });
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(fileName);
+
+      execCommand("insertImage", urlData.publicUrl);
+      toast({ title: "Image uploaded ✅" });
+    } catch (err: any) {
+      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+      const reader = new FileReader();
+      reader.onload = () => execCommand("insertImage", reader.result as string);
+      reader.readAsDataURL(file);
+    } finally {
+      setIsUploading(false);
+    }
     e.target.value = "";
   };
 
@@ -212,10 +237,10 @@ const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) =
           </PopoverTrigger>
           <PopoverContent className="w-72 p-3">
             <div className="space-y-2">
-              <Button size="sm" variant="outline" className="w-full" onClick={() => imageInputRef.current?.click()}>
-                Upload from device
+              <Button size="sm" variant="outline" className="w-full" onClick={() => imageInputRef.current?.click()} disabled={isUploading}>
+                {isUploading ? <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Uploading...</> : "Upload from device"}
               </Button>
-              <div className="text-xs text-center text-muted-foreground">or</div>
+              <p className="text-[10px] text-muted-foreground text-center">Images are saved to cloud storage</p>
               <Input
                 placeholder="Image URL"
                 value={imageUrl}
