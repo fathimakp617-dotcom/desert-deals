@@ -24,6 +24,7 @@ import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
 
 import { supabase } from "@/integrations/supabase/client";
 import { ProductSchema, BreadcrumbSchema } from "@/components/seo/JsonLd";
+import { useProductSoldCount } from "@/hooks/useProductSoldCount";
 
 
 import BuyNowOverlay from "@/components/BuyNowOverlay";
@@ -58,6 +59,7 @@ const ProductDetail = () => {
   
   const isSoldOut = isProductSoldOut(stockMap, id || "");
   const stockQuantity = getProductStock(stockMap, id || "");
+  const { data: soldCount = 0 } = useProductSoldCount(id);
 
   // Track Meta Pixel ViewContent once per product
   const viewContentFired = useRef(false);
@@ -385,12 +387,22 @@ const ProductDetail = () => {
                       {formatPrice(product.originalPrice)}
                     </span>
                   </div>
-                  {!isSoldOut ? (
+                {!isSoldOut ? (
                     <span className="text-xs sm:text-sm font-medium text-green-600">IN STOCK</span>
                   ) : (
                     <span className="text-xs sm:text-sm font-medium text-destructive">Sold Out</span>
                   )}
                 </motion.div>
+
+                {/* Sold count badge */}
+                {soldCount > 0 && (
+                  <motion.div variants={staggerItem} className="flex items-center gap-2">
+                    <span className="text-lg">🔥</span>
+                    <span className="text-sm font-semibold text-orange-600">
+                      Sold Out {soldCount} {soldCount === 1 ? "Time" : "Times"}
+                    </span>
+                  </motion.div>
+                )}
 
                 {/* Size Selector */}
                 <motion.div variants={staggerItem} className="space-y-2">
