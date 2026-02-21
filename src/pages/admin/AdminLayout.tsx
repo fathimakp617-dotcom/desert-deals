@@ -18,6 +18,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, User, RotateCcw, Star, ShoppingBag, Upload, ImageOff, Tags } from "lucide-react";
+import InstallAppBanner from "@/components/InstallAppBanner";
 import { motion } from "framer-motion";
 
 const ADMIN_SESSION_KEY = "rayn_admin_session";
@@ -280,6 +281,11 @@ const AdminLayout = () => {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
+
+            {/* Install App Banner */}
+            <div className="px-3 py-2">
+              <InstallAppBanner />
+            </div>
 
             {/* Bottom Actions - Admin Profile & Logout */}
             <div className="mt-auto px-3 py-4 border-t border-border space-y-2">
