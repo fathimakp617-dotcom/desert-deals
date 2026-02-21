@@ -1,10 +1,9 @@
 import { useState, memo, useEffect, useCallback, useRef, useMemo } from "react";
 import { Menu, X, ShoppingBag, Heart, User, Search, ChevronLeft, ChevronRight } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCategories } from "@/hooks/useCategories";
-import logoImg from "@/assets/logo.png";
 import SearchSuggestions from "@/components/SearchSuggestions";
 
 const announcements = [
@@ -24,8 +23,6 @@ const Navbar = memo(() => {
   const [searchClosing, setSearchClosing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const logoRef = useRef<HTMLAnchorElement>(null);
-  const [logoWidth, setLogoWidth] = useState(0);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems, openCart } = useCart();
@@ -41,7 +38,6 @@ const Navbar = memo(() => {
       href: `/shop?brand=${c.value}`,
     }));
 
-    // Split: first half in top row, rest + static links in bottom row
     const splitAt = Math.min(Math.ceil(categoryLinks.length / 2), 11);
     const top = [
       { name: "All Shoes", href: "/shop" },
@@ -53,12 +49,6 @@ const Navbar = memo(() => {
     ];
     return { topLinks: top, bottomLinks: bottom, allLinks: [...top, ...bottom] };
   }, [categories]);
-
-  useEffect(() => {
-    if (logoRef.current) {
-      setLogoWidth(logoRef.current.offsetWidth);
-    }
-  }, []);
 
   const nextAnnouncement = useCallback(() => {
     setAnnouncementIndex((prev) => (prev + 1) % announcements.length);
@@ -120,26 +110,40 @@ const Navbar = memo(() => {
       {/* Main Header */}
       <header className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+          {/* Single row: Logo left | Nav center | Icons right */}
           <div className="flex items-center h-14 sm:h-16 relative">
+            {/* Mobile hamburger */}
             <div className="lg:hidden flex items-center">
               <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
                 {isOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>
 
-            <Link to="/" ref={logoRef} className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:mr-12 mt-1">
-              <img src={logoImg} alt="Desert Deal" className="h-14 sm:h-16 w-auto object-contain" />
+            {/* Logo – text-based like reference */}
+            <Link
+              to="/"
+              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0"
+            >
+              <span className="text-xl sm:text-2xl font-heading font-extrabold tracking-wider text-foreground uppercase whitespace-nowrap">
+                Desert Deal
+              </span>
             </Link>
 
-            <div className="hidden lg:flex items-center gap-x-5 flex-1 overflow-x-auto no-scrollbar border-l border-border pl-8">
+            {/* Desktop nav – top row centered between logo and icons */}
+            <div className="hidden lg:flex items-center justify-center gap-x-5 flex-1 overflow-x-auto no-scrollbar">
               {topLinks.map((link) => (
-                <Link key={link.name} to={link.href} className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium">
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
+                >
                   {link.name}
                 </Link>
               ))}
             </div>
 
-            <div className="flex items-center gap-1 sm:gap-2 ml-auto shrink-0 relative z-10">
+            {/* Action icons */}
+            <div className="flex items-center gap-1 sm:gap-2 ml-auto lg:ml-0 shrink-0 relative z-10">
               <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
               </button>
@@ -161,9 +165,14 @@ const Navbar = memo(() => {
             </div>
           </div>
 
+          {/* Desktop nav – bottom row centered */}
           <div className="hidden lg:flex items-center justify-center gap-x-5 pb-2">
             {bottomLinks.map((link) => (
-              <Link key={link.name} to={link.href} className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium">
+              <Link
+                key={link.name}
+                to={link.href}
+                className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
+              >
                 {link.name}
               </Link>
             ))}
