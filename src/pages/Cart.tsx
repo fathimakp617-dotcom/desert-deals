@@ -1,5 +1,5 @@
 import { memo, useState, useRef, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, X, ShoppingBag, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
@@ -22,7 +22,7 @@ const getSizes = (product: Product): number[] => {
 };
 
 /** Cross-sell card with inline size picker */
-const CrossSellCard = ({ product, onAdd }: { product: Product; onAdd: (product: Product, size: number) => void }) => {
+const CrossSellCard = ({ product, onAdd, onBuyNow }: { product: Product; onAdd: (product: Product, size: number) => void; onBuyNow: (product: Product, size: number) => void }) => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const sizes = getSizes(product);
 
@@ -63,20 +63,36 @@ const CrossSellCard = ({ product, onAdd }: { product: Product; onAdd: (product: 
         </div>
       </div>
 
-      <button
-        onClick={() => {
-          if (!selectedSize) {
-            toast.error("Please select a size");
-            return;
-          }
-          onAdd(product, selectedSize);
-          toast.success(`${product.name} added!`);
-        }}
-        className="flex items-center gap-1 text-xs text-primary hover:underline mt-2 font-medium"
-      >
-        <Plus className="w-3 h-3" />
-        Add to Cart
-      </button>
+      <div className="flex gap-2 mt-2">
+        <button
+          onClick={() => {
+            if (!selectedSize) {
+              toast.error("Please select a size");
+              return;
+            }
+            onAdd(product, selectedSize);
+            toast.success(`${product.name} added!`);
+          }}
+          className="flex items-center gap-1 text-xs text-primary hover:underline font-medium"
+        >
+          <Plus className="w-3 h-3" />
+          Add to Cart
+        </button>
+        <span className="text-muted-foreground/40">|</span>
+        <button
+          onClick={() => {
+            if (!selectedSize) {
+              toast.error("Please select a size");
+              return;
+            }
+            onBuyNow(product, selectedSize);
+          }}
+          className="flex items-center gap-1 text-xs text-foreground hover:underline font-semibold"
+        >
+          <ShoppingBag className="w-3 h-3" />
+          Buy Now
+        </button>
+      </div>
     </div>
   );
 };
@@ -84,6 +100,7 @@ const CrossSellCard = ({ product, onAdd }: { product: Product; onAdd: (product: 
 const Cart = memo(() => {
   const { items, updateQuantity, removeFromCart, totalPrice, addToCart } = useCart();
   const { data: allProducts = [] } = useDbProducts();
+  const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const subtotal = totalPrice;
@@ -102,6 +119,12 @@ const Cart = memo(() => {
 
   const handleCrossSellAdd = (product: Product, size: number) => {
     addToCart(product, 1, `EU ${size}`);
+  };
+
+  const handleCrossSellBuyNow = (product: Product, size: number) => {
+    addToCart(product, 1, `EU ${size}`);
+    toast.success(`${product.name} added!`);
+    navigate("/checkout");
   };
 
   return (
@@ -223,7 +246,7 @@ const Cart = memo(() => {
                     </div>
                     <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2 snap-x">
                       {crossSellProducts.map((product) => (
-                        <CrossSellCard key={product.id} product={product} onAdd={handleCrossSellAdd} />
+                        <CrossSellCard key={product.id} product={product} onAdd={handleCrossSellAdd} onBuyNow={handleCrossSellBuyNow} />
                       ))}
                     </div>
                   </div>
