@@ -197,190 +197,149 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
           </DialogTitle>
         </DialogHeader>
 
-        <div ref={contentRef} className="space-y-6">
-          {/* Status Badges */}
-          <div className="flex flex-wrap gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Order Status:</span>
-              <Badge variant="outline" className={`capitalize ${getStatusColor(order.order_status)}`}>
-                {order.order_status}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Payment:</span>
-              <Badge variant="outline" className={`capitalize ${getPaymentStatusColor(order.payment_status)}`}>
-                {order.payment_status}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Method:</span>
-              <Badge variant="secondary">
-                {order.payment_method === "cod" ? "Cash on Delivery" : "Online Payment"}
-              </Badge>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Order Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3">
-              <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
+        <div ref={contentRef} className="bg-white rounded-xl overflow-hidden" style={{ color: '#1a1a1a' }}>
+          {/* Header */}
+          <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 px-6 py-5 text-white">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">Order Date</p>
-                <p className="text-sm font-medium">{formatDate(order.created_at)}</p>
+                <h2 className="text-lg font-bold tracking-tight">Desert Deal</h2>
+                <p className="text-neutral-400 text-xs mt-0.5">desertsdeals.com</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-semibold">{order.order_number}</p>
+                <p className="text-neutral-400 text-xs mt-0.5">{formatDate(order.created_at)}</p>
               </div>
             </div>
-            {order.tracking_number && (
-              <div className="flex items-start gap-3">
-                <Truck className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Tracking Number</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">{order.tracking_number}</p>
-                    {order.tracking_url && (
-                      <a 
-                        href={order.tracking_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-primary/80"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
-          <Separator />
+          {/* Status Row */}
+          <div className="px-6 py-3 flex items-center gap-3 border-b" style={{ borderColor: '#f0f0f0' }}>
+            <Badge variant="outline" className={`capitalize text-xs ${getStatusColor(order.order_status)}`}>
+              {order.order_status}
+            </Badge>
+            <Badge variant="outline" className={`capitalize text-xs ${getPaymentStatusColor(order.payment_status)}`}>
+              {order.payment_status}
+            </Badge>
+            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#f5f5f5', color: '#666' }}>
+              {order.payment_method === "cod" ? "Cash on Delivery" : "Online"}
+            </span>
+          </div>
 
-          {/* Customer Info */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Customer Information
-            </h3>
-            <div className="bg-muted/30 rounded-lg p-4 space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">{order.customer_name}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>{order.customer_email}</span>
-              </div>
+          {/* Two Column: Customer + Shipping */}
+          <div className="px-6 py-4 grid grid-cols-2 gap-6 border-b" style={{ borderColor: '#f0f0f0' }}>
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#999' }}>Customer</p>
+              <p className="text-sm font-medium">{order.customer_name}</p>
+              <p className="text-xs mt-0.5" style={{ color: '#666' }}>{order.customer_email}</p>
               {order.customer_phone && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-foreground">{order.customer_phone}</span>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <p className="text-xs" style={{ color: '#666' }}>{order.customer_phone}</p>
                   <button
                     type="button"
                     onClick={handleShareWhatsApp}
-                    className="inline-flex items-center gap-1 text-xs bg-green-500/10 text-green-600 px-2 py-1 rounded-full hover:bg-green-500/20 transition-colors"
+                    className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full transition-colors"
+                    style={{ background: '#dcfce7', color: '#16a34a' }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#25D366" className="h-3.5 w-3.5"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                    Share Order
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#25D366" className="h-3 w-3"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    Share
                   </button>
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Shipping Address */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Shipping Address
-            </h3>
-            <div className="bg-muted/30 rounded-lg p-4">
-              <p className="text-sm">
-                {order.shipping_address?.address}<br />
-                {order.shipping_address?.city}, {order.shipping_address?.state} {zipCode}<br />
-                {order.shipping_address?.country}
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#999' }}>Ship To</p>
+              <p className="text-sm font-medium">{order.shipping_address?.address}</p>
+              <p className="text-xs mt-0.5" style={{ color: '#666' }}>
+                {order.shipping_address?.city}, {order.shipping_address?.state} {zipCode}
               </p>
+              <p className="text-xs" style={{ color: '#666' }}>{order.shipping_address?.country}</p>
             </div>
           </div>
 
+          {order.tracking_number && (
+            <div className="px-6 py-2.5 border-b flex items-center gap-2" style={{ borderColor: '#f0f0f0', background: '#fafafa' }}>
+              <Truck className="h-3.5 w-3.5" style={{ color: '#999' }} />
+              <span className="text-xs" style={{ color: '#666' }}>Tracking:</span>
+              <span className="text-xs font-medium">{order.tracking_number}</span>
+              {order.tracking_url && (
+                <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-xs" style={{ color: '#2563eb' }}>
+                  Track →
+                </a>
+              )}
+            </div>
+          )}
+
           {/* Order Items */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              Order Items
-            </h3>
-            <div className="space-y-2">
+          <div className="px-6 py-4">
+            <p className="text-[10px] font-semibold uppercase tracking-wider mb-3" style={{ color: '#999' }}>Items</p>
+            <div className="space-y-3">
               {order.items.map((item, index) => (
-                <div 
-                  key={index} 
-                  className="flex items-center gap-3 text-sm p-3 bg-muted/30 rounded-lg"
-                >
+                <div key={index} className="flex items-center gap-3">
                   {item.productId && productImages[item.productId] ? (
                     <img
                       src={productImages[item.productId]}
                       alt={item.name || item.product_name || "Product"}
-                      className="h-12 w-12 rounded-md object-cover border border-border flex-shrink-0"
+                      className="h-14 w-14 rounded-lg object-cover flex-shrink-0"
+                      style={{ border: '1px solid #e5e5e5' }}
                       onError={(e) => { e.currentTarget.src = "/images/product-placeholder.jpg"; }}
                     />
                   ) : (
-                    <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
-                      <Package className="h-5 w-5 text-muted-foreground" />
+                    <div className="h-14 w-14 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#f5f5f5' }}>
+                      <Package className="h-5 w-5" style={{ color: '#ccc' }} />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <span className="font-medium">{item.name || item.product_name || "Product"}</span>
-                    {item.selectedSize && (
-                      <span className="text-xs text-muted-foreground ml-2">({item.selectedSize})</span>
-                    )}
-                    <span className="text-muted-foreground ml-2">×{item.quantity}</span>
+                    <p className="text-sm font-medium leading-tight">{item.name || item.product_name || "Product"}</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#999' }}>
+                      Qty: {item.quantity}
+                      {item.selectedSize && <span> · Size: {item.selectedSize}</span>}
+                    </p>
                   </div>
-                  <span className="font-medium flex-shrink-0">{formatCurrency(item.price * item.quantity)}</span>
+                  <span className="text-sm font-semibold flex-shrink-0">{formatCurrency(item.price * item.quantity)}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Coupons */}
+          {/* Coupon */}
           {order.coupon_code && (
-            <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 text-sm bg-green-500/10 text-green-600 px-3 py-1.5 rounded-full">
+            <div className="px-6 pb-2">
+              <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full" style={{ background: '#dcfce7', color: '#16a34a' }}>
                 <Tag className="h-3 w-3" />
-                Coupon: {order.coupon_code}
-              </div>
+                {order.coupon_code}
+              </span>
             </div>
           )}
 
-          <Separator />
-
-          {/* Order Summary */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              Order Summary
-            </h3>
-            <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+          {/* Summary */}
+          <div className="px-6 py-4 mt-1" style={{ background: '#fafafa', borderTop: '1px solid #f0f0f0' }}>
+            <div className="space-y-1.5">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span style={{ color: '#666' }}>Subtotal</span>
                 <span>{formatCurrency(order.subtotal)}</span>
               </div>
               {order.discount != null && order.discount > 0 && (
-                <div className="flex justify-between text-sm text-green-600">
+                <div className="flex justify-between text-sm" style={{ color: '#16a34a' }}>
                   <span>Discount</span>
                   <span>-{formatCurrency(order.discount)}</span>
                 </div>
               )}
               {order.shipping !== undefined && order.shipping !== null && order.shipping > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
+                  <span style={{ color: '#666' }}>Shipping</span>
                   <span>{formatCurrency(order.shipping)}</span>
                 </div>
               )}
-              <Separator className="my-2" />
-              <div className="flex justify-between font-semibold">
-                <span>Total</span>
-                <span className="text-primary">{formatCurrency(order.total)}</span>
+              <div className="flex justify-between pt-2 mt-2" style={{ borderTop: '1px solid #e5e5e5' }}>
+                <span className="text-base font-bold">Total</span>
+                <span className="text-base font-bold">{formatCurrency(order.total)}</span>
               </div>
             </div>
+          </div>
+
+          {/* Footer */}
+          <div className="px-6 py-3 text-center" style={{ borderTop: '1px solid #f0f0f0' }}>
+            <p className="text-[10px]" style={{ color: '#bbb' }}>Thank you for shopping with Desert Deal · desertsdeals.com</p>
           </div>
         </div>
 
