@@ -231,29 +231,7 @@ const Cart = memo(() => {
                 </div>
               </div>
 
-              {/* Cross-sell section - full width below cart */}
-              {crossSellProducts.length > 0 && (
-                <div className="mt-10 pt-8 border-t border-border overflow-hidden">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-base sm:text-lg font-heading font-bold tracking-tight">You May Also Like</h3>
-                    {crossSellProducts.length > 3 && (
-                      <div className="hidden sm:flex gap-1">
-                        <button onClick={() => scroll("left")} className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
-                          <ChevronLeft className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => scroll("right")} className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2 snap-x">
-                    {crossSellProducts.map((product) => (
-                      <CrossSellCard key={product.id} product={product} onAdd={handleCrossSellAdd} onBuyNow={handleCrossSellBuyNow} />
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Cross-selling paused */}
             </>
           )}
         </div>

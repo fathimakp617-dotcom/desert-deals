@@ -90,41 +90,7 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                   </>
                 )}
 
-                {/* Recommended */}
-                {recommended.length > 0 && (
-                  <div>
-                    <h3 className="font-heading text-center text-sm mb-4">Recommended for You</h3>
-                    <div className="relative">
-                      {recommended.length > 2 && (
-                        <>
-                          <button onClick={() => scroll("left")} className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full bg-card border border-border shadow flex items-center justify-center hover:bg-muted">
-                            <ChevronLeft className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => scroll("right")} className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full bg-card border border-border shadow flex items-center justify-center hover:bg-muted">
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                      <div ref={scrollRef} className="flex gap-3 overflow-x-auto scrollbar-hide px-1 pb-2 snap-x">
-                        {recommended.map((product) => (
-                          <div key={product.id} className="flex-shrink-0 w-[160px] border border-border rounded-lg p-3 snap-start">
-                            <Link to={`/product/${product.id}`} onClick={onClose} className="block">
-                              <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded mx-auto mb-2" />
-                              <p className="text-xs font-semibold text-foreground line-clamp-2 uppercase leading-tight">{product.name}</p>
-                              <p className="text-xs font-bold text-primary mt-1">{formatPrice(product.price)}</p>
-                            </Link>
-                            <button
-                              onClick={() => addToCart(product, 1)}
-                              className="text-xs text-primary hover:underline mt-2 font-medium"
-                            >
-                              + Quick Add
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {/* Cross-selling paused */}
               </div>
 
               {/* Footer */}
