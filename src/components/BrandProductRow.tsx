@@ -41,10 +41,10 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
   if (!isLoading && products.length === 0) return null;
 
   return (
-    <section className="py-6 sm:py-10 bg-background">
+    <section className="py-2 sm:py-3 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="flex items-center justify-between mb-6 border-b border-border pb-3">
-          <h3 className="text-base sm:text-lg font-heading font-semibold text-foreground">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm sm:text-base font-heading font-semibold text-foreground">
             {title}
           </h3>
           <Link
@@ -125,9 +125,6 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                       </div>
 
                       <div className="p-3 sm:p-4 bg-muted rounded-b-lg">
-                        <div className="flex flex-wrap gap-1 mb-1.5">
-                          <span className="text-[10px] text-muted-foreground">{product.category}</span>
-                        </div>
                         <Link to={`/product/${product.id}`}>
                           <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors">
                             {product.name}
