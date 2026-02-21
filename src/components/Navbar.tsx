@@ -44,6 +44,7 @@ const Navbar = memo(() => {
       ...categoryLinks,
       ...staticBottomLinks,
     ];
+    // "All Shoes" is hardcoded above; DB categories provide the brand links
     // Fill first row as much as possible (up to 10), rest goes to second row
     const splitAt = Math.min(12, allNavLinks.length);
     const top = allNavLinks.slice(0, splitAt);
