@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { formatPrice, Product } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
-import { Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, ChevronLeft, ChevronRight, Star } from "lucide-react";
 
 interface RelatedProductsProps {
   currentProductId: string;
@@ -77,6 +77,9 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                   </div>
                   <div className="p-3">
                     <span className="text-[10px] text-muted-foreground uppercase">{item.category}</span>
+                    <div className="flex gap-0.5 mt-1">
+                      {[1,2,3,4,5].map(s => <Star key={s} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}
+                    </div>
                     <h3 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 min-h-[2.5em] leading-snug mt-0.5">
                       {item.name}
                     </h3>
