@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { trackPurchase } from "@/lib/metaPixel";
+import { playOrderSuccessSound } from "@/lib/orderSuccessSound";
 
 import OrderReceipt from "./OrderReceipt";
 
@@ -55,10 +56,11 @@ const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
     }
   }, [orderNumber]);
 
-  // Fire Purchase pixel event exactly once when order data loads
+  // Fire Purchase pixel event and play success sound exactly once when order data loads
   useEffect(() => {
     if (orderData && !purchaseTracked) {
       setPurchaseTracked(true);
+      playOrderSuccessSound();
       const contentIds = orderData.items
         .map((item) => item.productId)
         .filter(Boolean) as string[];
