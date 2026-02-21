@@ -607,9 +607,18 @@ const ProductDetail = () => {
                 {/* Description - always visible */}
                 <motion.div variants={staggerItem} className="space-y-4 pt-4 border-b border-border/50 pb-6">
                   <h3 className="text-base font-heading font-semibold text-foreground">Description</h3>
-                  <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">
-                    {product.story || product.description}
-                  </p>
+                  {(() => {
+                    const desc = product.story || product.description || "";
+                    const isHtml = /<[a-z][\s\S]*>/i.test(desc);
+                    return isHtml ? (
+                      <div
+                        className="text-muted-foreground leading-relaxed text-sm prose prose-sm max-w-none [&_img]:rounded-lg [&_img]:max-w-full [&_img]:h-auto"
+                        dangerouslySetInnerHTML={{ __html: desc }}
+                      />
+                    ) : (
+                      <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{desc}</p>
+                    );
+                  })()}
                 </motion.div>
 
                 {/* Additional Information - collapsible text link */}
