@@ -157,6 +157,30 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_countries: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -421,6 +445,48 @@ export type Database = {
           tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      page_views: {
+        Row: {
+          country_code: string | null
+          created_at: string
+          id: string
+          page_path: string
+          product_id: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          country_code?: string | null
+          created_at?: string
+          id?: string
+          page_path: string
+          product_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          country_code?: string | null
+          created_at?: string
+          id?: string
+          page_path?: string
+          product_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Relationships: []
       }

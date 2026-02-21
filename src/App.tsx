@@ -13,6 +13,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { DirectionProvider } from "@/contexts/DirectionContext";
 import CartDrawer from "@/components/CartDrawer";
 import ScrollToTop from "@/components/ScrollToTop";
+import { GeoBlocker } from "@/components/GeoBlocker";
+import { usePageTracking } from "@/hooks/usePageTracking";
 
 
 // Eagerly load critical pages
@@ -61,7 +63,7 @@ const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminBulkImport = lazy(() => import("./pages/admin/AdminBulkImport"));
 const AdminImageFix = lazy(() => import("./pages/admin/AdminImageFix"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
-
+const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 
 // Minimal loading fallback
 const PageLoader = () => (
@@ -73,6 +75,7 @@ const PageLoader = () => (
 // Route prefetcher component
 const RoutePrefetcher = () => {
   usePrefetchRoutes();
+  usePageTracking();
   return null;
 };
 
@@ -100,6 +103,7 @@ const App = () => (
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
+                  <GeoBlocker>
                   <ScrollToTop />
                   <CartDrawer />
                   
@@ -131,11 +135,13 @@ const App = () => (
                         <Route path="products" element={<AdminProducts />} />
                         <Route path="bulk-import" element={<AdminBulkImport />} />
                         <Route path="categories" element={<AdminCategories />} />
+                        <Route path="analytics" element={<AdminAnalytics />} />
                         <Route path="fix-images" element={<AdminImageFix />} />
                       </Route>
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Suspense>
+                  </GeoBlocker>
                 </BrowserRouter>
               </TooltipProvider>
             </CouponProvider>
