@@ -44,10 +44,10 @@ interface ManualItem {
 }
 
 const generateManualOrderNumber = () => {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let result = "WA-";
+  const digits = "0123456789";
+  let result = "DD-";
   for (let i = 0; i < 6; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+    result += digits.charAt(Math.floor(Math.random() * digits.length));
   }
   return result;
 };
