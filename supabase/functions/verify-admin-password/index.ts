@@ -184,6 +184,42 @@ serve(async (req) => {
       const sessionToken = Array.from(array).map(b => b.toString(16).padStart(2, "0")).join("");
       const sessionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
+      // Enforce max 2 concurrent admin sessions
+      if (dbStaff.role === "admin") {
+        // Clean expired sessions first
+        await supabaseClient
+          .from("staff_sessions")
+          .delete()
+          .lt("expires_at", new Date().toISOString());
+
+        // Count active admin sessions (exclude current user's sessions)
+        const { data: activeSessions } = await supabaseClient
+          .from("staff_sessions")
+          .select("id, email, created_at")
+          .neq("email", normalizedEmail)
+          .order("created_at", { ascending: true });
+
+        const otherAdminSessions = activeSessions || [];
+
+        // Check if this user already has a session
+        const { data: ownSessions } = await supabaseClient
+          .from("staff_sessions")
+          .select("id")
+          .eq("email", normalizedEmail);
+
+        const totalActive = otherAdminSessions.length + (ownSessions?.length || 0);
+
+        if (totalActive >= 2 && (!ownSessions || ownSessions.length === 0)) {
+          // Already 2 sessions from other admins, kick the oldest one
+          const oldestSession = otherAdminSessions[0];
+          await supabaseClient
+            .from("staff_sessions")
+            .delete()
+            .eq("id", oldestSession.id);
+          console.log(`Kicked oldest admin session (${oldestSession.email}) to allow new login`);
+        }
+      }
+
       // Store session in database for validation
       try {
         // Clean up old sessions for this user
@@ -276,6 +312,38 @@ serve(async (req) => {
     crypto.getRandomValues(array);
     const sessionToken = Array.from(array).map(b => b.toString(16).padStart(2, "0")).join("");
     const sessionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Enforce max 2 concurrent admin sessions for admin role
+    if (role === "admin") {
+      await supabaseClient
+        .from("staff_sessions")
+        .delete()
+        .lt("expires_at", new Date().toISOString());
+
+      const { data: activeSessions } = await supabaseClient
+        .from("staff_sessions")
+        .select("id, email, created_at")
+        .neq("email", normalizedEmail)
+        .order("created_at", { ascending: true });
+
+      const otherAdminSessions = activeSessions || [];
+
+      const { data: ownSessions } = await supabaseClient
+        .from("staff_sessions")
+        .select("id")
+        .eq("email", normalizedEmail);
+
+      const totalActive = otherAdminSessions.length + (ownSessions?.length || 0);
+
+      if (totalActive >= 2 && (!ownSessions || ownSessions.length === 0)) {
+        const oldestSession = otherAdminSessions[0];
+        await supabaseClient
+          .from("staff_sessions")
+          .delete()
+          .eq("id", oldestSession.id);
+        console.log(`Kicked oldest admin session (${oldestSession.email}) to allow new login`);
+      }
+    }
 
     // Store session in database for validation
     try {
