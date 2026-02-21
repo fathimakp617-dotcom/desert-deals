@@ -132,10 +132,32 @@ Deno.serve(async (req) => {
 
     switch (action) {
       case "list": {
-        const { data: products, error } = await supabaseClient
+        // By default exclude trashed products; include_trashed returns all
+        const includeDeleted = body.include_deleted === true;
+        let query = supabaseClient
           .from("products")
           .select("*")
           .order("created_at", { ascending: false });
+
+        if (!includeDeleted) {
+          query = query.is("deleted_at", null);
+        }
+
+        const { data: products, error } = await query;
+
+        if (error) throw error;
+
+        return new Response(JSON.stringify({ products }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      case "list_trash": {
+        const { data: products, error } = await supabaseClient
+          .from("products")
+          .select("*")
+          .not("deleted_at", "is", null)
+          .order("deleted_at", { ascending: false });
 
         if (error) throw error;
 
@@ -287,7 +309,49 @@ Deno.serve(async (req) => {
       }
 
       case "delete": {
-        // Delete product images from storage first
+        // Soft delete — move to trash
+        const { error } = await supabaseClient
+          .from("products")
+          .update({ deleted_at: new Date().toISOString(), is_active: false })
+          .eq("id", product.id);
+
+        if (error) throw error;
+
+        // Log activity
+        await supabaseClient.from("activity_logs").insert({
+          actor_email: session.email,
+          actor_role: "admin",
+          action_type: "product_trashed",
+          action_details: { product_id: product.id },
+        });
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      case "restore": {
+        const { error } = await supabaseClient
+          .from("products")
+          .update({ deleted_at: null, is_active: true })
+          .eq("id", product.id);
+
+        if (error) throw error;
+
+        await supabaseClient.from("activity_logs").insert({
+          actor_email: session.email,
+          actor_role: "admin",
+          action_type: "product_restored",
+          action_details: { product_id: product.id },
+        });
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      case "permanent_delete": {
+        // Permanently delete product and its images
         const { data: files } = await supabaseClient.storage
           .from("product-images")
           .list(product.id);
@@ -304,11 +368,10 @@ Deno.serve(async (req) => {
 
         if (error) throw error;
 
-        // Log activity
         await supabaseClient.from("activity_logs").insert({
           actor_email: session.email,
           actor_role: "admin",
-          action_type: "product_deleted",
+          action_type: "product_permanently_deleted",
           action_details: { product_id: product.id },
         });
 

@@ -473,6 +473,7 @@ export type Database = {
         Row: {
           category: string | null
           created_at: string
+          deleted_at: string | null
           description: string | null
           discount_percent: number | null
           id: string
@@ -489,6 +490,7 @@ export type Database = {
         Insert: {
           category?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           discount_percent?: number | null
           id: string
@@ -505,6 +507,7 @@ export type Database = {
         Update: {
           category?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           discount_percent?: number | null
           id?: string

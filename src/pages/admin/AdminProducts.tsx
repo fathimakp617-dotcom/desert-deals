@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight, CheckSquare, Copy, Download } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, AlertCircle, Upload, Image, Search, ChevronLeft, ChevronRight, CheckSquare, Copy, Download, RotateCcw, Trash } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,6 +53,7 @@ interface Product {
   size: string;
   image_url: string;
   is_active: boolean;
+  deleted_at: string | null;
   notes: {
     top: string[];
     middle: string[];
@@ -92,7 +93,7 @@ const AdminProducts = () => {
   const [bulkEditField, setBulkEditField] = useState<string>("");
   const [bulkEditValue, setBulkEditValue] = useState<string>("");
   const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
-
+  const [showTrash, setShowTrash] = useState(false);
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],
     queryFn: async () => {
@@ -323,6 +324,60 @@ const AdminProducts = () => {
   });
 
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+
+  // Trash query
+  const { data: trashedProducts, isLoading: isTrashLoading } = useQuery({
+    queryKey: ["admin-products-trash"],
+    queryFn: async () => {
+      const session = getAdminSession();
+      if (!session) throw new Error("Not authenticated");
+      const { data, error } = await supabase.functions.invoke("manage-products", {
+        body: { action: "list_trash", admin_email: session.email, admin_token: session.token },
+      });
+      if (error) throw error;
+      return data.products as Product[];
+    },
+    enabled: showTrash,
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      const session = getAdminSession();
+      if (!session) throw new Error("Not authenticated");
+      const { data, error } = await supabase.functions.invoke("manage-products", {
+        body: { action: "restore", product: { id: productId }, admin_email: session.email, admin_token: session.token },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products-trash"] });
+      toast({ title: "Product restored" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const permanentDeleteMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      const session = getAdminSession();
+      if (!session) throw new Error("Not authenticated");
+      const { data, error } = await supabase.functions.invoke("manage-products", {
+        body: { action: "permanent_delete", product: { id: productId }, admin_email: session.email, admin_token: session.token },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products-trash"] });
+      toast({ title: "Product permanently deleted" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
 
   const bulkDeleteMutation = useMutation({
     mutationFn: async (productIds: string[]) => {
@@ -585,27 +640,115 @@ const AdminProducts = () => {
       {/* Status tabs */}
       <div className="flex items-center gap-1 text-sm text-muted-foreground">
         <button
-          onClick={() => handleFilterChange(setStatusFilter)("all")}
-          className={`hover:text-foreground transition-colors ${statusFilter === "all" ? "text-foreground font-medium" : ""}`}
+          onClick={() => { setShowTrash(false); handleFilterChange(setStatusFilter)("all"); }}
+          className={`hover:text-foreground transition-colors ${!showTrash && statusFilter === "all" ? "text-foreground font-medium" : ""}`}
         >
           All ({products?.length || 0})
         </button>
         <span>|</span>
         <button
-          onClick={() => handleFilterChange(setStatusFilter)("active")}
-          className={`hover:text-foreground transition-colors ${statusFilter === "active" ? "text-foreground font-medium" : ""}`}
+          onClick={() => { setShowTrash(false); handleFilterChange(setStatusFilter)("active"); }}
+          className={`hover:text-foreground transition-colors ${!showTrash && statusFilter === "active" ? "text-foreground font-medium" : ""}`}
         >
           Active ({activeCount})
         </button>
         <span>|</span>
         <button
-          onClick={() => handleFilterChange(setStatusFilter)("inactive")}
-          className={`hover:text-foreground transition-colors ${statusFilter === "inactive" ? "text-foreground font-medium" : ""}`}
+          onClick={() => { setShowTrash(false); handleFilterChange(setStatusFilter)("inactive"); }}
+          className={`hover:text-foreground transition-colors ${!showTrash && statusFilter === "inactive" ? "text-foreground font-medium" : ""}`}
         >
           Inactive ({inactiveCount})
         </button>
+        <span>|</span>
+        <button
+          onClick={() => { setShowTrash(true); setCurrentPage(1); }}
+          className={`hover:text-foreground transition-colors flex items-center gap-1 ${showTrash ? "text-foreground font-medium" : ""}`}
+        >
+          <Trash className="h-3.5 w-3.5" />
+          Trash ({trashedProducts?.length || 0})
+        </button>
       </div>
 
+      {/* Trash View */}
+      {showTrash ? (
+        <div className="space-y-4">
+          {isTrashLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : !trashedProducts?.length ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Trash className="h-12 w-12 mx-auto mb-3 opacity-30" />
+              <p className="text-lg font-medium">Trash is empty</p>
+              <p className="text-sm mt-1">Deleted products will appear here for recovery</p>
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="w-[50px]"></TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Deleted</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {trashedProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell className="py-2">
+                        {product.image_url ? (
+                          <img src={product.image_url.split(",")[0]?.trim()} alt="" className="h-10 w-10 rounded object-cover" />
+                        ) : (
+                          <div className="h-10 w-10 rounded bg-muted flex items-center justify-center">
+                            <Image className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="py-2">
+                        <span className="text-sm font-medium">{product.name}</span>
+                        <div className="text-xs text-muted-foreground">ID: {product.id}</div>
+                      </TableCell>
+                      <TableCell className="py-2 text-sm">{product.price} AED</TableCell>
+                      <TableCell className="py-2 text-sm text-muted-foreground">
+                        {product.deleted_at ? new Date(product.deleted_at).toLocaleDateString() : "—"}
+                      </TableCell>
+                      <TableCell className="text-right py-2">
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => restoreMutation.mutate(product.id)}
+                            disabled={restoreMutation.isPending}
+                          >
+                            <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                            Restore
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                              if (confirm("Permanently delete this product? This cannot be undone.")) {
+                                permanentDeleteMutation.mutate(product.id);
+                              }
+                            }}
+                            disabled={permanentDeleteMutation.isPending}
+                          >
+                            <Trash2 className="h-3.5 w-3.5 mr-1" />
+                            Delete Forever
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
+      ) : (
+      <>
       {/* Filters row */}
       <div className="flex flex-wrap items-center gap-2">
         <Select value={categoryFilter} onValueChange={handleFilterChange(setCategoryFilter)}>
@@ -960,6 +1103,8 @@ const AdminProducts = () => {
             </Button>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );
