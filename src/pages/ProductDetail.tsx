@@ -26,6 +26,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductSchema, BreadcrumbSchema } from "@/components/seo/JsonLd";
 
 
+import BuyNowOverlay from "@/components/BuyNowOverlay";
+
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -49,6 +51,7 @@ const ProductDetail = () => {
   const [showSpecification, setShowSpecification] = useState(false);
   const [showAdditional, setShowAdditional] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
+  const [showBuyNow, setShowBuyNow] = useState(false);
   const { addToCart, buyNow } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { data: stockMap } = useProductStock();
@@ -134,6 +137,8 @@ const ProductDetail = () => {
     });
   };
 
+
+
   const handleBuyNow = () => {
     if (isSoldOut) {
       toast.error("This product is currently sold out");
@@ -144,7 +149,7 @@ const ProductDetail = () => {
       return;
     }
     buyNow(product, quantity, `EU ${selectedSize}`);
-    navigate("/checkout");
+    setShowBuyNow(true);
   };
 
   const handleToggleWishlist = () => {
@@ -554,6 +559,7 @@ const ProductDetail = () => {
         <MobileBottomNav />
         </main>
       </PageTransition>
+      <BuyNowOverlay isOpen={showBuyNow} onClose={() => setShowBuyNow(false)} />
     </>
   );
 };
