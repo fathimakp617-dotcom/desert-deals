@@ -44,7 +44,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
     <section className="py-2 sm:py-3 bg-background">
       <div className="px-4 sm:px-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm sm:text-base font-heading font-semibold text-foreground">
+          <h3 className="text-xl sm:text-2xl font-heading font-bold tracking-tight">
             {title}
           </h3>
           <Link
@@ -60,94 +60,77 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : (
-          <div className="relative">
+          <div className="relative group/scroll">
             <button
               onClick={() => scroll("left")}
-              className="absolute -left-4 top-[35%] -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full flex items-center justify-center text-foreground hover:bg-muted transition-colors shadow-sm hidden sm:flex"
+              className="absolute -left-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => scroll("right")}
-              className="absolute -right-4 top-[35%] -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full flex items-center justify-center text-foreground hover:bg-muted transition-colors shadow-sm hidden sm:flex"
+              className="absolute -right-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
 
             <div
               ref={scrollRef}
-              className="flex gap-3 sm:gap-4 overflow-x-auto pb-4"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-2"
             >
               {products.map((product) => {
                 const soldOut = isProductSoldOut(stockMap, product.id);
                 const inWishlist = isInWishlist(product.id);
 
                 return (
-                  <div key={product.id} className="flex-shrink-0 w-[145px] sm:w-[220px] lg:w-[246px] group">
-                    <div className="bg-background border border-border/30 rounded-lg overflow-hidden flex flex-col h-full">
+                  <Link
+                    key={product.id}
+                    to={`/product/${product.id}`}
+                    className="group flex-shrink-0 w-[145px] sm:w-[200px] lg:w-[220px]"
+                  >
+                    <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
                       <div className="relative aspect-square bg-muted overflow-hidden">
-                        <Link to={`/product/${product.id}`}>
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
-                            loading="lazy"
-                          />
-                        </Link>
-
-
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
+                          loading="lazy"
+                        />
                         {soldOut && (
                           <div className="absolute top-2 left-2">
                             <Badge variant="destructive" className="text-[10px]">SOLD OUT</Badge>
                           </div>
                         )}
-
                         <button
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             inWishlist ? removeFromWishlist(product.id) : addToWishlist(product);
                           }}
-                          className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow opacity-0 group-hover:opacity-100"
+                          className="absolute top-2 right-2 p-1"
                         >
-                          <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                          <Heart className={`w-5 h-5 ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
                         </button>
-
                       </div>
-
-                      <div className="p-3 sm:p-4 bg-muted rounded-b-lg flex-1 flex flex-col">
-                        <Link to={`/product/${product.id}`}>
-                          <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors min-h-[2.5em]">
-                            {product.name}
-                          </h2>
-                        </Link>
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-sm text-foreground">{formatPrice(product.price)}</span>
+                      <div className="p-3">
+                        <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
+                        <h2 className="text-xs sm:text-sm font-bold text-foreground line-clamp-2 min-h-[2.5em] leading-snug mt-0.5">
+                          {product.name}
+                        </h2>
+                        <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                          <span className="text-sm font-medium text-foreground">{formatPrice(product.price)}</span>
                           {product.originalPrice > product.price && (
                             <span className="text-xs text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
                           )}
                         </div>
-                        <div className="mt-auto pt-1.5 flex items-center gap-1.5">
-                          {soldOut ? (
-                            <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
-                          ) : (
-                            <span className="text-[11px] font-bold text-green-600 uppercase">IN STOCK</span>
-                          )}
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              inWishlist ? removeFromWishlist(product.id) : addToWishlist(product);
-                            }}
-                            className="w-5 h-5 flex items-center justify-center"
-                          >
-                            <Heart className={`w-3.5 h-3.5 transition-colors ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
-                          </button>
-                        </div>
+                        {soldOut ? (
+                          <span className="text-[11px] font-bold text-red-500 uppercase mt-1 block">Out of Stock</span>
+                        ) : (
+                          <span className="text-[11px] font-bold text-emerald-600 uppercase mt-1 block">IN STOCK</span>
+                        )}
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
