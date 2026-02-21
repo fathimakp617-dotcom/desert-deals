@@ -70,6 +70,8 @@ const AdminOrders = () => {
   const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set());
   const [isBulkPrinting, setIsBulkPrinting] = useState(false);
   const [showBulkSlipPrint, setShowBulkSlipPrint] = useState(false);
+  const [bulkAction, setBulkAction] = useState<string | null>(null);
+  const [isBulkUpdating, setIsBulkUpdating] = useState(false);
   const { toast } = useToast();
 
   // Handle expired admin session (avoid blank/error loops)
@@ -489,6 +491,114 @@ const AdminOrders = () => {
     }
   };
 
+  const handleBulkStatusUpdate = async (newStatus: string) => {
+    setIsBulkUpdating(true);
+    try {
+      const sessionData = sessionStorage.getItem("rayn_admin_session");
+      if (!sessionData) throw new Error("No admin session found");
+      const session = JSON.parse(sessionData);
+
+      const ids = Array.from(selectedOrderIds);
+      let successCount = 0;
+      for (const orderId of ids) {
+        try {
+          const { error } = await supabase.functions.invoke('update-order-status', {
+            body: {
+              admin_email: session.email,
+              admin_token: session.token,
+              order_id: orderId,
+              new_status: newStatus,
+            },
+          });
+          if (!error) successCount++;
+        } catch {}
+      }
+
+      setOrders(prev => prev.map(o =>
+        selectedOrderIds.has(o.id) ? { ...o, order_status: newStatus } : o
+      ));
+      setSelectedOrderIds(new Set());
+      setBulkAction(null);
+      toast({ title: "Bulk Update", description: `${successCount} order(s) updated to ${newStatus}` });
+      invalidateOrders();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message || "Bulk update failed", variant: "destructive" });
+    } finally {
+      setIsBulkUpdating(false);
+    }
+  };
+
+  const handleBulkMarkPaid = async () => {
+    setIsBulkUpdating(true);
+    try {
+      const sessionData = sessionStorage.getItem("rayn_admin_session");
+      if (!sessionData) throw new Error("No admin session found");
+      const session = JSON.parse(sessionData);
+
+      const ids = Array.from(selectedOrderIds);
+      let successCount = 0;
+      for (const orderId of ids) {
+        try {
+          const { error } = await supabase.functions.invoke('mark-cash-received', {
+            body: {
+              admin_email: session.email,
+              admin_token: session.token,
+              order_id: orderId,
+              cash_received: true,
+            },
+          });
+          if (!error) successCount++;
+        } catch {}
+      }
+
+      setOrders(prev => prev.map(o =>
+        selectedOrderIds.has(o.id) ? { ...o, cash_received: true, payment_status: 'paid' } : o
+      ));
+      setSelectedOrderIds(new Set());
+      setBulkAction(null);
+      toast({ title: "Bulk Update", description: `${successCount} order(s) marked as paid` });
+      invalidateOrders();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message || "Bulk update failed", variant: "destructive" });
+    } finally {
+      setIsBulkUpdating(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setIsBulkUpdating(true);
+    try {
+      const sessionData = sessionStorage.getItem("rayn_admin_session");
+      if (!sessionData) throw new Error("No admin session found");
+      const session = JSON.parse(sessionData);
+
+      const ids = Array.from(selectedOrderIds);
+      let successCount = 0;
+      for (const orderId of ids) {
+        try {
+          const { error } = await supabase.functions.invoke('delete-admin-order', {
+            body: {
+              admin_email: session.email,
+              admin_token: session.token,
+              order_id: orderId,
+            },
+          });
+          if (!error) successCount++;
+        } catch {}
+      }
+
+      setOrders(prev => prev.filter(o => !selectedOrderIds.has(o.id)));
+      setSelectedOrderIds(new Set());
+      setBulkAction(null);
+      toast({ title: "Bulk Delete", description: `${successCount} order(s) deleted` });
+      invalidateOrders();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message || "Bulk delete failed", variant: "destructive" });
+    } finally {
+      setIsBulkUpdating(false);
+    }
+  };
+
   const downloadShippingAddresses = () => {
     // Filter orders that need shipping (not cancelled/delivered)
     const ordersToShip = filteredOrders.filter(
@@ -679,7 +789,7 @@ const AdminOrders = () => {
           <span className="text-sm font-medium">
             {selectedOrderIds.size} order{selectedOrderIds.size > 1 ? 's' : ''} selected
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               size="sm"
               variant="outline"
@@ -712,6 +822,39 @@ const AdminOrders = () => {
                   Download PDFs
                 </>
               )}
+            </Button>
+            <div className="w-px h-6 bg-border" />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setBulkAction("delivered")}
+            >
+              <Truck className="h-4 w-4 mr-2" />
+              Mark Delivered
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setBulkAction("shipped")}
+            >
+              <Package className="h-4 w-4 mr-2" />
+              Mark Shipped
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setBulkAction("paid")}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Mark Paid
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => setBulkAction("delete")}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
             </Button>
           </div>
         </div>
@@ -1213,6 +1356,46 @@ const AdminOrders = () => {
                 </>
               ) : (
                 "Delete Order"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Action Confirmation Dialog */}
+      <AlertDialog open={!!bulkAction} onOpenChange={() => !isBulkUpdating && setBulkAction(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              {bulkAction === "delete" ? "Delete Selected Orders" : `Bulk Update: ${selectedOrderIds.size} Order(s)`}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {bulkAction === "delete"
+                ? `Are you sure you want to delete ${selectedOrderIds.size} order(s)? This action cannot be undone.`
+                : bulkAction === "paid"
+                ? `Mark ${selectedOrderIds.size} order(s) as paid?`
+                : `Change ${selectedOrderIds.size} order(s) to "${bulkAction}"?`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkUpdating}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (bulkAction === "delete") handleBulkDelete();
+                else if (bulkAction === "paid") handleBulkMarkPaid();
+                else if (bulkAction) handleBulkStatusUpdate(bulkAction);
+              }}
+              className={bulkAction === "delete" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}
+              disabled={isBulkUpdating}
+            >
+              {isBulkUpdating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Confirm"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
