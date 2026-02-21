@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import html2canvas from "html2canvas";
 import {
   Dialog,
   DialogContent,
@@ -17,9 +18,11 @@ import {
   Calendar,
   Truck,
   Tag,
-  ExternalLink
+  ExternalLink,
+  Download
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 interface OrderItem {
   productId?: string;
@@ -69,6 +72,7 @@ interface OrderViewDialogProps {
 
 const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) => {
   const [productImages, setProductImages] = useState<Record<string, string>>({});
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!order || !open) return;
@@ -92,6 +96,19 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
         setProductImages(map);
       });
   }, [order, open]);
+
+  const handleDownloadImage = useCallback(async () => {
+    if (!contentRef.current || !order) return;
+    const canvas = await html2canvas(contentRef.current, {
+      backgroundColor: "#ffffff",
+      scale: 2,
+      useCORS: true,
+    });
+    const link = document.createElement("a");
+    link.download = `order-${order.order_number}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }, [order]);
 
   if (!order) return null;
 
@@ -145,7 +162,7 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div ref={contentRef} className="space-y-6">
           {/* Status Badges */}
           <div className="flex flex-wrap gap-3">
             <div className="flex items-center gap-2">
@@ -357,6 +374,13 @@ Thank you for choosing Desert Deal!`)}`}
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <Button variant="outline" size="sm" onClick={handleDownloadImage}>
+            <Download className="h-4 w-4 mr-2" />
+            Download as Image
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
