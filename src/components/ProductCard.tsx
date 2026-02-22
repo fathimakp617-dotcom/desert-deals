@@ -1,8 +1,9 @@
-import { memo, useState } from "react";
+import { memo, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Heart, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/data/products";
+import { usePrefetchProduct } from "@/hooks/useDbProducts";
 import type { SimpleProduct } from "@/hooks/usePaginatedProducts";
 
 
@@ -16,10 +17,12 @@ interface ProductCardProps {
 
 const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, viewMode }: ProductCardProps) => {
   const [imgError, setImgError] = useState(false);
+  const prefetch = usePrefetchProduct();
+  const handlePrefetch = useCallback(() => prefetch(product.id), [prefetch, product.id]);
 
   if (viewMode === "list") {
     return (
-      <div className="flex flex-col md:flex-row gap-4 border border-border/50 bg-card/50 p-4 hover:border-primary/30 transition-colors">
+      <div className="flex flex-col md:flex-row gap-4 border border-border/50 bg-card/50 p-4 hover:border-primary/30 transition-colors" onMouseEnter={handlePrefetch} onTouchStart={handlePrefetch}>
         <Link to={`/product/${product.id}`} className="w-full md:w-40 h-40 flex-shrink-0 overflow-hidden bg-muted flex items-center justify-center">
           {imgError ? (
             <ImageOff className="w-8 h-8 text-muted-foreground" />
@@ -51,7 +54,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
   }
 
   return (
-    <div className="group bg-background border border-border/30 rounded-lg overflow-hidden flex flex-col h-full">
+    <div className="group bg-background border border-border/30 rounded-lg overflow-hidden flex flex-col h-full" onMouseEnter={handlePrefetch} onTouchStart={handlePrefetch}>
       <div className="relative aspect-square bg-muted overflow-hidden flex-shrink-0">
         <Link to={`/product/${product.id}`} className="w-full h-full flex items-center justify-center">
           {imgError ? (
