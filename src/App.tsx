@@ -89,6 +89,12 @@ const queryClient = new QueryClient({
       refetchOnReconnect: false,
       retry: 1,
     },
+    mutations: {
+      onError: (error: unknown) => {
+        const msg = (error as any)?.message || String(error);
+        console.error("[Mutation Error]", msg);
+      },
+    },
   },
 });
 
@@ -104,6 +110,32 @@ const App = () => {
   const handleSplashComplete = useCallback(() => {
     sessionStorage.setItem(SPLASH_KEY, "1");
     setShowSplash(false);
+  }, []);
+
+  // Global error catcher — surfaces unhandled errors as visible toasts
+  useEffect(() => {
+    const handleRejection = (event: PromiseRejectionEvent) => {
+      const msg = event.reason?.message || String(event.reason);
+      console.error("[Unhandled Error]", msg);
+      // Use sonner toast for visibility
+      import("sonner").then(({ toast }) => {
+        toast.error(msg.length > 200 ? msg.slice(0, 200) + "…" : msg);
+      });
+    };
+
+    const handleError = (event: ErrorEvent) => {
+      console.error("[Global Error]", event.message);
+      import("sonner").then(({ toast }) => {
+        toast.error(event.message.length > 200 ? event.message.slice(0, 200) + "…" : event.message);
+      });
+    };
+
+    window.addEventListener("unhandledrejection", handleRejection);
+    window.addEventListener("error", handleError);
+    return () => {
+      window.removeEventListener("unhandledrejection", handleRejection);
+      window.removeEventListener("error", handleError);
+    };
   }, []);
 
   return (
