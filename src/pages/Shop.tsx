@@ -21,6 +21,7 @@ import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePaginatedProducts } from "@/hooks/usePaginatedProducts";
 import ProductCard from "@/components/ProductCard";
+import QuickViewDialog from "@/components/QuickViewDialog";
 import SearchSuggestions from "@/components/SearchSuggestions";
 import MobileFilterSheet from "@/components/MobileFilterSheet";
 import BackToTopButton from "@/components/BackToTopButton";
@@ -71,6 +72,7 @@ const Shop = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [quickViewId, setQuickViewId] = useState<string | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebounce(searchInput, 300);
@@ -322,6 +324,7 @@ const Shop = () => {
                         soldOut={isProductSoldOut(stockMap, product.id)}
                         inWishlist={isInWishlist(product.id)}
                         onToggleWishlist={handleToggleWishlist}
+                        onQuickView={setQuickViewId}
                         viewMode={viewMode}
                       />
                     </div>
@@ -361,6 +364,12 @@ const Shop = () => {
           <Footer />
           <MobileBottomNav />
         </main>
+
+        <QuickViewDialog
+          productId={quickViewId}
+          open={!!quickViewId}
+          onOpenChange={(open) => { if (!open) setQuickViewId(null); }}
+        />
       </PageTransition>
     </>
   );
