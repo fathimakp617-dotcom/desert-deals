@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useState, useCallback } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +15,7 @@ import CartDrawer from "@/components/CartDrawer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { GeoBlocker } from "@/components/GeoBlocker";
 import { usePageTracking } from "@/hooks/usePageTracking";
+import RamadanSplash from "@/components/RamadanSplash";
 
 
 // Eagerly load critical pages
@@ -82,8 +83,8 @@ const RoutePrefetcher = () => {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 15 * 60 * 1000, // 15 minutes - data stays fresh longer
-      gcTime: 20 * 60 * 1000, // 20 minutes cache
+      staleTime: 15 * 60 * 1000,
+      gcTime: 20 * 60 * 1000,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       retry: 1,
@@ -91,66 +92,83 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <DirectionProvider>
-      <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <CouponProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <GeoBlocker>
-                  <ScrollToTop />
-                  <CartDrawer />
-                  
-                  <RoutePrefetcher />
-                  <Suspense fallback={<PageLoader />}>
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/shop" element={<Shop />} />
-                      <Route path="/product/:id" element={<ProductDetail />} />
-                      <Route path="/wishlist" element={<Wishlist />} />
-                      <Route path="/cart" element={<Cart />} />
-                      <Route path="/checkout" element={<Checkout />} />
-                      <Route path="/auth" element={<Auth />} />
-                      <Route path="/account" element={<Account />} />
-                      <Route path="/terms" element={<Terms />} />
-                      <Route path="/privacy" element={<PrivacyPolicy />} />
-                      <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
-                      <Route path="/refund-policy" element={<CancellationRefundPolicy />} />
-                      <Route path="/cancellation-policy" element={<CancellationRefundPolicy />} />
-                      <Route path="/shipping-policy" element={<ShippingPolicy />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/admin" element={<AdminLayout />}>
-                        <Route index element={<AdminDashboard />} />
-                        <Route path="orders" element={<AdminOrders />} />
-                        <Route path="customers" element={<AdminCustomers />} />
-                        <Route path="account" element={<AdminAccount />} />
-                        <Route path="returns" element={<AdminReturns />} />
-                        <Route path="reviews" element={<AdminReviewsPage />} />
-                        <Route path="products" element={<AdminProducts />} />
-                        <Route path="bulk-import" element={<AdminBulkImport />} />
-                        <Route path="categories" element={<AdminCategories />} />
-                        <Route path="analytics" element={<AdminAnalytics />} />
-                        <Route path="fix-images" element={<AdminImageFix />} />
-                      </Route>
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Suspense>
-                  </GeoBlocker>
-                </BrowserRouter>
-              </TooltipProvider>
-            </CouponProvider>
-          </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
-      </DirectionProvider>
-    </QueryClientProvider>
-  </HelmetProvider>
-);
+const SPLASH_KEY = "dd_splash_shown";
+
+const App = () => {
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !sessionStorage.getItem(SPLASH_KEY);
+  });
+
+  const handleSplashComplete = useCallback(() => {
+    sessionStorage.setItem(SPLASH_KEY, "1");
+    setShowSplash(false);
+  }, []);
+
+  return (
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <DirectionProvider>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <CouponProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+
+                  {showSplash && <RamadanSplash onComplete={handleSplashComplete} />}
+
+                  <BrowserRouter>
+                    <GeoBlocker>
+                    <ScrollToTop />
+                    <CartDrawer />
+                    
+                    <RoutePrefetcher />
+                    <Suspense fallback={<PageLoader />}>
+                      <Routes>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/shop" element={<Shop />} />
+                        <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/wishlist" element={<Wishlist />} />
+                        <Route path="/cart" element={<Cart />} />
+                        <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/auth" element={<Auth />} />
+                        <Route path="/account" element={<Account />} />
+                        <Route path="/terms" element={<Terms />} />
+                        <Route path="/privacy" element={<PrivacyPolicy />} />
+                        <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
+                        <Route path="/refund-policy" element={<CancellationRefundPolicy />} />
+                        <Route path="/cancellation-policy" element={<CancellationRefundPolicy />} />
+                        <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/admin" element={<AdminLayout />}>
+                          <Route index element={<AdminDashboard />} />
+                          <Route path="orders" element={<AdminOrders />} />
+                          <Route path="customers" element={<AdminCustomers />} />
+                          <Route path="account" element={<AdminAccount />} />
+                          <Route path="returns" element={<AdminReturns />} />
+                          <Route path="reviews" element={<AdminReviewsPage />} />
+                          <Route path="products" element={<AdminProducts />} />
+                          <Route path="bulk-import" element={<AdminBulkImport />} />
+                          <Route path="categories" element={<AdminCategories />} />
+                          <Route path="analytics" element={<AdminAnalytics />} />
+                          <Route path="fix-images" element={<AdminImageFix />} />
+                        </Route>
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Suspense>
+                    </GeoBlocker>
+                  </BrowserRouter>
+                </TooltipProvider>
+              </CouponProvider>
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
+        </DirectionProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
+  );
+};
 
 export default App;
