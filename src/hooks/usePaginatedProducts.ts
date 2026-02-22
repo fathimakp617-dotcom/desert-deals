@@ -100,6 +100,16 @@ export const usePaginatedProducts = (options: UsePaginatedProductsOptions) => {
           "Dior": "Dior",
           "Hermes": "Hermes",
           "Basketball Shoes": "Basketball",
+          "Watches": "Watches",
+          "Wallets": "Wallets",
+          "Sunglasses": "Sunglasses",
+          "Heels": "Heels",
+          "Rolex": "Rolex",
+          "Cartier": "Cartier",
+          "Tom Ford": "Tom Ford",
+          "Christian Louboutin": "Louboutin",
+          "Chanel": "Chanel",
+          "Goyard": "Goyard",
         };
         const brandTerm = brandSearchTerms[category];
         if (brandTerm) {
