@@ -15,23 +15,48 @@ export const GeoBlocker = ({ children }: { children: React.ReactNode }) => {
           .eq("is_active", true);
 
         if (!allowedCountries || allowedCountries.length === 0) {
-          // No whitelist configured — allow everyone
           setChecked(true);
           return;
         }
 
         const allowedCodes = new Set(allowedCountries.map(c => c.country_code));
 
-        // Use a free geo IP API to get user's country
-        const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(5000) });
-        if (res.ok) {
-          const geo = await res.json();
-          if (geo.country_code && !allowedCodes.has(geo.country_code)) {
+        // Try multiple geo APIs for reliability
+        let countryCode: string | null = null;
+
+        try {
+          const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(4000) });
+          if (res.ok) {
+            const geo = await res.json();
+            countryCode = geo.country_code || null;
+          }
+        } catch {}
+
+        // Fallback API
+        if (!countryCode) {
+          try {
+            const res = await fetch("https://ip2c.org/s", { signal: AbortSignal.timeout(4000) });
+            if (res.ok) {
+              const text = await res.text();
+              const parts = text.split(";");
+              if (parts[0] === "1" && parts[1]) {
+                countryCode = parts[1];
+              }
+            }
+          } catch {}
+        }
+
+        if (countryCode) {
+          if (!allowedCodes.has(countryCode)) {
             setBlocked(true);
           }
+        } else {
+          // If all geo checks fail, block by default (fail closed)
+          setBlocked(true);
         }
       } catch {
-        // If geo check fails, allow access
+        // If everything fails, block by default
+        setBlocked(true);
       }
       setChecked(true);
     };
