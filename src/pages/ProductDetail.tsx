@@ -121,9 +121,23 @@ const ProductDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <main className="min-h-screen bg-background pb-20 md:pb-0">
+        <Navbar />
+        <section className="pt-24 sm:pt-28">
+          <div className="mx-auto px-0 lg:px-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+              <div className="aspect-square bg-muted animate-pulse" />
+              <div className="space-y-4 p-4 sm:p-6 lg:p-8">
+                <div className="h-4 w-20 bg-muted animate-pulse rounded" />
+                <div className="h-8 w-3/4 bg-muted animate-pulse rounded" />
+                <div className="h-6 w-1/3 bg-muted animate-pulse rounded" />
+                <div className="h-10 w-full bg-muted animate-pulse rounded mt-6" />
+                <div className="h-10 w-full bg-muted animate-pulse rounded" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
     );
   }
 

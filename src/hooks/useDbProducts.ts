@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product, products as staticProducts } from "@/data/products";
+import { useCallback } from "react";
 
 // Create a lookup map from static data for enrichment
 const staticEnrichmentMap = new Map<string, Product>();
@@ -22,10 +23,6 @@ interface DbProduct {
   created_at: string;
 }
 
-/**
- * Maps a database product to the frontend Product interface,
- * merging with static enrichment data when available.
- */
 const mapDbToProduct = (db: DbProduct): Product => {
   const staticData = staticEnrichmentMap.get(db.id);
 
@@ -58,10 +55,6 @@ const mapDbToProduct = (db: DbProduct): Product => {
   };
 };
 
-/**
- * Fetches all active products from the database and enriches them
- * with static data (taglines, stories, galleries, etc.) where available.
- */
 export const useDbProducts = () => {
   return useQuery({
     queryKey: ["db-products"],
@@ -74,7 +67,6 @@ export const useDbProducts = () => {
 
       if (error) {
         console.error("Error fetching products:", error);
-        // Fallback to static data if DB fails
         return staticProducts;
       }
 
@@ -84,16 +76,24 @@ export const useDbProducts = () => {
 
       return (data as DbProduct[]).map(mapDbToProduct);
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 };
 
 /**
- * Gets a single product by ID from the database,
- * with static enrichment data merged in.
+ * Gets a single product by ID, using cached list data as initialData
+ * for instant rendering when available.
  */
 export const useDbProduct = (id: string | undefined) => {
+  const queryClient = useQueryClient();
+
+  // Try to find the product in already-cached list data
+  const getCachedProduct = (): Product | undefined => {
+    const cachedList = queryClient.getQueryData<Product[]>(["db-products"]);
+    return cachedList?.find((p) => p.id === id);
+  };
+
   return useQuery({
     queryKey: ["db-product", id],
     queryFn: async () => {
@@ -107,12 +107,10 @@ export const useDbProduct = (id: string | undefined) => {
 
       if (error) {
         console.error("Error fetching product:", error);
-        // Fallback to static data
         return staticEnrichmentMap.get(id) || null;
       }
 
       if (!data) {
-        // Try static data as fallback
         return staticEnrichmentMap.get(id) || null;
       }
 
@@ -120,5 +118,47 @@ export const useDbProduct = (id: string | undefined) => {
     },
     enabled: !!id,
     staleTime: 2 * 60 * 1000,
+    initialData: getCachedProduct() ?? undefined,
+    initialDataUpdatedAt: () =>
+      queryClient.getQueryState(["db-products"])?.dataUpdatedAt,
   });
+};
+
+/**
+ * Hook that returns a prefetch function for product detail data.
+ * Call on hover/pointer-enter for instant navigation.
+ */
+export const usePrefetchProduct = () => {
+  const queryClient = useQueryClient();
+
+  return useCallback(
+    (productId: string) => {
+      // If already cached, skip
+      if (queryClient.getQueryData(["db-product", productId])) return;
+
+      // Check list cache first
+      const cachedList = queryClient.getQueryData<Product[]>(["db-products"]);
+      const cached = cachedList?.find((p) => p.id === productId);
+      if (cached) {
+        queryClient.setQueryData(["db-product", productId], cached);
+        return;
+      }
+
+      // Otherwise prefetch from DB
+      queryClient.prefetchQuery({
+        queryKey: ["db-product", productId],
+        queryFn: async () => {
+          const { data } = await supabase
+            .from("products")
+            .select("*")
+            .eq("id", productId)
+            .maybeSingle();
+          if (data) return mapDbToProduct(data as DbProduct);
+          return staticEnrichmentMap.get(productId) || null;
+        },
+        staleTime: 2 * 60 * 1000,
+      });
+    },
+    [queryClient]
+  );
 };
