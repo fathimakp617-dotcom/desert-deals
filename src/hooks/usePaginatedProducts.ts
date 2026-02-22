@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-const PAGE_SIZE = 48;
+const PAGE_SIZE = 1000;
 
 interface DbProduct {
   id: string;
@@ -100,16 +100,6 @@ export const usePaginatedProducts = (options: UsePaginatedProductsOptions) => {
           "Dior": "Dior",
           "Hermes": "Hermes",
           "Basketball Shoes": "Basketball",
-          "Watches": "Watches",
-          "Wallets": "Wallets",
-          "Sunglasses": "Sunglasses",
-          "Heels": "Heels",
-          "Rolex": "Rolex",
-          "Cartier": "Cartier",
-          "Tom Ford": "Tom Ford",
-          "Christian Louboutin": "Louboutin",
-          "Chanel": "Chanel",
-          "Goyard": "Goyard",
         };
         const brandTerm = brandSearchTerms[category];
         if (brandTerm) {

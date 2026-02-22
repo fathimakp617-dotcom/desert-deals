@@ -390,8 +390,6 @@ const AdminBulkImport = () => {
   const [progress, setProgress] = useState(0);
   const [replaceMode, setReplaceMode] = useState(false);
   const [result, setResult] = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
-  const [shopifyImporting, setShopifyImporting] = useState(false);
-  const [shopifyResult, setShopifyResult] = useState<Record<string, unknown> | null>(null);
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -482,46 +480,6 @@ const AdminBulkImport = () => {
     },
   });
 
-  const handleShopifyImport = useCallback(async () => {
-    const session = getAdminSession();
-    if (!session) {
-      toast({ title: "Not authenticated", variant: "destructive" });
-      return;
-    }
-    setShopifyImporting(true);
-    setShopifyResult(null);
-    const files = ["wallets_products.csv", "sunglasses_products.csv", "heels_products.csv", "watches_products.csv", "nike-1_products.csv"];
-    let totalImported = 0;
-    const allErrors: string[] = [];
-    const fileSummaries: Record<string, number> = {};
-    
-    try {
-      for (const file of files) {
-        toast({ title: `Importing ${file}...` });
-        const { data, error } = await supabase.functions.invoke("import-shopify-csv", {
-          body: { file },
-        });
-        if (error) {
-          allErrors.push(`${file}: ${error.message}`);
-        } else {
-          totalImported += data?.imported || 0;
-          fileSummaries[file] = data?.imported || 0;
-          if (data?.errors?.length) allErrors.push(...data.errors);
-        }
-      }
-      setShopifyResult({ totalImported, totalSkipped: 0, errors: allErrors, fileSummaries });
-      toast({
-        title: `Import Complete`,
-        description: `${totalImported} products imported from ${files.length} files`,
-      });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Unknown error";
-      toast({ title: "Shopify import failed", description: msg, variant: "destructive" });
-    } finally {
-      setShopifyImporting(false);
-    }
-  }, [toast]);
-
   return (
     <div className="space-y-6">
       <div>
@@ -529,52 +487,6 @@ const AdminBulkImport = () => {
         <p className="text-muted-foreground">
           Import products from your WooCommerce export file (CSV or pipe-delimited)
         </p>
-      </div>
-
-      {/* Shopify CSV Import Section */}
-      <div className="border border-border rounded-lg p-6 space-y-4 bg-card">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <FileSpreadsheet className="h-5 w-5 text-primary" />
-          Shopify Product Import
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Import all uploaded Shopify CSVs (Nike, Wallets, Sunglasses, Heels, Watches). Vendor names will be changed to Desert Deals and products auto-categorized.
-        </p>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={handleShopifyImport}
-            disabled={shopifyImporting}
-          >
-            {shopifyImporting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Importing Shopify CSVs...
-              </>
-            ) : (
-              <>
-                <Upload className="w-4 h-4 mr-2" />
-                Import All Shopify CSVs
-              </>
-            )}
-          </Button>
-        </div>
-        {shopifyResult && (
-          <div className="p-4 rounded-lg border border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="h-5 w-5 text-emerald-500" />
-              <span className="font-medium">
-                {(shopifyResult as Record<string, number>).totalImported || 0} products imported, {(shopifyResult as Record<string, number>).totalSkipped || 0} skipped
-              </span>
-            </div>
-            {(shopifyResult as Record<string, string[]>).errors?.length > 0 && (
-              <ul className="text-sm text-muted-foreground list-disc pl-5">
-                {((shopifyResult as Record<string, string[]>).errors || []).slice(0, 5).map((err: string, i: number) => (
-                  <li key={i}>{err}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Upload Section */}

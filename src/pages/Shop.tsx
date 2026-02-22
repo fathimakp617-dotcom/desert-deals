@@ -56,10 +56,6 @@ const brandSlugToCategory: Record<string, string> = {
   "gucci": "Gucci", "onitsuka-tiger": "Onitsuka Tiger", "loro-piana": "Loro Piana",
   "brooks": "Brooks", "dior": "Dior", "hermes": "Hermes",
   "basketball": "Basketball Shoes", "running": "Running",
-  "watches": "Watches", "wallets": "Wallets", "sunglasses": "Sunglasses",
-  "heels": "Heels", "rolex": "Rolex", "cartier": "Cartier",
-  "tom-ford": "Tom Ford", "christian-louboutin": "Christian Louboutin",
-  "chanel": "Chanel", "goyard": "Goyard",
 };
 
 const Shop = () => {
@@ -346,62 +342,7 @@ const Shop = () => {
                 </div>
               )}
 
-              {/* Pagination */}
-              {!isLoading && totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-8 mb-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => { prevPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    disabled={page === 0}
-                    className="gap-1"
-                  >
-                    <ChevronLeft className="w-4 h-4" /> Previous
-                  </Button>
-
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-                      let pageNum: number;
-                      if (totalPages <= 7) {
-                        pageNum = i;
-                      } else if (page < 4) {
-                        pageNum = i;
-                      } else if (page > totalPages - 5) {
-                        pageNum = totalPages - 7 + i;
-                      } else {
-                        pageNum = page - 3 + i;
-                      }
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={page === pageNum ? "default" : "outline"}
-                          size="sm"
-                          className="w-9 h-9 p-0"
-                          onClick={() => { setPage(pageNum); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                        >
-                          {pageNum + 1}
-                        </Button>
-                      );
-                    })}
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => { nextPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    disabled={!hasMore}
-                    className="gap-1"
-                  >
-                    Next <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
-
-              {!isLoading && totalCount > 0 && (
-                <p className="text-center text-xs text-muted-foreground mb-4">
-                  Showing {page * pageSize + 1}–{Math.min((page + 1) * pageSize, totalCount)} of {totalCount} products
-                </p>
-              )}
+              {/* All products shown - no pagination */}
             </div>
           </section>
 
