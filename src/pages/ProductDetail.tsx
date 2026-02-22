@@ -38,22 +38,33 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { data: product, isLoading } = useDbProduct(id);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [slideDir, setSlideDir] = useState(1);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const touchStartX = useRef(0);
+  const prevImageRef = useRef(0);
+
+  const changeImage = useCallback((next: number | ((p: number) => number), dir?: number) => {
+    setSelectedImage((prev) => {
+      const val = typeof next === "function" ? next(prev) : next;
+      setSlideDir(dir !== undefined ? dir : val > prev ? 1 : val < prev ? -1 : 1);
+      prevImageRef.current = prev;
+      return val;
+    });
+  }, []);
 
   // Reset size & quantity when navigating to a different product
   useEffect(() => {
     setSelectedSize(null);
     setQuantity(1);
-    setSelectedImage(0);
+    changeImage(0);
   }, [id]);
 
   // Auto-slide images every 10 seconds
   useEffect(() => {
     if (!product || product.gallery.length <= 1) return;
     const timer = setInterval(() => {
-      setSelectedImage((p) => (p + 1) % product.gallery.length);
+      changeImage((p) => (p + 1) % product.gallery.length, 1);
     }, 10000);
     return () => clearInterval(timer);
   }, [product]);
@@ -272,8 +283,8 @@ const ProductDetail = () => {
                   onTouchEnd={(e) => {
                     const diff = touchStartX.current - e.changedTouches[0].clientX;
                     if (Math.abs(diff) > 50 && product.gallery.length > 1) {
-                      if (diff > 0) setSelectedImage((p) => (p + 1) % product.gallery.length);
-                      else setSelectedImage((p) => (p - 1 + product.gallery.length) % product.gallery.length);
+                      if (diff > 0) changeImage((p) => (p + 1) % product.gallery.length, 1);
+                      else changeImage((p) => (p - 1 + product.gallery.length) % product.gallery.length, -1);
                     }
                   }}
                 >
@@ -290,13 +301,13 @@ const ProductDetail = () => {
                   {product.gallery.length > 1 && (
                     <>
                       <button
-                        onClick={() => setSelectedImage((p) => (p - 1 + product.gallery.length) % product.gallery.length)}
+                        onClick={() => changeImage((p) => (p - 1 + product.gallery.length) % product.gallery.length, -1)}
                         className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => setSelectedImage((p) => (p + 1) % product.gallery.length)}
+                        onClick={() => changeImage((p) => (p + 1) % product.gallery.length, 1)}
                         className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
                       >
                         <ChevronRight className="w-4 h-4" />
@@ -310,7 +321,7 @@ const ProductDetail = () => {
                       {product.gallery.map((_, idx) => (
                         <button
                           key={idx}
-                          onClick={() => setSelectedImage(idx)}
+                          onClick={() => changeImage(idx)}
                           className={`w-2 h-2 rounded-full transition-all ${
                             selectedImage === idx ? "bg-foreground w-4" : "bg-foreground/40"
                           }`}
@@ -319,13 +330,14 @@ const ProductDetail = () => {
                     </div>
                   )}
                   
-                  <AnimatePresence mode="wait">
+                  <AnimatePresence mode="popLayout" initial={false} custom={slideDir}>
                     <motion.div
                       key={selectedImage}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
+                      custom={slideDir}
+                      initial={{ x: `${slideDir * 100}%`, opacity: 0.5 }}
+                      animate={{ x: "0%", opacity: 1 }}
+                      exit={{ x: `${slideDir * -100}%`, opacity: 0.5 }}
+                      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
                       className="absolute inset-0"
                     >
                       <ImageZoom
@@ -366,7 +378,7 @@ const ProductDetail = () => {
                     {product.gallery.map((img, idx) => (
                       <button
                         key={idx}
-                        onClick={() => setSelectedImage(idx)}
+                        onClick={() => changeImage(idx)}
                         className={`flex-shrink-0 w-[calc(25%-6px)] lg:w-[calc(16.666%-8px)] aspect-square border-2 overflow-hidden transition-all snap-start rounded-sm ${
                           selectedImage === idx ? "border-primary" : "border-border/50 hover:border-primary/50"
                         }`}
