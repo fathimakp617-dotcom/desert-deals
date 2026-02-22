@@ -109,16 +109,15 @@ const AdminDashboard = () => {
   const { toast } = useToast();
 
   const handleSessionExpiry = useCallback(() => {
-    // Prevent multiple calls causing re-render loops
     if (isRedirectingRef.current) return;
     isRedirectingRef.current = true;
+    setIsLoading(false);
     sessionStorage.removeItem("rayn_admin_session");
     toast({
       title: "Session Expired",
       description: "Please log in again to continue.",
       variant: "destructive",
     });
-    // Use navigate instead of window.location.assign to avoid full page reload loops
     navigate("/admin", { replace: true });
   }, [navigate, toast]);
 
