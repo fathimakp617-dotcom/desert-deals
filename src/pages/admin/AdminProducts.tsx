@@ -508,6 +508,9 @@ const AdminProducts = () => {
     if (bulkEditField === "category") updates.category = bulkEditValue.trim();
     if (bulkEditField === "is_active") updates.is_active = bulkEditValue === "true";
     if (bulkEditField === "discount_percent") updates.discount_percent = parseInt(bulkEditValue) || 0;
+    if (bulkEditField === "price") updates.price = parseFloat(bulkEditValue) || 0;
+    if (bulkEditField === "original_price") updates.original_price = parseFloat(bulkEditValue) || 0;
+    if (bulkEditField === "stock_quantity") updates.stock_quantity = parseInt(bulkEditValue) || 0;
     bulkUpdateMutation.mutate({ productIds: Array.from(selectedIds), updates });
   };
 
@@ -854,11 +857,14 @@ const AdminProducts = () => {
               <SelectValue placeholder="Edit field..." />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="price">Price</SelectItem>
+              <SelectItem value="original_price">Original Price</SelectItem>
+              <SelectItem value="discount_percent">Discount %</SelectItem>
+              <SelectItem value="stock_quantity">Stock Qty</SelectItem>
               <SelectItem value="size">Size</SelectItem>
               <SelectItem value="category">Replace Category</SelectItem>
               <SelectItem value="add_category">Add Category</SelectItem>
               <SelectItem value="is_active">Status</SelectItem>
-              <SelectItem value="discount_percent">Discount %</SelectItem>
             </SelectContent>
           </Select>
           {bulkEditField === "is_active" ? (
@@ -884,7 +890,14 @@ const AdminProducts = () => {
             </Select>
           ) : bulkEditField ? (
             <Input
-              placeholder={bulkEditField === "size" ? "e.g. EU 36-45" : "e.g. 10"}
+              type={["price", "original_price", "discount_percent", "stock_quantity"].includes(bulkEditField) ? "number" : "text"}
+              placeholder={
+                bulkEditField === "size" ? "e.g. EU 36-45" :
+                bulkEditField === "price" ? "e.g. 199" :
+                bulkEditField === "original_price" ? "e.g. 299" :
+                bulkEditField === "stock_quantity" ? "e.g. 50" :
+                "e.g. 10"
+              }
               value={bulkEditValue}
               onChange={(e) => setBulkEditValue(e.target.value)}
               className="w-[160px] h-8 text-sm"
