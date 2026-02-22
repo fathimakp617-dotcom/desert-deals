@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, memo } from "react";
+import ImageZoom from "@/components/ImageZoom";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
@@ -319,16 +320,20 @@ const ProductDetail = () => {
                   )}
                   
                   <AnimatePresence mode="wait">
-                    <motion.img
+                    <motion.div
                       key={selectedImage}
-                      src={product.gallery[selectedImage] || product.image}
-                      alt={product.name}
-                      initial={{ opacity: 0, scale: 1.05 }}
-                      animate={{ opacity: 1, scale: 1 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute inset-0 w-full h-full object-cover object-center"
-                    />
+                      transition={{ duration: 0.3 }}
+                      className="absolute inset-0"
+                    >
+                      <ImageZoom
+                        src={product.gallery[selectedImage] || product.image}
+                        alt={product.name}
+                        className="w-full h-full"
+                      />
+                    </motion.div>
                   </AnimatePresence>
                 </div>
 
