@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-const PAGE_SIZE = 1000;
+const PAGE_SIZE = 48;
 
 interface DbProduct {
   id: string;
