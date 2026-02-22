@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Heart, Share2, Truck, Shield, RotateCcw, Star, ShoppingBag, PenLine, Zap, AlertCircle, Loader2, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -38,36 +39,41 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { data: product, isLoading } = useDbProduct(id);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [slideDir, setSlideDir] = useState(1);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
-  const touchStartX = useRef(0);
-  const prevImageRef = useRef(0);
 
-  const changeImage = useCallback((next: number | ((p: number) => number), dir?: number) => {
-    setSelectedImage((prev) => {
-      const val = typeof next === "function" ? next(prev) : next;
-      setSlideDir(dir !== undefined ? dir : val > prev ? 1 : val < prev ? -1 : 1);
-      prevImageRef.current = prev;
-      return val;
-    });
-  }, []);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false, skipSnaps: false });
+
+  const onEmblaSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedImage(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onEmblaSelect);
+    return () => { emblaApi.off("select", onEmblaSelect); };
+  }, [emblaApi, onEmblaSelect]);
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   // Reset size & quantity when navigating to a different product
   useEffect(() => {
     setSelectedSize(null);
     setQuantity(1);
-    changeImage(0);
+    setSelectedImage(0);
+    if (emblaApi) emblaApi.scrollTo(0, true);
   }, [id]);
 
   // Auto-slide images every 10 seconds
   useEffect(() => {
-    if (!product || product.gallery.length <= 1) return;
+    if (!product || product.gallery.length <= 1 || !emblaApi) return;
     const timer = setInterval(() => {
-      changeImage((p) => (p + 1) % product.gallery.length, 1);
+      emblaApi.scrollNext();
     }, 10000);
     return () => clearInterval(timer);
-  }, [product]);
+  }, [product, emblaApi]);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
   const [showDescription, setShowDescription] = useState(false);
@@ -290,19 +296,8 @@ const ProductDetail = () => {
                 variants={fadeInLeft}
                 className="space-y-3"
               >
-                {/* Main Image with swipe & auto-slide */}
-                <div
-                  className="relative w-full aspect-square overflow-hidden bg-card/50 touch-pan-y"
-                  onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
-                  onTouchEnd={(e) => {
-                    const diff = touchStartX.current - e.changedTouches[0].clientX;
-                    if (Math.abs(diff) > 50 && product.gallery.length > 1) {
-                      if (diff > 0) changeImage((p) => (p + 1) % product.gallery.length, 1);
-                      else changeImage((p) => (p - 1 + product.gallery.length) % product.gallery.length, -1);
-                    }
-                  }}
-                >
-                  
+                {/* Main Image Carousel (Embla) */}
+                <div className="relative w-full aspect-square overflow-hidden bg-card/50">
                   {isSoldOut && (
                     <div className="absolute top-6 right-6 z-20">
                       <Badge variant="destructive" className="text-xs sm:text-sm font-semibold px-3 py-1.5">
@@ -315,13 +310,13 @@ const ProductDetail = () => {
                   {product.gallery.length > 1 && (
                     <>
                       <button
-                        onClick={() => changeImage((p) => (p - 1 + product.gallery.length) % product.gallery.length, -1)}
+                        onClick={scrollPrev}
                         className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => changeImage((p) => (p + 1) % product.gallery.length, 1)}
+                        onClick={scrollNext}
                         className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
                       >
                         <ChevronRight className="w-4 h-4" />
@@ -335,7 +330,7 @@ const ProductDetail = () => {
                       {product.gallery.map((_, idx) => (
                         <button
                           key={idx}
-                          onClick={() => changeImage(idx)}
+                          onClick={() => emblaApi?.scrollTo(idx)}
                           className={`w-2 h-2 rounded-full transition-all ${
                             selectedImage === idx ? "bg-foreground w-4" : "bg-foreground/40"
                           }`}
@@ -343,24 +338,20 @@ const ProductDetail = () => {
                       ))}
                     </div>
                   )}
-                  
-                  <AnimatePresence mode="popLayout" initial={false} custom={slideDir}>
-                    <motion.div
-                      key={selectedImage}
-                      custom={slideDir}
-                      initial={{ x: `${slideDir * 100}%`, opacity: 0.5 }}
-                      animate={{ x: "0%", opacity: 1 }}
-                      exit={{ x: `${slideDir * -100}%`, opacity: 0.5 }}
-                      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-                      className="absolute inset-0"
-                    >
-                      <ImageZoom
-                        src={product.gallery[selectedImage] || product.image}
-                        alt={product.name}
-                        className="w-full h-full"
-                      />
-                    </motion.div>
-                  </AnimatePresence>
+
+                  <div className="overflow-hidden h-full" ref={emblaRef}>
+                    <div className="flex h-full">
+                      {product.gallery.map((img, idx) => (
+                        <div key={idx} className="flex-[0_0_100%] min-w-0 h-full">
+                          <ImageZoom
+                            src={img || product.image}
+                            alt={product.name}
+                            className="w-full h-full"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Thumbnails */}
@@ -392,7 +383,7 @@ const ProductDetail = () => {
                     {product.gallery.map((img, idx) => (
                       <button
                         key={idx}
-                        onClick={() => changeImage(idx)}
+                        onClick={() => { emblaApi?.scrollTo(idx); setSelectedImage(idx); }}
                         className={`flex-shrink-0 w-[calc(25%-6px)] lg:w-[calc(16.666%-8px)] aspect-square border-2 overflow-hidden transition-all snap-start rounded-sm ${
                           selectedImage === idx ? "border-primary" : "border-border/50 hover:border-primary/50"
                         }`}
