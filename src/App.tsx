@@ -97,6 +97,7 @@ const SPLASH_KEY = "dd_splash_shown";
 const App = () => {
   const [showSplash, setShowSplash] = useState(() => {
     if (typeof window === "undefined") return false;
+    if (localStorage.getItem("dd_splash_enabled") === "false") return false;
     return !sessionStorage.getItem(SPLASH_KEY);
   });
 

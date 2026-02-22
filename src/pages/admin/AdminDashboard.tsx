@@ -1,4 +1,6 @@
 import { useEffect, useState, memo, useRef, useCallback } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -351,10 +353,26 @@ const AdminDashboard = () => {
           <h1 className="text-2xl font-heading font-bold text-foreground">Dashboard</h1>
           <p className="text-muted-foreground">Welcome to your admin dashboard</p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchStats}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2">
+            <Switch
+              id="splash-toggle"
+              checked={localStorage.getItem("dd_splash_enabled") !== "false"}
+              onCheckedChange={(checked) => {
+                localStorage.setItem("dd_splash_enabled", checked ? "true" : "false");
+                // force re-render
+                const el = document.getElementById("splash-toggle");
+                el?.blur();
+                window.dispatchEvent(new Event("storage"));
+              }}
+            />
+            <Label htmlFor="splash-toggle" className="text-sm cursor-pointer">Ramadan Splash</Label>
+          </div>
+          <Button variant="outline" size="sm" onClick={fetchStats}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Date Filter Section */}
