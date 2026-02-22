@@ -1,6 +1,6 @@
 import { memo, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Heart, ImageOff } from "lucide-react";
+import { Heart, ImageOff, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/data/products";
 import { usePrefetchProduct } from "@/hooks/useDbProducts";
@@ -12,10 +12,11 @@ interface ProductCardProps {
   soldOut: boolean;
   inWishlist: boolean;
   onToggleWishlist: (id: string) => void;
+  onQuickView?: (id: string) => void;
   viewMode: "grid" | "list";
 }
 
-const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, viewMode }: ProductCardProps) => {
+const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQuickView, viewMode }: ProductCardProps) => {
   const [imgError, setImgError] = useState(false);
   const prefetch = usePrefetchProduct();
   const handlePrefetch = useCallback(() => prefetch(product.id), [prefetch, product.id]);
@@ -81,6 +82,15 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, view
           <div className="absolute top-2 left-2">
             <Badge variant="destructive" className="text-[10px]">SOLD OUT</Badge>
           </div>
+        )}
+
+        {onQuickView && (
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView(product.id); }}
+            className="absolute bottom-2 right-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <Eye className="w-3.5 h-3.5 text-foreground" />
+          </button>
         )}
 
         <button
