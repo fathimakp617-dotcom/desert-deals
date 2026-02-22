@@ -76,6 +76,24 @@ const getAdminSession = () => {
   return null;
 };
 
+const handleSessionExpired = () => {
+  sessionStorage.removeItem("rayn_admin_session");
+  window.dispatchEvent(new CustomEvent("admin-session-expired"));
+};
+
+const invokeManageProducts = async (body: Record<string, unknown>) => {
+  const { data, error } = await supabase.functions.invoke("manage-products", { body });
+  if (error) {
+    const status = (error as any)?.context?.status ?? (error as any)?.status;
+    const msg = String(error?.message ?? "").toLowerCase();
+    if (status === 401 || msg.includes("invalid session") || msg.includes("session expired")) {
+      handleSessionExpired();
+    }
+    throw error;
+  }
+  return data;
+};
+
 const AdminProducts = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -100,11 +118,7 @@ const AdminProducts = () => {
       const session = getAdminSession();
       if (!session) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase.functions.invoke("manage-products", {
-        body: { action: "list", admin_email: session.email, admin_token: session.token },
-      });
-
-      if (error) throw error;
+      const data = await invokeManageProducts({ action: "list", admin_email: session.email, admin_token: session.token });
       return data.products as Product[];
     },
   });
