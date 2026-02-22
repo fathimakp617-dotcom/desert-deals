@@ -56,6 +56,10 @@ const brandSlugToCategory: Record<string, string> = {
   "gucci": "Gucci", "onitsuka-tiger": "Onitsuka Tiger", "loro-piana": "Loro Piana",
   "brooks": "Brooks", "dior": "Dior", "hermes": "Hermes",
   "basketball": "Basketball Shoes", "running": "Running",
+  "watches": "Watches", "wallets": "Wallets", "sunglasses": "Sunglasses",
+  "heels": "Heels", "rolex": "Rolex", "cartier": "Cartier",
+  "tom-ford": "Tom Ford", "christian-louboutin": "Christian Louboutin",
+  "chanel": "Chanel", "goyard": "Goyard",
 };
 
 const Shop = () => {
