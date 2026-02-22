@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, memo } from "react";
+import { ZoomIn } from "lucide-react";
 
 interface ImageZoomProps {
   src: string;
@@ -45,7 +46,13 @@ const ImageZoom = memo(({ src, alt, className = "" }: ImageZoomProps) => {
         draggable={false}
       />
 
-      {/* Zoomed overlay */}
+      {/* Magnifying glass hint */}
+      {!zooming && (
+        <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 bg-background/80 backdrop-blur-sm border border-border rounded-full px-2.5 py-1.5 text-muted-foreground pointer-events-none transition-opacity">
+          <ZoomIn className="w-3.5 h-3.5" />
+          <span className="text-[10px] font-medium tracking-wide hidden sm:inline">HOVER TO ZOOM</span>
+        </div>
+      )}
       {zooming && (
         <div
           className="absolute inset-0 pointer-events-none"
