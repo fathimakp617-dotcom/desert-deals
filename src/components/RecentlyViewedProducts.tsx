@@ -1,8 +1,9 @@
 import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react";
 import { formatPrice, Product } from "@/data/products";
 import { useWishlist } from "@/contexts/WishlistContext";
+import QuickViewDialog from "@/components/QuickViewDialog";
 
 const STORAGE_KEY = "recently_viewed_products";
 const MAX_ITEMS = 20;
@@ -20,6 +21,7 @@ const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string
   const [products, setProducts] = useState<Product[]>([]);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -42,39 +44,38 @@ const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string
         </h2>
 
         <div className="relative group/scroll">
-          <button
-            onClick={() => scroll("left")}
-            className="absolute -left-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100"
-          >
+          <button onClick={() => scroll("left")} className="absolute -left-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <button
-            onClick={() => scroll("right")}
-            className="absolute -right-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100"
-          >
+          <button onClick={() => scroll("right")} className="absolute -right-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100">
             <ChevronRight className="w-4 h-4" />
           </button>
 
-          <div
-            ref={scrollRef}
-            className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-2"
-          >
+          <div ref={scrollRef} className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-2">
             {products.map((product) => {
               const inWishlist = isInWishlist(product.id);
               return (
-                <Link
-                  key={product.id}
-                  to={`/product/${product.id}`}
-                  className="group flex-shrink-0 w-[145px] sm:w-[200px] lg:w-[220px]"
-                >
-                    <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
+                <div key={product.id} className="group flex-shrink-0 w-[145px] sm:w-[200px] lg:w-[220px]">
+                  <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
                     <div className="relative aspect-square bg-muted overflow-hidden">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
-                      />
+                      <Link to={`/product/${product.id}`}>
+                        <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                      </Link>
+
+                      {/* Quick view */}
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQuickViewId(product.id); }}
+                        className="absolute bottom-2 right-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-foreground" />
+                      </button>
+
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); inWishlist ? removeFromWishlist(product.id) : addToWishlist(product); }}
+                        className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                      </button>
                     </div>
                     <div className="p-3">
                       <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
@@ -89,25 +90,20 @@ const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string
                       </div>
                       <div className="mt-1.5 flex items-center justify-between">
                         <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            inWishlist ? removeFromWishlist(product.id) : addToWishlist(product);
-                          }}
-                          className="p-0"
-                        >
+                        <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); inWishlist ? removeFromWishlist(product.id) : addToWishlist(product); }} className="p-0">
                           <Heart className={`w-4 h-4 ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
                         </button>
                       </div>
                     </div>
-                    </div>
-                </Link>
+                  </div>
+                </div>
               );
             })}
           </div>
         </div>
       </div>
+
+      <QuickViewDialog productId={quickViewId} open={!!quickViewId} onOpenChange={(open) => { if (!open) setQuickViewId(null); }} />
     </section>
   );
 };
