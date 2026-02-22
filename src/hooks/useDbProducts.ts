@@ -55,26 +55,49 @@ const mapDbToProduct = (db: DbProduct): Product => {
   };
 };
 
+// Fetch all products in batches to bypass Supabase 1000-row limit
+const fetchAllProducts = async (): Promise<DbProduct[]> => {
+  const BATCH_SIZE = 1000;
+  let allData: DbProduct[] = [];
+  let from = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .range(from, from + BATCH_SIZE - 1);
+
+    if (error) {
+      console.error("Error fetching products batch:", error);
+      break;
+    }
+
+    if (data && data.length > 0) {
+      allData = allData.concat(data as DbProduct[]);
+      from += BATCH_SIZE;
+      hasMore = data.length === BATCH_SIZE;
+    } else {
+      hasMore = false;
+    }
+  }
+
+  return allData;
+};
+
 export const useDbProducts = () => {
   return useQuery({
     queryKey: ["db-products"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
+      const allData = await fetchAllProducts();
 
-      if (error) {
-        console.error("Error fetching products:", error);
+      if (allData.length === 0) {
         return staticProducts;
       }
 
-      if (!data || data.length === 0) {
-        return staticProducts;
-      }
-
-      return (data as DbProduct[]).map(mapDbToProduct);
+      return allData.map(mapDbToProduct);
     },
     staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
