@@ -8,24 +8,25 @@ export const GeoBlocker = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const checkGeoBlock = async () => {
       try {
-        // Fetch blocked countries list
-        const { data: blockedCountries } = await supabase
-          .from("blocked_countries")
+        // Fetch allowed countries (whitelist)
+        const { data: allowedCountries } = await supabase
+          .from("allowed_countries")
           .select("country_code")
           .eq("is_active", true);
 
-        if (!blockedCountries || blockedCountries.length === 0) {
+        if (!allowedCountries || allowedCountries.length === 0) {
+          // No whitelist configured — allow everyone
           setChecked(true);
           return;
         }
 
-        const blockedCodes = new Set(blockedCountries.map(c => c.country_code));
+        const allowedCodes = new Set(allowedCountries.map(c => c.country_code));
 
         // Use a free geo IP API to get user's country
         const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(5000) });
         if (res.ok) {
           const geo = await res.json();
-          if (geo.country_code && blockedCodes.has(geo.country_code)) {
+          if (geo.country_code && !allowedCodes.has(geo.country_code)) {
             setBlocked(true);
           }
         }

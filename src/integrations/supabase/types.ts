@@ -124,6 +124,30 @@ export type Database = {
         }
         Relationships: []
       }
+      allowed_countries: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
       auth_rate_limits: {
         Row: {
           attempt_type: string
