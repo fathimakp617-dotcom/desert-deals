@@ -10,7 +10,7 @@ import headerLogo from "@/assets/desert-deal-logo-header.png";
 const announcements = [
   "Ramadan Sale Live Now - Up To 75% Off →",
   "COD Available Across the UAE →",
-  "Free Shipping on All Orders →",
+  "Shipping Available Across UAE →",
 ];
 
 const staticBottomLinks = [
