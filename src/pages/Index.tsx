@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -6,6 +6,7 @@ import Hero from "@/components/Hero";
 import PageTransition from "@/components/PageTransition";
 import { OrganizationSchema, LocalBusinessSchema, WebsiteSchema, FAQSchema } from "@/components/seo/JsonLd";
 import { useBanners } from "@/hooks/useBanners";
+import { useHomepageSections } from "@/hooks/useHomepageSections";
 import onCloudAd from "@/assets/banners/on-cloud-ad.webp";
 import nikeDunkAd from "@/assets/banners/nike-dunk-low-ad.webp";
 import adidasAd from "@/assets/banners/adidas-ad.jpeg";
@@ -65,6 +66,82 @@ const BrandAdBanner = ({ position, fallbackImg, fallbackLink, fallbackAlt, child
 };
 
 const Index = () => {
+  const { data: sections } = useHomepageSections();
+  
+  const visibleKeys = useMemo(() => {
+    if (!sections) return new Set<string>();
+    return new Set(sections.map(s => s.section_key));
+  }, [sections]);
+
+  const isVisible = (key: string) => !sections || visibleKeys.has(key);
+
+  // Build ordered section components based on DB order
+  const orderedSections = useMemo(() => {
+    if (!sections || sections.length === 0) return null;
+
+    const sectionMap: Record<string, React.ReactNode> = {
+      brand_categories: <BrandCategories key="brand_categories" />,
+      promo_banner: <PromoBanner key="promo_banner" />,
+      top_sellers: <TopSellers key="top_sellers" />,
+      promo_grid: <PromoGrid key="promo_grid" />,
+      on_cloud_ad: (
+        <BrandAdBanner key="on_cloud_ad" position="brand-ad-on" fallbackImg={onCloudAd} fallbackLink="/shop?brand=on-cloud" fallbackAlt="On Cloud Shoes" />
+      ),
+      on_cloud_collection: (
+        <BrandProductRow key="on_cloud_collection" brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
+      ),
+      adidas_ad: (
+        <BrandAdBanner key="adidas_ad" position="brand-ad-adidas" fallbackImg={adidasAd} fallbackLink="/shop?brand=adidas" fallbackAlt="Adidas Shoes">
+          {(banner) => (
+            <section className="bg-background">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
+                <Link to={banner.link_url} className="block relative rounded-lg overflow-hidden group">
+                  <img src={banner.image_url} alt={banner.title} className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute inset-y-0 left-8 sm:left-14 flex flex-col justify-center gap-2 sm:gap-3">
+                    <h3 className="text-white text-xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow-lg">{banner.title}</h3>
+                    <p className="text-white/80 text-xs sm:text-sm md:text-base max-w-xs sm:max-w-sm drop-shadow">Impossible is nothing. Explore the latest drops.</p>
+                    <span className="inline-block w-fit bg-white text-black text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-white/90 transition-colors mt-1">
+                      Shop Now →
+                    </span>
+                  </div>
+                </Link>
+              </div>
+            </section>
+          )}
+        </BrandAdBanner>
+      ),
+      adidas_collection: <BrandProductRow key="adidas_collection" brand="adidas" title="Adidas Collection" />,
+      nike_ad: (
+        <BrandAdBanner key="nike_ad" position="brand-ad-nike" fallbackImg={nikeDunkAd} fallbackLink="/shop?brand=nike" fallbackAlt="Nike Dunk Low">
+          {(banner) => (
+            <section className="bg-background">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
+                <Link to={banner.link_url} className="block relative rounded-lg overflow-hidden group bg-white">
+                  <img src={banner.image_url} alt={banner.title} className="w-full object-contain" />
+                  <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2">
+                    <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+                      Shop Now →
+                    </span>
+                  </div>
+                </Link>
+              </div>
+            </section>
+          )}
+        </BrandAdBanner>
+      ),
+      nike_collection: <BrandProductRow key="nike_collection" brand="nike" title="Nike Collection" />,
+      new_balance_promo: <NewBalancePromoGrid key="new_balance_promo" />,
+      new_balance_collection: <BrandProductRow key="new_balance_collection" brand="new balance" title="New Balance Collection" />,
+      testimonials: <Testimonials key="testimonials" />,
+      features_bar: <FeaturesBar key="features_bar" />,
+    };
+
+    return sections
+      .filter(s => sectionMap[s.section_key])
+      .map(s => sectionMap[s.section_key]);
+  }, [sections]);
+
   return (
     <>
       <Helmet>
@@ -86,67 +163,25 @@ const Index = () => {
       <PageTransition>
         <main className="min-h-screen bg-background relative z-10 pb-14 md:pb-0">
           <Navbar />
-          <Hero />
+          {isVisible("hero") && <Hero />}
           
           <Suspense fallback={<SectionLoader />}>
-            <BrandCategories />
-            <PromoBanner />
-            <TopSellers />
-            <PromoGrid />
-          </Suspense>
-
-          {/* On Cloud Ad Banner */}
-          <BrandAdBanner position="brand-ad-on" fallbackImg={onCloudAd} fallbackLink="/shop?brand=on-cloud" fallbackAlt="On Cloud Shoes" />
-
-          <Suspense fallback={<SectionLoader />}>
-            <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
-
-          {/* Adidas Ad Banner */}
-          <BrandAdBanner position="brand-ad-adidas" fallbackImg={adidasAd} fallbackLink="/shop?brand=adidas" fallbackAlt="Adidas Shoes">
-            {(banner) => (
-              <section className="bg-background">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
-                  <Link to={banner.link_url} className="block relative rounded-lg overflow-hidden group">
-                    <img src={banner.image_url} alt={banner.title} className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
-                    <div className="absolute inset-y-0 left-8 sm:left-14 flex flex-col justify-center gap-2 sm:gap-3">
-                      <h3 className="text-white text-xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow-lg">{banner.title}</h3>
-                      <p className="text-white/80 text-xs sm:text-sm md:text-base max-w-xs sm:max-w-sm drop-shadow">Impossible is nothing. Explore the latest drops.</p>
-                      <span className="inline-block w-fit bg-white text-black text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-white/90 transition-colors mt-1">
-                        Shop Now →
-                      </span>
-                    </div>
-                  </Link>
-                </div>
-              </section>
+            {orderedSections || (
+              <>
+                <BrandCategories />
+                <PromoBanner />
+                <TopSellers />
+                <PromoGrid />
+                <BrandAdBanner position="brand-ad-on" fallbackImg={onCloudAd} fallbackLink="/shop?brand=on-cloud" fallbackAlt="On Cloud Shoes" />
+                <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
+                <BrandProductRow brand="adidas" title="Adidas Collection" />
+                <BrandProductRow brand="nike" title="Nike Collection" />
+                <NewBalancePromoGrid />
+                <BrandProductRow brand="new balance" title="New Balance Collection" />
+                <Testimonials />
+                <FeaturesBar />
+              </>
             )}
-          </BrandAdBanner>
-
-            <BrandProductRow brand="adidas" title="Adidas Collection" />
-
-          {/* Nike Dunk Low Ad Banner */}
-          <BrandAdBanner position="brand-ad-nike" fallbackImg={nikeDunkAd} fallbackLink="/shop?brand=nike" fallbackAlt="Nike Dunk Low">
-            {(banner) => (
-              <section className="bg-background">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
-                  <Link to={banner.link_url} className="block relative rounded-lg overflow-hidden group bg-white">
-                    <img src={banner.image_url} alt={banner.title} className="w-full object-contain" />
-                    <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2">
-                      <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
-                        Shop Now →
-                      </span>
-                    </div>
-                  </Link>
-                </div>
-              </section>
-            )}
-          </BrandAdBanner>
-
-            <BrandProductRow brand="nike" title="Nike Collection" />
-            <NewBalancePromoGrid />
-            <BrandProductRow brand="new balance" title="New Balance Collection" />
-            <Testimonials />
-            <FeaturesBar />
             <Footer />
           </Suspense>
 
@@ -155,6 +190,11 @@ const Index = () => {
           </Suspense>
         </main>
       </PageTransition>
+
+      <Suspense fallback={null}>
+        <CookieConsent />
+        <SignupIncentivePopup />
+      </Suspense>
     </>
   );
 };

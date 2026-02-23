@@ -388,6 +388,45 @@ export type Database = {
         }
         Relationships: []
       }
+      homepage_sections: {
+        Row: {
+          config: Json | null
+          created_at: string
+          id: string
+          is_visible: boolean
+          section_key: string
+          section_type: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          section_key: string
+          section_type?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          section_key?: string
+          section_type?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       loyalty_rewards: {
         Row: {
           created_at: string
