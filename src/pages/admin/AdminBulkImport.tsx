@@ -3,8 +3,9 @@ import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Loader2, CheckCircle, AlertCircle, FileSpreadsheet, Trash2 } from "lucide-react";
+import { Upload, Loader2, CheckCircle, AlertCircle, FileSpreadsheet, Trash2, Plus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ParsedProduct {
   id: string;
@@ -63,6 +64,145 @@ const extractCategory = (cats: string): string => {
   const parts = cats.split(",").map((c) => c.trim());
   const brand = parts.find((p) => p !== "All Shoes" && p !== "Uncategorized");
   return brand || parts[0] || "All Shoes";
+};
+
+/** Detect brand/category from product title */
+const detectCategoryFromTitle = (title: string): string => {
+  const t = title.toLowerCase();
+  const brandMap: [string[], string][] = [
+    [["nike", "air max", "air force", "dunk", "flyknit", "vapormax"], "Nike"],
+    [["jordan", "air jordan"], "Jordan"],
+    [["adidas", "yeezy", "ultraboost"], "Adidas"],
+    [["new balance"], "New Balance"],
+    [["on cloud", "cloudmonster"], "On Cloud"],
+    [["asics", "gel-"], "Asics"],
+    [["hoka", "bondi", "clifton"], "Hoka"],
+    [["puma"], "Puma"],
+    [["louis vuitton", "lv "], "Louis Vuitton"],
+    [["gucci"], "Gucci"],
+    [["dior"], "Dior"],
+    [["hermes", "hermès"], "Hermes"],
+    [["rolex"], "Rolex"],
+    [["cartier"], "Cartier"],
+    [["tom ford"], "Tom Ford"],
+    [["christian louboutin", "louboutin"], "Christian Louboutin"],
+    [["chanel"], "Chanel"],
+    [["goyard"], "Goyard"],
+    [["onitsuka"], "Onitsuka Tiger"],
+    [["loro piana"], "Loro Piana"],
+    [["versace"], "Versace"],
+    [["balenciaga"], "Balenciaga"],
+    [["prada"], "Prada"],
+    [["omega", "audemars", "patek", "richard mille", "tag heuer", "hublot"], "Watches"],
+  ];
+  for (const [keywords, brand] of brandMap) {
+    for (const kw of keywords) {
+      if (t.includes(kw)) return brand;
+    }
+  }
+  return "";
+};
+
+/** Parse Shopify CSV format */
+const parseShopifyCSV = (text: string): ParsedProduct[] => {
+  const rows = parseCSV(text);
+  if (rows.length < 2) return [];
+
+  const headers = rows[0];
+  const colIndex = (name: string): number => headers.findIndex((h) => h.trim() === name);
+
+  const iHandle = colIndex("Handle");
+  const iTitle = colIndex("Title");
+  const iBody = colIndex("Body (HTML)");
+  const iPrice = colIndex("Variant Price");
+  const iCompare = colIndex("Variant Compare At Price");
+  const iImage = colIndex("Image Src");
+  const iStatus = colIndex("Status");
+  const iOpt1Val = colIndex("Option1 Value");
+
+  if (iHandle < 0) return []; // Not a Shopify CSV
+
+  const productMap = new Map<string, {
+    handle: string; title: string; description: string;
+    price: number; compareAt: number; images: string[];
+    sizes: string[]; status: string;
+  }>();
+
+  const getCol = (row: string[], idx: number): string => (idx >= 0 && idx < row.length ? row[idx].trim() : "");
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const handle = getCol(row, iHandle);
+    if (!handle) continue;
+
+    const title = getCol(row, iTitle);
+    const imageUrl = getCol(row, iImage);
+    const price = parseFloat(getCol(row, iPrice)) || 0;
+    const compareAt = parseFloat(getCol(row, iCompare)) || 0;
+    const status = getCol(row, iStatus);
+    const opt1Val = getCol(row, iOpt1Val);
+
+    if (!productMap.has(handle)) {
+      productMap.set(handle, {
+        handle,
+        title: title || handle,
+        description: stripHtml(getCol(row, iBody)),
+        price,
+        compareAt,
+        images: [],
+        sizes: [],
+        status: status || "active",
+      });
+    }
+
+    const p = productMap.get(handle)!;
+    if (title && p.title === handle) p.title = title;
+    const desc = stripHtml(getCol(row, iBody));
+    if (desc && !p.description) p.description = desc;
+    if (imageUrl && !p.images.includes(imageUrl)) p.images.push(imageUrl);
+    if (opt1Val && opt1Val !== "Default Title" && !p.sizes.includes(opt1Val)) p.sizes.push(opt1Val);
+    if (price > 0 && (p.price === 0 || price < p.price)) p.price = price;
+    if (compareAt > 0 && compareAt > p.compareAt) p.compareAt = compareAt;
+    if (status) p.status = status;
+  }
+
+  const products: ParsedProduct[] = [];
+  for (const [, p] of productMap) {
+    if (p.status !== "active" || p.price <= 0) continue;
+    const id = slugify(p.handle, p.handle) || slugify(p.title, p.handle);
+    if (!id || !p.title) continue;
+
+    const category = detectCategoryFromTitle(p.title) || "General";
+    const originalPrice = p.compareAt > p.price ? p.compareAt : p.price * 2;
+    const discount = Math.round(((originalPrice - p.price) / originalPrice) * 100);
+
+    const numericSizes = p.sizes.filter(s => /^\d+/.test(s)).sort((a, b) => parseFloat(a) - parseFloat(b));
+    let sizeStr = "Standard";
+    if (numericSizes.length > 1) {
+      sizeStr = `EU ${numericSizes[0]}-${numericSizes[numericSizes.length - 1]}`;
+    } else if (numericSizes.length === 1) {
+      sizeStr = `EU ${numericSizes[0]}`;
+    } else if (p.sizes.length > 0) {
+      sizeStr = p.sizes.join(", ");
+    }
+
+    products.push({
+      id,
+      name: p.title,
+      description: p.description || `Premium ${category} product from Desert Deals`,
+      price: p.price,
+      original_price: originalPrice,
+      discount_percent: discount,
+      stock_quantity: 50,
+      category,
+      size: sizeStr,
+      image_url: p.images.join(", "),
+      is_active: true,
+      notes: { top: [], middle: [], base: [] },
+    });
+  }
+
+  return products;
 };
 
 /**
@@ -374,12 +514,17 @@ const parseWooCommercePipe = (text: string): ParsedProduct[] => {
 };
 
 /** Auto-detect format and parse */
-const parseWooCommerceData = (text: string): ParsedProduct[] => {
+const parseProductData = (text: string): ParsedProduct[] => {
+  // Try Shopify format first (has "Handle" header)
+  const firstLine = text.split("\n")[0] || "";
+  if (firstLine.includes("Handle") && firstLine.includes("Variant Price")) {
+    return parseShopifyCSV(text);
+  }
   // If it starts with pipe-delimited rows, use legacy parser
   if (text.split("\n").some((l) => l.startsWith("|"))) {
     return parseWooCommercePipe(text);
   }
-  // Otherwise treat as CSV
+  // Otherwise treat as WooCommerce CSV
   return parseWooCommerceCSV(text);
 };
 
@@ -390,30 +535,40 @@ const AdminBulkImport = () => {
   const [progress, setProgress] = useState(0);
   const [replaceMode, setReplaceMode] = useState(false);
   const [result, setResult] = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
-  const [shopifyImporting, setShopifyImporting] = useState(false);
-  const [shopifyResult, setShopifyResult] = useState<Record<string, unknown> | null>(null);
 
-  const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleMultiFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    const text = await file.text();
-    const products = parseWooCommerceData(text);
+    let allProducts: ParsedProduct[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const text = await files[i].text();
+      const products = parseProductData(text);
+      allProducts = allProducts.concat(products);
+    }
 
-    if (products.length === 0) {
-      toast({ title: "No products found", description: "Could not parse any products from the file. Make sure it's in the correct format.", variant: "destructive" });
+    if (allProducts.length === 0) {
+      toast({ title: "No products found", description: "Could not parse any products. Make sure files are in Shopify or WooCommerce CSV format.", variant: "destructive" });
       return;
     }
 
-    setParsedProducts(products);
+    // Deduplicate by ID
+    const seen = new Set<string>();
+    allProducts = allProducts.filter(p => {
+      if (seen.has(p.id)) return false;
+      seen.add(p.id);
+      return true;
+    });
+
+    setParsedProducts(allProducts);
     setResult(null);
-    toast({ title: `${products.length} products parsed`, description: "Review the preview below and click Import to add them to the database." });
+    toast({ title: `${allProducts.length} products parsed from ${files.length} file(s)`, description: "Review the preview below and click Import." });
   }, [toast]);
 
   const handlePasteImport = useCallback(async () => {
     try {
       const text = await navigator.clipboard.readText();
-      const products = parseWooCommerceData(text);
+      const products = parseProductData(text);
       if (products.length === 0) {
         toast({ title: "No products found in clipboard", variant: "destructive" });
         return;
@@ -482,99 +637,14 @@ const AdminBulkImport = () => {
     },
   });
 
-  const handleShopifyImport = useCallback(async () => {
-    const session = getAdminSession();
-    if (!session) {
-      toast({ title: "Not authenticated", variant: "destructive" });
-      return;
-    }
-    setShopifyImporting(true);
-    setShopifyResult(null);
-    const files = ["wallets_products.csv", "sunglasses_products.csv", "heels_products.csv", "watches_products.csv", "nike-1_products.csv"];
-    let totalImported = 0;
-    const allErrors: string[] = [];
-    const fileSummaries: Record<string, number> = {};
-    
-    try {
-      for (const file of files) {
-        toast({ title: `Importing ${file}...` });
-        const { data, error } = await supabase.functions.invoke("import-shopify-csv", {
-          body: { file },
-        });
-        if (error) {
-          allErrors.push(`${file}: ${error.message}`);
-        } else {
-          totalImported += data?.imported || 0;
-          fileSummaries[file] = data?.imported || 0;
-          if (data?.errors?.length) allErrors.push(...data.errors);
-        }
-      }
-      setShopifyResult({ totalImported, totalSkipped: 0, errors: allErrors, fileSummaries });
-      toast({
-        title: `Import Complete`,
-        description: `${totalImported} products imported from ${files.length} files`,
-      });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Unknown error";
-      toast({ title: "Shopify import failed", description: msg, variant: "destructive" });
-    } finally {
-      setShopifyImporting(false);
-    }
-  }, [toast]);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-heading font-bold">Bulk Import Products</h1>
         <p className="text-muted-foreground">
-          Import products from your WooCommerce export file (CSV or pipe-delimited)
+          Upload product CSV files to import. Supports Shopify and WooCommerce export formats.
         </p>
-      </div>
-
-      {/* Shopify CSV Import Section */}
-      <div className="border border-border rounded-lg p-6 space-y-4 bg-card">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <FileSpreadsheet className="h-5 w-5 text-primary" />
-          Shopify Product Import
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Import all uploaded Shopify CSVs (Nike, Wallets, Sunglasses, Heels, Watches). Vendor names will be changed to Desert Deals and products auto-categorized.
-        </p>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={handleShopifyImport}
-            disabled={shopifyImporting}
-          >
-            {shopifyImporting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Importing Shopify CSVs...
-              </>
-            ) : (
-              <>
-                <Upload className="w-4 h-4 mr-2" />
-                Import All Shopify CSVs
-              </>
-            )}
-          </Button>
-        </div>
-        {shopifyResult && (
-          <div className="p-4 rounded-lg border border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="h-5 w-5 text-emerald-500" />
-              <span className="font-medium">
-                {(shopifyResult as Record<string, number>).totalImported || 0} products imported, {(shopifyResult as Record<string, number>).totalSkipped || 0} skipped
-              </span>
-            </div>
-            {(shopifyResult as Record<string, string[]>).errors?.length > 0 && (
-              <ul className="text-sm text-muted-foreground list-disc pl-5">
-                {((shopifyResult as Record<string, string[]>).errors || []).slice(0, 5).map((err: string, i: number) => (
-                  <li key={i}>{err}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Upload Section */}
@@ -583,7 +653,8 @@ const AdminBulkImport = () => {
         <div>
           <p className="font-medium">Upload your product export file</p>
           <p className="text-sm text-muted-foreground">
-            Supports CSV or pipe-delimited text files exported from WooCommerce
+            Auto-detects Shopify CSV (Handle column) or WooCommerce CSV/pipe-delimited formats.
+            Vendor names are replaced with Desert Deals and products are auto-categorized by brand.
           </p>
         </div>
         <div className="flex items-center justify-center gap-3">
@@ -591,13 +662,14 @@ const AdminBulkImport = () => {
             <input
               type="file"
               accept=".csv,.txt,.tsv"
+              multiple
               className="hidden"
-              onChange={handleFileUpload}
+              onChange={handleMultiFileUpload}
             />
             <Button variant="outline" asChild>
               <span>
                 <Upload className="w-4 h-4 mr-2" />
-                Choose File
+                Choose Files
               </span>
             </Button>
           </label>
@@ -652,12 +724,12 @@ const AdminBulkImport = () => {
           )}
 
           {result && (
-            <div className={`p-4 rounded-lg border ${result.errors.length > 0 ? "border-orange-500 bg-orange-50 dark:bg-orange-950/20" : "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20"}`}>
+            <div className={`p-4 rounded-lg border ${result.errors.length > 0 ? "border-destructive bg-destructive/10" : "border-primary bg-primary/10"}`}>
               <div className="flex items-center gap-2 mb-2">
                 {result.errors.length > 0 ? (
-                  <AlertCircle className="h-5 w-5 text-orange-500" />
+                  <AlertCircle className="h-5 w-5 text-destructive" />
                 ) : (
-                  <CheckCircle className="h-5 w-5 text-emerald-500" />
+                  <CheckCircle className="h-5 w-5 text-primary" />
                 )}
                 <span className="font-medium">
                   {result.imported} imported, {result.skipped} skipped
