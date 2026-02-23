@@ -66,7 +66,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
             </button>
 
             <div ref={scrollRef} className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-2">
-              {products.map((product) => {
+              {products.slice(0, 20).map((product) => {
                 const soldOut = isProductSoldOut(stockMap, product.id);
                 const inWishlist = isInWishlist(product.id);
 
