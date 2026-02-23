@@ -117,6 +117,25 @@ serve(async (req) => {
       });
     }
 
+    if (action === "reorder") {
+      const { updates } = body;
+      if (!Array.isArray(updates)) {
+        return new Response(JSON.stringify({ error: "updates array required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      for (const item of updates) {
+        const { error } = await supabase
+          .from("banners")
+          .update({ sort_order: item.sort_order })
+          .eq("id", item.id);
+        if (error) throw error;
+      }
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify({ error: "Invalid action" }), {
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
