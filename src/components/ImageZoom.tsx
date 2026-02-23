@@ -12,30 +12,42 @@ const ImageZoom = memo(({ src, alt, className = "" }: ImageZoomProps) => {
   const [position, setPosition] = useState({ x: 50, y: 50 });
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const handleDoubleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    setZooming(prev => {
+      if (!prev) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        setPosition({ x, y });
+      }
+      return !prev;
+    });
+  }, []);
+
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!zooming) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     setPosition({ x, y });
-  }, []);
+  }, [zooming]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (!zooming) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const touch = e.touches[0];
     const x = ((touch.clientX - rect.left) / rect.width) * 100;
     const y = ((touch.clientY - rect.top) / rect.height) * 100;
     setPosition({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
-  }, []);
+  }, [zooming]);
 
   return (
     <div
       ref={containerRef}
-      className={`relative overflow-hidden cursor-crosshair ${className}`}
-      onMouseEnter={() => setZooming(true)}
-      onMouseLeave={() => setZooming(false)}
+      className={`relative overflow-hidden ${zooming ? "cursor-crosshair" : "cursor-zoom-in"} ${className}`}
+      onDoubleClick={handleDoubleClick}
       onMouseMove={handleMouseMove}
-      onTouchStart={() => setZooming(true)}
-      onTouchEnd={() => setZooming(false)}
+      onMouseLeave={() => setZooming(false)}
       onTouchMove={handleTouchMove}
     >
       {/* Base image */}
@@ -46,11 +58,11 @@ const ImageZoom = memo(({ src, alt, className = "" }: ImageZoomProps) => {
         draggable={false}
       />
 
-      {/* Magnifying glass hint */}
+      {/* Hint */}
       {!zooming && (
         <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 bg-background/80 backdrop-blur-sm border border-border rounded-full px-2.5 py-1.5 text-muted-foreground pointer-events-none transition-opacity">
           <ZoomIn className="w-3.5 h-3.5" />
-          <span className="text-[10px] font-medium tracking-wide hidden sm:inline">HOVER TO ZOOM</span>
+          <span className="text-[10px] font-medium tracking-wide hidden sm:inline">DOUBLE-CLICK TO ZOOM</span>
         </div>
       )}
       {zooming && (
