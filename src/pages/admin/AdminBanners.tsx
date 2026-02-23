@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,23 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Loader2, ImageIcon, GripVertical } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import SortableBannerItem from "@/components/admin/SortableBannerItem";
 import type { Banner } from "@/hooks/useBanners";
 
 const ADMIN_SESSION_KEY = "rayn_admin_session";
@@ -46,6 +62,11 @@ const AdminBanners = () => {
   const [position, setPosition] = useState("hero");
   const [sortOrder, setSortOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   const fetchBanners = async () => {
     const session = getSession();
@@ -124,7 +145,7 @@ const AdminBanners = () => {
         title, image_url: imageUrl, link_url: linkUrl,
         position, sort_order: sortOrder, is_active: isActive,
       };
-      const { data, error } = await supabase.functions.invoke("manage-banners", {
+      const { error } = await supabase.functions.invoke("manage-banners", {
         body: { action, email: session.email, token: session.token, banner },
       });
       if (error) throw error;
@@ -153,9 +174,42 @@ const AdminBanners = () => {
     }
   };
 
+  const handleDragEnd = useCallback(async (event: DragEndEvent, positionGroup: string) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const groupItems = banners.filter(b => b.position === positionGroup);
+    const oldIndex = groupItems.findIndex(b => b.id === active.id);
+    const newIndex = groupItems.findIndex(b => b.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(groupItems, oldIndex, newIndex);
+
+    // Optimistic update
+    const updatedBanners = banners.map(b => {
+      if (b.position !== positionGroup) return b;
+      const idx = reordered.findIndex(r => r.id === b.id);
+      return idx !== -1 ? { ...b, sort_order: idx } : b;
+    });
+    setBanners(updatedBanners);
+
+    // Persist to backend
+    const session = getSession();
+    if (!session) return;
+    try {
+      const updates = reordered.map((b, idx) => ({ id: b.id, sort_order: idx }));
+      await supabase.functions.invoke("manage-banners", {
+        body: { action: "reorder", email: session.email, token: session.token, updates },
+      });
+    } catch (err: any) {
+      toast({ title: "Reorder failed", description: err.message, variant: "destructive" });
+      fetchBanners(); // Rollback
+    }
+  }, [banners, toast]);
+
   const groupedBanners = POSITIONS.map(p => ({
     ...p,
-    items: banners.filter(b => b.position === p.value),
+    items: banners.filter(b => b.position === p.value).sort((a, b) => a.sort_order - b.sort_order),
   }));
 
   return (
@@ -163,7 +217,7 @@ const AdminBanners = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Banners</h1>
-          <p className="text-muted-foreground text-sm">Manage all homepage banners and ads</p>
+          <p className="text-muted-foreground text-sm">Manage all homepage banners and ads. Drag to reorder.</p>
         </div>
         <Button onClick={openCreate}>
           <Plus className="mr-2 h-4 w-4" /> Add Banner
@@ -182,37 +236,24 @@ const AdminBanners = () => {
               {group.items.length === 0 ? (
                 <p className="text-sm text-muted-foreground bg-muted rounded-lg p-4">No banners configured for this position.</p>
               ) : (
-                <div className="grid gap-3">
-                  {group.items.map(b => (
-                    <div key={b.id} className="flex items-center gap-4 bg-card border border-border rounded-lg p-3">
-                      <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <div className="w-24 h-14 rounded-md overflow-hidden bg-muted shrink-0">
-                        {b.image_url ? (
-                          <img src={b.image_url} alt={b.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{b.title || "Untitled"}</p>
-                        <p className="text-xs text-muted-foreground truncate">{b.link_url}</p>
-                      </div>
-                      <div className={`px-2 py-0.5 rounded-full text-xs ${b.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                        {b.is_active ? "Active" : "Inactive"}
-                      </div>
-                      <div className="flex gap-1 shrink-0">
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(b)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(b.id)} className="text-destructive hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={(e) => handleDragEnd(e, group.value)}
+                >
+                  <SortableContext items={group.items.map(b => b.id)} strategy={verticalListSortingStrategy}>
+                    <div className="grid gap-2">
+                      {group.items.map(b => (
+                        <SortableBannerItem
+                          key={b.id}
+                          banner={b}
+                          onEdit={openEdit}
+                          onDelete={handleDelete}
+                        />
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
               )}
             </div>
           ))}
@@ -256,7 +297,7 @@ const AdminBanners = () => {
                     className="flex-1"
                   />
                   <label className="cursor-pointer">
-                    <Button variant="outline" size="sm" asChild disabled={uploading}>
+                    <Button variant="outline" size="sm" type="button" asChild disabled={uploading}>
                       <span>{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Upload"}</span>
                     </Button>
                     <input
