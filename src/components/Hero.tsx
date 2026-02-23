@@ -1,31 +1,26 @@
 import { useState, useEffect, memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useBanners } from "@/hooks/useBanners";
 import slide1 from "@/assets/banners/slide-9.webp";
 import slide2 from "@/assets/banners/slide-10.png";
 
-const slides = [
-  { image: slide1, alt: "Shopping Sale - Desert Deal" },
-  { image: slide2, alt: "Ramadan Season - Family Collection" },
+const fallbackSlides = [
+  { image: slide1, alt: "Shopping Sale - Desert Deal", link: "/shop" },
+  { image: slide2, alt: "Ramadan Season - Family Collection", link: "/shop" },
 ];
-
-const preloadFirstImage = () => {
-  const img = new Image();
-  img.src = slide1;
-};
-preloadFirstImage();
 
 const Hero = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
+  const { data: heroBanners } = useBanners("hero");
+
+  const slides = heroBanners && heroBanners.length > 0
+    ? heroBanners.map(b => ({ image: b.image_url, alt: b.title, link: b.link_url }))
+    : fallbackSlides;
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-  }, []);
-
-  const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 4000);
@@ -34,7 +29,7 @@ const Hero = memo(() => {
 
   return (
     <section id="home" className="relative w-full mt-[100px] sm:mt-[116px] px-3 sm:px-4">
-      <div className="relative w-full aspect-[16/9] sm:aspect-[16/7] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer bg-muted rounded-xl sm:rounded-2xl" onClick={() => navigate("/shop")}>
+      <div className="relative w-full aspect-[16/9] sm:aspect-[16/7] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer bg-muted rounded-xl sm:rounded-2xl" onClick={() => navigate(slides[currentSlide]?.link || "/shop")}>
         {slides.map((slide, index) => (
           <div
             key={index}
@@ -52,9 +47,7 @@ const Hero = memo(() => {
           </div>
         ))}
 
-        {/* Light black gradient overlay at top */}
         <div className="absolute inset-x-0 top-0 h-24 sm:h-32 bg-gradient-to-b from-black/40 to-transparent z-10 pointer-events-none rounded-t-xl sm:rounded-t-2xl" />
-
 
         <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 z-10 flex justify-center gap-2">
           {slides.map((_, index) => (

@@ -141,5 +141,8 @@ verify_jwt = false
 [functions.get-analytics]
 verify_jwt = false
 
+[functions.manage-banners]
+verify_jwt = false
+
 [functions.manage-blocked-countries]
 verify_jwt = false
