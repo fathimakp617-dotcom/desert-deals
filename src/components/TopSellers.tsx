@@ -66,7 +66,7 @@ const TopSellers = memo(() => {
               className="flex gap-3 sm:gap-4 overflow-x-auto pb-4"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {products.map((product) => {
+              {products.slice(0, 30).map((product) => {
                 const soldOut = isProductSoldOut(stockMap, product.id);
                 const inWishlist = isInWishlist(product.id);
 
