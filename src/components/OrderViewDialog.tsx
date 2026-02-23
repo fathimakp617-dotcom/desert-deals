@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { X } from "lucide-react";
 import { 
   Package, 
   MapPin, 
@@ -72,6 +73,7 @@ interface OrderViewDialogProps {
 
 const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) => {
   const [productImages, setProductImages] = useState<Record<string, string>>({});
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -290,8 +292,9 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
                     <img
                       src={productImages[item.productId]}
                       alt={item.name || item.product_name || "Product"}
-                      className="h-14 w-14 rounded-lg object-cover flex-shrink-0"
+                      className="h-14 w-14 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity ring-1 ring-transparent hover:ring-primary"
                       style={{ border: '1px solid #e5e5e5' }}
+                      onClick={() => setZoomedImage(productImages[item.productId!])}
                       onError={(e) => { e.currentTarget.src = "/images/product-placeholder.jpg"; }}
                     />
                   ) : (
@@ -360,6 +363,27 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
             Download as Image
           </Button>
         </div>
+
+        {/* Image Lightbox */}
+        {zoomedImage && (
+          <div
+            className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center cursor-pointer"
+            onClick={() => setZoomedImage(null)}
+          >
+            <button
+              className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2 hover:bg-black/70 transition-colors"
+              onClick={() => setZoomedImage(null)}
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <img
+              src={zoomedImage}
+              alt="Product zoom"
+              className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
