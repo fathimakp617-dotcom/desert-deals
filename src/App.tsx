@@ -8,6 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { CouponProvider } from "@/contexts/CouponContext";
+import { Analytics } from "@vercel/analytics/react";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DirectionProvider } from "@/contexts/DirectionContext";
@@ -151,6 +152,7 @@ const App = () => {
                 <TooltipProvider>
                   <Toaster />
                   <Sonner />
+                  <Analytics />
 
                   {showSplash && <RamadanSplash onComplete={handleSplashComplete} />}
 
