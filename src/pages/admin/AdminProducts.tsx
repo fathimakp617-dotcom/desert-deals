@@ -112,6 +112,8 @@ const AdminProducts = () => {
   const [bulkEditValue, setBulkEditValue] = useState<string>("");
   const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
   const [showTrash, setShowTrash] = useState(false);
+  const [trashSelectedIds, setTrashSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkTrashDeleteOpen, setIsBulkTrashDeleteOpen] = useState(false);
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],
     queryFn: async () => {
@@ -393,6 +395,32 @@ const AdminProducts = () => {
     },
   });
 
+  const bulkPermanentDeleteMutation = useMutation({
+    mutationFn: async (productIds: string[]) => {
+      const session = getAdminSession();
+      if (!session) throw new Error("Not authenticated");
+      let deleted = 0;
+      for (const id of productIds) {
+        const { error } = await supabase.functions.invoke("manage-products", {
+          body: { action: "permanent_delete", product: { id }, admin_email: session.email, admin_token: session.token },
+        });
+        if (error) throw error;
+        deleted++;
+      }
+      return { deleted };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products-trash"] });
+      setTrashSelectedIds(new Set());
+      setIsBulkTrashDeleteOpen(false);
+      toast({ title: `${data.deleted} products permanently deleted` });
+    },
+    onError: (error: Error) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products-trash"] });
+      toast({ title: "Bulk delete failed", description: error.message, variant: "destructive" });
+    },
+  });
+
   const bulkDeleteMutation = useMutation({
     mutationFn: async (productIds: string[]) => {
       const session = getAdminSession();
@@ -418,6 +446,23 @@ const AdminProducts = () => {
       toast({ title: "Bulk delete failed", description: error.message, variant: "destructive" });
     },
   });
+
+  const toggleTrashSelect = (id: string) => {
+    setTrashSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleTrashSelectAll = () => {
+    if (!trashedProducts) return;
+    if (trashSelectedIds.size === trashedProducts.length) {
+      setTrashSelectedIds(new Set());
+    } else {
+      setTrashSelectedIds(new Set(trashedProducts.map((p) => p.id)));
+    }
+  };
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -741,68 +786,120 @@ const AdminProducts = () => {
               <p className="text-sm mt-1">Deleted products will appear here for recovery</p>
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead className="w-[50px]"></TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Deleted</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {trashedProducts.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="py-2">
-                        {product.image_url ? (
-                          <img src={product.image_url.split(",")[0]?.trim()} alt="" className="h-10 w-10 rounded object-cover" />
-                        ) : (
-                          <div className="h-10 w-10 rounded bg-muted flex items-center justify-center">
-                            <Image className="h-4 w-4 text-muted-foreground" />
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell className="py-2">
-                        <span className="text-sm font-medium">{product.name}</span>
-                        <div className="text-xs text-muted-foreground">ID: {product.id}</div>
-                      </TableCell>
-                      <TableCell className="py-2 text-sm">{product.price} AED</TableCell>
-                      <TableCell className="py-2 text-sm text-muted-foreground">
-                        {product.deleted_at ? new Date(product.deleted_at).toLocaleDateString() : "—"}
-                      </TableCell>
-                      <TableCell className="text-right py-2">
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => restoreMutation.mutate(product.id)}
-                            disabled={restoreMutation.isPending}
-                          >
-                            <RotateCcw className="h-3.5 w-3.5 mr-1" />
-                            Restore
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              if (confirm("Permanently delete this product? This cannot be undone.")) {
-                                permanentDeleteMutation.mutate(product.id);
-                              }
-                            }}
-                            disabled={permanentDeleteMutation.isPending}
-                          >
-                            <Trash2 className="h-3.5 w-3.5 mr-1" />
-                            Delete Forever
-                          </Button>
-                        </div>
-                      </TableCell>
+            <>
+              {/* Bulk action bar for trash */}
+              {trashSelectedIds.size > 0 && (
+                <div className="flex items-center gap-3 p-3 rounded-md border bg-muted/50 mb-4">
+                  <CheckSquare className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">{trashSelectedIds.size} selected</span>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => setIsBulkTrashDeleteOpen(true)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 mr-1" />
+                    Delete Forever ({trashSelectedIds.size})
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setTrashSelectedIds(new Set())}>
+                    Clear
+                  </Button>
+                </div>
+              )}
+              <AlertDialog open={isBulkTrashDeleteOpen} onOpenChange={setIsBulkTrashDeleteOpen}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Permanently Delete {trashSelectedIds.size} Products?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. All selected products and their images will be permanently removed.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      onClick={() => bulkPermanentDeleteMutation.mutate(Array.from(trashSelectedIds))}
+                      disabled={bulkPermanentDeleteMutation.isPending}
+                    >
+                      {bulkPermanentDeleteMutation.isPending ? "Deleting..." : "Delete Forever"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="w-[40px]">
+                        <Checkbox
+                          checked={trashedProducts.length > 0 && trashSelectedIds.size === trashedProducts.length}
+                          onCheckedChange={toggleTrashSelectAll}
+                        />
+                      </TableHead>
+                      <TableHead className="w-[50px]"></TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Deleted</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {trashedProducts.map((product) => (
+                      <TableRow key={product.id} className={trashSelectedIds.has(product.id) ? "bg-muted/30" : ""}>
+                        <TableCell className="py-2">
+                          <Checkbox
+                            checked={trashSelectedIds.has(product.id)}
+                            onCheckedChange={() => toggleTrashSelect(product.id)}
+                          />
+                        </TableCell>
+                        <TableCell className="py-2">
+                          {product.image_url ? (
+                            <img src={product.image_url.split(",")[0]?.trim()} alt="" className="h-10 w-10 rounded object-cover" />
+                          ) : (
+                            <div className="h-10 w-10 rounded bg-muted flex items-center justify-center">
+                              <Image className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="py-2">
+                          <span className="text-sm font-medium">{product.name}</span>
+                          <div className="text-xs text-muted-foreground">ID: {product.id}</div>
+                        </TableCell>
+                        <TableCell className="py-2 text-sm">{product.price} AED</TableCell>
+                        <TableCell className="py-2 text-sm text-muted-foreground">
+                          {product.deleted_at ? new Date(product.deleted_at).toLocaleDateString() : "—"}
+                        </TableCell>
+                        <TableCell className="text-right py-2">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => restoreMutation.mutate(product.id)}
+                              disabled={restoreMutation.isPending}
+                            >
+                              <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                              Restore
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                if (confirm("Permanently delete this product? This cannot be undone.")) {
+                                  permanentDeleteMutation.mutate(product.id);
+                                }
+                              }}
+                              disabled={permanentDeleteMutation.isPending}
+                            >
+                              <Trash2 className="h-3.5 w-3.5 mr-1" />
+                              Delete Forever
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </div>
       ) : (

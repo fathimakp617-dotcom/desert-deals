@@ -252,6 +252,7 @@ const AdminLayout = () => {
     { title: "Bulk Import", url: "/admin/bulk-import", icon: Upload },
     { title: "Categories", url: "/admin/categories", icon: Tags },
     { title: "Banners", url: "/admin/banners", icon: Image },
+    { title: "Sections", url: "/admin/sections", icon: LayoutDashboard },
   ];
 
   const isActive = (path: string) => {
