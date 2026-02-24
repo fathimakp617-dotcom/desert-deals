@@ -126,16 +126,6 @@ const Footer = memo(() => {
           <p className="text-xs text-white/40">
             © {new Date().getFullYear()} Desert Deal. All rights reserved.
           </p>
-          <div className="flex items-center gap-2">
-            {["Visa", "MasterCard", "COD"].map((method) => (
-              <span
-                key={method}
-                className="text-[11px] text-white/50 border border-white/15 px-3 py-1 rounded-md font-medium tracking-wide"
-              >
-                {method}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </footer>
