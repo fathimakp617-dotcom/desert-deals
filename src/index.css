@@ -211,12 +211,12 @@
     }
   }
 
-  .animate-marquee {
+  .marquee-on-hover {
     display: inline-block;
     white-space: nowrap;
   }
 
-  .group:hover .animate-marquee {
+  .group:hover .marquee-on-hover {
     animation: marquee 3s linear infinite;
   }
 }
