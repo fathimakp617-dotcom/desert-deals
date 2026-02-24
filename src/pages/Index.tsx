@@ -24,7 +24,7 @@ const Footer = lazy(() => import("@/components/Footer"));
 const MobileBottomNav = lazy(() => import("@/components/MobileBottomNav"));
 const OrderSuccessModal = lazy(() => import("@/components/OrderSuccessModal"));
 const CookieConsent = lazy(() => import("@/components/CookieConsent"));
-const SignupIncentivePopup = lazy(() => import("@/components/SignupIncentivePopup"));
+
 
 const SectionLoader = () => (
   <div className="py-6 flex items-center justify-center">
@@ -193,7 +193,6 @@ const Index = () => {
 
       <Suspense fallback={null}>
         <CookieConsent />
-        <SignupIncentivePopup />
       </Suspense>
     </>
   );
