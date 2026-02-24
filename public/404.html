@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Desert Deal</title>
+  <script>
+    // Single Page App redirect for hosts that serve 404.html on unknown routes
+    var segment = 0;
+    var loc = window.location;
+    var path = loc.pathname + loc.search + loc.hash;
+    loc.replace(loc.protocol + '//' + loc.host + '/?p=' + encodeURIComponent(path));
+  </script>
+</head>
+<body>
+</body>
+</html>

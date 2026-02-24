@@ -99,6 +99,15 @@
       src="https://www.facebook.com/tr?id=677063762163766&ev=PageView&noscript=1"
     /></noscript>
     <div id="root"></div>
+    <script>
+      // SPA redirect handler: if redirected from 404.html, restore the original path
+      (function() {
+        var redirect = new URLSearchParams(window.location.search).get('p');
+        if (redirect) {
+          window.history.replaceState(null, '', redirect);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
