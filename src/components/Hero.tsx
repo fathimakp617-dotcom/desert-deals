@@ -39,6 +39,8 @@ const Hero = memo(() => {
             <img
               src={slide.image}
               alt={slide.alt}
+              width={1600}
+              height={900}
               className="w-full h-full object-cover object-center"
               loading={index === 0 ? "eager" : "lazy"}
               decoding="async"

@@ -64,6 +64,8 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
             <img
               src={product.image}
               alt={product.name}
+              width={250}
+              height={250}
               className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
               loading="lazy"
               decoding="async"

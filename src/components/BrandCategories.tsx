@@ -2,18 +2,18 @@ import { memo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import pumaLogo from "@/assets/brands/puma.png";
-import onitsukaTigerLogo from "@/assets/brands/onitsuka-tiger.png";
+import pumaLogo from "@/assets/brands/puma.webp";
+import onitsukaTigerLogo from "@/assets/brands/onitsuka-tiger.webp";
 import onCloudLogo from "@/assets/brands/on-cloud.png";
-import nikeLogo from "@/assets/brands/nike.png";
-import newBalanceLogo from "@/assets/brands/new-balance.png";
-import louisVuittonLogo from "@/assets/brands/louis-vuitton.png";
-import loroPianaLogo from "@/assets/brands/loro-piana.png";
-import jordanLogo from "@/assets/brands/jordan.png";
-import hermesLogo from "@/assets/brands/hermes.png";
-import diorLogo from "@/assets/brands/dior.png";
-import airJordanLogo from "@/assets/brands/air-jordan.png";
-import adidasLogo from "@/assets/brands/adidas.png";
+import nikeLogo from "@/assets/brands/nike.svg";
+import newBalanceLogo from "@/assets/brands/new-balance.webp";
+import louisVuittonLogo from "@/assets/brands/louis-vuitton.webp";
+import loroPianaLogo from "@/assets/brands/loro-piana.webp";
+import jordanLogo from "@/assets/brands/jordan.webp";
+import hermesLogo from "@/assets/brands/hermes.webp";
+import diorLogo from "@/assets/brands/dior.webp";
+import airJordanLogo from "@/assets/brands/air-jordan.webp";
+import adidasLogo from "@/assets/brands/adidas.svg";
 import asicsLogo from "@/assets/brands/asics.svg";
 import hokaLogo from "@/assets/brands/hoka.png";
 import gucciLogo from "@/assets/brands/gucci.png";
@@ -41,7 +41,7 @@ const BrandLogo = memo(({ logo, fallback, name }: { logo: string; fallback: stri
   if (!logo || failed) {
     return <span className="font-heading font-bold text-lg tracking-tight">{fallback}</span>;
   }
-  return <img src={logo} alt={name} className="w-full h-full object-contain" loading="lazy" onError={() => setFailed(true)} />;
+  return <img src={logo} alt={name} width={91} height={91} className="w-full h-full object-contain" loading="lazy" onError={() => setFailed(true)} />;
 });
 BrandLogo.displayName = "BrandLogo";
 
