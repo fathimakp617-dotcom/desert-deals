@@ -113,8 +113,8 @@ const TopSellers = memo(() => {
                         <div className="flex flex-wrap gap-1 mb-1.5">
                           <span className="text-[10px] text-muted-foreground">{product.category}</span>
                         </div>
-                        <Link to={`/product/${product.id}`}>
-                          <h2 className="text-[13px] sm:text-sm font-bold text-foreground line-clamp-2 mb-1.5 leading-snug hover:text-primary transition-colors min-h-[2.5em]">
+                        <Link to={`/product/${product.id}`} className="block overflow-hidden min-h-[2.5em] mb-1.5">
+                          <h2 className="text-[13px] sm:text-sm font-bold text-foreground leading-snug hover:text-primary transition-colors whitespace-nowrap group-hover:animate-marquee">
                             {product.name}
                           </h2>
                         </Link>
