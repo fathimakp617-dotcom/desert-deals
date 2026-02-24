@@ -30,8 +30,6 @@ interface AdminSession {
   role?: string;
 }
 
-const ADMIN_ACCESS_KEY = "dd_admin_access";
-
 const AdminLayout = () => {
   const [adminSession, setAdminSession] = useState<AdminSession | null>(null);
   const [isChecking, setIsChecking] = useState(true);
@@ -41,16 +39,6 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-
-  // Block direct URL access - allow if navigated from app OR has existing admin session
-  useEffect(() => {
-    const hasAccessFlag = sessionStorage.getItem(ADMIN_ACCESS_KEY);
-    const hasAdminSession = sessionStorage.getItem(ADMIN_SESSION_KEY);
-    if (!hasAccessFlag && !hasAdminSession) {
-      navigate("/", { replace: true });
-      return;
-    }
-  }, []);
 
   // Check existing session on mount only
   useEffect(() => {

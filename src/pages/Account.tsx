@@ -557,22 +557,10 @@ const Account = () => {
                   {user.email}
                 </p>
               </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    sessionStorage.setItem("dd_admin_access", "1");
-                    navigate("/admin");
-                  }}
-                >
-                  <Shield size={18} className="mr-2" />
-                  Admin
-                </Button>
-                <Button variant="outline" onClick={handleLogout}>
-                  <LogOut size={18} className="mr-2" />
-                  Sign Out
-                </Button>
-              </div>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut size={18} className="mr-2" />
+                Sign Out
+              </Button>
             </div>
 
             {/* Tabs */}
