@@ -201,6 +201,24 @@
       opacity: 0.7;
     }
   }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .group:hover .animate-marquee {
+    animation: marquee 3s linear infinite;
+  }
 }
 
 @layer utilities {
