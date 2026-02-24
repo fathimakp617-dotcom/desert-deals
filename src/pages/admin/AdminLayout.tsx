@@ -42,10 +42,11 @@ const AdminLayout = () => {
   const location = useLocation();
   const { toast } = useToast();
 
-  // Block direct URL access - only allow navigation from within the app
+  // Block direct URL access - allow if navigated from app OR has existing admin session
   useEffect(() => {
-    const hasAccess = sessionStorage.getItem(ADMIN_ACCESS_KEY);
-    if (!hasAccess) {
+    const hasAccessFlag = sessionStorage.getItem(ADMIN_ACCESS_KEY);
+    const hasAdminSession = sessionStorage.getItem(ADMIN_SESSION_KEY);
+    if (!hasAccessFlag && !hasAdminSession) {
       navigate("/", { replace: true });
       return;
     }
