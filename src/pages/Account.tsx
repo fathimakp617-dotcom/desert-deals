@@ -36,7 +36,8 @@ import {
   Home,
   Loader2,
   Zap,
-  Wallet
+  Wallet,
+  Shield
 } from "lucide-react";
 import ReturnRequestDialog from "@/components/ReturnRequestDialog";
 
@@ -556,10 +557,22 @@ const Account = () => {
                   {user.email}
                 </p>
               </div>
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut size={18} className="mr-2" />
-                Sign Out
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    sessionStorage.setItem("dd_admin_access", "1");
+                    navigate("/admin");
+                  }}
+                >
+                  <Shield size={18} className="mr-2" />
+                  Admin
+                </Button>
+                <Button variant="outline" onClick={handleLogout}>
+                  <LogOut size={18} className="mr-2" />
+                  Sign Out
+                </Button>
+              </div>
             </div>
 
             {/* Tabs */}
