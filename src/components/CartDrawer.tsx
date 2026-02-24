@@ -7,7 +7,7 @@ import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 
 const CartDrawer = memo(() => {
-  const { items, isOpen, closeCart, addToCart, totalItems } = useCart();
+  const { items, isOpen, closeCart, addToCart, removeFromCart, totalItems } = useCart();
   const { data: allProducts } = useDbProducts();
   const [visible, setVisible] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -67,7 +67,7 @@ const CartDrawer = memo(() => {
           {/* All cart items */}
           <div className="space-y-3">
             {items.map((item) => (
-              <div key={`${item.product.id}-${item.selectedSize || ''}`} className="flex gap-3 p-3 border border-border rounded-lg">
+              <div key={`${item.product.id}-${item.selectedSize || ''}`} className="flex gap-3 p-3 border border-border rounded-lg relative group">
                 <Link to={`/product/${item.product.id}`} onClick={closeCart} className="w-16 h-16 flex-shrink-0">
                   <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover rounded-md" />
                 </Link>
@@ -80,7 +80,16 @@ const CartDrawer = memo(() => {
                   )}
                   <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity}</p>
                 </div>
-                <span className="text-sm font-bold text-primary whitespace-nowrap">{formatPrice(item.product.price * item.quantity)}</span>
+                <div className="flex flex-col items-end justify-between">
+                  <button
+                    onClick={() => removeFromCart(item.product.id, item.selectedSize)}
+                    className="p-1 text-muted-foreground hover:text-destructive transition-colors rounded-full hover:bg-muted"
+                    aria-label="Remove item"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <span className="text-sm font-bold text-primary whitespace-nowrap">{formatPrice(item.product.price * item.quantity)}</span>
+                </div>
               </div>
             ))}
           </div>
