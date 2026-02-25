@@ -24,6 +24,8 @@ const Footer = lazy(() => import("@/components/Footer"));
 const MobileBottomNav = lazy(() => import("@/components/MobileBottomNav"));
 const OrderSuccessModal = lazy(() => import("@/components/OrderSuccessModal"));
 const CookieConsent = lazy(() => import("@/components/CookieConsent"));
+const DynamicBanner = lazy(() => import("@/components/DynamicBanner"));
+const DynamicTextBlock = lazy(() => import("@/components/DynamicTextBlock"));
 
 
 const SectionLoader = () => (
@@ -138,8 +140,21 @@ const Index = () => {
     };
 
     return sections
-      .filter(s => sectionMap[s.section_key])
-      .map(s => sectionMap[s.section_key]);
+      .filter(s => sectionMap[s.section_key] || s.section_type === "product_row" || s.section_type === "banner" || s.section_type === "text_block")
+      .map(s => {
+        if (sectionMap[s.section_key]) return sectionMap[s.section_key];
+        const cfg = (s.config || {}) as Record<string, any>;
+        if (s.section_type === "product_row" && cfg.brand) {
+          return <BrandProductRow key={s.id} brand={cfg.brand} title={s.title} shopLink={cfg.shop_link} />;
+        }
+        if (s.section_type === "banner" && cfg.image_url) {
+          return <DynamicBanner key={s.id} imageUrl={cfg.image_url} linkUrl={cfg.link_url || "/shop"} buttonText={cfg.button_text} title={s.title} />;
+        }
+        if (s.section_type === "text_block") {
+          return <DynamicTextBlock key={s.id} heading={cfg.heading || s.title} description={cfg.description || s.subtitle} buttonText={cfg.button_text} buttonLink={cfg.button_link} />;
+        }
+        return null;
+      });
   }, [sections]);
 
   return (
