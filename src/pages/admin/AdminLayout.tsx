@@ -17,7 +17,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, User, RotateCcw, Star, ShoppingBag, Upload, ImageOff, Tags, BarChart3, Image } from "lucide-react";
+import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, User, RotateCcw, Star, ShoppingBag, Upload, ImageOff, Tags, BarChart3, Image, LayoutTemplate } from "lucide-react";
 import InstallAppBanner from "@/components/InstallAppBanner";
 import { motion } from "framer-motion";
 
@@ -253,6 +253,7 @@ const AdminLayout = () => {
     { title: "Categories", url: "/admin/categories", icon: Tags },
     { title: "Banners", url: "/admin/banners", icon: Image },
     { title: "Sections", url: "/admin/sections", icon: LayoutDashboard },
+    { title: "Page Builder", url: "/admin/page-builder", icon: LayoutTemplate },
   ];
 
   const isActive = (path: string) => {

@@ -1,0 +1,525 @@
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { GripVertical, Plus, Loader2, Trash2, Pencil, Eye, EyeOff, LayoutTemplate, ShoppingBag, ImageIcon, Type, Rows3 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+const ADMIN_SESSION_KEY = "rayn_admin_session";
+
+interface SectionConfig {
+  type?: string;
+  brand?: string;
+  shop_link?: string;
+  image_url?: string;
+  link_url?: string;
+  heading?: string;
+  description?: string;
+  button_text?: string;
+  button_link?: string;
+  category?: string;
+  limit?: number;
+}
+
+interface PageSection {
+  id: string;
+  section_key: string;
+  title: string;
+  subtitle: string;
+  is_visible: boolean;
+  sort_order: number;
+  section_type: string;
+  config: SectionConfig;
+}
+
+const SECTION_TYPES = [
+  { value: "product_row", label: "Product Row", icon: ShoppingBag, desc: "Scrollable row of products by brand/category" },
+  { value: "banner", label: "Banner / Ad", icon: ImageIcon, desc: "Full-width image banner with link" },
+  { value: "text_block", label: "Text / CTA Block", icon: Type, desc: "Heading, description, and call-to-action" },
+];
+
+const getSession = (): { email: string; token: string } | null => {
+  try {
+    const raw = sessionStorage.getItem(ADMIN_SESSION_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    return { email: s.email, token: s.token };
+  } catch { return null; }
+};
+
+const typeIcon = (type: string) => {
+  switch (type) {
+    case "product_row": return <ShoppingBag className="h-4 w-4" />;
+    case "banner": return <ImageIcon className="h-4 w-4" />;
+    case "text_block": return <Type className="h-4 w-4" />;
+    default: return <Rows3 className="h-4 w-4" />;
+  }
+};
+
+const typeLabel = (type: string) => {
+  const t = SECTION_TYPES.find(s => s.value === type);
+  return t?.label || type;
+};
+
+// Sortable card
+const SortableSectionCard = ({ section, onEdit, onToggle, onDelete }: {
+  section: PageSection;
+  onEdit: (s: PageSection) => void;
+  onToggle: (s: PageSection) => void;
+  onDelete: (id: string) => void;
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1, zIndex: isDragging ? 50 : undefined };
+
+  const config = section.config || {};
+
+  return (
+    <div ref={setNodeRef} style={style} className={`flex items-start gap-3 bg-card border border-border rounded-lg p-4 ${isDragging ? "shadow-lg ring-2 ring-primary" : ""}`}>
+      <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none p-1 mt-0.5 rounded hover:bg-muted shrink-0">
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+      </button>
+
+      {/* Preview */}
+      <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">{typeIcon(section.section_type)}</span>
+          <span className="font-medium text-sm truncate">{section.title || "Untitled"}</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{typeLabel(section.section_type)}</span>
+        </div>
+        <p className="text-xs text-muted-foreground truncate">{section.subtitle}</p>
+        {section.section_type === "product_row" && config.brand && (
+          <p className="text-xs text-primary">Brand: {config.brand}</p>
+        )}
+        {section.section_type === "banner" && config.image_url && (
+          <div className="w-full max-w-[200px] h-14 rounded overflow-hidden bg-muted mt-1">
+            <img src={config.image_url} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
+        {section.section_type === "text_block" && config.heading && (
+          <p className="text-xs font-medium">{config.heading}</p>
+        )}
+      </div>
+
+      <div className="flex items-center gap-1 shrink-0">
+        <button onClick={() => onToggle(section)} className="p-1.5 rounded hover:bg-muted">
+          {section.is_visible ? <Eye className="h-4 w-4 text-emerald-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
+        </button>
+        <Button size="icon" variant="ghost" onClick={() => onEdit(section)}><Pencil className="h-4 w-4" /></Button>
+        <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => onDelete(section.id)}><Trash2 className="h-4 w-4" /></Button>
+      </div>
+    </div>
+  );
+};
+
+// Config forms per type
+const ProductRowConfig = ({ config, onChange }: { config: SectionConfig; onChange: (c: SectionConfig) => void }) => (
+  <div className="space-y-3">
+    <div>
+      <label className="text-sm font-medium">Brand Filter</label>
+      <Input placeholder="e.g. nike, adidas, on" value={config.brand || ""} onChange={e => onChange({ ...config, brand: e.target.value })} />
+      <p className="text-xs text-muted-foreground mt-1">Products matching this brand name will be shown</p>
+    </div>
+    <div>
+      <label className="text-sm font-medium">Category Filter (optional)</label>
+      <Input placeholder="e.g. sneakers" value={config.category || ""} onChange={e => onChange({ ...config, category: e.target.value })} />
+    </div>
+    <div>
+      <label className="text-sm font-medium">Shop Link</label>
+      <Input placeholder="/shop?brand=nike" value={config.shop_link || ""} onChange={e => onChange({ ...config, shop_link: e.target.value })} />
+    </div>
+    <div>
+      <label className="text-sm font-medium">Max Products</label>
+      <Input type="number" placeholder="20" value={config.limit || ""} onChange={e => onChange({ ...config, limit: parseInt(e.target.value) || undefined })} />
+    </div>
+  </div>
+);
+
+const BannerConfig = ({ config, onChange }: { config: SectionConfig; onChange: (c: SectionConfig) => void }) => {
+  const handleUpload = async (file: File) => {
+    const ext = file.name.split(".").pop();
+    const path = `banners/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file);
+    if (error) return;
+    const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
+    onChange({ ...config, image_url: urlData.publicUrl });
+  };
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className="text-sm font-medium">Banner Image URL</label>
+        <Input placeholder="https://..." value={config.image_url || ""} onChange={e => onChange({ ...config, image_url: e.target.value })} />
+      </div>
+      <div>
+        <label className="text-sm font-medium">Or Upload Image</label>
+        <Input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) handleUpload(e.target.files[0]); }} />
+      </div>
+      {config.image_url && (
+        <div className="w-full h-32 rounded-lg overflow-hidden bg-muted">
+          <img src={config.image_url} alt="Preview" className="w-full h-full object-cover" />
+        </div>
+      )}
+      <div>
+        <label className="text-sm font-medium">Link URL</label>
+        <Input placeholder="/shop?brand=nike" value={config.link_url || ""} onChange={e => onChange({ ...config, link_url: e.target.value })} />
+      </div>
+      <div>
+        <label className="text-sm font-medium">Button Text</label>
+        <Input placeholder="Shop Now →" value={config.button_text || ""} onChange={e => onChange({ ...config, button_text: e.target.value })} />
+      </div>
+    </div>
+  );
+};
+
+const TextBlockConfig = ({ config, onChange }: { config: SectionConfig; onChange: (c: SectionConfig) => void }) => (
+  <div className="space-y-3">
+    <div>
+      <label className="text-sm font-medium">Heading</label>
+      <Input placeholder="Summer Collection" value={config.heading || ""} onChange={e => onChange({ ...config, heading: e.target.value })} />
+    </div>
+    <div>
+      <label className="text-sm font-medium">Description</label>
+      <Textarea placeholder="Explore our latest collection..." value={config.description || ""} onChange={e => onChange({ ...config, description: e.target.value })} rows={3} />
+    </div>
+    <div>
+      <label className="text-sm font-medium">Button Text</label>
+      <Input placeholder="Shop Now" value={config.button_text || ""} onChange={e => onChange({ ...config, button_text: e.target.value })} />
+    </div>
+    <div>
+      <label className="text-sm font-medium">Button Link</label>
+      <Input placeholder="/shop" value={config.button_link || ""} onChange={e => onChange({ ...config, button_link: e.target.value })} />
+    </div>
+  </div>
+);
+
+const AdminPageBuilder = () => {
+  const { toast } = useToast();
+  const [sections, setSections] = useState<PageSection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingSection, setEditingSection] = useState<PageSection | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Form state
+  const [formTitle, setFormTitle] = useState("");
+  const [formSubtitle, setFormSubtitle] = useState("");
+  const [formType, setFormType] = useState("product_row");
+  const [formConfig, setFormConfig] = useState<SectionConfig>({});
+  const [formVisible, setFormVisible] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  const fetchSections = useCallback(async () => {
+    const session = getSession();
+    if (!session) return;
+    try {
+      const { data, error } = await supabase.functions.invoke("manage-homepage-sections", {
+        body: { action: "list", email: session.email, token: session.token },
+      });
+      if (error) throw error;
+      setSections((data.sections || []) as PageSection[]);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => { fetchSections(); }, [fetchSections]);
+
+  const openCreate = () => {
+    setEditingSection(null);
+    setFormTitle("");
+    setFormSubtitle("");
+    setFormType("product_row");
+    setFormConfig({});
+    setFormVisible(true);
+    setDialogOpen(true);
+  };
+
+  const openEdit = (section: PageSection) => {
+    setEditingSection(section);
+    setFormTitle(section.title);
+    setFormSubtitle(section.subtitle);
+    setFormType(section.section_type);
+    setFormConfig(section.config || {});
+    setFormVisible(section.is_visible);
+    setDialogOpen(true);
+  };
+
+  const handleSave = async () => {
+    const session = getSession();
+    if (!session) return;
+    if (!formTitle.trim()) {
+      toast({ title: "Title is required", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    try {
+      if (editingSection) {
+        await supabase.functions.invoke("manage-homepage-sections", {
+          body: {
+            action: "update",
+            email: session.email,
+            token: session.token,
+            section: {
+              id: editingSection.id,
+              title: formTitle,
+              subtitle: formSubtitle,
+              is_visible: formVisible,
+              sort_order: editingSection.sort_order,
+              config: formConfig,
+            },
+          },
+        });
+        toast({ title: "Section updated" });
+      } else {
+        const key = formTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_");
+        await supabase.functions.invoke("manage-homepage-sections", {
+          body: {
+            action: "create",
+            email: session.email,
+            token: session.token,
+            section: {
+              section_key: `custom_${key}_${Date.now()}`,
+              title: formTitle,
+              subtitle: formSubtitle,
+              is_visible: formVisible,
+              sort_order: sections.length + 1,
+              section_type: formType,
+              config: formConfig,
+            },
+          },
+        });
+        toast({ title: "Section created" });
+      }
+      setDialogOpen(false);
+      fetchSections();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleToggle = async (section: PageSection) => {
+    const session = getSession();
+    if (!session) return;
+    const updated = { ...section, is_visible: !section.is_visible };
+    setSections(prev => prev.map(s => s.id === section.id ? updated : s));
+    try {
+      await supabase.functions.invoke("manage-homepage-sections", {
+        body: { action: "update", email: session.email, token: session.token, section: updated },
+      });
+    } catch {
+      setSections(prev => prev.map(s => s.id === section.id ? section : s));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const session = getSession();
+    if (!session) return;
+    try {
+      await supabase.functions.invoke("manage-homepage-sections", {
+        body: { action: "delete", email: session.email, token: session.token, section: { id: deleteId } },
+      });
+      toast({ title: "Section deleted" });
+      setDeleteId(null);
+      fetchSections();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIdx = sections.findIndex(s => s.id === active.id);
+    const newIdx = sections.findIndex(s => s.id === over.id);
+    const reordered = arrayMove(sections, oldIdx, newIdx).map((s, i) => ({ ...s, sort_order: i + 1 }));
+    setSections(reordered);
+
+    const session = getSession();
+    if (!session) return;
+    try {
+      await supabase.functions.invoke("manage-homepage-sections", {
+        body: {
+          action: "reorder",
+          email: session.email,
+          token: session.token,
+          updates: reordered.map(s => ({ id: s.id, sort_order: s.sort_order })),
+        },
+      });
+    } catch {
+      fetchSections();
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <LayoutTemplate className="h-5 w-5 text-primary" />
+          <h1 className="text-2xl font-heading font-bold">Page Builder</h1>
+        </div>
+        <Button onClick={openCreate}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Section
+        </Button>
+      </div>
+
+      <p className="text-sm text-muted-foreground">
+        Build your homepage by adding product rows, banners, and text blocks. Drag to reorder.
+      </p>
+
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2">
+            {sections.length === 0 ? (
+              <div className="text-center py-12 border border-dashed border-border rounded-lg">
+                <LayoutTemplate className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground">No sections yet. Click "Add Section" to start building.</p>
+              </div>
+            ) : (
+              sections.map(section => (
+                <SortableSectionCard
+                  key={section.id}
+                  section={section}
+                  onEdit={openEdit}
+                  onToggle={handleToggle}
+                  onDelete={id => setDeleteId(id)}
+                />
+              ))
+            )}
+          </div>
+        </SortableContext>
+      </DndContext>
+
+      {/* Create / Edit Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingSection ? "Edit Section" : "Add New Section"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Section Title</label>
+              <Input placeholder="e.g. Nike Collection" value={formTitle} onChange={e => setFormTitle(e.target.value)} />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Subtitle / Description</label>
+              <Input placeholder="Brief description" value={formSubtitle} onChange={e => setFormSubtitle(e.target.value)} />
+            </div>
+
+            {!editingSection && (
+              <div>
+                <label className="text-sm font-medium">Section Type</label>
+                <Select value={formType} onValueChange={v => { setFormType(v); setFormConfig({}); }}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {SECTION_TYPES.map(t => (
+                      <SelectItem key={t.value} value={t.value}>
+                        <div className="flex items-center gap-2">
+                          <t.icon className="h-4 w-4" />
+                          <span>{t.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="border-t pt-4">
+              <label className="text-sm font-medium mb-2 block">Configuration</label>
+              {(editingSection?.section_type || formType) === "product_row" && <ProductRowConfig config={formConfig} onChange={setFormConfig} />}
+              {(editingSection?.section_type || formType) === "banner" && <BannerConfig config={formConfig} onChange={setFormConfig} />}
+              {(editingSection?.section_type || formType) === "text_block" && <TextBlockConfig config={formConfig} onChange={setFormConfig} />}
+              {!["product_row", "banner", "text_block"].includes(editingSection?.section_type || formType) && (
+                <p className="text-sm text-muted-foreground">Built-in section — only title and visibility can be changed.</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center gap-2">
+                <Switch checked={formVisible} onCheckedChange={setFormVisible} />
+                <span className="text-sm">Visible on homepage</span>
+              </div>
+            </div>
+
+            <Button onClick={handleSave} className="w-full" disabled={saving}>
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {editingSection ? "Save Changes" : "Create Section"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={open => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Section?</AlertDialogTitle>
+            <AlertDialogDescription>This will permanently remove this section from the homepage.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default AdminPageBuilder;
