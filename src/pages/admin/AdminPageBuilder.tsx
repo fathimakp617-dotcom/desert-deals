@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -28,20 +29,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { GripVertical, Plus, Loader2, Trash2, Pencil, Eye, EyeOff, LayoutTemplate, ShoppingBag, ImageIcon, Type, Rows3 } from "lucide-react";
+import { GripVertical, Plus, Loader2, Trash2, Pencil, Eye, EyeOff, LayoutTemplate, ShoppingBag, ImageIcon, Type, Rows3, Monitor, PanelLeft, ArrowUp, ArrowDown } from "lucide-react";
 import {
   DndContext,
   closestCenter,
   PointerSensor,
+  KeyboardSensor,
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   verticalListSortingStrategy,
   useSortable,
+  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -101,37 +106,68 @@ const typeLabel = (type: string) => {
   return t?.label || type;
 };
 
-// Sortable card
-const SortableSectionCard = ({ section, onEdit, onToggle, onDelete }: {
+// ─── Sortable card ───
+const SortableSectionCard = ({ section, onEdit, onToggle, onDelete, onMoveUp, onMoveDown, isFirst, isLast }: {
   section: PageSection;
   onEdit: (s: PageSection) => void;
   onToggle: (s: PageSection) => void;
   onDelete: (id: string) => void;
+  onMoveUp: (id: string) => void;
+  onMoveDown: (id: string) => void;
+  isFirst: boolean;
+  isLast: boolean;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
-  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1, zIndex: isDragging ? 50 : undefined };
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
 
   const config = section.config || {};
 
   return (
-    <div ref={setNodeRef} style={style} className={`flex items-start gap-3 bg-card border border-border rounded-lg p-4 ${isDragging ? "shadow-lg ring-2 ring-primary" : ""}`}>
-      <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none p-1 mt-0.5 rounded hover:bg-muted shrink-0">
-        <GripVertical className="h-4 w-4 text-muted-foreground" />
-      </button>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-start gap-3 bg-card border rounded-lg p-4 transition-shadow ${
+        isDragging ? "shadow-xl ring-2 ring-primary border-primary" : "border-border hover:shadow-md"
+      } ${!section.is_visible ? "opacity-60" : ""}`}
+    >
+      <div className="flex flex-col items-center gap-0.5 shrink-0">
+        <button
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing touch-none p-1.5 rounded hover:bg-muted"
+          title="Drag to reorder"
+        >
+          <GripVertical className="h-5 w-5 text-muted-foreground" />
+        </button>
+        <button onClick={() => onMoveUp(section.id)} disabled={isFirst} className="p-0.5 rounded hover:bg-muted disabled:opacity-30" title="Move up">
+          <ArrowUp className="h-3.5 w-3.5 text-muted-foreground" />
+        </button>
+        <button onClick={() => onMoveDown(section.id)} disabled={isLast} className="p-0.5 rounded hover:bg-muted disabled:opacity-30" title="Move down">
+          <ArrowDown className="h-3.5 w-3.5 text-muted-foreground" />
+        </button>
+      </div>
 
-      {/* Preview */}
+      {/* Info */}
       <div className="flex-1 min-w-0 space-y-1">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-muted-foreground">{typeIcon(section.section_type)}</span>
           <span className="font-medium text-sm truncate">{section.title || "Untitled"}</span>
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{typeLabel(section.section_type)}</span>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${section.is_visible ? "bg-emerald-500/10 text-emerald-600" : "bg-destructive/10 text-destructive"}`}>
+            {section.is_visible ? "Visible" : "Hidden"}
+          </span>
         </div>
-        <p className="text-xs text-muted-foreground truncate">{section.subtitle}</p>
+        {section.subtitle && <p className="text-xs text-muted-foreground truncate">{section.subtitle}</p>}
         {section.section_type === "product_row" && config.brand && (
           <p className="text-xs text-primary">Brand: {config.brand}</p>
         )}
         {section.section_type === "banner" && config.image_url && (
-          <div className="w-full max-w-[200px] h-14 rounded overflow-hidden bg-muted mt-1">
+          <div className="w-full max-w-[240px] h-16 rounded overflow-hidden bg-muted mt-1">
             <img src={config.image_url} alt="" className="w-full h-full object-cover" />
           </div>
         )}
@@ -141,7 +177,7 @@ const SortableSectionCard = ({ section, onEdit, onToggle, onDelete }: {
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
-        <button onClick={() => onToggle(section)} className="p-1.5 rounded hover:bg-muted">
+        <button onClick={() => onToggle(section)} className="p-1.5 rounded hover:bg-muted" title={section.is_visible ? "Hide" : "Show"}>
           {section.is_visible ? <Eye className="h-4 w-4 text-emerald-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
         </button>
         <Button size="icon" variant="ghost" onClick={() => onEdit(section)}><Pencil className="h-4 w-4" /></Button>
@@ -151,7 +187,87 @@ const SortableSectionCard = ({ section, onEdit, onToggle, onDelete }: {
   );
 };
 
-// Config forms per type
+// Drag overlay card (shown while dragging)
+const DragOverlayCard = ({ section }: { section: PageSection }) => (
+  <div className="flex items-center gap-3 bg-card border-2 border-primary rounded-lg p-4 shadow-2xl opacity-90">
+    <GripVertical className="h-5 w-5 text-primary shrink-0" />
+    <span className="text-muted-foreground">{typeIcon(section.section_type)}</span>
+    <span className="font-medium text-sm">{section.title || "Untitled"}</span>
+    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground ml-auto">{typeLabel(section.section_type)}</span>
+  </div>
+);
+
+// ─── Preview components ───
+const PreviewProductRow = ({ section }: { section: PageSection }) => (
+  <div className="border border-dashed border-border rounded-lg p-4 bg-muted/30">
+    <div className="flex items-center justify-between mb-3">
+      <h3 className="font-heading font-bold text-foreground">{section.title}</h3>
+      {section.config?.shop_link && (
+        <span className="text-xs text-primary">View All →</span>
+      )}
+    </div>
+    <div className="flex gap-3 overflow-hidden">
+      {[1,2,3,4].map(i => (
+        <div key={i} className="w-[140px] shrink-0 space-y-2">
+          <div className="w-full h-[140px] rounded-lg bg-muted animate-pulse" />
+          <div className="h-3 w-3/4 rounded bg-muted animate-pulse" />
+          <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
+        </div>
+      ))}
+    </div>
+    <p className="text-[10px] text-muted-foreground mt-2">Brand: {section.config?.brand || "—"}</p>
+  </div>
+);
+
+const PreviewBanner = ({ section }: { section: PageSection }) => (
+  <div className="rounded-lg overflow-hidden relative bg-muted">
+    {section.config?.image_url ? (
+      <img src={section.config.image_url} alt={section.title} className="w-full h-[120px] sm:h-[180px] object-cover" />
+    ) : (
+      <div className="w-full h-[120px] sm:h-[180px] flex items-center justify-center">
+        <ImageIcon className="h-8 w-8 text-muted-foreground" />
+      </div>
+    )}
+    <div className="absolute bottom-4 left-4">
+      <span className="bg-foreground text-background text-xs px-4 py-1.5 rounded-full">
+        {section.config?.button_text || "Shop Now →"}
+      </span>
+    </div>
+  </div>
+);
+
+const PreviewTextBlock = ({ section }: { section: PageSection }) => (
+  <div className="rounded-lg border border-dashed border-border p-6 text-center bg-muted/20">
+    {section.config?.heading && <h3 className="text-lg font-heading font-bold text-foreground mb-1">{section.config.heading}</h3>}
+    {section.config?.description && <p className="text-sm text-muted-foreground mb-3">{section.config.description}</p>}
+    {section.config?.button_text && (
+      <span className="inline-block bg-foreground text-background text-xs px-5 py-2 rounded-full">
+        {section.config.button_text}
+      </span>
+    )}
+  </div>
+);
+
+const PreviewBuiltIn = ({ section }: { section: PageSection }) => (
+  <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20 flex items-center gap-3">
+    <Rows3 className="h-5 w-5 text-muted-foreground shrink-0" />
+    <div>
+      <p className="text-sm font-medium text-foreground">{section.title}</p>
+      <p className="text-xs text-muted-foreground">Built-in section</p>
+    </div>
+  </div>
+);
+
+const SectionPreview = ({ section }: { section: PageSection }) => {
+  switch (section.section_type) {
+    case "product_row": return <PreviewProductRow section={section} />;
+    case "banner": return <PreviewBanner section={section} />;
+    case "text_block": return <PreviewTextBlock section={section} />;
+    default: return <PreviewBuiltIn section={section} />;
+  }
+};
+
+// ─── Config forms ───
 const ProductRowConfig = ({ config, onChange }: { config: SectionConfig; onChange: (c: SectionConfig) => void }) => (
   <div className="space-y-3">
     <div>
@@ -232,6 +348,7 @@ const TextBlockConfig = ({ config, onChange }: { config: SectionConfig; onChange
   </div>
 );
 
+// ─── Main Component ───
 const AdminPageBuilder = () => {
   const { toast } = useToast();
   const [sections, setSections] = useState<PageSection[]>([]);
@@ -239,6 +356,8 @@ const AdminPageBuilder = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<PageSection | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"builder" | "preview">("builder");
 
   // Form state
   const [formTitle, setFormTitle] = useState("");
@@ -248,7 +367,10 @@ const AdminPageBuilder = () => {
   const [formVisible, setFormVisible] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const fetchSections = useCallback(async () => {
     const session = getSession();
@@ -373,14 +495,9 @@ const AdminPageBuilder = () => {
     }
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIdx = sections.findIndex(s => s.id === active.id);
-    const newIdx = sections.findIndex(s => s.id === over.id);
-    const reordered = arrayMove(sections, oldIdx, newIdx).map((s, i) => ({ ...s, sort_order: i + 1 }));
-    setSections(reordered);
-
+  const reorderAndSave = async (reordered: PageSection[]) => {
+    const withOrder = reordered.map((s, i) => ({ ...s, sort_order: i + 1 }));
+    setSections(withOrder);
     const session = getSession();
     if (!session) return;
     try {
@@ -389,13 +506,40 @@ const AdminPageBuilder = () => {
           action: "reorder",
           email: session.email,
           token: session.token,
-          updates: reordered.map(s => ({ id: s.id, sort_order: s.sort_order })),
+          updates: withOrder.map(s => ({ id: s.id, sort_order: s.sort_order })),
         },
       });
     } catch {
       fetchSections();
     }
   };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    setActiveId(null);
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIdx = sections.findIndex(s => s.id === active.id);
+    const newIdx = sections.findIndex(s => s.id === over.id);
+    await reorderAndSave(arrayMove(sections, oldIdx, newIdx));
+  };
+
+  const handleMoveUp = (id: string) => {
+    const idx = sections.findIndex(s => s.id === id);
+    if (idx <= 0) return;
+    reorderAndSave(arrayMove(sections, idx, idx - 1));
+  };
+
+  const handleMoveDown = (id: string) => {
+    const idx = sections.findIndex(s => s.id === id);
+    if (idx < 0 || idx >= sections.length - 1) return;
+    reorderAndSave(arrayMove(sections, idx, idx + 1));
+  };
+
+  const activeSection = activeId ? sections.find(s => s.id === activeId) : null;
 
   if (loading) {
     return (
@@ -407,43 +551,100 @@ const AdminPageBuilder = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <LayoutTemplate className="h-5 w-5 text-primary" />
           <h1 className="text-2xl font-heading font-bold">Page Builder</h1>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Section
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* View toggle */}
+          <div className="flex bg-muted rounded-lg p-0.5">
+            <button
+              onClick={() => setViewMode("builder")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "builder" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <PanelLeft className="h-3.5 w-3.5 inline mr-1" />
+              Builder
+            </button>
+            <button
+              onClick={() => setViewMode("preview")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "preview" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <Monitor className="h-3.5 w-3.5 inline mr-1" />
+              Preview
+            </button>
+          </div>
+          <Button onClick={openCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Section
+          </Button>
+        </div>
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Build your homepage by adding product rows, banners, and text blocks. Drag to reorder.
+        {viewMode === "builder"
+          ? "Drag cards or use arrows to reorder. Toggle visibility and edit configuration."
+          : "Preview how sections will appear on the homepage."}
       </p>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
-            {sections.length === 0 ? (
-              <div className="text-center py-12 border border-dashed border-border rounded-lg">
-                <LayoutTemplate className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground">No sections yet. Click "Add Section" to start building.</p>
-              </div>
+      {/* ─── Builder View ─── */}
+      {viewMode === "builder" && (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {sections.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-border rounded-lg">
+                  <LayoutTemplate className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground">No sections yet. Click "Add Section" to start building.</p>
+                </div>
+              ) : (
+                sections.map((section, idx) => (
+                  <SortableSectionCard
+                    key={section.id}
+                    section={section}
+                    onEdit={openEdit}
+                    onToggle={handleToggle}
+                    onDelete={id => setDeleteId(id)}
+                    onMoveUp={handleMoveUp}
+                    onMoveDown={handleMoveDown}
+                    isFirst={idx === 0}
+                    isLast={idx === sections.length - 1}
+                  />
+                ))
+              )}
+            </div>
+          </SortableContext>
+          <DragOverlay>
+            {activeSection ? <DragOverlayCard section={activeSection} /> : null}
+          </DragOverlay>
+        </DndContext>
+      )}
+
+      {/* ─── Preview View ─── */}
+      {viewMode === "preview" && (
+        <div className="border border-border rounded-xl bg-background overflow-hidden">
+          <div className="bg-muted/50 px-4 py-2 border-b border-border flex items-center gap-2">
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-destructive/60" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+              <div className="w-3 h-3 rounded-full bg-emerald-500/60" />
+            </div>
+            <span className="text-xs text-muted-foreground ml-2">Homepage Preview</span>
+          </div>
+          <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+            {sections.filter(s => s.is_visible).length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No visible sections to preview.</p>
             ) : (
-              sections.map(section => (
-                <SortableSectionCard
-                  key={section.id}
-                  section={section}
-                  onEdit={openEdit}
-                  onToggle={handleToggle}
-                  onDelete={id => setDeleteId(id)}
-                />
+              sections.filter(s => s.is_visible).map(section => (
+                <div key={section.id}>
+                  <SectionPreview section={section} />
+                </div>
               ))
             )}
           </div>
-        </SortableContext>
-      </DndContext>
+        </div>
+      )}
 
       {/* Create / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
