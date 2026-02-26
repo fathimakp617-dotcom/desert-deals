@@ -120,7 +120,53 @@ const OrderViewDialog = ({ order, open, onOpenChange }: OrderViewDialogProps) =>
     setIsSharing(true);
 
     const phone = order.customer_phone.replace(/[^0-9]/g, '');
-    const message = `*Order Received ✅*\n\nThank you for your order with Desert Deal!\n\nTo proceed with your delivery, kindly confirm your order and share your full location, including any nearby landmarks. Our delivery partner is Max Express Courier.\n\n📦 *Delivery Timings:*\nWe deliver from Monday to Saturday, between 8 AM and 8 PM.\n🚫 No deliveries on Sundays.\n\n🕒 *Please Note:*\nSome areas have direct delivery service between 9 AM and 9 PM.\nIn certain areas, there's a break between 1 PM and 5 PM, but deliveries resume after 10 PM.\n\nIf you have any confusion or need to double-check, feel free to visit our official website:\n👉 https://desertsdeals.com/\n\nOnce we receive your confirmation and delivery details, we'll schedule your order and send you the tracking information.\n\nWe look forward to your reply.\n\nThank you for choosing Desert Deal!`;
+    const message = `*Order Received* ✅
+
+Thank you for shopping with Desert Deal!
+
+To proceed with your delivery, please confirm your order and share your complete location, including nearby landmarks.
+
+Our delivery partner is Max Express Courier.
+
+📦 *Delivery Schedule:*
+
+Monday to Saturday | 8:00 AM – 8:00 PM
+
+🚫 No delivery on Sundays
+
+🕒 *Area Timing Notice:*
+
+Some locations: 9:00 AM – 9:00 PM
+
+In certain areas, there is a break from 1:00 PM – 5:00 PM, with deliveries resuming after 10:00 PM.
+
+⚠️ *Return & Refund Policy – Please Read Carefully*
+
+✅ You may check the item before the courier leaves your location.
+
+If returned immediately, no charges will apply.
+
+❌ If you accept the item and complete the payment, and later request a return:
+
+The delivery charge (20 AED) will be deducted.
+
+The return delivery charge (25 AED) will also be deducted.
+
+The refund will be processed after deducting both charges from the total bill amount.
+
+Refund Amount = Product Price – 20 AED – 25 AED
+
+*Please check your order carefully at the time of delivery to avoid additional deductions.*
+
+For more details, visit our official website:
+
+👉 https://www.desertsdeals.com/
+
+Once we receive your confirmation and full address, we will schedule your delivery and share the tracking details.
+
+We look forward to your reply.
+
+Thank you for choosing *Desert Deal!*`;
 
     // Pre-open WhatsApp window BEFORE async work to avoid popup blocker
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
