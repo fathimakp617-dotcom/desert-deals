@@ -57,6 +57,7 @@ interface SectionConfig {
   brand?: string;
   shop_link?: string;
   image_url?: string;
+  images?: string[];
   link_url?: string;
   heading?: string;
   description?: string;
@@ -163,17 +164,10 @@ const SortableSectionCard = ({ section, onEdit, onToggle, onDelete, onMoveUp, on
           </span>
         </div>
         {section.subtitle && <p className="text-xs text-muted-foreground truncate">{section.subtitle}</p>}
-        {section.section_type === "product_row" && config.brand && (
-          <p className="text-xs text-primary">Brand: {config.brand}</p>
-        )}
-        {section.section_type === "banner" && config.image_url && (
-          <div className="w-full max-w-[240px] h-16 rounded overflow-hidden bg-muted mt-1">
-            <img src={config.image_url} alt="" className="w-full h-full object-cover" />
-          </div>
-        )}
-        {section.section_type === "text_block" && config.heading && (
-          <p className="text-xs font-medium">{config.heading}</p>
-        )}
+        {/* Inline preview for all section types */}
+        <div className="mt-1">
+          <SectionPreview section={section} />
+        </div>
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
@@ -219,22 +213,42 @@ const PreviewProductRow = ({ section }: { section: PageSection }) => (
   </div>
 );
 
-const PreviewBanner = ({ section }: { section: PageSection }) => (
-  <div className="rounded-lg overflow-hidden relative bg-muted">
-    {section.config?.image_url ? (
-      <img src={section.config.image_url} alt={section.title} className="w-full h-[120px] sm:h-[180px] object-cover" />
-    ) : (
-      <div className="w-full h-[120px] sm:h-[180px] flex items-center justify-center">
-        <ImageIcon className="h-8 w-8 text-muted-foreground" />
+const PreviewBanner = ({ section }: { section: PageSection }) => {
+  const images = section.config?.images || (section.config?.image_url ? [section.config.image_url] : []);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const timer = setInterval(() => setCurrentSlide(prev => (prev + 1) % images.length), 3000);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
+  return (
+    <div className="rounded-lg overflow-hidden relative bg-muted">
+      {images.length > 0 ? (
+        <div className="relative">
+          <img src={images[currentSlide] || images[0]} alt={section.title} className="w-full h-[120px] sm:h-[180px] object-cover transition-opacity duration-500" />
+          {images.length > 1 && (
+            <div className="absolute bottom-8 right-4 flex gap-1">
+              {images.map((_, i) => (
+                <button key={i} onClick={() => setCurrentSlide(i)} className={`w-2 h-2 rounded-full transition-colors ${i === currentSlide ? "bg-foreground" : "bg-foreground/40"}`} />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="w-full h-[120px] sm:h-[180px] flex items-center justify-center">
+          <ImageIcon className="h-8 w-8 text-muted-foreground" />
+        </div>
+      )}
+      <div className="absolute bottom-4 left-4">
+        <span className="bg-foreground text-background text-xs px-4 py-1.5 rounded-full">
+          {section.config?.button_text || "Shop Now →"}
+        </span>
       </div>
-    )}
-    <div className="absolute bottom-4 left-4">
-      <span className="bg-foreground text-background text-xs px-4 py-1.5 rounded-full">
-        {section.config?.button_text || "Shop Now →"}
-      </span>
     </div>
-  </div>
-);
+  );
+};
 
 const PreviewTextBlock = ({ section }: { section: PageSection }) => (
   <div className="rounded-lg border border-dashed border-border p-6 text-center bg-muted/20">
@@ -291,30 +305,74 @@ const ProductRowConfig = ({ config, onChange }: { config: SectionConfig; onChang
 );
 
 const BannerConfig = ({ config, onChange }: { config: SectionConfig; onChange: (c: SectionConfig) => void }) => {
-  const handleUpload = async (file: File) => {
-    const ext = file.name.split(".").pop();
-    const path = `banners/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("product-images").upload(path, file);
-    if (error) return;
-    const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
-    onChange({ ...config, image_url: urlData.publicUrl });
+  const images = config.images || (config.image_url ? [config.image_url] : []);
+
+  const handleUpload = async (files: FileList) => {
+    const newImages = [...images];
+    for (const file of Array.from(files)) {
+      const ext = file.name.split(".").pop();
+      const path = `banners/${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext}`;
+      const { error } = await supabase.storage.from("product-images").upload(path, file);
+      if (error) continue;
+      const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
+      newImages.push(urlData.publicUrl);
+    }
+    onChange({ ...config, images: newImages, image_url: newImages[0] || "" });
+  };
+
+  const removeImage = (idx: number) => {
+    const updated = images.filter((_, i) => i !== idx);
+    onChange({ ...config, images: updated, image_url: updated[0] || "" });
   };
 
   return (
     <div className="space-y-3">
       <div>
-        <label className="text-sm font-medium">Banner Image URL</label>
-        <Input placeholder="https://..." value={config.image_url || ""} onChange={e => onChange({ ...config, image_url: e.target.value })} />
+        <label className="text-sm font-medium">Banner Images</label>
+        <p className="text-xs text-muted-foreground mb-2">Upload multiple images to create a slider. Single image = static banner.</p>
+        <Input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={e => { if (e.target.files?.length) handleUpload(e.target.files); }}
+        />
       </div>
-      <div>
-        <label className="text-sm font-medium">Or Upload Image</label>
-        <Input type="file" accept="image/*" onChange={e => { if (e.target.files?.[0]) handleUpload(e.target.files[0]); }} />
-      </div>
-      {config.image_url && (
-        <div className="w-full h-32 rounded-lg overflow-hidden bg-muted">
-          <img src={config.image_url} alt="Preview" className="w-full h-full object-cover" />
+      {images.length > 0 && (
+        <div className="grid grid-cols-3 gap-2">
+          {images.map((url, idx) => (
+            <div key={idx} className="relative group rounded-lg overflow-hidden bg-muted h-20">
+              <img src={url} alt={`Slide ${idx + 1}`} className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => removeImage(idx)}
+                className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                ×
+              </button>
+              <span className="absolute bottom-1 left-1 bg-foreground/70 text-background text-[10px] px-1.5 rounded">{idx + 1}</span>
+            </div>
+          ))}
         </div>
       )}
+      <div>
+        <label className="text-sm font-medium">Or Paste Image URL</label>
+        <div className="flex gap-2">
+          <Input
+            placeholder="https://..."
+            onKeyDown={e => {
+              if (e.key === "Enter") {
+                const val = (e.target as HTMLInputElement).value.trim();
+                if (val) {
+                  const updated = [...images, val];
+                  onChange({ ...config, images: updated, image_url: updated[0] || "" });
+                  (e.target as HTMLInputElement).value = "";
+                }
+                e.preventDefault();
+              }
+            }}
+          />
+        </div>
+      </div>
       <div>
         <label className="text-sm font-medium">Link URL</label>
         <Input placeholder="/shop?brand=nike" value={config.link_url || ""} onChange={e => onChange({ ...config, link_url: e.target.value })} />

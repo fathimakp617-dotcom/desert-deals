@@ -148,8 +148,8 @@ const Index = () => {
         if (s.section_type === "product_row" && cfg.brand) {
           return <BrandProductRow key={s.id} brand={cfg.brand} title={s.title} shopLink={cfg.shop_link} />;
         }
-        if (s.section_type === "banner" && cfg.image_url) {
-          return <DynamicBanner key={s.id} imageUrl={cfg.image_url} linkUrl={cfg.link_url || "/shop"} buttonText={cfg.button_text} title={s.title} />;
+        if (s.section_type === "banner" && (cfg.image_url || cfg.images?.length)) {
+          return <DynamicBanner key={s.id} imageUrl={cfg.image_url || cfg.images?.[0] || ""} images={cfg.images} linkUrl={cfg.link_url || "/shop"} buttonText={cfg.button_text} title={s.title} />;
         }
         if (s.section_type === "text_block") {
           return <DynamicTextBlock key={s.id} heading={cfg.heading || s.title} description={cfg.description || s.subtitle} buttonText={cfg.button_text} buttonLink={cfg.button_link} />;
