@@ -262,15 +262,28 @@ const PreviewTextBlock = ({ section }: { section: PageSection }) => (
   </div>
 );
 
-const PreviewBuiltIn = ({ section }: { section: PageSection }) => (
-  <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20 flex items-center gap-3">
-    <Rows3 className="h-5 w-5 text-muted-foreground shrink-0" />
-    <div>
-      <p className="text-sm font-medium text-foreground">{section.title}</p>
-      <p className="text-xs text-muted-foreground">Built-in section</p>
+const isBuiltInBanner = (key: string) => /_ad$|_ad_|banner|promo/.test(key);
+const isBuiltInProductRow = (key: string) => /_collection$/.test(key);
+
+const PreviewBuiltIn = ({ section }: { section: PageSection }) => {
+  const config = section.config || {};
+  // If it has images or image_url, show banner preview
+  if (config.image_url || (config.images && config.images.length > 0)) {
+    return <PreviewBanner section={section} />;
+  }
+  if (config.brand) {
+    return <PreviewProductRow section={section} />;
+  }
+  return (
+    <div className="border border-dashed border-border rounded-lg p-4 bg-muted/20 flex items-center gap-3">
+      <Rows3 className="h-5 w-5 text-muted-foreground shrink-0" />
+      <div>
+        <p className="text-sm font-medium text-foreground">{section.title}</p>
+        <p className="text-xs text-muted-foreground">Built-in section</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const SectionPreview = ({ section }: { section: PageSection }) => {
   switch (section.section_type) {
@@ -745,7 +758,13 @@ const AdminPageBuilder = () => {
               {(editingSection?.section_type || formType) === "banner" && <BannerConfig config={formConfig} onChange={setFormConfig} />}
               {(editingSection?.section_type || formType) === "text_block" && <TextBlockConfig config={formConfig} onChange={setFormConfig} />}
               {!["product_row", "banner", "text_block"].includes(editingSection?.section_type || formType) && (
-                <p className="text-sm text-muted-foreground">Built-in section — only title and visibility can be changed.</p>
+                editingSection && (isBuiltInBanner(editingSection.section_key) || isBuiltInBanner(editingSection.title.toLowerCase())) ? (
+                  <BannerConfig config={formConfig} onChange={setFormConfig} />
+                ) : editingSection && isBuiltInProductRow(editingSection.section_key) ? (
+                  <ProductRowConfig config={formConfig} onChange={setFormConfig} />
+                ) : (
+                  <p className="text-sm text-muted-foreground">Built-in section — only title and visibility can be changed.</p>
+                )
               )}
             </div>
 

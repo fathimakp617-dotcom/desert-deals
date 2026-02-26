@@ -143,8 +143,12 @@ const Index = () => {
     return sections
       .filter(s => sectionMap[s.section_key] || s.section_type === "product_row" || s.section_type === "banner" || s.section_type === "text_block")
       .map(s => {
-        if (sectionMap[s.section_key]) return sectionMap[s.section_key];
         const cfg = (s.config || {}) as Record<string, any>;
+        // If a built-in section has admin-configured images, use DynamicBanner instead of default
+        if (sectionMap[s.section_key] && (cfg.images?.length > 0 || cfg.image_url)) {
+          return <DynamicBanner key={s.id} imageUrl={cfg.image_url || cfg.images?.[0] || ""} images={cfg.images} linkUrl={cfg.link_url || "/shop"} buttonText={cfg.button_text} title={s.title} />;
+        }
+        if (sectionMap[s.section_key]) return sectionMap[s.section_key];
         if (s.section_type === "product_row" && cfg.brand) {
           return <BrandProductRow key={s.id} brand={cfg.brand} title={s.title} shopLink={cfg.shop_link} />;
         }
