@@ -135,6 +135,7 @@ const Index = () => {
       nike_collection: <BrandProductRow key="nike_collection" brand="nike" title="Nike Collection" />,
       new_balance_promo: <NewBalancePromoGrid key="new_balance_promo" />,
       new_balance_collection: <BrandProductRow key="new_balance_collection" brand="new balance" title="New Balance Collection" />,
+      asics_collection: <BrandProductRow key="asics_collection" brand="asics" title="Asics Collection" shopLink="/shop?brand=asics" />,
       testimonials: <Testimonials key="testimonials" />,
       features_bar: <FeaturesBar key="features_bar" />,
     };
