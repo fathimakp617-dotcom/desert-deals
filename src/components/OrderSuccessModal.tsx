@@ -56,46 +56,47 @@ const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
     }
   }, [orderNumber]);
 
-  const buildWhatsAppMessage = (data: OrderData): string => {
-    const itemsList = data.items
-      .map((item) => `• ${item.name} × ${item.quantity} — ${Math.round(item.price * item.quantity)} AED`)
-      .join("\n");
-
+  const buildWhatsAppMessage = (): string => {
     return `*Order Received* ✅
 
 Thank you for shopping with Desert Deal!
 
 To proceed with your delivery, please confirm your order and share your complete location, including nearby landmarks.
 
-📋 *Order Details:*
-Order Number: ${data.order_number}
-${itemsList}
-Total: ${Math.round(data.total)} AED
-
 Our delivery partner is Max Express Courier.
 
 📦 *Delivery Schedule:*
+
 Monday to Saturday | 8:00 AM – 8:00 PM
+
 🚫 No delivery on Sundays
 
 🕒 *Area Timing Notice:*
+
 Some locations: 9:00 AM – 9:00 PM
+
 In certain areas, there is a break from 1:00 PM – 5:00 PM, with deliveries resuming after 10:00 PM.
 
 ⚠️ *Return & Refund Policy – Please Read Carefully*
 
 ✅ You may check the item before the courier leaves your location.
+
 If returned immediately, no charges will apply.
 
 ❌ If you accept the item and complete the payment, and later request a return:
+
 The delivery charge (20 AED) will be deducted.
+
 The return delivery charge (25 AED) will also be deducted.
+
 The refund will be processed after deducting both charges from the total bill amount.
+
 Refund Amount = Product Price – 20 AED – 25 AED
 
 *Please check your order carefully at the time of delivery to avoid additional deductions.*
 
 For more details, visit our official website:
+
 👉 https://www.desertsdeals.com/
 
 Once we receive your confirmation and full address, we will schedule your delivery and share the tracking details.
@@ -115,7 +116,7 @@ Thank you for choosing *Desert Deal!*`;
       const phone = (orderData as any).customer_phone;
       if (phone) {
         const cleanPhone = phone.replace(/[^0-9]/g, "");
-        const message = encodeURIComponent(buildWhatsAppMessage(orderData));
+        const message = encodeURIComponent(buildWhatsAppMessage());
         window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
       }
 
