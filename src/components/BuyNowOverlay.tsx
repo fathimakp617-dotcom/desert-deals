@@ -142,14 +142,9 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
 
               {/* Footer */}
               <div className="p-5 border-t border-border">
-                <div className="flex gap-3">
-                  <Button variant="outline" className="flex-1 font-heading" size="lg" onClick={onClose}>
-                    Keep Shopping
-                  </Button>
-                  <Button className="flex-1 font-heading" size="lg" onClick={handleGoToCheckout}>
-                    Go to Checkout
-                  </Button>
-                </div>
+                <Button className="w-full font-heading" size="lg" onClick={handleGoToCheckout}>
+                  Go to Checkout
+                </Button>
               </div>
             </div>
           </motion.div>
