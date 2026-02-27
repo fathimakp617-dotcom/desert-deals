@@ -17,7 +17,10 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
-  const relatedProducts = products.filter((p) => p.id !== currentProductId);
+  // Show only socks products as cross-selling items
+  const relatedProducts = products.filter(
+    (p) => p.id !== currentProductId && p.category?.toLowerCase().includes("socks")
+  );
 
   if (relatedProducts.length === 0) return null;
 
@@ -29,7 +32,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
     <section className="py-2 sm:py-3 bg-background">
       <div className="px-4 sm:px-6">
         <h2 className="text-xl sm:text-2xl font-heading font-bold tracking-tight mb-6">
-          Related products
+          Complete Your Look
         </h2>
 
         <div className="relative group/scroll">
