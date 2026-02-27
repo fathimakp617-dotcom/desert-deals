@@ -77,7 +77,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
       return [...prev, { product, quantity, selectedSize }];
     });
-    setIsOpen(true);
+    // No drawer — callers handle navigation directly
   };
 
   const removeFromCart = (productId: string, selectedSize?: string) => {
