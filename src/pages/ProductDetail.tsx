@@ -177,7 +177,7 @@ const ProductDetail = () => {
       value: product.price * quantity,
       currency: "AED",
     });
-    navigate("/checkout");
+    setShowBuyNow(true);
   };
 
 
@@ -192,7 +192,7 @@ const ProductDetail = () => {
       return;
     }
     buyNow(product, quantity, `EU ${selectedSize}`);
-    navigate("/checkout");
+    setShowBuyNow(true);
   };
 
   const handleToggleWishlist = () => {
