@@ -23,15 +23,16 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
   const brandLower = brand.toLowerCase().trim();
+  const nonSocksProducts = allProducts.filter(p => !p.category?.toLowerCase().includes("socks"));
   const products = brandLower
-    ? allProducts.filter((p) => {
+    ? nonSocksProducts.filter((p) => {
         if (!p.category) return false;
         const cats = p.category.toLowerCase().split(",").map((c) => c.trim());
         return cats.some(
           (cat) => cat === brandLower || cat === brandLower.replace(/\s+/g, "-")
         );
       })
-    : allProducts;
+    : nonSocksProducts;
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
