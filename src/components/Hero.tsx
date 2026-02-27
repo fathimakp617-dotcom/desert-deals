@@ -28,8 +28,8 @@ const Hero = memo(() => {
   }, [nextSlide]);
 
   return (
-    <section id="home" className="relative w-full mt-[100px] sm:mt-[116px] px-3 sm:px-4">
-      <div className="relative w-full aspect-[16/9] sm:aspect-[16/7] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer bg-muted rounded-xl sm:rounded-2xl" onClick={() => navigate(slides[currentSlide]?.link || "/shop")}>
+    <section id="home" className="relative w-full mt-[100px] sm:mt-[116px]">
+      <div className="relative w-full aspect-[16/9] sm:aspect-[16/7] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer bg-muted rounded-2xl" onClick={() => navigate(slides[currentSlide]?.link || "/shop")}>
         {slides.map((slide, index) => (
           <div
             key={index}
@@ -49,7 +49,7 @@ const Hero = memo(() => {
           </div>
         ))}
 
-        <div className="absolute inset-x-0 top-0 h-24 sm:h-32 bg-gradient-to-b from-black/40 to-transparent z-10 pointer-events-none rounded-t-xl sm:rounded-t-2xl" />
+        <div className="absolute inset-x-0 top-0 h-24 sm:h-32 bg-gradient-to-b from-black/40 to-transparent z-10 pointer-events-none rounded-t-2xl" />
 
         <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 z-10 flex justify-center gap-2">
           {slides.map((_, index) => (

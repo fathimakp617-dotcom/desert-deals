@@ -13,9 +13,9 @@ const PromoBanner = memo(() => {
   const alt = banner?.title || "Promo Banner";
 
   return (
-    <section className="bg-background px-3 sm:px-4">
+    <section className="bg-background">
       <div
-        className="relative w-full overflow-hidden cursor-pointer bg-muted rounded-xl sm:rounded-2xl"
+        className="relative w-full overflow-hidden cursor-pointer bg-muted rounded-2xl"
         onClick={() => navigate(link)}
       >
         <img
