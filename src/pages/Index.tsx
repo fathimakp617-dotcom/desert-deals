@@ -90,7 +90,7 @@ const Index = () => {
         <BrandAdBanner key="on_cloud_ad" position="brand-ad-on" fallbackImg={onCloudAd} fallbackLink="/shop?brand=on-cloud" fallbackAlt="On Cloud Shoes" />
       ),
       on_cloud_collection: (
-        <BrandProductRow key="on_cloud_collection" brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
+        <BrandProductRow key="on_cloud_collection" brand="on-cloud" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
       ),
       adidas_ad: (
         <BrandAdBanner key="adidas_ad" position="brand-ad-adidas" fallbackImg={adidasAd} fallbackLink="/shop?brand=adidas" fallbackAlt="Adidas Shoes">
@@ -193,7 +193,7 @@ const Index = () => {
                 <TopSellers />
                 <PromoGrid />
                 <BrandAdBanner position="brand-ad-on" fallbackImg={onCloudAd} fallbackLink="/shop?brand=on-cloud" fallbackAlt="On Cloud Shoes" />
-                <BrandProductRow brand="on" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
+                <BrandProductRow brand="on-cloud" title="On Cloud Collection" shopLink="/shop?brand=on-cloud" />
                 <BrandProductRow brand="adidas" title="Adidas Collection" />
                 <BrandProductRow brand="nike" title="Nike Collection" />
                 <NewBalancePromoGrid />
