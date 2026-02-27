@@ -420,6 +420,9 @@ const ProductDetail = () => {
                     <span className="text-xl sm:text-2xl lg:text-3xl font-light text-muted-foreground line-through">
                       {formatPrice(product.originalPrice)}
                     </span>
+                    {product.discountPercent > 0 && (
+                      <span className="text-sm font-semibold text-destructive">-{product.discountPercent}%</span>
+                    )}
                   </div>
                 {!isSoldOut ? (
                     <span className="text-xs sm:text-sm font-medium text-green-600">IN STOCK</span>
