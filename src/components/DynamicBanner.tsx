@@ -30,8 +30,8 @@ const DynamicBanner = ({ imageUrl, images, linkUrl, buttonText, title }: Dynamic
                 key={i}
                 src={img}
                 alt={title || `Banner slide ${i + 1}`}
-                className={`w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover transition-opacity duration-700 ${
-                  i === current ? "opacity-100" : "opacity-0 absolute inset-0"
+                className={`w-full h-auto object-contain transition-opacity duration-700 ${
+                  i === current ? "opacity-100 relative" : "opacity-0 absolute inset-0"
                 }`}
                 loading={i === 0 ? "eager" : "lazy"}
               />
