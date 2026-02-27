@@ -93,6 +93,9 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
         } else {
           q = q.eq("category", category);
         }
+      } else if (category === "All") {
+        // Exclude luxury brands from general listing — they have dedicated pages
+        q = q.not("category", "ilike", "%Louis Vuitton%");
       }
 
       if (priceMin > 0) q = q.gte("price", priceMin);
