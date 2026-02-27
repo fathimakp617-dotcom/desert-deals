@@ -22,8 +22,8 @@ const DynamicBanner = ({ imageUrl, images, linkUrl, buttonText, title }: Dynamic
 
   return (
     <section className="bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
-        <Link to={linkUrl} className="block relative rounded-lg overflow-hidden group">
+      <div className="w-full py-6 sm:py-10">
+        <Link to={linkUrl} className="block relative rounded-2xl overflow-hidden group">
           <div className="relative">
             {allImages.map((img, i) => (
               <img
