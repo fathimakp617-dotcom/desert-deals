@@ -29,19 +29,17 @@ const Hero = memo(() => {
 
   return (
     <section id="home" className="relative w-full mt-[100px] sm:mt-[116px]">
-      <div className="relative w-full aspect-[16/9] sm:aspect-[16/7] lg:h-[calc(100vh-116px)] overflow-hidden mx-auto cursor-pointer bg-muted rounded-2xl" onClick={() => navigate(slides[currentSlide]?.link || "/shop")}>
+      <div className="relative w-full overflow-hidden mx-auto cursor-pointer bg-muted rounded-2xl" onClick={() => navigate(slides[currentSlide]?.link || "/shop")}>
         {slides.map((slide, index) => (
           <div
             key={index}
-            className="absolute inset-0 transition-opacity duration-700"
+            className={`w-full transition-opacity duration-700 ${index === 0 ? "relative" : "absolute inset-0"}`}
             style={{ opacity: index === currentSlide ? 1 : 0 }}
           >
             <img
               src={slide.image}
               alt={slide.alt}
-              width={1600}
-              height={900}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-auto object-contain"
               loading={index === 0 ? "eager" : "lazy"}
               decoding="async"
               fetchPriority={index === 0 ? "high" : "auto"}
@@ -49,7 +47,7 @@ const Hero = memo(() => {
           </div>
         ))}
 
-        <div className="absolute inset-x-0 top-0 h-24 sm:h-32 bg-gradient-to-b from-black/40 to-transparent z-10 pointer-events-none rounded-t-2xl" />
+        <div className="absolute inset-x-0 top-0 h-24 sm:h-32 bg-gradient-to-b from-black/30 to-transparent z-10 pointer-events-none rounded-t-2xl" />
 
         <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 z-10 flex justify-center gap-2">
           {slides.map((_, index) => (
