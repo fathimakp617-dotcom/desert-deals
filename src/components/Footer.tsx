@@ -141,34 +141,22 @@ const Footer = memo(() => {
 
       {/* Payment Methods */}
       <div className="container mx-auto px-6 lg:px-12 pb-6">
-        <div className="flex justify-center sm:justify-end gap-2">
-          {/* Visa */}
-          <div className="w-12 h-8 rounded bg-white/10 flex items-center justify-center">
-            <svg viewBox="0 0 48 32" className="w-10 h-6"><rect width="48" height="32" rx="4" fill="#1A1F71"/><path d="M19.5 21h-3l1.9-11.5h3L19.5 21zm12.1-11.2c-.6-.2-1.5-.5-2.7-.5-3 0-5.1 1.5-5.1 3.7 0 1.6 1.5 2.5 2.6 3.1 1.2.6 1.6.9 1.6 1.4 0 .8-.9 1.1-1.8 1.1-1.2 0-1.9-.2-2.9-.6l-.4-.2-.4 2.5c.7.3 2 .6 3.4.6 3.2 0 5.2-1.5 5.3-3.8 0-1.3-.8-2.2-2.5-3-.6-.5-1.4-.8-1.4-1.3 0-.5.5-.9 1.5-.9.8 0 1.5.2 2 .4l.2.1.6-2.6zM36 21l2.4-11.5H36c-.7 0-1.3.2-1.6 1L30 21h3.2l.6-1.7h3.9l.3 1.7zm-2.7-4l1.6-4.3.9 4.3h-2.5zM16 9.5l-2.8 7.8-.3-1.5c-.5-1.7-2.1-3.6-3.9-4.5l2.7 9.7h3.2L19.2 9.5H16z" fill="#fff"/><path d="M11 9.5H6l0 .2c3.8.9 6.3 3.2 7.3 5.8L12.2 10c-.2-.8-.8-1-1.2-1z" fill="#F9A533"/></svg>
-          </div>
-          {/* Mastercard */}
-          <div className="w-12 h-8 rounded bg-white/10 flex items-center justify-center">
-            <svg viewBox="0 0 48 32" className="w-10 h-6"><rect width="48" height="32" rx="4" fill="#252525"/><circle cx="19" cy="16" r="8" fill="#EB001B"/><circle cx="29" cy="16" r="8" fill="#F79E1B"/><path d="M24 10.3a8 8 0 0 1 0 11.4 8 8 0 0 1 0-11.4z" fill="#FF5F00"/></svg>
-          </div>
-          {/* Amex */}
-          <div className="w-12 h-8 rounded bg-white/10 flex items-center justify-center">
-            <svg viewBox="0 0 48 32" className="w-10 h-6"><rect width="48" height="32" rx="4" fill="#2E77BC"/><text x="24" y="18" textAnchor="middle" fill="#fff" fontSize="7" fontWeight="bold" fontFamily="Arial">AMEX</text></svg>
-          </div>
-          {/* Apple Pay */}
-          <div className="w-12 h-8 rounded bg-white/10 flex items-center justify-center">
-            <svg viewBox="0 0 48 32" className="w-10 h-6"><rect width="48" height="32" rx="4" fill="#000"/><text x="24" y="18" textAnchor="middle" fill="#fff" fontSize="7" fontWeight="bold" fontFamily="Arial"> Pay</text></svg>
-          </div>
-          {/* Google Pay */}
-          <div className="w-12 h-8 rounded bg-white/10 flex items-center justify-center">
-            <svg viewBox="0 0 48 32" className="w-10 h-6"><rect width="48" height="32" rx="4" fill="#fff"/><text x="24" y="18" textAnchor="middle" fill="#5F6368" fontSize="6.5" fontWeight="bold" fontFamily="Arial">GPay</text></svg>
-          </div>
-          {/* Stripe */}
-          <div className="w-12 h-8 rounded bg-white/10 flex items-center justify-center">
-            <svg viewBox="0 0 48 32" className="w-10 h-6"><rect width="48" height="32" rx="4" fill="#635BFF"/><text x="24" y="18" textAnchor="middle" fill="#fff" fontSize="7" fontWeight="bold" fontFamily="Arial">Stripe</text></svg>
-          </div>
-          {/* PayPal */}
-          <div className="w-12 h-8 rounded bg-white/10 flex items-center justify-center">
-            <svg viewBox="0 0 48 32" className="w-10 h-6"><rect width="48" height="32" rx="4" fill="#003087"/><text x="24" y="18" textAnchor="middle" fill="#fff" fontSize="6.5" fontWeight="bold" fontFamily="Arial">PayPal</text></svg>
+        <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-end gap-3">
+          <p className="text-xs text-white/50 font-medium">We Accept:</p>
+          <div className="flex items-center gap-2">
+            {[
+              { src: "/images/payments/visa.png", alt: "Visa" },
+              { src: "/images/payments/mastercard.png", alt: "MasterCard" },
+              { src: "/images/payments/amex.png", alt: "American Express" },
+              { src: "/images/payments/apple-pay.png", alt: "Apple Pay" },
+              { src: "/images/payments/google-pay.png", alt: "Google Pay" },
+              { src: "/images/payments/tabby.png", alt: "Tabby" },
+              { src: "/images/payments/tamara.png", alt: "Tamara" },
+            ].map((pm) => (
+              <div key={pm.alt} className="w-12 h-8 rounded bg-white flex items-center justify-center p-1">
+                <img src={pm.src} alt={pm.alt} title={pm.alt} className="max-h-5 max-w-[38px] object-contain" loading="lazy" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
