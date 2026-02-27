@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, memo, useRef } from "react";
+import { useState, useEffect, useCallback, memo, useRef, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { useSearchParams, Link } from "react-router-dom";
-import { Search, Grid3X3, List, Filter, X, ChevronDown, ChevronLeft, ChevronRight, Loader2, SlidersHorizontal } from "lucide-react";
+import { Search, Grid3X3, List, Filter, X, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,7 @@ import { CollectionPageSchema } from "@/components/seo/JsonLd";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
 import { useDebounce } from "@/hooks/useDebounce";
-import { usePaginatedProducts } from "@/hooks/usePaginatedProducts";
+import { useInfiniteProducts } from "@/hooks/useInfiniteProducts";
 import ProductCard from "@/components/ProductCard";
 import QuickViewDialog from "@/components/QuickViewDialog";
 import SearchSuggestions from "@/components/SearchSuggestions";
@@ -78,6 +78,7 @@ const Shop = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebounce(searchInput, 300);
   const priceRange = priceRanges[selectedPriceRange];
@@ -92,14 +93,11 @@ const Shop = () => {
   const {
     data,
     isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
     isFetching,
-    page,
-    setPage,
-    resetPage,
-    nextPage,
-    prevPage,
-    pageSize,
-  } = usePaginatedProducts({
+  } = useInfiniteProducts({
     search: debouncedSearch,
     category: selectedCategory,
     sortBy,
@@ -114,8 +112,6 @@ const Shop = () => {
     if (search) setSearchInput(search);
   }, [searchParams]);
 
-  useEffect(() => { resetPage(); }, [debouncedSearch, selectedCategory, selectedPriceRange, sortBy, resetPage]);
-
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
@@ -126,10 +122,26 @@ const Shop = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const products = data?.products || [];
-  const totalCount = data?.totalCount || 0;
-  const hasMore = data?.hasMore || false;
-  const totalPages = Math.ceil(totalCount / pageSize);
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "400px" }
+    );
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const products = useMemo(
+    () => data?.pages.flatMap(p => p.products) || [],
+    [data]
+  );
+  const totalCount = data?.pages[0]?.totalCount || 0;
 
   const handleToggleWishlist = useCallback((id: string) => {
     if (isInWishlist(id)) {
@@ -314,7 +326,7 @@ const Shop = () => {
                 </div>
               )}
 
-              {/* #11: Products Grid with slide-in animation, #5: 6 columns on desktop */}
+              {/* Products Grid */}
               {!isLoading && products.length > 0 && (
                 <div className={
                   viewMode === "grid"
@@ -346,60 +358,19 @@ const Shop = () => {
                 </div>
               )}
 
-              {/* Pagination */}
-              {!isLoading && totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-8 mb-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => { prevPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    disabled={page === 0}
-                    className="gap-1"
-                  >
-                    <ChevronLeft className="w-4 h-4" /> Previous
-                  </Button>
+              {/* Infinite scroll trigger */}
+              <div ref={loadMoreRef} className="h-1" />
 
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-                      let pageNum: number;
-                      if (totalPages <= 7) {
-                        pageNum = i;
-                      } else if (page < 4) {
-                        pageNum = i;
-                      } else if (page > totalPages - 5) {
-                        pageNum = totalPages - 7 + i;
-                      } else {
-                        pageNum = page - 3 + i;
-                      }
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={page === pageNum ? "default" : "outline"}
-                          size="sm"
-                          className="w-9 h-9 p-0"
-                          onClick={() => { setPage(pageNum); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                        >
-                          {pageNum + 1}
-                        </Button>
-                      );
-                    })}
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => { nextPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    disabled={!hasMore}
-                    className="gap-1"
-                  >
-                    Next <ChevronRight className="w-4 h-4" />
-                  </Button>
+              {isFetchingNextPage && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="ml-2 text-sm text-muted-foreground">Loading more...</span>
                 </div>
               )}
 
               {!isLoading && totalCount > 0 && (
-                <p className="text-center text-xs text-muted-foreground mb-4">
-                  Showing {page * pageSize + 1}–{Math.min((page + 1) * pageSize, totalCount)} of {totalCount} products
+                <p className="text-center text-xs text-muted-foreground mb-4 mt-4">
+                  Showing {products.length} of {totalCount} products
                 </p>
               )}
             </div>
