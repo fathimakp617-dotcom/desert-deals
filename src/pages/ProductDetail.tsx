@@ -421,7 +421,7 @@ const ProductDetail = () => {
                       {formatPrice(product.originalPrice)}
                     </span>
                     {product.discountPercent > 0 && (
-                      <span className="text-sm font-semibold text-destructive">-{product.discountPercent}%</span>
+                      <span className="text-lg sm:text-xl font-bold text-green-600">-{product.discountPercent}%</span>
                     )}
                   </div>
                 {!isSoldOut ? (
