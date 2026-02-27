@@ -29,22 +29,25 @@ export const usePageTracking = () => {
     if (key === lastTracked.current) return;
     lastTracked.current = key;
 
-    const productMatch = location.pathname.match(/^\/product\/(.+)$/);
-    const productId = productMatch ? productMatch[1] : null;
+    // Defer tracking to avoid blocking rendering
+    const track = () => {
+      const productMatch = location.pathname.match(/^\/product\/(.+)$/);
+      const utm = getUtmParams();
+      supabase.functions.invoke("track-pageview", {
+        body: {
+          product_id: productMatch ? productMatch[1] : null,
+          page_path: location.pathname,
+          referrer: document.referrer || "",
+          ...utm,
+          session_id: getSessionId(),
+        },
+      }).catch(() => {});
+    };
 
-    const utm = getUtmParams();
-
-    // Fire and forget - don't await
-    supabase.functions.invoke("track-pageview", {
-      body: {
-        product_id: productId,
-        page_path: location.pathname,
-        referrer: document.referrer || "",
-        ...utm,
-        session_id: getSessionId(),
-      },
-    }).catch(() => {
-      // Silently ignore tracking errors
-    });
+    if ("requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(track);
+    } else {
+      setTimeout(track, 100);
+    }
   }, [location.pathname, location.search]);
 };

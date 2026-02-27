@@ -5,8 +5,8 @@ const RamadanSplash = ({ onComplete }: { onComplete: () => void }) => {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setFadeOut(true), 3200);
-    const remove = setTimeout(onComplete, 3900);
+    const timer = setTimeout(() => setFadeOut(true), 1200);
+    const remove = setTimeout(onComplete, 1800);
     return () => { clearTimeout(timer); clearTimeout(remove); };
   }, [onComplete]);
 
@@ -144,7 +144,7 @@ const RamadanSplash = ({ onComplete }: { onComplete: () => void }) => {
       >
         <div
           className="h-full rounded-full"
-          style={{ background: "linear-gradient(90deg, #d4a853, #f5d47a)", animation: "splash-load 2.8s ease-in-out forwards" }}
+          style={{ background: "linear-gradient(90deg, #d4a853, #f5d47a)", animation: "splash-load 1.2s ease-in-out forwards" }}
         />
       </div>
 

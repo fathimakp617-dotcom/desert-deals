@@ -115,30 +115,13 @@ const App = () => {
     setShowSplash(false);
   }, []);
 
-  // Global error catcher — surfaces unhandled errors as visible toasts
+  // Global error catcher — log only, no dynamic imports
   useEffect(() => {
     const handleRejection = (event: PromiseRejectionEvent) => {
-      const msg = event.reason?.message || String(event.reason);
-      console.error("[Unhandled Error]", msg);
-      // Use sonner toast for visibility
-      import("sonner").then(({ toast }) => {
-        toast.error(msg.length > 200 ? msg.slice(0, 200) + "…" : msg);
-      });
+      console.error("[Unhandled Error]", event.reason?.message || String(event.reason));
     };
-
-    const handleError = (event: ErrorEvent) => {
-      console.error("[Global Error]", event.message);
-      import("sonner").then(({ toast }) => {
-        toast.error(event.message.length > 200 ? event.message.slice(0, 200) + "…" : event.message);
-      });
-    };
-
     window.addEventListener("unhandledrejection", handleRejection);
-    window.addEventListener("error", handleError);
-    return () => {
-      window.removeEventListener("unhandledrejection", handleRejection);
-      window.removeEventListener("error", handleError);
-    };
+    return () => window.removeEventListener("unhandledrejection", handleRejection);
   }, []);
 
   return (

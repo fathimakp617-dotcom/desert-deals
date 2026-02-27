@@ -43,14 +43,12 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Core React
           "vendor-react": ["react", "react-dom", "react-router-dom"],
-          // UI Components
           "vendor-ui": ["framer-motion", "lucide-react", "sonner"],
-          // Forms & Validation
           "vendor-forms": ["react-hook-form", "@hookform/resolvers", "zod"],
-          // Heavy libraries
           "vendor-pdf": ["jspdf", "jspdf-autotable", "html2canvas"],
+          "vendor-supabase": ["@supabase/supabase-js"],
+          "vendor-query": ["@tanstack/react-query"],
         },
       },
     },
