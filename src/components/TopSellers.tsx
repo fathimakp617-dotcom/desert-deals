@@ -11,7 +11,8 @@ import QuickViewDialog from "@/components/QuickViewDialog";
 
 // Matches the "Top Sellers" product-tab-carousel from the original HTML
 const TopSellers = memo(() => {
-  const { data: products = [], isLoading } = useDbProducts();
+  const { data: allProducts = [], isLoading } = useDbProducts();
+  const products = allProducts.filter(p => !p.category?.toLowerCase().includes("socks"));
   const { data: stockMap } = useProductStock();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
