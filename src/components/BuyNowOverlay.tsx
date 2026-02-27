@@ -21,7 +21,9 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
   const buyNowItem = items.length > 0 ? items[0] : null;
 
   const cartIds = new Set(items.map((i) => i.product.id));
-  const recommended = (allProducts || []).filter((p) => !cartIds.has(p.id)).slice(0, 10);
+  const socksProducts = (allProducts || []).filter(
+    (p) => !cartIds.has(p.id) && p.category?.toLowerCase().includes("socks")
+  ).slice(0, 10);
 
   const scroll = (dir: "left" | "right") => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -220 : 220, behavior: "smooth" });
@@ -90,7 +92,39 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                   </>
                 )}
 
-                {/* Cross-selling paused */}
+                {/* Cross-selling socks */}
+                {socksProducts.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-heading font-semibold text-foreground mb-3">Complete Your Look</h3>
+                    <div className="relative group/scroll">
+                      <button onClick={() => scroll("left")} className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background border border-border rounded-full hidden sm:flex items-center justify-center shadow-sm opacity-0 group-hover/scroll:opacity-100 transition-opacity">
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => scroll("right")} className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background border border-border rounded-full hidden sm:flex items-center justify-center shadow-sm opacity-0 group-hover/scroll:opacity-100 transition-opacity">
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                      <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2">
+                        {socksProducts.map((sock) => (
+                          <div key={sock.id} className="flex-shrink-0 w-[120px]">
+                            <Link to={`/product/${sock.id}`} onClick={onClose} className="block">
+                              <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-2">
+                                <img src={sock.image} alt={sock.name} className="w-full h-full object-cover" loading="lazy" />
+                              </div>
+                              <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug">{sock.name}</p>
+                              <p className="text-xs font-bold text-primary mt-0.5">{formatPrice(sock.price)}</p>
+                            </Link>
+                            <button
+                              onClick={() => addToCart(sock, 1)}
+                              className="mt-1.5 w-full text-[10px] font-semibold py-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                            >
+                              + Add
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Footer */}
