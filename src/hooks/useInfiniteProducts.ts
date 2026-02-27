@@ -94,8 +94,9 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
           q = q.eq("category", category);
         }
       } else if (category === "All") {
-        // Exclude luxury brands from general listing — they have dedicated pages
-        q = q.not("category", "ilike", "%Louis Vuitton%");
+        // Exclude categories that have dedicated pages — only shown via direct nav links
+        q = q.not("category", "ilike", "%Louis Vuitton%")
+             .not("category", "ilike", "%Socks%");
       }
 
       if (priceMin > 0) q = q.gte("price", priceMin);

@@ -22,6 +22,9 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
+  // Categories excluded from general rows — only shown on their dedicated pages
+  const excludedFromGeneral = ["louis vuitton", "socks"];
+
   const brandLower = brand.toLowerCase().trim();
   const products = brandLower
     ? allProducts.filter((p) => {
@@ -31,7 +34,11 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
           (cat) => cat === brandLower || cat === brandLower.replace(/\s+/g, "-")
         );
       })
-    : allProducts;
+    : allProducts.filter((p) => {
+        if (!p.category) return true;
+        const cats = p.category.toLowerCase().split(",").map((c) => c.trim());
+        return !cats.some((cat) => excludedFromGeneral.some((ex) => cat.includes(ex)));
+      });
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
