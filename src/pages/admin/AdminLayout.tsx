@@ -254,6 +254,7 @@ const AdminLayout = () => {
     { title: "Banners", url: "/admin/banners", icon: Image },
     { title: "Sections", url: "/admin/sections", icon: LayoutDashboard },
     { title: "Page Builder", url: "/admin/page-builder", icon: LayoutTemplate },
+    { title: "Send Email", url: "/admin/emails", icon: Mail },
   ];
 
   const isActive = (path: string) => {

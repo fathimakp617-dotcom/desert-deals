@@ -76,7 +76,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     // Send notification to admin
     const adminEmailResponse = await resend.emails.send({
-      from: "Desert Deal <onboarding@resend.dev>",
+      from: "Desert Deal <notifications@desertsdeals.com>",
       to: allRecipients,
       subject: `New Contact: ${safeSubject}`,
       html: `
@@ -151,7 +151,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     // Send confirmation to customer
     const customerEmailResponse = await resend.emails.send({
-      from: "Desert Deal <onboarding@resend.dev>",
+      from: "Desert Deal <notifications@desertsdeals.com>",
       to: [email],
       subject: "We received your message - Desert Deal",
       html: `
