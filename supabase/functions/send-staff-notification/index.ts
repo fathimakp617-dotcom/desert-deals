@@ -551,7 +551,7 @@ serve(async (req) => {
       const emailPromises = allStaffEmails.map(async (email) => {
         try {
           const { error } = await resend.emails.send({
-          from: "Desert Deal <notifications@desertdeal.site>",
+          from: "Desert Deal <notifications@desertsdeals.com>",
             to: [email],
             subject: emailTemplate.subject,
             html: emailTemplate.html,
@@ -644,7 +644,7 @@ serve(async (req) => {
     const emailPromises = recipients.map(async (email) => {
       try {
         const { error } = await resend.emails.send({
-          from: "Desert Deal <notifications@desertdeal.site>",
+          from: "Desert Deal <notifications@desertsdeals.com>",
           to: [email],
           subject: emailTemplate.subject,
           html: emailTemplate.html,
