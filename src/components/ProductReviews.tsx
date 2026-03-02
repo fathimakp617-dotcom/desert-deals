@@ -117,7 +117,14 @@ const ProductReviews = ({ productId }: ProductReviewsProps) => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setReviews(data || []);
+      // Sort reviews with photos first, then by date
+      const sorted = (data || []).sort((a: any, b: any) => {
+        const aHasPhotos = a.photos && a.photos.length > 0 ? 1 : 0;
+        const bHasPhotos = b.photos && b.photos.length > 0 ? 1 : 0;
+        if (bHasPhotos !== aHasPhotos) return bHasPhotos - aHasPhotos;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+      setReviews(sorted);
     } catch (error) {
       console.error("Error fetching reviews:", error);
     } finally {
