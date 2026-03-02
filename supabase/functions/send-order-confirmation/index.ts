@@ -238,7 +238,7 @@ const generateOrderEmailHTML = (order: OrderConfirmationRequest): string => {
                   
                   <p style="margin: 0; text-align: center; color: #888; font-size: 14px; line-height: 1.6;">
                     If you have any questions about your order, please contact us at<br>
-                    <a href="mailto:support@desertdeal.site" style="color: #1a1a1a; text-decoration: underline; font-weight: 500;">support@desertdeal.site</a>
+                    <a href="mailto:support@desertsdeals.com" style="color: #1a1a1a; text-decoration: underline; font-weight: 500;">support@desertsdeals.com</a>
                   </p>
                 </td>
               </tr>
@@ -438,7 +438,7 @@ const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint
   page.drawRectangle({ x: 0, y: 0, width, height: 70, color: brand });
 
   page.drawText('DESERT DEAL', { x: width / 2 - 35, y: 48, size: 10, font: boldFont, color: white });
-  page.drawText('support@desertdeal.site  |  +971 50 678 4405  |  United Arab Emirates', {
+  page.drawText('support@desertsdeals.com  |  +971 50 678 4405  |  United Arab Emirates', {
     x: width / 2 - 155, y: 33, size: 8, font, color: rgb(0.75, 0.75, 0.75),
   });
   page.drawText(`Thank you for your purchase!  ©${new Date().getFullYear()} Desert Deal`, {
@@ -1050,14 +1050,14 @@ Payment Method: ${orderData.payment_method === 'cod' ? 'Cash on Delivery' : 'Onl
 
 Your invoice is attached to this email.
 
-For questions, contact us at support@desertdeal.site
+For questions, contact us at support@desertsdeals.com
 
 Thank you for shopping with Desert Deal!
 `;
 
     // Send customer confirmation email with PDF invoice
     const emailResponse = await resend.emails.send({
-      from: "Desert Deal <orders@desertdeal.site>",
+      from: "Desert Deal <orders@desertsdeals.com>",
       to: [orderData.customer_email],
       subject: `Order Confirmed - ${orderData.order_number}`,
       html: emailHTML,
@@ -1125,7 +1125,7 @@ Invoice and shipping label are attached.
 
         const sendAdminEmail = async () =>
           await resend.emails.send({
-            from: "Desert Deal <notifications@desertdeal.site>",
+            from: "Desert Deal <notifications@desertsdeals.com>",
             to: allRecipients,
             subject: `🚚 NEW ORDER - ${orderData.order_number} - ${orderData.customer_name}`,
             html: adminEmailHTML,

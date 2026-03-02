@@ -50,7 +50,7 @@ const sendLowStockAlert = async (params: {
     `;
 
     const emailRes = await resend.emails.send({
-      from: 'Desert Deal <notifications@desertdeal.site>',
+      from: 'Desert Deal <notifications@desertsdeals.com>',
       to: recipients,
       subject,
       html,

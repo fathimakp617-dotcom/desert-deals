@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
     const orderData = {
       order_number: sanitize(body.order_number, 20),
       customer_name: sanitize(body.customer_name, 100),
-      customer_email: sanitize(body.customer_email || "manual-order@desertdeal.site", 255).toLowerCase(),
+      customer_email: sanitize(body.customer_email || "manual-order@desertsdeals.com", 255).toLowerCase(),
       customer_phone: sanitize(body.customer_phone || "", 20) || null,
       shipping_address: {
         address: sanitize(body.shipping_address.address || "", 200),
