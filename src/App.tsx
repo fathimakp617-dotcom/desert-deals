@@ -68,6 +68,7 @@ const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminBanners = lazy(() => import("./pages/admin/AdminBanners"));
 const AdminSections = lazy(() => import("./pages/admin/AdminSections"));
 const AdminPageBuilder = lazy(() => import("./pages/admin/AdminPageBuilder"));
+const AdminEmails = lazy(() => import("./pages/admin/AdminEmails"));
 
 // Minimal loading fallback
 const PageLoader = () => (
@@ -175,6 +176,7 @@ const App = () => {
                           <Route path="banners" element={<AdminBanners />} />
                           <Route path="sections" element={<AdminSections />} />
                           <Route path="page-builder" element={<AdminPageBuilder />} />
+                          <Route path="emails" element={<AdminEmails />} />
                           <Route path="fix-images" element={<AdminImageFix />} />
                         </Route>
                         <Route path="*" element={<NotFound />} />
