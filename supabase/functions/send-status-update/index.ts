@@ -173,7 +173,7 @@ const generateStatusEmailHTML = (request: StatusUpdateRequest): string => {
           <div style="text-align: center; margin-top: 35px; padding-top: 25px; border-top: 1px solid #3d3d3d;">
             <p style="color: #888; font-size: 14px;">
               Questions? Contact us at<br>
-              <a href="mailto:support@desertsdeals.com" style="color: #c7915e; text-decoration: none;">support@desertsdeals.com</a>
+              <a href="mailto:support@desertdeal.site" style="color: #c7915e; text-decoration: none;">support@desertdeal.site</a>
             </p>
           </div>
         </div>
@@ -231,7 +231,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailHtml = generateStatusEmailHTML(request);
 
     const { data, error } = await resend.emails.send({
-      from: "Desert Deal <shipping@desertsdeals.com>",
+      from: "Desert Deal <shipping@desertdeal.site>",
       to: [request.customer_email],
       subject: `${config.emoji} ${config.title} - Order #${request.order_number}`,
       html: emailHtml,

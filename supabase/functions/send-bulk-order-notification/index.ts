@@ -231,7 +231,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const { data: emailResult, error: emailError } = await resend.emails.send({
-      from: "Desert Deal <notifications@desertsdeals.com>",
+      from: "Desert Deal <notifications@desertdeal.site>",
       to: uniqueRecipients,
       subject: `🚨 BULK ORDER: ${data.total_quantity} Items - Order #${data.order_number}`,
       html: emailHtml,

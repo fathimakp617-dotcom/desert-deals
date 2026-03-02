@@ -137,7 +137,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Send customer cancellation email
       try {
         await resend.emails.send({
-          from: "Desert Deal <shipping@desertsdeals.com>",
+          from: "Desert Deal <shipping@desertdeal.site>",
           to: [order.customer_email],
           subject: `❌ Order Cancelled - ${order.order_number}`,
           html: `
@@ -178,7 +178,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
                   <p style="color: #6b7280; font-size: 14px;">
                     Questions? Contact us at<br>
-                    <a href="mailto:support@desertsdeals.com" style="color: #a87c39;">support@desertsdeals.com</a>
+                    <a href="mailto:support@desertdeal.site" style="color: #a87c39;">support@desertdeal.site</a>
                   </p>
                 </div>
               </div>
@@ -199,7 +199,7 @@ const handler = async (req: Request): Promise<Response> => {
       if (adminEmail) {
         try {
           await resend.emails.send({
-            from: "Desert Deal <shipping@desertsdeals.com>",
+            from: "Desert Deal <shipping@desertdeal.site>",
             to: [adminEmail],
             subject: `⚠️ Order Cancelled - ${order.order_number}`,
             html: `
