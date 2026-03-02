@@ -74,7 +74,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     for (const recipient of to_emails) {
       try {
         await resend.emails.send({
-          from: "Desert Deal <notifications@desertsdeals.com>",
+          from: "Desert Deal <notifications@desertdeal.site>",
           to: [recipient],
           subject: safeSubject,
           html: `

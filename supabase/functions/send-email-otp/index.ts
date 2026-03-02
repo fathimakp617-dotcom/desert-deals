@@ -87,7 +87,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send branded email via Resend with the 4-digit OTP
     const emailResponse = await resend.emails.send({
-      from: "Desert Deal <noreply@desertsdeals.com>",
+      from: "Desert Deal <noreply@desertdeal.site>",
       to: [email],
       subject: "Your Login Code - Desert Deal",
       html: `

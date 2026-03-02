@@ -57,7 +57,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send branded email via Resend
     const emailResponse = await resend.emails.send({
-      from: "Desert Deal <noreply@desertsdeals.com>",
+      from: "Desert Deal <noreply@desertdeal.site>",
       to: [email],
       subject: "Reset Your Password - Desert Deal",
       html: `

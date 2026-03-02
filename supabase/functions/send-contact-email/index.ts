@@ -71,12 +71,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
     )];
 
     if (allRecipients.length === 0) {
-      allRecipients.push("support@desertsdeals.com");
+      allRecipients.push("support@desertdeal.site");
     }
 
     // Send notification to admin
     const adminEmailResponse = await resend.emails.send({
-      from: "Desert Deal <notifications@desertsdeals.com>",
+      from: "Desert Deal <notifications@desertdeal.site>",
       to: allRecipients,
       subject: `New Contact: ${safeSubject}`,
       html: `
@@ -151,7 +151,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     // Send confirmation to customer
     const customerEmailResponse = await resend.emails.send({
-      from: "Desert Deal <notifications@desertsdeals.com>",
+      from: "Desert Deal <notifications@desertdeal.site>",
       to: [email],
       subject: "We received your message - Desert Deal",
       html: `
