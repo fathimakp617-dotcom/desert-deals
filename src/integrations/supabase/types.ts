@@ -598,6 +598,7 @@ export type Database = {
           id: string
           is_approved: boolean | null
           is_verified_purchase: boolean | null
+          photos: string[] | null
           product_id: string
           rating: number
           title: string | null
@@ -612,6 +613,7 @@ export type Database = {
           id?: string
           is_approved?: boolean | null
           is_verified_purchase?: boolean | null
+          photos?: string[] | null
           product_id: string
           rating: number
           title?: string | null
@@ -626,6 +628,7 @@ export type Database = {
           id?: string
           is_approved?: boolean | null
           is_verified_purchase?: boolean | null
+          photos?: string[] | null
           product_id?: string
           rating?: number
           title?: string | null
@@ -958,6 +961,7 @@ export type Database = {
           id: string | null
           is_approved: boolean | null
           is_verified_purchase: boolean | null
+          photos: string[] | null
           product_id: string | null
           rating: number | null
           title: string | null
@@ -971,6 +975,7 @@ export type Database = {
           id?: string | null
           is_approved?: boolean | null
           is_verified_purchase?: boolean | null
+          photos?: string[] | null
           product_id?: string | null
           rating?: number | null
           title?: string | null
@@ -984,6 +989,7 @@ export type Database = {
           id?: string | null
           is_approved?: boolean | null
           is_verified_purchase?: boolean | null
+          photos?: string[] | null
           product_id?: string | null
           rating?: number | null
           title?: string | null

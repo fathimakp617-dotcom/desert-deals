@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Star, User, Loader2, PenLine } from "lucide-react";
+import { Star, User, Loader2, PenLine, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ interface Review {
   title: string | null;
   comment: string | null;
   is_verified_purchase: boolean;
+  photos: string[] | null;
 }
 
 interface ProductReviewsProps {
@@ -58,6 +59,36 @@ const StarRating = ({ rating, onRate, interactive = false, size = "md" }: {
         </button>
       ))}
     </div>
+  );
+};
+
+const ReviewPhotos = ({ photos }: { photos: string[] }) => {
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  return (
+    <>
+      <div className="flex gap-2 mt-3 flex-wrap">
+        {photos.map((photo, idx) => (
+          <button
+            key={idx}
+            onClick={() => setLightbox(photo)}
+            className="w-16 h-16 rounded-md overflow-hidden border border-border/50 hover:border-primary transition-colors"
+          >
+            <img src={photo} alt={`Review photo ${idx + 1}`} className="w-full h-full object-cover" />
+          </button>
+        ))}
+      </div>
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <button onClick={() => setLightbox(null)} className="absolute top-4 right-4 text-white">
+            <X className="w-6 h-6" />
+          </button>
+          <img src={lightbox} alt="Review photo" className="max-w-full max-h-[85vh] object-contain rounded-lg" />
+        </div>
+      )}
+    </>
   );
 };
 
@@ -346,6 +377,9 @@ const ProductReviews = ({ productId }: ProductReviewsProps) => {
               {review.title && <h4 className="font-medium mb-2">{review.title}</h4>}
               {review.comment && (
                 <p className="text-muted-foreground text-sm leading-relaxed">{review.comment}</p>
+              )}
+              {review.photos && review.photos.length > 0 && (
+                <ReviewPhotos photos={review.photos} />
               )}
             </motion.div>
           ))
