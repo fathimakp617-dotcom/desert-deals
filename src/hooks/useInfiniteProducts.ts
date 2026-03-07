@@ -61,7 +61,7 @@ interface UseInfiniteProductsOptions {
 
 const brandSearchTerms: Record<string, string> = {
   "Nike": "Nike", "Jordan": "Jordan", "New Balance": "New Balance",
-  "On Cloud": "On ", "Asics": "Asics", "Adidas": "Adidas",
+  "On Cloud": "On Cloud", "Asics": "Asics", "Adidas": "Adidas",
   "Hoka": "Hoka", "Puma": "Puma", "Louis Vuitton": "Louis Vuitton",
   "Gucci": "Gucci", "Onitsuka Tiger": "Onitsuka", "Loro Piana": "Loro Piana",
   "Brooks": "Brooks", "Dior": "Dior", "Hermes": "Hermes",
