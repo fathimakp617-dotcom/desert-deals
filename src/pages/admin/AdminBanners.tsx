@@ -96,6 +96,7 @@ const AdminBanners = () => {
     setPosition("hero");
     setSortOrder(0);
     setIsActive(true);
+    setShowButton(false);
     setDialogOpen(true);
   };
 
