@@ -391,8 +391,12 @@ const BannerConfig = ({ config, onChange }: { config: SectionConfig; onChange: (
         <Input placeholder="/shop?brand=nike" value={config.link_url || ""} onChange={e => onChange({ ...config, link_url: e.target.value })} />
       </div>
       <div>
-        <label className="text-sm font-medium">Button Text</label>
+        <label className="text-sm font-medium">Button Text (only shown if button enabled)</label>
         <Input placeholder="Shop Now →" value={config.button_text || ""} onChange={e => onChange({ ...config, button_text: e.target.value })} />
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch checked={config.show_button === true} onCheckedChange={v => onChange({ ...config, show_button: v })} />
+        <label className="text-sm font-medium">Show Button on Banner</label>
       </div>
     </div>
   );

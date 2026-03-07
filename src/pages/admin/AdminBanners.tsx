@@ -330,6 +330,10 @@ const AdminBanners = () => {
                 <Switch checked={isActive} onCheckedChange={setIsActive} />
                 <Label>Active</Label>
               </div>
+              <div className="flex items-center gap-2 pt-6">
+                <Switch checked={showButton} onCheckedChange={setShowButton} />
+                <Label>Show Button</Label>
+              </div>
             </div>
             <Button onClick={handleSave} disabled={saving} className="w-full">
               {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
