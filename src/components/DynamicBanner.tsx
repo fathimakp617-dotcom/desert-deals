@@ -10,7 +10,7 @@ interface DynamicBannerProps {
   showButton?: boolean;
 }
 
-const DynamicBanner = ({ imageUrl, images, linkUrl, buttonText, title }: DynamicBannerProps) => {
+const DynamicBanner = ({ imageUrl, images, linkUrl, buttonText, title, showButton = false }: DynamicBannerProps) => {
   const allImages = images && images.length > 0 ? images : [imageUrl];
   const isSlider = allImages.length > 1;
   const [current, setCurrent] = useState(0);
