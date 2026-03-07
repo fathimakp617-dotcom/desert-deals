@@ -1,0 +1,1 @@
+ALTER TABLE public.banners ADD COLUMN show_button boolean NOT NULL DEFAULT false;
