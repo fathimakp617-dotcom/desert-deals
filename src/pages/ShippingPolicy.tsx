@@ -34,7 +34,7 @@ const ShippingPolicy = () => {
 
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-heading text-foreground mb-4">Shipping Policy</h1>
-            <p className="text-muted-foreground mb-12">Last updated: January 2026</p>
+            <p className="text-muted-foreground mb-12">Last updated: March 2026</p>
 
             {/* Shipping Charges */}
             <section className="mb-12">
@@ -44,24 +44,14 @@ const ShippingPolicy = () => {
                 </div>
                 <h2 className="text-2xl font-heading text-foreground">Shipping Charges</h2>
               </div>
-              <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <p className="font-medium text-foreground">Orders 999 AED & Above</p>
-                    </div>
-                    <p className="text-2xl font-bold text-green-500">FREE</p>
-                    <p className="text-sm text-muted-foreground">Shipping across India</p>
+              <div className="bg-card border border-border rounded-xl p-6">
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Package className="w-5 h-5 text-primary" />
+                    <p className="font-medium text-foreground">All Orders</p>
                   </div>
-                  <div className="p-4 bg-orange-500/5 border border-orange-500/20 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertTriangle className="w-5 h-5 text-orange-500" />
-                      <p className="font-medium text-foreground">Orders Below 999 AED</p>
-                    </div>
-                    <p className="text-2xl font-bold text-orange-500">79 AED</p>
-                    <p className="text-sm text-muted-foreground">Flat shipping charge</p>
-                  </div>
+                  <p className="text-2xl font-bold text-primary">25 AED</p>
+                  <p className="text-sm text-muted-foreground">Flat delivery charge across the UAE</p>
                 </div>
               </div>
             </section>
@@ -77,18 +67,18 @@ const ShippingPolicy = () => {
               <div className="bg-card border border-border rounded-xl p-6">
                 <div className="grid sm:grid-cols-2 gap-4 mb-4">
                   <div className="p-4 bg-muted/50 rounded-lg">
-                    <p className="font-medium text-foreground mb-1">Metro Cities</p>
-                    <p className="text-xl font-bold text-primary">3-5 Business Days</p>
-                    <p className="text-sm text-muted-foreground">Delhi, Mumbai, Bangalore, Chennai, Kolkata, Hyderabad</p>
+                    <p className="font-medium text-foreground mb-1">Dubai, Abu Dhabi, Sharjah</p>
+                    <p className="text-xl font-bold text-primary">1-3 Business Days</p>
+                    <p className="text-sm text-muted-foreground">Major emirates with fastest delivery</p>
                   </div>
                   <div className="p-4 bg-muted/50 rounded-lg">
-                    <p className="font-medium text-foreground mb-1">Other Locations</p>
-                    <p className="text-xl font-bold text-primary">5-7 Business Days</p>
-                    <p className="text-sm text-muted-foreground">All other serviceable pin codes in India</p>
+                    <p className="font-medium text-foreground mb-1">Other Emirates</p>
+                    <p className="text-xl font-bold text-primary">3-5 Business Days</p>
+                    <p className="text-sm text-muted-foreground">Ajman, RAK, Fujairah, Umm Al Quwain</p>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  * Delivery times may vary during peak seasons, festivals, or due to unforeseen circumstances.
+                  * Delivery times may vary during peak seasons, holidays, or due to unforeseen circumstances.
                 </p>
               </div>
             </section>
@@ -105,24 +95,24 @@ const ShippingPolicy = () => {
                 <div className="flex items-start gap-3 p-4 bg-green-500/5 border border-green-500/20 rounded-lg mb-4">
                   <MapPin className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-foreground">Pan-India Delivery</p>
+                    <p className="font-medium text-foreground">UAE-Wide Delivery</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      We deliver to all major cities and towns across India via our trusted courier partners.
+                      We deliver across all seven emirates of the United Arab Emirates.
                     </p>
                   </div>
                 </div>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Currently, we ship only within India
+                    We currently ship only within the UAE
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Some remote areas may have extended delivery times
+                    All emirates are covered including remote areas
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Enter your pin code at checkout to verify serviceability
+                    Please provide a complete address with emirate at checkout
                   </li>
                 </ul>
               </div>
@@ -137,32 +127,27 @@ const ShippingPolicy = () => {
                 <h2 className="text-2xl font-heading text-foreground">Cash on Delivery (COD)</h2>
               </div>
               <div className="bg-card border border-border rounded-xl p-6">
-                <div className="flex items-start gap-3 p-4 bg-orange-500/5 border border-orange-500/20 rounded-lg mb-4">
-                  <AlertTriangle className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                <div className="flex items-start gap-3 p-4 bg-green-500/5 border border-green-500/20 rounded-lg mb-4">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-foreground">Important: COD Advance Payment</p>
+                    <p className="font-medium text-foreground">Pay When You Receive</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      For COD orders, the <span className="text-orange-500 font-semibold">shipping charge (79 AED) must be paid in advance</span> online 
-                      before order confirmation. Only the product amount is collected at delivery.
+                      Pay the full amount (product + 25 AED delivery charge) in cash when your order is delivered to your door.
                     </p>
                   </div>
                 </div>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    COD is available for all serviceable pin codes
+                    COD is available for all addresses across the UAE
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Please keep exact change ready at delivery
+                    Please keep the exact amount ready at delivery
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Order processing starts after shipping charge confirmation
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary">•</span>
-                    COD advance fee is non-refundable if order is refused
+                    Order confirmation is sent via email immediately
                   </li>
                 </ul>
               </div>
