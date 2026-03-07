@@ -11,7 +11,7 @@ const Terms = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>Terms & Conditions | Desert Deal UAE</title>
-        <meta name="description" content="Terms and conditions for Desert Deal. Shipping policy, COD terms, payment options, and return/refund policies for UAE." />
+        <meta name="description" content="Terms and conditions for Desert Deal. Shipping policy, COD terms, and return/refund policies for UAE." />
         <meta name="keywords" content="Desert Deal terms, shoe shipping UAE, COD shoes, return policy, refund policy" />
         <link rel="canonical" href="https://desertsdeals.com/terms" />
       </Helmet>
@@ -34,7 +34,7 @@ const Terms = () => {
 
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-heading text-foreground mb-4">Terms & Conditions</h1>
-            <p className="text-muted-foreground mb-12">Last updated: December 2024</p>
+            <p className="text-muted-foreground mb-12">Last updated: March 2026</p>
 
             {/* Shipping Charges Section */}
             <section className="mb-12">
@@ -48,17 +48,20 @@ const Terms = () => {
                 <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg">
                   <AlertTriangle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-foreground">Additional Shipping Charge</p>
+                    <p className="font-medium text-foreground">Flat Delivery Charge</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      A shipping charge of <span className="text-primary font-semibold">79 AED</span> applies to all orders below 999 AED. 
-                      Orders above 999 AED qualify for FREE shipping across the UAE.
+                      A flat delivery charge of <span className="text-primary font-semibold">25 AED</span> applies to all orders across the UAE.
                     </p>
                   </div>
                 </div>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Standard delivery takes 5-7 business days across India
+                    Dubai, Abu Dhabi & Sharjah: 1-3 business days
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">•</span>
+                    Other Emirates: 3-5 business days
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
@@ -66,7 +69,7 @@ const Terms = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    We currently ship only within India
+                    We currently ship within the UAE only
                   </li>
                 </ul>
               </div>
@@ -84,25 +87,25 @@ const Terms = () => {
                 <div className="flex items-start gap-3 p-4 bg-orange-500/5 border border-orange-500/20 rounded-lg">
                   <AlertTriangle className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-foreground">COD Shipping Charge Prepayment Required</p>
+                    <p className="font-medium text-foreground">Pay When You Receive</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      For Cash on Delivery orders, the <span className="text-orange-500 font-semibold">shipping charge must be paid in advance</span> at the time of delivery confirmation. 
-                      This is a non-refundable fee to cover courier handling costs.
+                      All orders are <span className="text-orange-500 font-semibold">Cash on Delivery</span>. 
+                      Pay the full amount (product price + 25 AED delivery charge) in cash when your order is delivered.
                     </p>
                   </div>
                 </div>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    COD is available for orders within India only
+                    COD is available for all orders within the UAE
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Please keep exact change ready at the time of delivery
+                    Please keep the exact amount ready at the time of delivery
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Order will be shipped after shipping charge confirmation
+                    No advance payment or online payment is required
                   </li>
                 </ul>
               </div>
@@ -120,19 +123,15 @@ const Terms = () => {
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    We accept Cash on Delivery (COD)
+                    We accept Cash on Delivery (COD) only
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    All online payments are secured with SSL encryption
+                    No online payment or prepayment is required
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Cash on Delivery (COD) available with advance shipping charge
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary">•</span>
-                    Prices are inclusive of all applicable taxes
+                    Prices are listed in AED and inclusive of all applicable taxes
                   </li>
                 </ul>
               </div>
@@ -162,7 +161,7 @@ const Terms = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
-                    Shipping charges are non-refundable
+                    Delivery charges (25 AED) are non-refundable
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">•</span>
@@ -202,6 +201,10 @@ const Terms = () => {
                     <span className="text-primary">•</span>
                     By placing an order, you agree to all terms stated herein
                   </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">•</span>
+                    These terms are governed by the laws of the United Arab Emirates
+                  </li>
                 </ul>
               </div>
             </section>
@@ -211,6 +214,8 @@ const Terms = () => {
               <h3 className="text-xl font-heading text-foreground mb-2">Have Questions?</h3>
               <p className="text-muted-foreground mb-4">
                 Contact us at <a href="mailto:support@desertsdeals.com" className="text-primary hover:underline">support@desertsdeals.com</a>
+                <br />
+                or call us at <a href="tel:+971506784405" className="text-primary hover:underline">+971 50 678 4405</a>
               </p>
               <p className="text-sm text-muted-foreground">
                 © 2026 Desert Deal. All rights reserved.
