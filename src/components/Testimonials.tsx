@@ -96,71 +96,66 @@ const Testimonials = () => {
 
         {/* Two-column layout: Testimonials left, Stats right */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left half — Testimonial cards */}
-          <div className="relative">
-            <div className="space-y-4">
-              {currentPage.map((t: any, i: number) => {
+          {/* Left half — Auto-sliding carousel */}
+          <div className="relative overflow-hidden">
+            <div
+              className="flex transition-transform duration-700 ease-in-out"
+              style={{ transform: `translateX(-${current * 100}%)` }}
+            >
+              {testimonials.map((t: any, i: number) => {
                 const product = t.product_id
                   ? allProducts?.find((p) => p.id === t.product_id)
                   : null;
 
                 return (
                   <div
-                    key={`${page}-${i}`}
-                    className="border border-border rounded-lg p-5 sm:p-6 flex flex-col bg-card"
+                    key={i}
+                    className="w-full flex-shrink-0 px-1"
                   >
-                    <div className="flex gap-0.5 mb-3">
-                      {Array.from({ length: t.stars }).map((_, s) => (
-                        <Star key={s} className="w-3.5 h-3.5 fill-foreground text-foreground" />
-                      ))}
-                    </div>
-                    <h3 className="text-sm sm:text-base font-bold text-foreground mb-1.5">{t.title}</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-3">{t.text}</p>
-                    {/* Review photos */}
-                    {t.photos && t.photos.length > 0 && (
-                      <div className="flex gap-2 mb-3 overflow-x-auto">
-                        {t.photos.slice(0, 3).map((photo: string, pi: number) => (
-                          <img
-                            key={pi}
-                            src={photo}
-                            alt={`Review photo ${pi + 1}`}
-                            className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-border"
-                            loading="lazy"
-                          />
+                    <div className="border border-border rounded-lg p-5 sm:p-6 flex flex-col bg-card h-full">
+                      <div className="flex gap-0.5 mb-3">
+                        {Array.from({ length: t.stars }).map((_, s) => (
+                          <Star key={s} className="w-3.5 h-3.5 fill-foreground text-foreground" />
                         ))}
                       </div>
-                    )}
-                    <div className="flex items-center gap-2 mt-auto">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
-                        {t.name?.charAt(0)?.toUpperCase() || "V"}
+                      <h3 className="text-sm sm:text-base font-bold text-foreground mb-1.5">{t.title}</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-3">{t.text}</p>
+                      {t.photos && t.photos.length > 0 && (
+                        <div className="flex gap-2 mb-3 overflow-x-auto">
+                          {t.photos.slice(0, 3).map((photo: string, pi: number) => (
+                            <img
+                              key={pi}
+                              src={photo}
+                              alt={`Review photo ${pi + 1}`}
+                              className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-border"
+                              loading="lazy"
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 mt-auto">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                          {t.name?.charAt(0)?.toUpperCase() || "V"}
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">{t.name}</p>
                       </div>
-                      <p className="text-sm font-semibold text-foreground">{t.name}</p>
                     </div>
                   </div>
                 );
               })}
             </div>
 
-            {/* Dots + arrow */}
-            <div className="flex items-center justify-center gap-3 mt-5">
-              <div className="flex gap-1.5">
-                {testimonialPages.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setPage(i)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      i === page ? "bg-foreground w-4" : "bg-muted-foreground/30"
-                    }`}
-                  />
-                ))}
-              </div>
-              <button
-                onClick={next}
-                className="w-8 h-8 flex items-center justify-center rounded-full border border-border bg-card hover:bg-muted transition-colors"
-                aria-label="Next testimonials"
-              >
-                <ChevronRight className="w-4 h-4 text-foreground" />
-              </button>
+            {/* Dots */}
+            <div className="flex items-center justify-center gap-1.5 mt-5">
+              {testimonials.map((_: any, i: number) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrent(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    i === current ? "bg-foreground w-4" : "bg-muted-foreground/30"
+                  }`}
+                />
+              ))}
             </div>
           </div>
 
