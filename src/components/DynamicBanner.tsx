@@ -7,6 +7,7 @@ interface DynamicBannerProps {
   linkUrl: string;
   buttonText?: string;
   title?: string;
+  showButton?: boolean;
 }
 
 const DynamicBanner = ({ imageUrl, images, linkUrl, buttonText, title }: DynamicBannerProps) => {

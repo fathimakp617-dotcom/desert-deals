@@ -104,9 +104,11 @@ const Index = () => {
                   <div className="absolute inset-y-0 left-8 sm:left-14 flex flex-col justify-center gap-2 sm:gap-3">
                     <h3 className="text-white text-xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow-lg">{banner.title}</h3>
                     <p className="text-white/80 text-xs sm:text-sm md:text-base max-w-xs sm:max-w-sm drop-shadow">Impossible is nothing. Explore the latest drops.</p>
-                    <span className="inline-block w-fit bg-white text-black text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-white/90 transition-colors mt-1">
-                      Shop Now →
-                    </span>
+                    {banner.show_button && (
+                      <span className="inline-block w-fit bg-white text-black text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-white/90 transition-colors mt-1">
+                        Shop Now →
+                      </span>
+                    )}
                   </div>
                 </Link>
               </div>
@@ -122,11 +124,13 @@ const Index = () => {
               <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
                 <Link to={banner.link_url} className="block relative rounded-lg overflow-hidden group bg-white">
                   <img src={banner.image_url} alt={banner.title} className="w-full object-contain" />
-                  <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2">
-                    <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
-                      Shop Now →
-                    </span>
-                  </div>
+                  {banner.show_button && (
+                    <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2">
+                      <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+                        Shop Now →
+                      </span>
+                    </div>
+                  )}
                 </Link>
               </div>
             </section>
