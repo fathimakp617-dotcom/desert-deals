@@ -69,7 +69,7 @@ const brandSearchTerms: Record<string, string> = {
   "Sunglasses": "Sunglasses", "Heels": "Heels", "Rolex": "Rolex",
   "Cartier": "Cartier", "Tom Ford": "Tom Ford",
   "Christian Louboutin": "Louboutin", "Chanel": "Chanel", "Goyard": "Goyard",
-  "Bags": "Bags",
+  "Bags": "Bags", "Socks": "Socks",
 };
 
 export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
