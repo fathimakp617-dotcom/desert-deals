@@ -3,8 +3,8 @@ import newBalanceBanner from "@/assets/banners/new-balance-summer.jpg";
 
 const NewBalancePromoGrid = () => {
   return (
-    <section className="w-full">
-      <Link to="/shop?brand=new-balance" className="block relative overflow-hidden group">
+    <section className="w-full px-4 sm:px-6 lg:px-12">
+      <Link to="/shop?brand=new-balance" className="block relative overflow-hidden group rounded-2xl">
         <img
           src={newBalanceBanner}
           alt="New Balance Shoes – Summer Collection"
