@@ -44,7 +44,7 @@ const ReviewCard = ({ t, onClick }: { t: any; onClick: () => void }) => (
     >
       <div className="flex gap-0.5 mb-3">
         {Array.from({ length: t.stars }).map((_, s) => (
-          <Star key={s} className="w-3.5 h-3.5 fill-foreground text-foreground" />
+          <Star key={s} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
         ))}
       </div>
       <h3 className="text-sm sm:text-base font-bold text-foreground mb-1.5">{t.title}</h3>
@@ -311,7 +311,7 @@ const Testimonials = () => {
               {/* Stars */}
               <div className="flex gap-0.5">
                 {Array.from({ length: selectedReview.stars }).map((_, s) => (
-                  <Star key={s} className="w-4 h-4 fill-foreground text-foreground" />
+                  <Star key={s} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
 
