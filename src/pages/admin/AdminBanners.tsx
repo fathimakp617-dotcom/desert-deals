@@ -108,6 +108,7 @@ const AdminBanners = () => {
     setPosition(b.position);
     setSortOrder(b.sort_order);
     setIsActive(b.is_active);
+    setShowButton((b as any).show_button ?? false);
     setDialogOpen(true);
   };
 
