@@ -39,27 +39,30 @@ const BrandAdBanner = ({ position, fallbackImg, fallbackLink, fallbackAlt, child
   fallbackImg: string;
   fallbackLink: string;
   fallbackAlt: string;
-  children?: (banner: { image_url: string; link_url: string; title: string }) => React.ReactNode;
+  children?: (banner: { image_url: string; link_url: string; title: string; show_button: boolean }) => React.ReactNode;
 }) => {
   const { data: banners } = useBanners(position);
   const banner = banners?.[0];
   const imgSrc = banner?.image_url || fallbackImg;
   const link = banner?.link_url || fallbackLink;
   const alt = banner?.title || fallbackAlt;
+  const showButton = banner?.show_button ?? false;
 
   if (children) {
-    return <>{children({ image_url: imgSrc, link_url: link, title: alt })}</>;
+    return <>{children({ image_url: imgSrc, link_url: link, title: alt, show_button: showButton })}</>;
   }
 
   return (
     <section className="w-full">
       <Link to={link} className="block relative overflow-hidden group">
         <img src={imgSrc} alt={alt} className="w-full h-auto object-cover" loading="lazy" decoding="async" />
-        <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
-          <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
-            Shop Now →
-          </span>
-        </div>
+        {showButton && (
+          <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
+            <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+              Shop Now →
+            </span>
+          </div>
+        )}
       </Link>
     </section>
   );
