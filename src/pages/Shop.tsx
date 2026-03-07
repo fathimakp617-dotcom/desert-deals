@@ -59,7 +59,7 @@ const brandSlugToCategory: Record<string, string> = {
   "watches": "Watches", "wallets": "Wallets", "sunglasses": "Sunglasses",
   "heels": "Heels", "rolex": "Rolex", "cartier": "Cartier",
   "tom-ford": "Tom Ford", "christian-louboutin": "Christian Louboutin",
-  "chanel": "Chanel", "goyard": "Goyard",
+  "chanel": "Chanel", "goyard": "Goyard", "socks": "Socks",
 };
 
 const Shop = () => {
