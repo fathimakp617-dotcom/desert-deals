@@ -23,16 +23,27 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
   const brandLower = brand.toLowerCase().trim();
-  const nonSocksProducts = allProducts.filter(p => !p.category?.toLowerCase().includes("socks"));
+  const excludedCategories = ["socks", "heels", "bags"];
+  const isExcludedCategory = excludedCategories.includes(brandLower);
+  
+  const filteredBase = allProducts.filter(p => {
+    if (!p.category) return true;
+    const cats = p.category.toLowerCase();
+    // If this row IS for an excluded category, don't filter it out
+    if (isExcludedCategory) return true;
+    // Otherwise exclude these categories from appearing in other brand rows
+    return !excludedCategories.some(ex => cats.includes(ex));
+  });
+  
   const products = brandLower
-    ? nonSocksProducts.filter((p) => {
+    ? filteredBase.filter((p) => {
         if (!p.category) return false;
         const cats = p.category.toLowerCase().split(",").map((c) => c.trim());
         return cats.some(
           (cat) => cat === brandLower || cat === brandLower.replace(/\s+/g, "-")
         );
       })
-    : nonSocksProducts;
+    : filteredBase;
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
