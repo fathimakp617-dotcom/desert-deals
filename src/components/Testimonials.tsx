@@ -124,36 +124,25 @@ const Testimonials = () => {
                     </div>
                     <h3 className="text-sm sm:text-base font-bold text-foreground mb-1.5">{t.title}</h3>
                     <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-3">{t.text}</p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                      </div>
-                      {product && (
-                        <Link to={`/product/${product.id}`} className="flex items-center gap-2 group">
+                    {/* Review photos */}
+                    {t.photos && t.photos.length > 0 && (
+                      <div className="flex gap-2 mb-3 overflow-x-auto">
+                        {t.photos.slice(0, 3).map((photo: string, pi: number) => (
                           <img
-                            src={product.image || ""}
-                            alt={product.name}
-                            className="w-10 h-10 object-contain rounded"
+                            key={pi}
+                            src={photo}
+                            alt={`Review photo ${pi + 1}`}
+                            className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-border"
                             loading="lazy"
                           />
-                          <div className="hidden sm:block">
-                            <p className="text-xs font-medium text-foreground group-hover:underline line-clamp-1">
-                              {product.name}
-                            </p>
-                            <span className="text-xs font-semibold text-foreground">
-                              {formatPrice(product.price)}
-                            </span>
-                          </div>
-                        </Link>
-                      )}
-                      {t.photos && t.photos.length > 0 && !product && (
-                        <img
-                          src={t.photos[0]}
-                          alt="Review photo"
-                          className="w-10 h-10 object-cover rounded"
-                          loading="lazy"
-                        />
-                      )}
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 mt-auto">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                        {t.name?.charAt(0)?.toUpperCase() || "V"}
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">{t.name}</p>
                     </div>
                   </div>
                 );

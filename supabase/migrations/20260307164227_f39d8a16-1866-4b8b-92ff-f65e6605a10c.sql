@@ -1,0 +1,1 @@
+UPDATE product_reviews SET title = 'Great Quality Product!' WHERE title = 'Super product coupled with super Amazon delivery :-)';
