@@ -65,6 +65,7 @@ interface SectionConfig {
   button_link?: string;
   category?: string;
   limit?: number;
+  show_button?: boolean;
 }
 
 interface PageSection {
