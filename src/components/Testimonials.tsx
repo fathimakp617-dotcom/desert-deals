@@ -143,6 +143,7 @@ const Testimonials = () => {
                         {t.name?.charAt(0)?.toUpperCase() || "V"}
                       </div>
                       <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                    </div>
                   </div>
                 );
               })}
