@@ -52,42 +52,34 @@ const Testimonials = () => {
 
   const { data: allProducts } = useDbProducts();
 
-  // Build pages of 3 reviews each
-  const testimonialPages = useMemo(() => {
-    const items = reviews && reviews.length >= 3
-      ? reviews.map((r: any) => ({
-          stars: r.rating,
-          title: r.title || "Great Product!",
-          text: r.comment || "",
-          name: r.customer_name,
-          product_id: r.product_id,
-          photos: r.photos,
-        }))
-      : fallbackTestimonials;
-
-    const pages: typeof items[] = [];
-    for (let i = 0; i < items.length; i += 3) {
-      const chunk = items.slice(i, i + 3);
-      if (chunk.length === 3) pages.push(chunk);
+  const testimonials = useMemo(() => {
+    if (reviews && reviews.length >= 3) {
+      return reviews.map((r: any) => ({
+        stars: r.rating,
+        title: r.title || "Great Product!",
+        text: r.comment || "",
+        name: r.customer_name,
+        product_id: r.product_id,
+        photos: r.photos,
+      }));
     }
-    return pages.length > 0 ? pages : [fallbackTestimonials];
+    return fallbackTestimonials;
   }, [reviews]);
 
+  const [current, setCurrent] = useState(0);
+
   const next = useCallback(() => {
-    setPage((p) => (p + 1) % testimonialPages.length);
-  }, [testimonialPages.length]);
+    setCurrent((p) => (p + 1) % testimonials.length);
+  }, [testimonials.length]);
 
   useEffect(() => {
-    const timer = setInterval(next, 8000);
+    const timer = setInterval(next, 4000);
     return () => clearInterval(timer);
   }, [next]);
 
-  // Reset page if pages change
   useEffect(() => {
-    setPage(0);
-  }, [testimonialPages.length]);
-
-  const currentPage = testimonialPages[page] || testimonialPages[0];
+    setCurrent(0);
+  }, [testimonials.length]);
 
   return (
     <section className="bg-background py-12 sm:py-16 lg:py-20">
