@@ -84,8 +84,11 @@ const TopSellers = memo(() => {
                           <img
                             src={product.image}
                             alt={product.name}
+                            width={246}
+                            height={246}
                             className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
                             loading="lazy"
+                            decoding="async"
                           />
                         </Link>
 
