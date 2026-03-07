@@ -12,7 +12,12 @@ import QuickViewDialog from "@/components/QuickViewDialog";
 // Matches the "Top Sellers" product-tab-carousel from the original HTML
 const TopSellers = memo(() => {
   const { data: allProducts = [], isLoading } = useDbProducts();
-  const products = allProducts.filter(p => !p.category?.toLowerCase().includes("socks"));
+  const excludedCats = ["socks", "heels", "bags"];
+  const products = allProducts.filter(p => {
+    if (!p.category) return true;
+    const catLower = p.category.toLowerCase();
+    return !excludedCats.some(ex => catLower.includes(ex));
+  });
   const { data: stockMap } = useProductStock();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -67,7 +72,7 @@ const TopSellers = memo(() => {
               className="flex gap-3 sm:gap-4 overflow-x-auto pb-4"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {products.slice(0, 30).map((product) => {
+              {products.slice(0, 20).map((product) => {
                 const soldOut = isProductSoldOut(stockMap, product.id);
                 const inWishlist = isInWishlist(product.id);
 
@@ -79,8 +84,11 @@ const TopSellers = memo(() => {
                           <img
                             src={product.image}
                             alt={product.name}
+                            width={246}
+                            height={246}
                             className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
                             loading="lazy"
+                            decoding="async"
                           />
                         </Link>
 

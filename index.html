@@ -39,12 +39,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://ttgsrrlhqvtnmtlkvlyi.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://ipapi.co" />
     
-    <!-- Load fonts with display=swap for non-blocking render -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+    <!-- Preload critical font -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" /></noscript>
     
-    <!-- Preload Critical Assets -->
-    <link rel="prefetch" href="/shop" />
+    <!-- Load remaining fonts deferred -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
     
   
   

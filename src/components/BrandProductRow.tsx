@@ -92,8 +92,11 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                           <img
                             src={product.image}
                             alt={product.name}
+                            width={220}
+                            height={220}
                             className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
                             loading="lazy"
+                            decoding="async"
                           />
                         </Link>
                         {soldOut && (

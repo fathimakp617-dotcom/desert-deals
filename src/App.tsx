@@ -92,6 +92,8 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       retry: 1,
+      // Reduce concurrent network requests
+      networkMode: "online",
     },
     mutations: {
       onError: (error: unknown) => {
