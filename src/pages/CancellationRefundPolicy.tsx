@@ -308,11 +308,7 @@ const CancellationRefundPolicy = () => {
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2">
                       <span className="text-primary">•</span>
-                      <strong>Online Payments:</strong> Refunded to original payment method
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <strong>COD Orders:</strong> Refunded via bank transfer (NEFT/IMPS)
+                      <strong>COD Orders:</strong> Refunded via bank transfer to your UAE bank account
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-primary">•</span>
