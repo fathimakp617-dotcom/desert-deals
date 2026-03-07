@@ -174,17 +174,17 @@ const Testimonials = () => {
 
           {/* Right half — Stats */}
           <div className="flex flex-col justify-center divide-y divide-border border border-border rounded-lg bg-card">
-            <div className="text-center py-10 sm:py-14 px-6">
-              <p className="text-5xl sm:text-6xl font-bold text-muted-foreground/20 mb-2">4.5k</p>
-              <h3 className="text-lg font-bold text-foreground mb-2">Happy Customers</h3>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+            <div className="text-center py-6 sm:py-8 px-4">
+              <p className="text-3xl sm:text-4xl font-bold text-muted-foreground/20 mb-1">4.5k</p>
+              <h3 className="text-sm font-bold text-foreground mb-1">Happy Customers</h3>
+              <p className="text-xs text-muted-foreground max-w-xs mx-auto">
                 Desert Deal ensures a seamless shopping experience with top-quality products and excellent service. Your satisfaction is our priority!
               </p>
             </div>
-            <div className="text-center py-10 sm:py-14 px-6">
-              <p className="text-5xl sm:text-6xl font-bold text-muted-foreground/20 mb-2">456k</p>
-              <h3 className="text-lg font-bold text-foreground mb-2">Total Sales Per Year</h3>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+            <div className="text-center py-6 sm:py-8 px-4">
+              <p className="text-3xl sm:text-4xl font-bold text-muted-foreground/20 mb-1">456k</p>
+              <h3 className="text-sm font-bold text-foreground mb-1">Total Sales Per Year</h3>
+              <p className="text-xs text-muted-foreground max-w-xs mx-auto">
                 With thousands of successful transactions every month, Desert Deal is a trusted destination for premium products at unbeatable prices.
               </p>
             </div>
