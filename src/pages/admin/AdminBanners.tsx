@@ -62,6 +62,7 @@ const AdminBanners = () => {
   const [position, setPosition] = useState("hero");
   const [sortOrder, setSortOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
+  const [showButton, setShowButton] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -95,6 +96,7 @@ const AdminBanners = () => {
     setPosition("hero");
     setSortOrder(0);
     setIsActive(true);
+    setShowButton(false);
     setDialogOpen(true);
   };
 
@@ -106,6 +108,7 @@ const AdminBanners = () => {
     setPosition(b.position);
     setSortOrder(b.sort_order);
     setIsActive(b.is_active);
+    setShowButton((b as any).show_button ?? false);
     setDialogOpen(true);
   };
 
@@ -144,6 +147,7 @@ const AdminBanners = () => {
         ...(editBanner ? { id: editBanner.id } : {}),
         title, image_url: imageUrl, link_url: linkUrl,
         position, sort_order: sortOrder, is_active: isActive,
+        show_button: showButton,
       };
       const { error } = await supabase.functions.invoke("manage-banners", {
         body: { action, email: session.email, token: session.token, banner },
@@ -325,6 +329,10 @@ const AdminBanners = () => {
               <div className="flex items-center gap-2 pt-6">
                 <Switch checked={isActive} onCheckedChange={setIsActive} />
                 <Label>Active</Label>
+              </div>
+              <div className="flex items-center gap-2 pt-6">
+                <Switch checked={showButton} onCheckedChange={setShowButton} />
+                <Label>Show Button</Label>
               </div>
             </div>
             <Button onClick={handleSave} disabled={saving} className="w-full">

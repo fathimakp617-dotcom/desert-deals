@@ -39,27 +39,30 @@ const BrandAdBanner = ({ position, fallbackImg, fallbackLink, fallbackAlt, child
   fallbackImg: string;
   fallbackLink: string;
   fallbackAlt: string;
-  children?: (banner: { image_url: string; link_url: string; title: string }) => React.ReactNode;
+  children?: (banner: { image_url: string; link_url: string; title: string; show_button: boolean }) => React.ReactNode;
 }) => {
   const { data: banners } = useBanners(position);
   const banner = banners?.[0];
   const imgSrc = banner?.image_url || fallbackImg;
   const link = banner?.link_url || fallbackLink;
   const alt = banner?.title || fallbackAlt;
+  const showButton = banner?.show_button ?? false;
 
   if (children) {
-    return <>{children({ image_url: imgSrc, link_url: link, title: alt })}</>;
+    return <>{children({ image_url: imgSrc, link_url: link, title: alt, show_button: showButton })}</>;
   }
 
   return (
     <section className="w-full">
       <Link to={link} className="block relative overflow-hidden group">
         <img src={imgSrc} alt={alt} className="w-full h-auto object-cover" loading="lazy" decoding="async" />
-        <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
-          <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
-            Shop Now →
-          </span>
-        </div>
+        {showButton && (
+          <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
+            <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+              Shop Now →
+            </span>
+          </div>
+        )}
       </Link>
     </section>
   );
@@ -101,9 +104,11 @@ const Index = () => {
                   <div className="absolute inset-y-0 left-8 sm:left-14 flex flex-col justify-center gap-2 sm:gap-3">
                     <h3 className="text-white text-xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow-lg">{banner.title}</h3>
                     <p className="text-white/80 text-xs sm:text-sm md:text-base max-w-xs sm:max-w-sm drop-shadow">Impossible is nothing. Explore the latest drops.</p>
-                    <span className="inline-block w-fit bg-white text-black text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-white/90 transition-colors mt-1">
-                      Shop Now →
-                    </span>
+                    {banner.show_button && (
+                      <span className="inline-block w-fit bg-white text-black text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-white/90 transition-colors mt-1">
+                        Shop Now →
+                      </span>
+                    )}
                   </div>
                 </Link>
               </div>
@@ -119,11 +124,13 @@ const Index = () => {
               <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
                 <Link to={banner.link_url} className="block relative rounded-lg overflow-hidden group bg-white">
                   <img src={banner.image_url} alt={banner.title} className="w-full object-contain" />
-                  <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2">
-                    <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
-                      Shop Now →
-                    </span>
-                  </div>
+                  {banner.show_button && (
+                    <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2">
+                      <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+                        Shop Now →
+                      </span>
+                    </div>
+                  )}
                 </Link>
               </div>
             </section>
@@ -144,14 +151,14 @@ const Index = () => {
         const cfg = (s.config || {}) as Record<string, any>;
         // If a built-in section has admin-configured images, use DynamicBanner instead of default
         if (sectionMap[s.section_key] && (cfg.images?.length > 0 || cfg.image_url)) {
-          return <DynamicBanner key={s.id} imageUrl={cfg.image_url || cfg.images?.[0] || ""} images={cfg.images} linkUrl={cfg.link_url || "/shop"} buttonText={cfg.button_text} title={s.title} />;
+          return <DynamicBanner key={s.id} imageUrl={cfg.image_url || cfg.images?.[0] || ""} images={cfg.images} linkUrl={cfg.link_url || "/shop"} buttonText={cfg.button_text} title={s.title} showButton={cfg.show_button === true} />;
         }
         if (sectionMap[s.section_key]) return sectionMap[s.section_key];
         if (s.section_type === "product_row" && cfg.brand) {
           return <BrandProductRow key={s.id} brand={cfg.brand} title={s.title} shopLink={cfg.shop_link} />;
         }
         if (s.section_type === "banner" && (cfg.image_url || cfg.images?.length)) {
-          return <DynamicBanner key={s.id} imageUrl={cfg.image_url || cfg.images?.[0] || ""} images={cfg.images} linkUrl={cfg.link_url || "/shop"} buttonText={cfg.button_text} title={s.title} />;
+          return <DynamicBanner key={s.id} imageUrl={cfg.image_url || cfg.images?.[0] || ""} images={cfg.images} linkUrl={cfg.link_url || "/shop"} buttonText={cfg.button_text} title={s.title} showButton={cfg.show_button === true} />;
         }
         if (s.section_type === "text_block") {
           return <DynamicTextBlock key={s.id} heading={cfg.heading || s.title} description={cfg.description || s.subtitle} buttonText={cfg.button_text} buttonLink={cfg.button_link} />;

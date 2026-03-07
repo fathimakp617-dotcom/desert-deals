@@ -189,6 +189,7 @@ export type Database = {
           is_active: boolean
           link_url: string
           position: string
+          show_button: boolean
           sort_order: number
           title: string
           updated_at: string
@@ -200,6 +201,7 @@ export type Database = {
           is_active?: boolean
           link_url?: string
           position?: string
+          show_button?: boolean
           sort_order?: number
           title?: string
           updated_at?: string
@@ -211,6 +213,7 @@ export type Database = {
           is_active?: boolean
           link_url?: string
           position?: string
+          show_button?: boolean
           sort_order?: number
           title?: string
           updated_at?: string
