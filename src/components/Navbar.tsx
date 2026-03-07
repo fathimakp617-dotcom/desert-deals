@@ -15,7 +15,7 @@ const announcements = [
 
 const staticBottomLinks = [
   { name: "About Us", href: "/#about" },
-  { name: "Reviews", href: "/#collection" },
+  { name: "Reviews", href: "/#testimonials" },
 ];
 
 const Navbar = memo(() => {
