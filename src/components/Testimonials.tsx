@@ -159,11 +159,14 @@ const Testimonials = () => {
         {/* Continuously scrolling marquee carousel */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-hidden"
+          className="flex gap-4 overflow-x-auto scrollbar-hide"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           onTouchStart={() => setPaused(true)}
-          onTouchEnd={() => setPaused(false)}
+          onTouchEnd={() => {
+            setTimeout(() => setPaused(false), 3000);
+          }}
         >
           {marqueeItems.map((t, i) => (
             <ReviewCard key={i} t={t} />
