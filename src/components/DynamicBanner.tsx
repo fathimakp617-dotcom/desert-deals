@@ -52,11 +52,13 @@ const DynamicBanner = ({ imageUrl, images, linkUrl, buttonText, title, showButto
               ))}
             </div>
           )}
-          <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
-            <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
-              {buttonText || "Shop Now →"}
-            </span>
-          </div>
+          {showButton && (
+            <div className="absolute bottom-8 sm:bottom-12 left-8 sm:left-14">
+              <span className="inline-block w-fit bg-foreground text-background text-xs sm:text-sm font-medium px-6 py-2.5 rounded-full group-hover:bg-foreground/90 transition-colors">
+                {buttonText || "Shop Now →"}
+              </span>
+            </div>
+          )}
         </Link>
       </div>
     </section>
