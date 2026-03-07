@@ -147,6 +147,7 @@ const AdminBanners = () => {
         ...(editBanner ? { id: editBanner.id } : {}),
         title, image_url: imageUrl, link_url: linkUrl,
         position, sort_order: sortOrder, is_active: isActive,
+        show_button: showButton,
       };
       const { error } = await supabase.functions.invoke("manage-banners", {
         body: { action, email: session.email, token: session.token, banner },
