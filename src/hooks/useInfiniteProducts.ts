@@ -89,9 +89,9 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
       if (category && category !== "All") {
         const brandTerm = brandSearchTerms[category];
         if (brandTerm) {
-          q = q.or(`category.eq.${category},name.ilike.%${brandTerm}%`);
+          q = q.or(`category.ilike.%${category}%,name.ilike.%${brandTerm}%`);
         } else {
-          q = q.eq("category", category);
+          q = q.ilike("category", `%${category}%`);
         }
       } else if (category === "All") {
         // Exclude categories that have dedicated pages — only shown via direct nav links
