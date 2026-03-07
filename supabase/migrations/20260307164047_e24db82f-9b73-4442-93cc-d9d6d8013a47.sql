@@ -1,0 +1,1 @@
+UPDATE product_reviews SET customer_name = 'Verified Buyer' WHERE customer_name = 'Amazon Customer';
