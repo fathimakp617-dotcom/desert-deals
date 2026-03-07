@@ -31,7 +31,7 @@ const fallbackTestimonials = [
 ];
 
 const Testimonials = () => {
-  const [page, setPage] = useState(0);
+  const [current, setCurrent] = useState(0);
 
   const { data: reviews } = useQuery({
     queryKey: ["testimonial-reviews"],
