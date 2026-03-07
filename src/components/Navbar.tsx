@@ -171,6 +171,16 @@ const Navbar = memo(() => {
               <Link
                 key={link.name}
                 to={link.href}
+                onClick={(e) => {
+                  if (link.href.includes("#")) {
+                    const hash = link.href.split("#")[1];
+                    const el = document.getElementById(hash);
+                    if (el) {
+                      e.preventDefault();
+                      el.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }
+                }}
                 className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
               >
                 {link.name}
