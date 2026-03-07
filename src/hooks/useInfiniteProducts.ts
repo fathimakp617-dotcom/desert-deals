@@ -69,6 +69,7 @@ const brandSearchTerms: Record<string, string> = {
   "Sunglasses": "Sunglasses", "Heels": "Heels", "Rolex": "Rolex",
   "Cartier": "Cartier", "Tom Ford": "Tom Ford",
   "Christian Louboutin": "Louboutin", "Chanel": "Chanel", "Goyard": "Goyard",
+  "Bags": "Bags",
 };
 
 export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
@@ -96,7 +97,9 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
       } else if (category === "All") {
         // Exclude categories that have dedicated pages — only shown via direct nav links
         q = q.not("category", "ilike", "%Louis Vuitton%")
-             .not("category", "ilike", "%Socks%");
+             .not("category", "ilike", "%Socks%")
+             .not("category", "ilike", "%Heels%")
+             .not("category", "ilike", "%Bags%");
       }
 
       if (priceMin > 0) q = q.gte("price", priceMin);
