@@ -1,7 +1,5 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { Star } from "lucide-react";
-import { Link } from "react-router-dom";
-import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +11,7 @@ const fallbackTestimonials = [
     text: "Desert Deal exceeded my expectations! Fast delivery, quality products, and great customer support. Highly recommended!",
     name: "Mohammed Ali",
     product_id: null,
+    photos: null,
   },
   {
     stars: 5,
@@ -20,6 +19,7 @@ const fallbackTestimonials = [
     text: "I've been purchasing from Desert Deal for months now, and every order has been smooth. Great prices and quick delivery!",
     name: "Rahul Sharma",
     product_id: null,
+    photos: null,
   },
   {
     stars: 5,
@@ -27,11 +27,44 @@ const fallbackTestimonials = [
     text: "Shopping at Desert Deal has been a fantastic experience. The team is super responsive, and the products are always as described!",
     name: "Ayesha Khan",
     product_id: null,
+    photos: null,
   },
 ];
 
-const Testimonials = () => {
+const ReviewCard = ({ t }: { t: any }) => (
+  <div className="w-[85vw] sm:w-[calc(33.333%-1rem)] flex-shrink-0 px-2">
+    <div className="border border-border rounded-lg p-5 sm:p-6 flex flex-col bg-card h-full min-h-[180px]">
+      <div className="flex gap-0.5 mb-3">
+        {Array.from({ length: t.stars }).map((_, s) => (
+          <Star key={s} className="w-3.5 h-3.5 fill-foreground text-foreground" />
+        ))}
+      </div>
+      <h3 className="text-sm sm:text-base font-bold text-foreground mb-1.5">{t.title}</h3>
+      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-3">{t.text}</p>
+      {t.photos && t.photos.length > 0 && (
+        <div className="flex gap-2 mb-3 overflow-x-auto">
+          {t.photos.slice(0, 3).map((photo: string, pi: number) => (
+            <img
+              key={pi}
+              src={photo}
+              alt={`Review photo ${pi + 1}`}
+              className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-border"
+              loading="lazy"
+            />
+          ))}
+        </div>
+      )}
+      <div className="flex items-center gap-2 mt-auto">
+        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+          {t.name?.charAt(0)?.toUpperCase() || "V"}
+        </div>
+        <p className="text-sm font-semibold text-foreground">{t.name}</p>
+      </div>
+    </div>
+  </div>
+);
 
+const Testimonials = () => {
   const { data: reviews } = useQuery({
     queryKey: ["testimonial-reviews"],
     queryFn: async () => {
@@ -65,20 +98,32 @@ const Testimonials = () => {
     return fallbackTestimonials;
   }, [reviews]);
 
-  const [current, setCurrent] = useState(0);
+  // Marquee: duplicate items for seamless loop
+  const marqueeItems = useMemo(() => [...testimonials, ...testimonials], [testimonials]);
 
-  const next = useCallback(() => {
-    setCurrent((p) => (p + 1) % testimonials.length);
-  }, [testimonials.length]);
-
-  useEffect(() => {
-    const timer = setInterval(next, 4000);
-    return () => clearInterval(timer);
-  }, [next]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    setCurrent(0);
-  }, [testimonials.length]);
+    const el = scrollRef.current;
+    if (!el) return;
+    let raf: number;
+    const speed = 0.5; // px per frame
+
+    const step = () => {
+      if (!paused && el) {
+        el.scrollLeft += speed;
+        // Reset to start when we've scrolled through the first set
+        const halfWidth = el.scrollWidth / 2;
+        if (el.scrollLeft >= halfWidth) {
+          el.scrollLeft -= halfWidth;
+        }
+      }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [paused, marqueeItems]);
 
   return (
     <section className="bg-background py-12 sm:py-16 lg:py-20">
@@ -99,79 +144,30 @@ const Testimonials = () => {
             <p className="text-3xl sm:text-4xl font-bold text-muted-foreground/20 mb-1">4.5k</p>
             <h3 className="text-sm font-bold text-foreground mb-1">Happy Customers</h3>
             <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-              Desert Deal ensures a seamless shopping experience with top-quality products and excellent service. Your satisfaction is our priority!
+              Desert Deal ensures a seamless shopping experience with top-quality products and excellent service.
             </p>
           </div>
           <div className="text-center py-6 sm:py-8 px-4 border border-border rounded-lg bg-card">
             <p className="text-3xl sm:text-4xl font-bold text-muted-foreground/20 mb-1">456k</p>
             <h3 className="text-sm font-bold text-foreground mb-1">Total Sales Per Year</h3>
             <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-              With thousands of successful transactions every month, Desert Deal is a trusted destination for premium products at unbeatable prices.
+              With thousands of successful transactions every month, Desert Deal is a trusted destination.
             </p>
           </div>
         </div>
 
-        {/* Testimonials carousel below */}
-        <div className="relative overflow-hidden">
-          <div
-            className="flex transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${current * 100}%)` }}
-          >
-            {testimonials.map((t: any, i: number) => {
-              const product = t.product_id
-                ? allProducts?.find((p) => p.id === t.product_id)
-                : null;
-
-              return (
-                <div
-                  key={i}
-                  className="w-full flex-shrink-0 px-1"
-                >
-                  <div className="border border-border rounded-lg p-5 sm:p-6 flex flex-col bg-card h-full">
-                    <div className="flex gap-0.5 mb-3">
-                      {Array.from({ length: t.stars }).map((_, s) => (
-                        <Star key={s} className="w-3.5 h-3.5 fill-foreground text-foreground" />
-                      ))}
-                    </div>
-                    <h3 className="text-sm sm:text-base font-bold text-foreground mb-1.5">{t.title}</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-3">{t.text}</p>
-                    {t.photos && t.photos.length > 0 && (
-                      <div className="flex gap-2 mb-3 overflow-x-auto">
-                        {t.photos.slice(0, 3).map((photo: string, pi: number) => (
-                          <img
-                            key={pi}
-                            src={photo}
-                            alt={`Review photo ${pi + 1}`}
-                            className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-border"
-                            loading="lazy"
-                          />
-                        ))}
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2 mt-auto">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
-                        {t.name?.charAt(0)?.toUpperCase() || "V"}
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Dots */}
-          <div className="flex items-center justify-center gap-1.5 mt-5">
-            {testimonials.map((_: any, i: number) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  i === current ? "bg-foreground w-4" : "bg-muted-foreground/30"
-                }`}
-              />
-            ))}
-          </div>
+        {/* Continuously scrolling marquee carousel */}
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-hidden"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onTouchStart={() => setPaused(true)}
+          onTouchEnd={() => setPaused(false)}
+        >
+          {marqueeItems.map((t, i) => (
+            <ReviewCard key={i} t={t} />
+          ))}
         </div>
       </div>
     </section>
