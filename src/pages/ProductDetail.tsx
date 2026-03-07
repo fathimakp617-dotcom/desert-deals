@@ -432,7 +432,16 @@ const ProductDetail = () => {
 
                 {/* Rating stars - matching review section style */}
                 {totalReviews > 0 && (
-                  <motion.div variants={staggerItem} className="flex items-center gap-3">
+                  <motion.div
+                    variants={staggerItem}
+                    className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      setShowReviews(true);
+                      setTimeout(() => {
+                        document.getElementById("reviews-section")?.scrollIntoView({ behavior: "smooth" });
+                      }, 100);
+                    }}
+                  >
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((s) => (
                          <Star
@@ -441,7 +450,7 @@ const ProductDetail = () => {
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-muted-foreground underline underline-offset-2">
                       {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? "review" : "reviews"})
                     </span>
                   </motion.div>
