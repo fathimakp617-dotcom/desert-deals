@@ -171,6 +171,16 @@ const Navbar = memo(() => {
               <Link
                 key={link.name}
                 to={link.href}
+                onClick={(e) => {
+                  if (link.href.includes("#")) {
+                    const hash = link.href.split("#")[1];
+                    const el = document.getElementById(hash);
+                    if (el) {
+                      e.preventDefault();
+                      el.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }
+                }}
                 className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
               >
                 {link.name}
@@ -184,7 +194,21 @@ const Navbar = memo(() => {
           <div className="lg:hidden bg-background border-t border-border max-h-[70vh] overflow-y-auto">
             <div className="container mx-auto px-6 py-4 flex flex-col gap-3">
               {allLinks.map((link) => (
-                <Link key={link.name} to={link.href} onClick={() => setIsOpen(false)} className="text-sm text-foreground hover:opacity-60 transition-opacity py-1">
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    if (link.href.includes("#")) {
+                      const hash = link.href.split("#")[1];
+                      setTimeout(() => {
+                        const el = document.getElementById(hash);
+                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                      }, 100);
+                    }
+                  }}
+                  className="text-sm text-foreground hover:opacity-60 transition-opacity py-1"
+                >
                   {link.name}
                 </Link>
               ))}
