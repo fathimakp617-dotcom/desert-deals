@@ -1,0 +1,1 @@
+INSERT INTO categories (label, value, sort_order, is_active) VALUES ('Kids', 'Kids', 13, true);
