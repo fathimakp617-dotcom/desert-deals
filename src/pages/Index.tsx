@@ -204,6 +204,7 @@ const Index = () => {
                 <BrandProductRow brand="nike" title="Nike Collection" />
                 <NewBalancePromoGrid />
                 <BrandProductRow brand="new balance" title="New Balance Collection" />
+                <BrandProductRow brand="jersey" title="Jersey Collection" shopLink="/shop?brand=jersey" />
                 <Testimonials />
                 <FeaturesBar />
               </>
