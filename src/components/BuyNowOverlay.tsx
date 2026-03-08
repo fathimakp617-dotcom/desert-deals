@@ -91,7 +91,7 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                         </span>
                       </div>
                       {/* Added cross-selling items appear here */}
-                      {items.filter((item) => item.product.id !== buyNowItem.product.id && item.product.category?.toLowerCase().includes("socks")).map((item) => (
+                      {items.filter((item) => item.product.id !== buyNowItem.product.id && (item.product.category?.toLowerCase().includes("socks") || item.product.category?.toLowerCase().includes("kids"))).map((item) => (
                         <div key={item.product.id} className="flex gap-3 p-3 items-center">
                           <img src={item.product.image} alt={item.product.name} className="w-12 h-12 object-cover rounded-md flex-shrink-0" />
                           <div className="flex-1 min-w-0">

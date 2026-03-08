@@ -17,9 +17,9 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
-  // Show only socks products as cross-selling items
+  // Show socks and kids products as cross-selling items
   const relatedProducts = products.filter(
-    (p) => p.id !== currentProductId && p.category?.toLowerCase().includes("socks")
+    (p) => p.id !== currentProductId && (p.category?.toLowerCase().includes("socks") || p.category?.toLowerCase().includes("kids"))
   );
 
   if (relatedProducts.length === 0) return null;
