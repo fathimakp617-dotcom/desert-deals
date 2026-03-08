@@ -100,7 +100,8 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
              .not("category", "ilike", "%Socks%")
              .not("category", "ilike", "%Heels%")
              .not("category", "ilike", "%Bags%")
-             .not("category", "ilike", "%Jersey%");
+             .not("category", "ilike", "%Jersey%")
+             .not("category", "ilike", "%Kids%");
       }
 
       if (priceMin > 0) q = q.gte("price", priceMin);
