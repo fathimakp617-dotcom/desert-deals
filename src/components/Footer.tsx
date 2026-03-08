@@ -2,6 +2,13 @@ import { memo } from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Linkedin, ArrowRight } from "lucide-react";
 import desertDealLogo from "@/assets/desert-deal-logo-dark.png";
+import visaLogo from "@/assets/payments/visa.svg";
+import mastercardLogo from "@/assets/payments/mastercard.svg";
+import amexLogo from "@/assets/payments/amex.png";
+import applePayLogo from "@/assets/payments/apple-pay.png";
+import tabbyLogo from "@/assets/payments/tabby.png";
+import tamaraLogo from "@/assets/payments/tamara.jpeg";
+import cashLogo from "@/assets/payments/cash.png";
 
 const quickLinks = [
   { label: "Shipping Information", to: "/shipping-policy" },
