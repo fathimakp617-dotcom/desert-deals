@@ -105,8 +105,8 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                   </>
                 )}
 
-                {/* Cross-selling socks */}
-                {socksProducts.length > 0 && (
+                {/* Cross-selling */}
+                {crossSellProducts.length > 0 && (
                   <div>
                     <h3 className="text-sm font-heading font-semibold text-foreground mb-3">Complete Your Look</h3>
                     <div className="relative group/scroll">
@@ -117,7 +117,7 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                       <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2">
-                        {socksProducts.map((sock) => (
+                        {crossSellProducts.map((sock) => (
                           <div key={sock.id} className="flex-shrink-0 w-[120px]">
                             <Link to={`/product/${sock.id}`} onClick={onClose} className="block">
                               <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-2">
