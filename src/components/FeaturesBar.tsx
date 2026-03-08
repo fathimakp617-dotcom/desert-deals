@@ -38,7 +38,7 @@ const FeaturesBar = memo(() => {
   const Feature = features[current];
 
   return (
-    <section className="py-6 sm:py-10 border-t border-border bg-background">
+    <section className="py-6 sm:py-10 border-t-0 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12">
         {/* Desktop: show all 4 */}
         <div className="hidden lg:grid grid-cols-4 gap-8">
