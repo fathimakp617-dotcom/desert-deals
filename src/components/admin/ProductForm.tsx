@@ -391,47 +391,62 @@ const ProductForm = ({
         </div>
           <div className="col-span-3">
             <Label>Available Sizes</Label>
-            <div className="flex items-center gap-2 mt-2 mb-2">
-              <span className="text-xs text-muted-foreground">Quick select:</span>
-              {[
-                { label: "36–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 45; }) },
-                { label: "40–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 45; }) },
-                { label: "All", sizes: ALL_SIZES },
-                { label: "None", sizes: [] as string[] },
-              ].map((preset) => (
-                <Button
-                  key={preset.label}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs px-2.5"
-                  onClick={() => setFormData(prev => ({ ...prev, size: preset.sizes.join(", ") }))}
-                >
-                  {preset.label}
-                </Button>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {ALL_SIZES.map((size) => {
-                const selected = formData.size.split(",").map(s => s.trim()).filter(Boolean);
-                const isChecked = selected.includes(size);
-                return (
-                  <label key={size} className="flex items-center gap-1.5 text-sm cursor-pointer">
-                    <Checkbox
-                      checked={isChecked}
-                      onCheckedChange={(checked) => {
-                        const current = formData.size.split(",").map(s => s.trim()).filter(Boolean);
-                        const updated = checked
-                          ? [...current, size]
-                          : current.filter(s => s !== size);
-                        setFormData(prev => ({ ...prev, size: updated.join(", ") }));
-                      }}
-                    />
-                    {size}
-                  </label>
-                );
-              })}
-            </div>
+            {(() => {
+              const isJersey = formData.category.toLowerCase().includes("jersey");
+              const sizeOptions = isJersey ? JERSEY_SIZES : ALL_SIZES;
+              return (
+                <>
+                  <div className="flex items-center gap-2 mt-2 mb-2">
+                    <span className="text-xs text-muted-foreground">Quick select:</span>
+                    {isJersey ? (
+                      <>
+                        {[
+                          { label: "S–XL", sizes: JERSEY_SIZES.filter(s => ["S","M","L","XL"].includes(s)) },
+                          { label: "All", sizes: JERSEY_SIZES },
+                          { label: "None", sizes: [] as string[] },
+                        ].map((preset) => (
+                          <Button key={preset.label} type="button" variant="outline" size="sm" className="h-7 text-xs px-2.5"
+                            onClick={() => setFormData(prev => ({ ...prev, size: preset.sizes.join(", ") }))}>{preset.label}</Button>
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        {[
+                          { label: "36–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 45; }) },
+                          { label: "40–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 45; }) },
+                          { label: "All", sizes: ALL_SIZES },
+                          { label: "None", sizes: [] as string[] },
+                        ].map((preset) => (
+                          <Button key={preset.label} type="button" variant="outline" size="sm" className="h-7 text-xs px-2.5"
+                            onClick={() => setFormData(prev => ({ ...prev, size: preset.sizes.join(", ") }))}>{preset.label}</Button>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {sizeOptions.map((size) => {
+                      const selected = formData.size.split(",").map(s => s.trim()).filter(Boolean);
+                      const isChecked = selected.includes(size);
+                      return (
+                        <label key={size} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                          <Checkbox
+                            checked={isChecked}
+                            onCheckedChange={(checked) => {
+                              const current = formData.size.split(",").map(s => s.trim()).filter(Boolean);
+                              const updated = checked
+                                ? [...current, size]
+                                : current.filter(s => s !== size);
+                              setFormData(prev => ({ ...prev, size: updated.join(", ") }));
+                            }}
+                          />
+                          {size}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
           </div>
 
         {/* Product Images - Multiple */}
