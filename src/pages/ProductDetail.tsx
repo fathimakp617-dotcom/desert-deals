@@ -721,8 +721,8 @@ const ProductDetail = () => {
 
         {/* Cross-sell sections */}
         <div className="border-t border-border mt-4">
-          <CustomersAlsoBought currentProduct={product} />
           <RelatedProducts currentProductId={product.id} currentCategory={product.category} />
+          <CustomersAlsoBought currentProduct={product} />
           <RecentlyViewedProducts currentProductId={product.id} />
           <BrandProductRow brand="Nike" title="Nike" />
           <BrandProductRow brand="Adidas" title="Adidas" />
