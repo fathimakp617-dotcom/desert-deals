@@ -16,6 +16,7 @@ import RelatedProducts from "@/components/RelatedProducts";
 import FrequentlyBoughtTogether from "@/components/FrequentlyBoughtTogether";
 import BrandProductRow from "@/components/BrandProductRow";
 import RecentlyViewedProducts, { addToRecentlyViewed } from "@/components/RecentlyViewedProducts";
+import CustomersAlsoBought from "@/components/CustomersAlsoBought";
 
 import PageTransition from "@/components/PageTransition";
 import { formatPrice } from "@/data/products";
