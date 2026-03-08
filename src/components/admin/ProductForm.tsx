@@ -24,6 +24,8 @@ const ALL_SIZES = [
   "Free Size",
 ];
 
+const JERSEY_SIZES = ["S", "M", "L", "XL", "XXL", "XXXL"];
+
 const FALLBACK_CATEGORIES = [
   { value: "all-shoes", label: "All Shoes" },
   { value: "nike", label: "Nike" },

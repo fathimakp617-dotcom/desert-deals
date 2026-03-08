@@ -96,10 +96,11 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
         }
       } else if (category === "All") {
         // Exclude categories that have dedicated pages — only shown via direct nav links
-        q = q.not("category", "ilike", "%Louis Vuitton%")
+      q = q.not("category", "ilike", "%Louis Vuitton%")
              .not("category", "ilike", "%Socks%")
              .not("category", "ilike", "%Heels%")
-             .not("category", "ilike", "%Bags%");
+             .not("category", "ilike", "%Bags%")
+             .not("category", "ilike", "%Jersey%");
       }
 
       if (priceMin > 0) q = q.gte("price", priceMin);
