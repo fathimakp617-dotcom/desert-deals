@@ -16,6 +16,7 @@ import RelatedProducts from "@/components/RelatedProducts";
 import FrequentlyBoughtTogether from "@/components/FrequentlyBoughtTogether";
 import BrandProductRow from "@/components/BrandProductRow";
 import RecentlyViewedProducts, { addToRecentlyViewed } from "@/components/RecentlyViewedProducts";
+import CustomersAlsoBought from "@/components/CustomersAlsoBought";
 
 import PageTransition from "@/components/PageTransition";
 import { formatPrice } from "@/data/products";
@@ -718,8 +719,9 @@ const ProductDetail = () => {
           </div>
         </section>
 
-        {/* Brand Product Rows */}
+        {/* Cross-sell sections */}
         <div className="border-t border-border mt-4">
+          <CustomersAlsoBought currentProduct={product} />
           <RelatedProducts currentProductId={product.id} currentCategory={product.category} />
           <RecentlyViewedProducts currentProductId={product.id} />
           <BrandProductRow brand="Nike" title="Nike" />
