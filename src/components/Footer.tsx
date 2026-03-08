@@ -146,30 +146,30 @@ const Footer = memo(() => {
       </div>
 
       {/* Payment Methods */}
-      <div className="container mx-auto px-6 lg:px-12 pb-6">
-        <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-end gap-3">
-          <p className="text-xs text-white/50 font-medium">We Accept:</p>
-          <div className="flex items-center gap-2 flex-wrap justify-center">
-            <div className="w-12 h-8 rounded bg-white flex items-center justify-center p-1">
-              <img src={visaLogo} alt="Visa" className="h-4 w-auto" />
+      <div className="container mx-auto px-6 lg:px-12 pb-8">
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-xs text-white/40 font-medium uppercase tracking-widest">We Accept</p>
+          <div className="flex items-center gap-3 flex-wrap justify-center">
+            <div className="w-14 h-9 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center p-1.5 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+              <img src={visaLogo} alt="Visa" className="h-3.5 w-auto brightness-0 invert" />
             </div>
-            <div className="w-12 h-8 rounded bg-white flex items-center justify-center p-1">
-              <img src={mastercardLogo} alt="Mastercard" className="h-4 w-auto" />
+            <div className="w-14 h-9 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center p-1.5 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+              <img src={mastercardLogo} alt="Mastercard" className="h-5 w-auto" />
             </div>
-            <div className="w-12 h-8 rounded overflow-hidden flex items-center justify-center">
-              <img src={amexLogo} alt="American Express" className="h-8 w-12 object-cover" />
+            <div className="w-14 h-9 rounded-lg bg-white/10 backdrop-blur-sm overflow-hidden flex items-center justify-center p-1 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+              <img src={amexLogo} alt="American Express" className="h-7 w-auto object-contain rounded" />
             </div>
-            <div className="w-12 h-8 rounded bg-white flex items-center justify-center p-1">
-              <img src={applePayLogo} alt="Apple Pay" className="h-5 w-auto" />
+            <div className="w-14 h-9 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center p-1.5 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+              <img src={applePayLogo} alt="Apple Pay" className="h-5 w-auto brightness-0 invert" />
             </div>
-            <div className="w-12 h-8 rounded overflow-hidden flex items-center justify-center">
-              <img src={tabbyLogo} alt="Tabby" className="h-8 w-12 object-cover" />
+            <div className="w-14 h-9 rounded-lg bg-white/10 backdrop-blur-sm overflow-hidden flex items-center justify-center p-1 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+              <img src={tabbyLogo} alt="Tabby" className="h-7 w-auto object-contain rounded" />
             </div>
-            <div className="w-12 h-8 rounded overflow-hidden flex items-center justify-center">
-              <img src={tamaraLogo} alt="Tamara" className="h-8 w-12 object-cover" />
+            <div className="w-14 h-9 rounded-lg bg-white/10 backdrop-blur-sm overflow-hidden flex items-center justify-center p-1 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+              <img src={tamaraLogo} alt="Tamara" className="h-7 w-auto object-contain rounded" />
             </div>
-            <div className="w-12 h-8 rounded bg-white flex items-center justify-center p-0.5">
-              <img src={cashLogo} alt="Cash on Delivery" className="h-5 w-auto" />
+            <div className="w-14 h-9 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center p-1.5 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+              <img src={cashLogo} alt="Cash on Delivery" className="h-5 w-auto brightness-0 invert" />
             </div>
           </div>
         </div>
