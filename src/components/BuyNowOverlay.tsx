@@ -21,8 +21,8 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
   const buyNowItem = items.length > 0 ? items[0] : null;
 
   const cartIds = new Set(items.map((i) => i.product.id));
-  const socksProducts = (allProducts || []).filter(
-    (p) => !cartIds.has(p.id) && p.category?.toLowerCase().includes("socks")
+  const crossSellProducts = (allProducts || []).filter(
+    (p) => !cartIds.has(p.id) && (p.category?.toLowerCase().includes("socks") || p.category?.toLowerCase().includes("kids"))
   ).slice(0, 10);
 
   const scroll = (dir: "left" | "right") => {
