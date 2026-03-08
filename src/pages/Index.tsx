@@ -141,6 +141,7 @@ const Index = () => {
       new_balance_promo: <NewBalancePromoGrid key="new_balance_promo" />,
       new_balance_collection: <BrandProductRow key="new_balance_collection" brand="new balance" title="New Balance Collection" />,
       asics_collection: <BrandProductRow key="asics_collection" brand="asics" title="Asics Collection" shopLink="/shop?brand=asics" />,
+      jersey_collection: <BrandProductRow key="jersey_collection" brand="jersey" title="Jersey Collection" shopLink="/shop?brand=jersey" />,
       testimonials: <Testimonials key="testimonials" />,
       features_bar: <FeaturesBar key="features_bar" />,
     };
@@ -203,6 +204,7 @@ const Index = () => {
                 <BrandProductRow brand="nike" title="Nike Collection" />
                 <NewBalancePromoGrid />
                 <BrandProductRow brand="new balance" title="New Balance Collection" />
+                <BrandProductRow brand="jersey" title="Jersey Collection" shopLink="/shop?brand=jersey" />
                 <Testimonials />
                 <FeaturesBar />
               </>
