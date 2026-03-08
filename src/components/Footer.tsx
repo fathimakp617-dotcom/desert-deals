@@ -2,6 +2,13 @@ import { memo } from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Linkedin, ArrowRight } from "lucide-react";
 import desertDealLogo from "@/assets/desert-deal-logo-dark.png";
+import visaLogo from "@/assets/payments/visa.svg";
+import mastercardLogo from "@/assets/payments/mastercard.svg";
+import amexLogo from "@/assets/payments/amex.png";
+import applePayLogo from "@/assets/payments/apple-pay.png";
+import tabbyLogo from "@/assets/payments/tabby.png";
+import tamaraLogo from "@/assets/payments/tamara.jpeg";
+import cashLogo from "@/assets/payments/cash.png";
 
 const quickLinks = [
   { label: "Shipping Information", to: "/shipping-policy" },
@@ -143,33 +150,26 @@ const Footer = memo(() => {
         <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-end gap-3">
           <p className="text-xs text-white/50 font-medium">We Accept:</p>
           <div className="flex items-center gap-2 flex-wrap justify-center">
-            {/* Visa */}
             <div className="w-12 h-8 rounded bg-white flex items-center justify-center p-1">
-              <svg viewBox="0 0 48 32" className="w-10 h-5"><path d="M19.5 21h-3l1.9-11.5h3L19.5 21zm12.1-11.2c-.6-.2-1.5-.5-2.7-.5-3 0-5.1 1.5-5.1 3.7 0 1.6 1.5 2.5 2.6 3.1 1.2.6 1.6.9 1.6 1.4 0 .8-.9 1.1-1.8 1.1-1.2 0-1.9-.2-2.9-.6l-.4-.2-.4 2.5c.7.3 2 .6 3.4.6 3.2 0 5.2-1.5 5.3-3.8 0-1.3-.8-2.2-2.5-3-.6-.5-1.4-.8-1.4-1.3 0-.5.5-.9 1.5-.9.8 0 1.5.2 2 .4l.2.1.6-2.6zM36 21l2.4-11.5H36c-.7 0-1.3.2-1.6 1L30 21h3.2l.6-1.7h3.9l.3 1.7zm-2.7-4l1.6-4.3.9 4.3h-2.5zM16 9.5l-2.8 7.8-.3-1.5c-.5-1.7-2.1-3.6-3.9-4.5l2.7 9.7h3.2L19.2 9.5H16z" fill="#1A1F71"/><path d="M11 9.5H6l0 .2c3.8.9 6.3 3.2 7.3 5.8L12.2 10c-.2-.8-.8-1-1.2-1z" fill="#F9A533"/></svg>
+              <img src={visaLogo} alt="Visa" className="h-4 w-auto" />
             </div>
-            {/* Mastercard */}
             <div className="w-12 h-8 rounded bg-white flex items-center justify-center p-1">
-              <svg viewBox="0 0 48 32" className="w-10 h-5"><circle cx="17" cy="16" r="9" fill="#EB001B"/><circle cx="31" cy="16" r="9" fill="#F79E1B"/><path d="M24 9.2a9 9 0 0 1 0 13.6 9 9 0 0 1 0-13.6z" fill="#FF5F00"/></svg>
+              <img src={mastercardLogo} alt="Mastercard" className="h-4 w-auto" />
             </div>
-            {/* Amex */}
-            <div className="w-12 h-8 rounded flex items-center justify-center p-1" style={{background:'#016fd0'}}>
-              <svg viewBox="0 0 48 16" className="w-10 h-4"><text x="24" y="12" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="bold" fontFamily="Arial,sans-serif">AMEX</text></svg>
+            <div className="w-12 h-8 rounded overflow-hidden flex items-center justify-center">
+              <img src={amexLogo} alt="American Express" className="h-8 w-12 object-cover" />
             </div>
-            {/* Apple Pay */}
-            <div className="w-12 h-8 rounded bg-black flex items-center justify-center p-1">
-              <svg viewBox="0 0 50 20" className="w-10 h-4"><path d="M9.4 3.2c.6-.8 1-1.8.9-2.9-1 0-2.1.6-2.8 1.4-.6.7-1.1 1.8-1 2.8 1.1.1 2.2-.5 2.9-1.3zm2.9 1.5c-1.6-.1-3 .9-3.7.9s-2-.9-3.3-.8c-1.7 0-3.3 1-4.2 2.5-1.8 3.1-.5 7.6 1.3 10.1.8 1.2 1.9 2.6 3.2 2.5 1.3-.1 1.8-.8 3.3-.8s2 .8 3.3.8c1.4 0 2.3-1.2 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4 0-2.5 2.1-3.7 2.2-3.8-1.2-1.8-3.1-2-3.9-2z" fill="#fff"/><text x="30" y="14" fill="#fff" fontSize="10" fontWeight="600" fontFamily="Arial,sans-serif">Pay</text></svg>
+            <div className="w-12 h-8 rounded bg-white flex items-center justify-center p-1">
+              <img src={applePayLogo} alt="Apple Pay" className="h-5 w-auto" />
             </div>
-            {/* Google Pay */}
-            <div className="w-12 h-8 rounded bg-white flex items-center justify-center p-1 border border-gray-200">
-              <svg viewBox="0 0 50 20" className="w-10 h-4"><text x="25" y="14" textAnchor="middle" fontSize="9" fontWeight="bold" fontFamily="Arial,sans-serif"><tspan fill="#4285F4">G</tspan><tspan fill="#EA4335">P</tspan><tspan fill="#FBBC04">a</tspan><tspan fill="#4285F4">y</tspan></text></svg>
+            <div className="w-12 h-8 rounded overflow-hidden flex items-center justify-center">
+              <img src={tabbyLogo} alt="Tabby" className="h-8 w-12 object-cover" />
             </div>
-            {/* Tabby */}
-            <div className="w-12 h-8 rounded flex items-center justify-center p-1" style={{background:'#3BFFC0'}}>
-              <svg viewBox="0 0 50 16" className="w-10 h-3.5"><text x="25" y="12" textAnchor="middle" fill="#292929" fontSize="10" fontWeight="bold" fontFamily="Arial,sans-serif">tabby</text></svg>
+            <div className="w-12 h-8 rounded overflow-hidden flex items-center justify-center">
+              <img src={tamaraLogo} alt="Tamara" className="h-8 w-12 object-cover" />
             </div>
-            {/* Tamara */}
-            <div className="w-12 h-8 rounded flex items-center justify-center p-1" style={{background:'#2B2458'}}>
-              <svg viewBox="0 0 56 16" className="w-10 h-3.5"><text x="28" y="12" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="bold" fontFamily="Arial,sans-serif">tamara</text></svg>
+            <div className="w-12 h-8 rounded bg-white flex items-center justify-center p-0.5">
+              <img src={cashLogo} alt="Cash on Delivery" className="h-5 w-auto" />
             </div>
           </div>
         </div>
