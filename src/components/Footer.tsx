@@ -26,8 +26,7 @@ const bottomPolicyLinks = [
 const Footer = memo(() => {
   return (
     <footer className="bg-black text-white overflow-x-hidden">
-      {/* Accent top bar */}
-      <div className="h-1 bg-destructive w-full" />
+      {/* Accent top bar removed */}
 
       {/* Main Footer */}
       <div className="container mx-auto px-6 lg:px-12 pt-14 pb-10">
