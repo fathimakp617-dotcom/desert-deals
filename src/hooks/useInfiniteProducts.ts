@@ -69,7 +69,7 @@ const brandSearchTerms: Record<string, string> = {
   "Sunglasses": "Sunglasses", "Heels": "Heels", "Rolex": "Rolex",
   "Cartier": "Cartier", "Tom Ford": "Tom Ford",
   "Christian Louboutin": "Louboutin", "Chanel": "Chanel", "Goyard": "Goyard",
-  "Bags": "Bags", "Socks": "Socks", "Jersey": "Jersey",
+  "Bags": "Bags", "Socks": "Socks", "Jersey": "Jersey", "Kids": "Kids",
 };
 
 export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
@@ -100,7 +100,8 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
              .not("category", "ilike", "%Socks%")
              .not("category", "ilike", "%Heels%")
              .not("category", "ilike", "%Bags%")
-             .not("category", "ilike", "%Jersey%");
+             .not("category", "ilike", "%Jersey%")
+             .not("category", "ilike", "%Kids%");
       }
 
       if (priceMin > 0) q = q.gte("price", priceMin);
