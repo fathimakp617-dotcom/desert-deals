@@ -23,7 +23,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
   const brandLower = brand.toLowerCase().trim();
-  const excludedCategories = ["socks", "heels", "bags", "jersey"];
+  const excludedCategories = ["socks", "heels", "bags", "jersey", "kids"];
   const isExcludedCategory = excludedCategories.includes(brandLower);
   
   const filteredBase = allProducts.filter(p => {
