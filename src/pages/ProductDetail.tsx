@@ -162,17 +162,20 @@ const ProductDetail = () => {
   }
 
   const inWishlist = isInWishlist(product.id);
+  const categoryLower = (product.category || "").toLowerCase();
+  const needsSize = !["bags", "bag"].some(c => categoryLower.includes(c));
 
   const handleAddToCart = () => {
     if (isSoldOut) {
       toast.error("This product is currently sold out");
       return;
     }
-    if (!selectedSize) {
+    if (needsSize && !selectedSize) {
       toast.error("Please select a size first");
       return;
     }
-    addToCart(product, quantity, `EU ${selectedSize}`);
+    const sizeLabel = needsSize && selectedSize ? `EU ${selectedSize}` : "One Size";
+    addToCart(product, quantity, sizeLabel);
     trackAddToCart({
       content_ids: [product.id],
       value: product.price * quantity,
@@ -182,17 +185,17 @@ const ProductDetail = () => {
   };
 
 
-
   const handleBuyNow = () => {
     if (isSoldOut) {
       toast.error("This product is currently sold out");
       return;
     }
-    if (!selectedSize) {
+    if (needsSize && !selectedSize) {
       toast.error("Please select a size first");
       return;
     }
-    buyNow(product, quantity, `EU ${selectedSize}`);
+    const sizeLabel = needsSize && selectedSize ? `EU ${selectedSize}` : "One Size";
+    buyNow(product, quantity, sizeLabel);
     setShowBuyNow(true);
   };
 
@@ -458,6 +461,7 @@ const ProductDetail = () => {
                 )}
 
                 {/* Size Selector */}
+                {needsSize && (
                 <motion.div variants={staggerItem} className="space-y-2">
                   <p className="text-xs sm:text-sm text-muted-foreground">Size <span className="text-destructive">*</span></p>
                   <div className="flex flex-wrap gap-1.5">
@@ -479,6 +483,7 @@ const ProductDetail = () => {
                     ))}
                   </div>
                 </motion.div>
+                )}
 
                 {/* Stock warnings */}
                 {isSoldOut && (
