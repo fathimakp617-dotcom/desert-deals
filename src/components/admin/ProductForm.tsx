@@ -24,7 +24,12 @@ const ALL_SIZES = [
   "Free Size",
 ];
 
-const JERSEY_SIZES = ["S", "M", "L", "XL", "XXL", "XXXL"];
+const KIDS_SIZES = [
+  "EU 24", "EU 25", "EU 26", "EU 27", "EU 28", "EU 29",
+  "EU 30", "EU 31", "EU 32", "EU 33", "EU 34", "EU 35", "EU 36",
+];
+
+const JERSEY_SIZES = ["S", "M", "L", "XL", "XXL"];
 
 const FALLBACK_CATEGORIES = [
   { value: "all-shoes", label: "All Shoes" },
@@ -392,8 +397,10 @@ const ProductForm = ({
           <div className="col-span-3">
             <Label>Available Sizes</Label>
             {(() => {
-              const isJersey = formData.category.toLowerCase().includes("jersey");
-              const sizeOptions = isJersey ? JERSEY_SIZES : ALL_SIZES;
+              const catLower = formData.category.toLowerCase();
+              const isJersey = catLower.includes("jersey");
+              const isKids = catLower.includes("kids");
+              const sizeOptions = isJersey ? JERSEY_SIZES : isKids ? KIDS_SIZES : ALL_SIZES;
               return (
                 <>
                   <div className="flex items-center gap-2 mt-2 mb-2">
@@ -403,6 +410,18 @@ const ProductForm = ({
                         {[
                           { label: "S–XL", sizes: JERSEY_SIZES.filter(s => ["S","M","L","XL"].includes(s)) },
                           { label: "All", sizes: JERSEY_SIZES },
+                          { label: "None", sizes: [] as string[] },
+                        ].map((preset) => (
+                          <Button key={preset.label} type="button" variant="outline" size="sm" className="h-7 text-xs px-2.5"
+                            onClick={() => setFormData(prev => ({ ...prev, size: preset.sizes.join(", ") }))}>{preset.label}</Button>
+                        ))}
+                      </>
+                    ) : isKids ? (
+                      <>
+                        {[
+                          { label: "24–30", sizes: KIDS_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 24 && n <= 30; }) },
+                          { label: "30–36", sizes: KIDS_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 30 && n <= 36; }) },
+                          { label: "All", sizes: KIDS_SIZES },
                           { label: "None", sizes: [] as string[] },
                         ].map((preset) => (
                           <Button key={preset.label} type="button" variant="outline" size="sm" className="h-7 text-xs px-2.5"
