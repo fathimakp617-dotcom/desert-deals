@@ -34,17 +34,16 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
   const isSoldOut = isProductSoldOut(stockMap, productId || "");
   const inWishlist = product ? isInWishlist(product.id) : false;
 
-  // Parse sizes from product.size string like "EU 36-45"
-  const parseSizes = (sizeStr: string): number[] => {
+  const parseSizes = (sizeStr: string): string[] => {
     const match = sizeStr.match(/(\d+)\s*-\s*(\d+)/);
     if (match) {
       const start = parseInt(match[1]);
       const end = parseInt(match[2]);
-      const sizes: number[] = [];
-      for (let i = start; i <= end; i++) sizes.push(i);
+      const sizes: string[] = [];
+      for (let i = start; i <= end; i++) sizes.push(`EU ${i}`);
       return sizes;
     }
-    return [36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
+    return sizeStr.split(",").map(s => s.trim()).filter(Boolean);
   };
 
   const handleAddToCart = () => {
