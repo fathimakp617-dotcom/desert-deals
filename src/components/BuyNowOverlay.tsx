@@ -118,20 +118,24 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                       </button>
                       <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2">
                         {crossSellProducts.map((sock) => (
-                          <div key={sock.id} className="flex-shrink-0 w-[120px]">
+                          <div key={sock.id} className="flex-shrink-0 w-[130px] flex flex-col">
                             <Link to={`/product/${sock.id}`} onClick={onClose} className="block">
                               <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-2">
                                 <img src={sock.image} alt={sock.name} className="w-full h-full object-cover" loading="lazy" />
                               </div>
-                              <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug">{sock.name}</p>
-                              <p className="text-xs font-bold text-primary mt-0.5">{formatPrice(sock.price)}</p>
                             </Link>
-                            <button
-                              onClick={() => addToCart(sock, 1)}
-                              className="mt-1.5 w-full text-[10px] font-semibold py-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                            >
-                              + Add
-                            </button>
+                            <div className="flex flex-col flex-1">
+                              <Link to={`/product/${sock.id}`} onClick={onClose} className="block">
+                                <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug min-h-[2.5em]">{sock.name}</p>
+                                <p className="text-xs font-bold text-foreground mt-0.5">{formatPrice(sock.price)}</p>
+                              </Link>
+                              <button
+                                onClick={() => addToCart(sock, 1)}
+                                className="mt-2 w-full text-xs font-semibold py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors"
+                              >
+                                + Add
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
