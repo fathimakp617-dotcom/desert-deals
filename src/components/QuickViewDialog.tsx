@@ -63,7 +63,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       toast.error("Please select a size first");
       return;
     }
-    buyNow(product, quantity, `EU ${selectedSize}`);
+    buyNow(product, quantity, selectedSize);
     setShowBuyNow(true);
   };
 
