@@ -53,6 +53,7 @@ interface Product {
   size: string;
   image_url: string;
   is_active: boolean;
+  cross_sell_price: number | null;
   deleted_at: string | null;
   notes: {
     top: string[];
