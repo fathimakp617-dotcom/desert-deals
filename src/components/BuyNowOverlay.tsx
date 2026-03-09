@@ -16,17 +16,21 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
   const { items, addToCart, totalItems } = useCart();
   const { data: allProducts } = useDbProducts();
   const navigate = useNavigate();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const socksScrollRef = useRef<HTMLDivElement>(null);
+  const kidsScrollRef = useRef<HTMLDivElement>(null);
 
   const buyNowItem = items.length > 0 ? items[0] : null;
 
   const cartIds = new Set(items.map((i) => i.product.id));
-  const crossSellProducts = (allProducts || []).filter(
-    (p) => !cartIds.has(p.id) && (p.category?.toLowerCase().includes("socks") || p.category?.toLowerCase().includes("kids")) && !p.category?.toLowerCase().includes("bags")
+  const socksProducts = (allProducts || []).filter(
+    (p) => !cartIds.has(p.id) && p.category?.toLowerCase().includes("socks") && !p.category?.toLowerCase().includes("bags")
+  ).slice(0, 10);
+  const kidsProducts = (allProducts || []).filter(
+    (p) => !cartIds.has(p.id) && p.category?.toLowerCase().includes("kids") && !p.category?.toLowerCase().includes("bags")
   ).slice(0, 10);
 
-  const scroll = (dir: "left" | "right") => {
-    scrollRef.current?.scrollBy({ left: dir === "left" ? -220 : 220, behavior: "smooth" });
+  const scrollRow = (ref: React.RefObject<HTMLDivElement | null>, dir: "left" | "right") => {
+    ref.current?.scrollBy({ left: dir === "left" ? -220 : 220, behavior: "smooth" });
   };
 
   const handleGoToCheckout = () => {
@@ -105,36 +109,64 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                   </>
                 )}
 
-                {/* Cross-selling */}
-                {crossSellProducts.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-heading font-semibold text-foreground mb-3">Complete Your Look</h3>
+                {/* Cross-selling - Socks Row */}
+                {socksProducts.length > 0 && (
+                  <div className="mb-5">
+                    <h3 className="text-sm font-heading font-semibold text-foreground mb-3">Add Socks</h3>
                     <div className="relative group/scroll">
-                      <button onClick={() => scroll("left")} className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background border border-border rounded-full hidden sm:flex items-center justify-center shadow-sm opacity-0 group-hover/scroll:opacity-100 transition-opacity">
+                      <button onClick={() => scrollRow(socksScrollRef, "left")} className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background border border-border rounded-full hidden sm:flex items-center justify-center shadow-sm opacity-0 group-hover/scroll:opacity-100 transition-opacity">
                         <ChevronLeft className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => scroll("right")} className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background border border-border rounded-full hidden sm:flex items-center justify-center shadow-sm opacity-0 group-hover/scroll:opacity-100 transition-opacity">
+                      <button onClick={() => scrollRow(socksScrollRef, "right")} className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background border border-border rounded-full hidden sm:flex items-center justify-center shadow-sm opacity-0 group-hover/scroll:opacity-100 transition-opacity">
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
-                      <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2">
-                        {crossSellProducts.map((sock) => (
-                          <div key={sock.id} className="flex-shrink-0 w-[130px] flex flex-col">
-                            <Link to={`/product/${sock.id}`} onClick={onClose} className="block">
+                      <div ref={socksScrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2">
+                        {socksProducts.map((p) => (
+                          <div key={p.id} className="flex-shrink-0 w-[130px] flex flex-col">
+                            <Link to={`/product/${p.id}`} onClick={onClose} className="block">
                               <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-2">
-                                <img src={sock.image} alt={sock.name} className="w-full h-full object-cover" loading="lazy" />
+                                <img src={p.image} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
                               </div>
                             </Link>
                             <div className="flex flex-col flex-1">
-                              <Link to={`/product/${sock.id}`} onClick={onClose} className="block">
-                                <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug min-h-[2.5em]">{sock.name}</p>
-                                <p className="text-xs font-bold text-foreground mt-0.5">{formatPrice(sock.price)}</p>
+                              <Link to={`/product/${p.id}`} onClick={onClose} className="block">
+                                <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug min-h-[2.5em]">{p.name}</p>
+                                <p className="text-xs font-bold text-foreground mt-0.5">{formatPrice(p.price)}</p>
                               </Link>
-                              <button
-                                onClick={() => addToCart(sock, 1)}
-                                className="mt-2 w-full text-xs font-semibold py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors"
-                              >
-                                + Add
-                              </button>
+                              <button onClick={() => addToCart(p, 1)} className="mt-2 w-full text-xs font-semibold py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors">+ Add</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Cross-selling - Kids Row */}
+                {kidsProducts.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-heading font-semibold text-foreground mb-3">Kids Shoes</h3>
+                    <div className="relative group/scroll">
+                      <button onClick={() => scrollRow(kidsScrollRef, "left")} className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background border border-border rounded-full hidden sm:flex items-center justify-center shadow-sm opacity-0 group-hover/scroll:opacity-100 transition-opacity">
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => scrollRow(kidsScrollRef, "right")} className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background border border-border rounded-full hidden sm:flex items-center justify-center shadow-sm opacity-0 group-hover/scroll:opacity-100 transition-opacity">
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                      <div ref={kidsScrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2">
+                        {kidsProducts.map((p) => (
+                          <div key={p.id} className="flex-shrink-0 w-[130px] flex flex-col">
+                            <Link to={`/product/${p.id}`} onClick={onClose} className="block">
+                              <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-2">
+                                <img src={p.image} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
+                              </div>
+                            </Link>
+                            <div className="flex flex-col flex-1">
+                              <Link to={`/product/${p.id}`} onClick={onClose} className="block">
+                                <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug min-h-[2.5em]">{p.name}</p>
+                                <p className="text-xs font-bold text-foreground mt-0.5">{formatPrice(p.price)}</p>
+                              </Link>
+                              <button onClick={() => addToCart(p, 1)} className="mt-2 w-full text-xs font-semibold py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors">+ Add</button>
                             </div>
                           </div>
                         ))}
