@@ -162,6 +162,8 @@ const ProductDetail = () => {
   }
 
   const inWishlist = isInWishlist(product.id);
+  const categoryLower = (product.category || "").toLowerCase();
+  const needsSize = !["bags", "bag"].some(c => categoryLower.includes(c));
 
   const handleAddToCart = () => {
     if (isSoldOut) {
