@@ -1,4 +1,4 @@
-import { memo, useRef } from "react";
+import { memo, useRef, useState } from "react";
 import { X, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,11 +6,17 @@ import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 interface BuyNowOverlayProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const parseSizes = (sizeStr?: string | null): string[] => {
+  if (!sizeStr) return [];
+  return sizeStr.split(",").map(s => s.trim()).filter(Boolean);
+};
 
 const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
   const { items, addToCart, totalItems } = useCart();
@@ -18,6 +24,7 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
   const navigate = useNavigate();
   const socksScrollRef = useRef<HTMLDivElement>(null);
   const kidsScrollRef = useRef<HTMLDivElement>(null);
+  const [selectedKidSizes, setSelectedKidSizes] = useState<Record<string, string>>({});
 
   const buyNowItem = items.length > 0 ? items[0] : null;
 
@@ -36,6 +43,16 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
   const handleGoToCheckout = () => {
     onClose();
     navigate("/checkout");
+  };
+
+  const handleAddKids = (p: typeof kidsProducts[0]) => {
+    const sizes = parseSizes(p.size);
+    if (sizes.length > 0 && !selectedKidSizes[p.id]) {
+      toast.error("Please select a size first");
+      return;
+    }
+    const sizeLabel = selectedKidSizes[p.id] || "One Size";
+    addToCart(p.crossSellPrice ? { ...p, price: p.crossSellPrice } : p, 1, sizeLabel);
   };
 
   return (
@@ -94,13 +111,14 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                           {formatPrice(buyNowItem.product.price * buyNowItem.quantity)}
                         </span>
                       </div>
-                      {/* Added cross-selling items appear here */}
                       {items.filter((item) => item.product.id !== buyNowItem.product.id && (item.product.category?.toLowerCase().includes("socks") || item.product.category?.toLowerCase().includes("kids"))).map((item) => (
                         <div key={item.product.id} className="flex gap-3 p-3 items-center">
                           <img src={item.product.image} alt={item.product.name} className="w-12 h-12 object-cover rounded-md flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-medium text-foreground line-clamp-1">{item.product.name}</p>
-                            <p className="text-[10px] text-muted-foreground">Qty: {item.quantity}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {item.selectedSize && `Size: ${item.selectedSize} · `}Qty: {item.quantity}
+                            </p>
                           </div>
                           <span className="text-sm font-bold text-primary whitespace-nowrap">{formatPrice(item.product.price * item.quantity)}</span>
                         </div>
@@ -154,22 +172,44 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                       <div ref={kidsScrollRef} className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2">
-                        {kidsProducts.map((p) => (
-                          <div key={p.id} className="flex-shrink-0 w-[130px] flex flex-col">
-                            <Link to={`/product/${p.id}`} onClick={onClose} className="block">
-                              <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-2">
-                                <img src={p.image} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
-                              </div>
-                            </Link>
-                            <div className="flex flex-col flex-1">
+                        {kidsProducts.map((p) => {
+                          const sizes = parseSizes(p.size);
+                          const selected = selectedKidSizes[p.id];
+                          return (
+                            <div key={p.id} className="flex-shrink-0 w-[130px] flex flex-col">
                               <Link to={`/product/${p.id}`} onClick={onClose} className="block">
-                                <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug min-h-[2.5em]">{p.name}</p>
-                                <p className="text-xs font-bold text-foreground mt-0.5">{formatPrice(p.crossSellPrice || p.price)}</p>
+                                <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-2">
+                                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
+                                </div>
                               </Link>
-                              <button onClick={() => addToCart(p.crossSellPrice ? { ...p, price: p.crossSellPrice } : p, 1)} className="mt-2 w-full text-xs font-semibold py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors">+ Add</button>
+                              <div className="flex flex-col flex-1">
+                                <Link to={`/product/${p.id}`} onClick={onClose} className="block">
+                                  <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug min-h-[2.5em]">{p.name}</p>
+                                  <p className="text-xs font-bold text-foreground mt-0.5">{formatPrice(p.crossSellPrice || p.price)}</p>
+                                </Link>
+                                {/* Size selector */}
+                                {sizes.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-1.5">
+                                    {sizes.map(size => (
+                                      <button
+                                        key={size}
+                                        onClick={() => setSelectedKidSizes(prev => ({ ...prev, [p.id]: size }))}
+                                        className={`min-w-[26px] h-[22px] px-1 text-[10px] border rounded transition-colors ${
+                                          selected === size
+                                            ? "border-foreground bg-foreground text-background"
+                                            : "border-border hover:border-foreground text-foreground"
+                                        }`}
+                                      >
+                                        {size.replace(/^EU\s*/i, "")}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                                <button onClick={() => handleAddKids(p)} className="mt-2 w-full text-xs font-semibold py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors">+ Add</button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
