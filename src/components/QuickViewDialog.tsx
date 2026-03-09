@@ -52,9 +52,9 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       toast.error("Please select a size first");
       return;
     }
-    addToCart(product, quantity, `EU ${selectedSize}`);
+    addToCart(product, quantity, selectedSize);
     trackAddToCart({ content_ids: [product.id], value: product.price * quantity, currency: "AED" });
-    toast.success(`${product.name} added to cart`, { description: `Size: EU ${selectedSize} · Qty: ${quantity}` });
+    toast.success(`${product.name} added to cart`, { description: `Size: ${selectedSize} · Qty: ${quantity}` });
   };
 
   const handleBuyNow = () => {
