@@ -376,7 +376,7 @@ const ProductForm = ({
           </div>
         )}
 
-
+        <div>
           <Label htmlFor="stock_quantity">Stock Quantity</Label>
           <Input
             id="stock_quantity"
