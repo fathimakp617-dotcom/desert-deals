@@ -599,6 +599,7 @@ const AdminProducts = () => {
       notes_top: product.notes?.top?.join(", ") || "",
       notes_middle: product.notes?.middle?.join(", ") || "",
       notes_base: product.notes?.base?.join(", ") || "",
+      cross_sell_price: product.cross_sell_price?.toString() || "",
     });
     setEditingProduct(null);
     setIsAddDialogOpen(true);
