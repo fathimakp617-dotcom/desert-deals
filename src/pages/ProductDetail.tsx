@@ -170,11 +170,12 @@ const ProductDetail = () => {
       toast.error("This product is currently sold out");
       return;
     }
-    if (!selectedSize) {
+    if (needsSize && !selectedSize) {
       toast.error("Please select a size first");
       return;
     }
-    addToCart(product, quantity, `EU ${selectedSize}`);
+    const sizeLabel = needsSize && selectedSize ? `EU ${selectedSize}` : "One Size";
+    addToCart(product, quantity, sizeLabel);
     trackAddToCart({
       content_ids: [product.id],
       value: product.price * quantity,
@@ -182,7 +183,6 @@ const ProductDetail = () => {
     });
     setShowBuyNow(true);
   };
-
 
 
   const handleBuyNow = () => {
