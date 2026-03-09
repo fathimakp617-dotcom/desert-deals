@@ -24,7 +24,12 @@ const ALL_SIZES = [
   "Free Size",
 ];
 
-const JERSEY_SIZES = ["S", "M", "L", "XL", "XXL", "XXXL"];
+const KIDS_SIZES = [
+  "EU 24", "EU 25", "EU 26", "EU 27", "EU 28", "EU 29",
+  "EU 30", "EU 31", "EU 32", "EU 33", "EU 34", "EU 35", "EU 36",
+];
+
+const JERSEY_SIZES = ["S", "M", "L", "XL", "XXL"];
 
 const FALLBACK_CATEGORIES = [
   { value: "all-shoes", label: "All Shoes" },
