@@ -41,7 +41,7 @@ const ProductDetail = () => {
   const { data: product, isLoading } = useDbProduct(id);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState<number | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false, skipSnaps: false });
 
@@ -174,7 +174,7 @@ const ProductDetail = () => {
       toast.error("Please select a size first");
       return;
     }
-    const sizeLabel = needsSize && selectedSize ? `EU ${selectedSize}` : "One Size";
+    const sizeLabel = needsSize && selectedSize ? selectedSize : "One Size";
     addToCart(product, quantity, sizeLabel);
     trackAddToCart({
       content_ids: [product.id],
@@ -194,7 +194,7 @@ const ProductDetail = () => {
       toast.error("Please select a size first");
       return;
     }
-    const sizeLabel = needsSize && selectedSize ? `EU ${selectedSize}` : "One Size";
+    const sizeLabel = needsSize && selectedSize ? selectedSize : "One Size";
     buyNow(product, quantity, sizeLabel);
     setShowBuyNow(true);
   };
@@ -466,19 +466,19 @@ const ProductDetail = () => {
                   <p className="text-xs sm:text-sm text-muted-foreground">Size <span className="text-destructive">*</span></p>
                   <div className="flex flex-wrap gap-1.5">
                     {([...new Set(product.size
-                      ? product.size.split(",").map(s => s.trim().replace(/^EU\s*/i, "")).filter(Boolean).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b)
-                      : [36, 37, 38, 39, 40, 41, 42, 43, 44, 45]
+                      ? product.size.split(",").map(s => s.trim()).filter(Boolean)
+                      : ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45"]
                     )]).map((size) => (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full border text-xs sm:text-sm font-medium transition-all duration-200 ${
+                        className={`min-w-9 h-9 px-2 sm:min-w-11 sm:h-11 rounded-full border text-xs sm:text-sm font-medium transition-all duration-200 ${
                           selectedSize === size
                             ? "border-foreground bg-foreground text-background"
                             : "border-border hover:border-foreground text-foreground"
                         }`}
                       >
-                        {size}
+                        {size.replace(/^EU\s*/i, "")}
                       </button>
                     ))}
                   </div>

@@ -24,7 +24,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
   const { addToCart, buyNow } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { data: stockMap } = useProductStock();
-  const [selectedSize, setSelectedSize] = useState<number | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [showBuyNow, setShowBuyNow] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -34,17 +34,16 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
   const isSoldOut = isProductSoldOut(stockMap, productId || "");
   const inWishlist = product ? isInWishlist(product.id) : false;
 
-  // Parse sizes from product.size string like "EU 36-45"
-  const parseSizes = (sizeStr: string): number[] => {
+  const parseSizes = (sizeStr: string): string[] => {
     const match = sizeStr.match(/(\d+)\s*-\s*(\d+)/);
     if (match) {
       const start = parseInt(match[1]);
       const end = parseInt(match[2]);
-      const sizes: number[] = [];
-      for (let i = start; i <= end; i++) sizes.push(i);
+      const sizes: string[] = [];
+      for (let i = start; i <= end; i++) sizes.push(`EU ${i}`);
       return sizes;
     }
-    return [36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
+    return sizeStr.split(",").map(s => s.trim()).filter(Boolean);
   };
 
   const handleAddToCart = () => {
@@ -53,9 +52,9 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       toast.error("Please select a size first");
       return;
     }
-    addToCart(product, quantity, `EU ${selectedSize}`);
+    addToCart(product, quantity, selectedSize);
     trackAddToCart({ content_ids: [product.id], value: product.price * quantity, currency: "AED" });
-    toast.success(`${product.name} added to cart`, { description: `Size: EU ${selectedSize} · Qty: ${quantity}` });
+    toast.success(`${product.name} added to cart`, { description: `Size: ${selectedSize} · Qty: ${quantity}` });
   };
 
   const handleBuyNow = () => {
@@ -64,7 +63,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       toast.error("Please select a size first");
       return;
     }
-    buyNow(product, quantity, `EU ${selectedSize}`);
+    buyNow(product, quantity, selectedSize);
     setShowBuyNow(true);
   };
 
@@ -161,13 +160,13 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`w-11 h-9 text-sm border rounded transition-colors ${
+                        className={`min-w-11 h-9 px-2 text-sm border rounded transition-colors ${
                           selectedSize === size
                             ? "border-foreground bg-foreground text-background"
                             : "border-border hover:border-foreground"
                         }`}
                       >
-                        {size}
+                        {size.replace(/^EU\s*/i, "")}
                       </button>
                     ))}
                   </div>
