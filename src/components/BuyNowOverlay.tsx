@@ -22,7 +22,7 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
 
   const cartIds = new Set(items.map((i) => i.product.id));
   const crossSellProducts = (allProducts || []).filter(
-    (p) => !cartIds.has(p.id) && (p.category?.toLowerCase().includes("socks") || p.category?.toLowerCase().includes("kids"))
+    (p) => !cartIds.has(p.id) && (p.category?.toLowerCase().includes("socks") || p.category?.toLowerCase().includes("kids")) && !p.category?.toLowerCase().includes("bags")
   ).slice(0, 10);
 
   const scroll = (dir: "left" | "right") => {
