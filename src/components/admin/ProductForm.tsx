@@ -66,6 +66,7 @@ export interface ProductFormData {
   notes_top: string;
   notes_middle: string;
   notes_base: string;
+  cross_sell_price: string;
 }
 
 export const emptyFormData: ProductFormData = {
