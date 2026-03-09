@@ -194,7 +194,7 @@ const ProductDetail = () => {
       toast.error("Please select a size first");
       return;
     }
-    const sizeLabel = needsSize && selectedSize ? `EU ${selectedSize}` : "One Size";
+    const sizeLabel = needsSize && selectedSize ? selectedSize : "One Size";
     buyNow(product, quantity, sizeLabel);
     setShowBuyNow(true);
   };

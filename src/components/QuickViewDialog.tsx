@@ -160,13 +160,13 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`w-11 h-9 text-sm border rounded transition-colors ${
+                        className={`min-w-11 h-9 px-2 text-sm border rounded transition-colors ${
                           selectedSize === size
                             ? "border-foreground bg-foreground text-background"
                             : "border-border hover:border-foreground"
                         }`}
                       >
-                        {size}
+                        {size.replace(/^EU\s*/i, "")}
                       </button>
                     ))}
                   </div>
