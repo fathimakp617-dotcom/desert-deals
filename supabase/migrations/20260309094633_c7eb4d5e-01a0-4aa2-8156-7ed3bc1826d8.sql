@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN cross_sell_price numeric DEFAULT NULL;

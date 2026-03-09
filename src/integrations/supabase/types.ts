@@ -644,6 +644,7 @@ export type Database = {
         Row: {
           category: string | null
           created_at: string
+          cross_sell_price: number | null
           deleted_at: string | null
           description: string | null
           discount_percent: number | null
@@ -661,6 +662,7 @@ export type Database = {
         Insert: {
           category?: string | null
           created_at?: string
+          cross_sell_price?: number | null
           deleted_at?: string | null
           description?: string | null
           discount_percent?: number | null
@@ -678,6 +680,7 @@ export type Database = {
         Update: {
           category?: string | null
           created_at?: string
+          cross_sell_price?: number | null
           deleted_at?: string | null
           description?: string | null
           discount_percent?: number | null
