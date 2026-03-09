@@ -222,6 +222,7 @@ const AdminProducts = () => {
     size: fd.size,
     image_url: fd.image_url.trim(),
     is_active: fd.is_active,
+    cross_sell_price: fd.cross_sell_price ? parseFloat(fd.cross_sell_price) : null,
     notes: {
       top: fd.notes_top.split(",").map((n) => n.trim()).filter(Boolean),
       middle: fd.notes_middle.split(",").map((n) => n.trim()).filter(Boolean),
