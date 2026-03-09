@@ -131,7 +131,7 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                             <div className="flex flex-col flex-1">
                               <Link to={`/product/${p.id}`} onClick={onClose} className="block">
                                 <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug min-h-[2.5em]">{p.name}</p>
-                                <p className="text-xs font-bold text-foreground mt-0.5">{formatPrice(p.price)}</p>
+                                <p className="text-xs font-bold text-foreground mt-0.5">{formatPrice(p.crossSellPrice || p.price)}</p>
                               </Link>
                               <button onClick={() => addToCart(p, 1)} className="mt-2 w-full text-xs font-semibold py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors">+ Add</button>
                             </div>
