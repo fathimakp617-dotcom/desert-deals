@@ -53,6 +53,7 @@ const mapDbToProduct = (db: DbProduct): Product => {
     fit: staticData?.fit || "",
     season: staticData?.season || [],
     occasion: staticData?.occasion || [],
+    crossSellPrice: db.cross_sell_price ?? null,
   };
 };
 
