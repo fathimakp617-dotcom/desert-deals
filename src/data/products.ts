@@ -32,6 +32,7 @@ export interface Product {
   fit: string;
   season: string[];
   occasion: string[];
+  crossSellPrice?: number | null;
 }
 
 export const products: Product[] = [

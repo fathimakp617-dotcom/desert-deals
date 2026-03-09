@@ -21,6 +21,7 @@ interface DbProduct {
   is_active: boolean | null;
   notes: { top?: string[]; middle?: string[]; base?: string[] } | null;
   created_at: string;
+  cross_sell_price: number | null;
 }
 
 const mapDbToProduct = (db: DbProduct): Product => {
@@ -52,6 +53,7 @@ const mapDbToProduct = (db: DbProduct): Product => {
     fit: staticData?.fit || "",
     season: staticData?.season || [],
     occasion: staticData?.occasion || [],
+    crossSellPrice: db.cross_sell_price ?? null,
   };
 };
 

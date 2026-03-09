@@ -66,6 +66,7 @@ export interface ProductFormData {
   notes_top: string;
   notes_middle: string;
   notes_base: string;
+  cross_sell_price: string;
 }
 
 export const emptyFormData: ProductFormData = {
@@ -83,6 +84,7 @@ export const emptyFormData: ProductFormData = {
   notes_top: "",
   notes_middle: "",
   notes_base: "",
+  cross_sell_price: "",
 };
 
 interface ProductFormProps {
@@ -356,6 +358,23 @@ const ProductForm = ({
             />
           </div>
         </div>
+
+        {/* Cross-sell price - show for socks/kids categories */}
+        {(formData.category.toLowerCase().includes("socks") || formData.category.toLowerCase().includes("kids")) && (
+          <div>
+            <Label htmlFor="cross_sell_price">Cross-Sell Price (AED)</Label>
+            <p className="text-xs text-muted-foreground mb-1">Special price shown only in cross-selling sections. Leave empty to use regular price.</p>
+            <Input
+              id="cross_sell_price"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.cross_sell_price}
+              onChange={(e) => setFormData((prev) => ({ ...prev, cross_sell_price: e.target.value }))}
+              placeholder="e.g. 15"
+            />
+          </div>
+        )}
 
         <div>
           <Label htmlFor="stock_quantity">Stock Quantity</Label>

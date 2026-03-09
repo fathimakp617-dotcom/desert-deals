@@ -75,7 +75,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                         {item.name}
                       </h3>
                       <div className="flex items-center gap-1.5 flex-wrap mt-1">
-                        <span className="text-sm font-medium text-foreground">{formatPrice(item.price)}</span>
+                        <span className="text-sm font-medium text-foreground">{formatPrice(item.crossSellPrice || item.price)}</span>
                         {item.originalPrice > item.price && (
                           <span className="text-xs text-muted-foreground line-through">{formatPrice(item.originalPrice)}</span>
                         )}

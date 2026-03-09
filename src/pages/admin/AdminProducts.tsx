@@ -53,6 +53,7 @@ interface Product {
   size: string;
   image_url: string;
   is_active: boolean;
+  cross_sell_price: number | null;
   deleted_at: string | null;
   notes: {
     top: string[];
@@ -221,6 +222,7 @@ const AdminProducts = () => {
     size: fd.size,
     image_url: fd.image_url.trim(),
     is_active: fd.is_active,
+    cross_sell_price: fd.cross_sell_price ? parseFloat(fd.cross_sell_price) : null,
     notes: {
       top: fd.notes_top.split(",").map((n) => n.trim()).filter(Boolean),
       middle: fd.notes_middle.split(",").map((n) => n.trim()).filter(Boolean),
@@ -576,6 +578,7 @@ const AdminProducts = () => {
       notes_top: product.notes?.top?.join(", ") || "",
       notes_middle: product.notes?.middle?.join(", ") || "",
       notes_base: product.notes?.base?.join(", ") || "",
+      cross_sell_price: product.cross_sell_price?.toString() || "",
     });
   };
 
@@ -596,6 +599,7 @@ const AdminProducts = () => {
       notes_top: product.notes?.top?.join(", ") || "",
       notes_middle: product.notes?.middle?.join(", ") || "",
       notes_base: product.notes?.base?.join(", ") || "",
+      cross_sell_price: product.cross_sell_price?.toString() || "",
     });
     setEditingProduct(null);
     setIsAddDialogOpen(true);

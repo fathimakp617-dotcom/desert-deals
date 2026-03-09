@@ -252,6 +252,7 @@ Deno.serve(async (req) => {
             image_url: product.image_url,
             is_active: product.is_active ?? true,
             notes: product.notes || { top: [], middle: [], base: [] },
+            cross_sell_price: product.cross_sell_price ?? null,
           })
           .select()
           .single();
@@ -285,6 +286,7 @@ Deno.serve(async (req) => {
         if (product.image_url !== undefined) updateData.image_url = product.image_url;
         if (product.is_active !== undefined) updateData.is_active = product.is_active;
         if (product.notes !== undefined) updateData.notes = product.notes;
+        if (product.cross_sell_price !== undefined) updateData.cross_sell_price = product.cross_sell_price;
 
         const { data: updatedProduct, error } = await supabaseClient
           .from("products")
