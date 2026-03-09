@@ -16,17 +16,21 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
   const { items, addToCart, totalItems } = useCart();
   const { data: allProducts } = useDbProducts();
   const navigate = useNavigate();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const socksScrollRef = useRef<HTMLDivElement>(null);
+  const kidsScrollRef = useRef<HTMLDivElement>(null);
 
   const buyNowItem = items.length > 0 ? items[0] : null;
 
   const cartIds = new Set(items.map((i) => i.product.id));
-  const crossSellProducts = (allProducts || []).filter(
-    (p) => !cartIds.has(p.id) && (p.category?.toLowerCase().includes("socks") || p.category?.toLowerCase().includes("kids")) && !p.category?.toLowerCase().includes("bags")
+  const socksProducts = (allProducts || []).filter(
+    (p) => !cartIds.has(p.id) && p.category?.toLowerCase().includes("socks") && !p.category?.toLowerCase().includes("bags")
+  ).slice(0, 10);
+  const kidsProducts = (allProducts || []).filter(
+    (p) => !cartIds.has(p.id) && p.category?.toLowerCase().includes("kids") && !p.category?.toLowerCase().includes("bags")
   ).slice(0, 10);
 
-  const scroll = (dir: "left" | "right") => {
-    scrollRef.current?.scrollBy({ left: dir === "left" ? -220 : 220, behavior: "smooth" });
+  const scrollRow = (ref: React.RefObject<HTMLDivElement | null>, dir: "left" | "right") => {
+    ref.current?.scrollBy({ left: dir === "left" ? -220 : 220, behavior: "smooth" });
   };
 
   const handleGoToCheckout = () => {
