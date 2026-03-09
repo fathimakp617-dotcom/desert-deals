@@ -461,6 +461,7 @@ const ProductDetail = () => {
                 )}
 
                 {/* Size Selector */}
+                {needsSize && (
                 <motion.div variants={staggerItem} className="space-y-2">
                   <p className="text-xs sm:text-sm text-muted-foreground">Size <span className="text-destructive">*</span></p>
                   <div className="flex flex-wrap gap-1.5">
@@ -482,6 +483,7 @@ const ProductDetail = () => {
                     ))}
                   </div>
                 </motion.div>
+                )}
 
                 {/* Stock warnings */}
                 {isSoldOut && (
