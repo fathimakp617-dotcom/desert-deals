@@ -252,6 +252,7 @@ Deno.serve(async (req) => {
             image_url: product.image_url,
             is_active: product.is_active ?? true,
             notes: product.notes || { top: [], middle: [], base: [] },
+            cross_sell_price: product.cross_sell_price ?? null,
           })
           .select()
           .single();
