@@ -113,6 +113,8 @@ const AdminProducts = () => {
   const [bulkEditField, setBulkEditField] = useState<string>("");
   const [bulkEditValue, setBulkEditValue] = useState<string>("");
   const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
+  const [bulkDescription, setBulkDescription] = useState<string>("");
+  const [isBulkDescDialogOpen, setIsBulkDescDialogOpen] = useState(false);
   const [showTrash, setShowTrash] = useState(false);
   const [trashSelectedIds, setTrashSelectedIds] = useState<Set<string>>(new Set());
   const [isBulkTrashDeleteOpen, setIsBulkTrashDeleteOpen] = useState(false);
