@@ -976,9 +976,14 @@ const AdminProducts = () => {
               <SelectItem value="category">Replace Category</SelectItem>
               <SelectItem value="add_category">Add Category</SelectItem>
               <SelectItem value="is_active">Status</SelectItem>
+              <SelectItem value="description">Description</SelectItem>
             </SelectContent>
           </Select>
-          {bulkEditField === "is_active" ? (
+          {bulkEditField === "description" ? (
+            <Button size="sm" onClick={() => setIsBulkDescDialogOpen(true)}>
+              Open Editor
+            </Button>
+          ) : bulkEditField === "is_active" ? (
             <Select value={bulkEditValue} onValueChange={setBulkEditValue}>
               <SelectTrigger className="w-[120px] h-8 text-sm">
                 <SelectValue placeholder="Status..." />
