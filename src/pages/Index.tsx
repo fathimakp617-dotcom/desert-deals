@@ -98,8 +98,8 @@ const Index = () => {
           {(banner) => (
             <section className="bg-background">
               <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10">
-                <Link to={banner.link_url} className="block relative rounded-lg overflow-hidden group">
-                  <img src={banner.image_url} alt={banner.title} className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover" />
+                <Link to={banner.link_url} className="block relative rounded-lg overflow-hidden group aspect-[16/7] sm:aspect-[16/6] md:aspect-[16/5]">
+                  <img src={banner.image_url} alt={banner.title} className="absolute inset-0 w-full h-full object-cover" loading="eager" decoding="async" />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
                   <div className="absolute inset-y-0 left-8 sm:left-14 flex flex-col justify-center gap-2 sm:gap-3">
                     <h3 className="text-white text-xl sm:text-3xl md:text-4xl font-bold tracking-tight drop-shadow-lg">{banner.title}</h3>
