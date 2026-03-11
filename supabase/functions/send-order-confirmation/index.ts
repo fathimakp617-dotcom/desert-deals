@@ -1077,10 +1077,11 @@ Thank you for shopping with Desert Deal!
 `;
 
     // Send customer confirmation email with PDF invoice
-    const emailResponse = await resend.emails.send({
+    const customerSubject = `Order Confirmed - ${orderData.order_number}`;
+    let emailResponse = await resend.emails.send({
       from: "Desert Deal <orders@desertsdeals.com>",
       to: [orderData.customer_email],
-      subject: `Order Confirmed - ${orderData.order_number}`,
+      subject: customerSubject,
       html: emailHTML,
       text: plainTextEmail,
       attachments: [
@@ -1091,7 +1092,33 @@ Thank you for shopping with Desert Deal!
       ],
     });
 
-    console.log("Customer email sent successfully:", emailResponse);
+    // Retry once on rate limit or error
+    if ((emailResponse as any)?.error) {
+      console.warn("Customer email failed, retrying after 700ms:", JSON.stringify((emailResponse as any).error));
+      await new Promise((r) => setTimeout(r, 700));
+      emailResponse = await resend.emails.send({
+        from: "Desert Deal <orders@desertsdeals.com>",
+        to: [orderData.customer_email],
+        subject: customerSubject,
+        html: emailHTML,
+        text: plainTextEmail,
+        attachments: [
+          {
+            filename: `invoice-${orderData.order_number}.pdf`,
+            content: invoicePdfBase64,
+          },
+        ],
+      });
+    }
+
+    if ((emailResponse as any)?.error) {
+      const errMsg = (emailResponse as any).error?.message || JSON.stringify((emailResponse as any).error);
+      console.error("Customer email failed after retry:", errMsg);
+      await logEmail({ email_type: "order_confirmation", recipient_email: orderData.customer_email, subject: customerSubject, order_number: orderData.order_number, status: "failed", error_message: errMsg });
+    } else {
+      console.log("Customer email sent successfully:", emailResponse);
+      await logEmail({ email_type: "order_confirmation", recipient_email: orderData.customer_email, subject: customerSubject, order_number: orderData.order_number, status: "sent", resend_id: (emailResponse as any)?.data?.id || (emailResponse as any)?.id });
+    }
 
     // Send admin and shipping notification email for packing and shipping
     const adminOrderEmailRaw = Deno.env.get("ADMIN_ORDER_EMAIL") || "";
