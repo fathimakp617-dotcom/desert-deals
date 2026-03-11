@@ -5,6 +5,27 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+const supabaseAdmin = createClient(
+  Deno.env.get("SUPABASE_URL") || "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+);
+
+const logEmail = async (params: { email_type: string; recipient_email: string; subject: string; order_number?: string; status: string; resend_id?: string; error_message?: string }) => {
+  try {
+    await supabaseAdmin.from("email_logs").insert({
+      email_type: params.email_type,
+      recipient_email: params.recipient_email,
+      subject: params.subject,
+      order_number: params.order_number || null,
+      status: params.status,
+      resend_id: params.resend_id || null,
+      error_message: params.error_message || null,
+    });
+  } catch (e) {
+    console.error("Failed to log email:", e);
+  }
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
