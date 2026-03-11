@@ -1087,8 +1087,15 @@ const AdminProducts = () => {
               <Button
                 disabled={!bulkDescription.trim() || bulkUpdateMutation.isPending}
                 onClick={() => {
-                  setBulkEditField("description");
-                  setTimeout(() => handleBulkEdit(), 0);
+                  bulkUpdateMutation.mutate(
+                    { productIds: Array.from(selectedIds), updates: { description: bulkDescription } },
+                    {
+                      onSuccess: () => {
+                        setIsBulkDescDialogOpen(false);
+                        setBulkDescription("");
+                      },
+                    }
+                  );
                 }}
               >
                 {bulkUpdateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
