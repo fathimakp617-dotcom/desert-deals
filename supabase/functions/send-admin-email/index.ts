@@ -125,8 +125,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
 </html>`,
         });
         results.push({ email: recipient, success: true });
+        await logEmail({ email_type: "admin_email", recipient_email: recipient, subject: safeSubject, status: "sent" });
       } catch (err: any) {
         results.push({ email: recipient, success: false, error: err.message });
+        await logEmail({ email_type: "admin_email", recipient_email: recipient, subject: safeSubject, status: "failed", error_message: err.message });
       }
     }
 
