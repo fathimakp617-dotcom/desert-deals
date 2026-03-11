@@ -180,6 +180,7 @@ const App = () => {
                           <Route path="sections" element={<AdminSections />} />
                           <Route path="page-builder" element={<AdminPageBuilder />} />
                           <Route path="emails" element={<AdminEmails />} />
+                          <Route path="email-logs" element={<AdminEmailLogs />} />
                           <Route path="fix-images" element={<AdminImageFix />} />
                         </Route>
                         <Route path="*" element={<NotFound />} />
