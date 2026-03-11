@@ -39,6 +39,7 @@ verify_jwt = false
 [functions.get-email-logs]
 verify_jwt = false
 
+[functions.get-admin-affiliates]
 verify_jwt = false
 
 [functions.get-admin-customers]
