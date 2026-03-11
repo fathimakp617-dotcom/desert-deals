@@ -1200,14 +1200,18 @@ Invoice and shipping label are attached.
           adminResp = await sendAdminEmail();
         }
 
+        const adminSubject = `🚚 NEW ORDER - ${orderData.order_number} - ${orderData.customer_name}`;
         if ((adminResp as any)?.error) {
           console.error("Order notification email failed:", JSON.stringify(adminResp));
+          await logEmail({ email_type: "order_admin_notification", recipient_email: allRecipients.join(", "), subject: adminSubject, order_number: orderData.order_number, status: "failed", error_message: JSON.stringify((adminResp as any).error) });
         } else {
           console.log("Order notification email sent successfully:", JSON.stringify(adminResp));
+          await logEmail({ email_type: "order_admin_notification", recipient_email: allRecipients.join(", "), subject: adminSubject, order_number: orderData.order_number, status: "sent", resend_id: (adminResp as any)?.data?.id || (adminResp as any)?.id });
         }
       } catch (adminError: any) {
         console.error("Failed to send order notification email:", adminError?.message || adminError);
         console.error("Email error details:", JSON.stringify(adminError));
+        await logEmail({ email_type: "order_admin_notification", recipient_email: "admin", subject: "Order notification", order_number: orderData.order_number, status: "failed", error_message: adminError?.message || "Unknown error" });
       }
     } else {
       console.warn("No ADMIN_ORDER_EMAIL or SHIPPING_EMAILS configured, skipping order notification");
