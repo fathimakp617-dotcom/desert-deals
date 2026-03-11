@@ -483,50 +483,7 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Online Revenue */}
-            <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-xl p-5 border border-blue-500/20">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-blue-500/20 rounded-lg">
-                  <CreditCard className="h-5 w-5 text-blue-500" />
-                </div>
-                <span className="text-sm font-medium text-muted-foreground">Online Revenue</span>
-              </div>
-              <p className="text-3xl font-bold text-foreground">{formatCurrency(paymentBreakdown.online.revenue)}</p>
-              <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                <span>{paymentBreakdown.online.orders} orders</span>
-                <span className="text-green-500">{paymentBreakdown.online.delivered} delivered</span>
-              </div>
-            </div>
           </div>
-
-          {/* Revenue Percentage Bar */}
-          {stats.totalRevenue > 0 && (
-            <div className="mt-6">
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Payment Split</span>
-                <div className="flex gap-4">
-                  <span className="flex items-center gap-1">
-                    <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
-                    COD {((paymentBreakdown.cod.revenue / stats.totalRevenue) * 100).toFixed(1)}%
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
-                    Online {((paymentBreakdown.online.revenue / stats.totalRevenue) * 100).toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-              <div className="h-3 bg-muted rounded-full overflow-hidden flex">
-                <div 
-                  className="bg-orange-500 h-full transition-all duration-300"
-                  style={{ width: `${(paymentBreakdown.cod.revenue / stats.totalRevenue) * 100}%` }}
-                />
-                <div 
-                  className="bg-blue-500 h-full transition-all duration-300"
-                  style={{ width: `${(paymentBreakdown.online.revenue / stats.totalRevenue) * 100}%` }}
-                />
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
 
