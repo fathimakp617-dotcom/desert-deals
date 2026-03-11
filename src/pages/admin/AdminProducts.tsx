@@ -1067,7 +1067,38 @@ const AdminProducts = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Products Table */}
+      {/* Bulk Description Editor Dialog */}
+      <Dialog open={isBulkDescDialogOpen} onOpenChange={setIsBulkDescDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Bulk Edit Description ({selectedIds.size} products)</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              This description will be applied to all {selectedIds.size} selected products.
+            </p>
+            <RichTextEditor
+              value={bulkDescription}
+              onChange={setBulkDescription}
+              placeholder="Enter description for selected products..."
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsBulkDescDialogOpen(false)}>Cancel</Button>
+              <Button
+                disabled={!bulkDescription.trim() || bulkUpdateMutation.isPending}
+                onClick={() => {
+                  setBulkEditField("description");
+                  setTimeout(() => handleBulkEdit(), 0);
+                }}
+              >
+                {bulkUpdateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                Apply to {selectedIds.size} Products
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
