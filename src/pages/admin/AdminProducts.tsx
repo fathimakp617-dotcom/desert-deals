@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import ProductForm, { emptyFormData, type ProductFormData } from "@/components/admin/ProductForm";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 interface Product {
   id: string;
@@ -112,6 +113,8 @@ const AdminProducts = () => {
   const [bulkEditField, setBulkEditField] = useState<string>("");
   const [bulkEditValue, setBulkEditValue] = useState<string>("");
   const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false);
+  const [bulkDescription, setBulkDescription] = useState<string>("");
+  const [isBulkDescDialogOpen, setIsBulkDescDialogOpen] = useState(false);
   const [showTrash, setShowTrash] = useState(false);
   const [trashSelectedIds, setTrashSelectedIds] = useState<Set<string>>(new Set());
   const [isBulkTrashDeleteOpen, setIsBulkTrashDeleteOpen] = useState(false);
@@ -550,6 +553,13 @@ const AdminProducts = () => {
       return;
     }
     
+    if (bulkEditField === "description") {
+      bulkUpdateMutation.mutate({ productIds: Array.from(selectedIds), updates: { description: bulkDescription } });
+      setIsBulkDescDialogOpen(false);
+      setBulkDescription("");
+      return;
+    }
+    
     const updates: Record<string, unknown> = {};
     if (bulkEditField === "size") updates.size = bulkEditValue.trim();
     if (bulkEditField === "category") updates.category = bulkEditValue.trim();
@@ -966,9 +976,14 @@ const AdminProducts = () => {
               <SelectItem value="category">Replace Category</SelectItem>
               <SelectItem value="add_category">Add Category</SelectItem>
               <SelectItem value="is_active">Status</SelectItem>
+              <SelectItem value="description">Description</SelectItem>
             </SelectContent>
           </Select>
-          {bulkEditField === "is_active" ? (
+          {bulkEditField === "description" ? (
+            <Button size="sm" onClick={() => setIsBulkDescDialogOpen(true)}>
+              Open Editor
+            </Button>
+          ) : bulkEditField === "is_active" ? (
             <Select value={bulkEditValue} onValueChange={setBulkEditValue}>
               <SelectTrigger className="w-[120px] h-8 text-sm">
                 <SelectValue placeholder="Status..." />
@@ -1052,7 +1067,45 @@ const AdminProducts = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Products Table */}
+      {/* Bulk Description Editor Dialog */}
+      <Dialog open={isBulkDescDialogOpen} onOpenChange={setIsBulkDescDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Bulk Edit Description ({selectedIds.size} products)</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              This description will be applied to all {selectedIds.size} selected products.
+            </p>
+            <RichTextEditor
+              value={bulkDescription}
+              onChange={setBulkDescription}
+              placeholder="Enter description for selected products..."
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsBulkDescDialogOpen(false)}>Cancel</Button>
+              <Button
+                disabled={!bulkDescription.trim() || bulkUpdateMutation.isPending}
+                onClick={() => {
+                  bulkUpdateMutation.mutate(
+                    { productIds: Array.from(selectedIds), updates: { description: bulkDescription } },
+                    {
+                      onSuccess: () => {
+                        setIsBulkDescDialogOpen(false);
+                        setBulkDescription("");
+                      },
+                    }
+                  );
+                }}
+              >
+                {bulkUpdateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                Apply to {selectedIds.size} Products
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>

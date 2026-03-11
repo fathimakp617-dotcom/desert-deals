@@ -512,6 +512,7 @@ Deno.serve(async (req) => {
         if (updates.price !== undefined) updatePayload.price = updates.price;
         if (updates.original_price !== undefined) updatePayload.original_price = updates.original_price;
         if (updates.stock_quantity !== undefined) updatePayload.stock_quantity = updates.stock_quantity;
+        if (updates.description !== undefined) updatePayload.description = updates.description;
 
         if (Object.keys(updatePayload).length === 0) {
           return new Response(JSON.stringify({ error: "No fields to update" }), {
