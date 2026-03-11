@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import ProductForm, { emptyFormData, type ProductFormData } from "@/components/admin/ProductForm";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 interface Product {
   id: string;
