@@ -1,9 +1,31 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const supabaseAdmin = createClient(
+  Deno.env.get("SUPABASE_URL") || "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+);
+
+const logEmail = async (params: { email_type: string; recipient_email: string; subject: string; order_number?: string; status: string; resend_id?: string; error_message?: string }) => {
+  try {
+    await supabaseAdmin.from("email_logs").insert({
+      email_type: params.email_type,
+      recipient_email: params.recipient_email,
+      subject: params.subject,
+      order_number: params.order_number || null,
+      status: params.status,
+      resend_id: params.resend_id || null,
+      error_message: params.error_message || null,
+    });
+  } catch (e) {
+    console.error("Failed to log email:", e);
+  }
 };
 
 interface OrderItem {
@@ -230,15 +252,33 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailHtml = generateStatusEmailHTML(request);
 
-    const { data, error } = await resend.emails.send({
+    const emailSubject = `${config.emoji} ${config.title} - Order #${request.order_number}`;
+
+    let sendResult = await resend.emails.send({
       from: "Desert Deal <shipping@desertsdeals.com>",
       to: [request.customer_email],
-      subject: `${config.emoji} ${config.title} - Order #${request.order_number}`,
+      subject: emailSubject,
       html: emailHtml,
     });
 
+    // Retry once on failure
+    if ((sendResult as any)?.error) {
+      console.warn("Status email failed, retrying after 700ms:", JSON.stringify((sendResult as any).error));
+      await new Promise((r) => setTimeout(r, 700));
+      sendResult = await resend.emails.send({
+        from: "Desert Deal <shipping@desertsdeals.com>",
+        to: [request.customer_email],
+        subject: emailSubject,
+        html: emailHtml,
+      });
+    }
+
+    const data = (sendResult as any)?.data;
+    const error = (sendResult as any)?.error;
+
     if (error) {
       console.error("Resend error:", error);
+      await logEmail({ email_type: "status_update", recipient_email: request.customer_email, subject: emailSubject, order_number: request.order_number, status: "failed", error_message: error?.message || JSON.stringify(error) });
       return new Response(
         JSON.stringify({ error: "Failed to send email", details: error }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -246,6 +286,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log(`Status update email sent successfully:`, data);
+    await logEmail({ email_type: "status_update", recipient_email: request.customer_email, subject: emailSubject, order_number: request.order_number, status: "sent", resend_id: data?.id });
 
     return new Response(
       JSON.stringify({ success: true, message: "Email sent successfully" }),

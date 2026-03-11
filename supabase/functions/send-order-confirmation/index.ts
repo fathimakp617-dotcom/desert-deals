@@ -5,6 +5,27 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+const supabaseAdmin = createClient(
+  Deno.env.get("SUPABASE_URL") || "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+);
+
+const logEmail = async (params: { email_type: string; recipient_email: string; subject: string; order_number?: string; status: string; resend_id?: string; error_message?: string }) => {
+  try {
+    await supabaseAdmin.from("email_logs").insert({
+      email_type: params.email_type,
+      recipient_email: params.recipient_email,
+      subject: params.subject,
+      order_number: params.order_number || null,
+      status: params.status,
+      resend_id: params.resend_id || null,
+      error_message: params.error_message || null,
+    });
+  } catch (e) {
+    console.error("Failed to log email:", e);
+  }
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -1056,10 +1077,11 @@ Thank you for shopping with Desert Deal!
 `;
 
     // Send customer confirmation email with PDF invoice
-    const emailResponse = await resend.emails.send({
+    const customerSubject = `Order Confirmed - ${orderData.order_number}`;
+    let emailResponse = await resend.emails.send({
       from: "Desert Deal <orders@desertsdeals.com>",
       to: [orderData.customer_email],
-      subject: `Order Confirmed - ${orderData.order_number}`,
+      subject: customerSubject,
       html: emailHTML,
       text: plainTextEmail,
       attachments: [
@@ -1070,7 +1092,33 @@ Thank you for shopping with Desert Deal!
       ],
     });
 
-    console.log("Customer email sent successfully:", emailResponse);
+    // Retry once on rate limit or error
+    if ((emailResponse as any)?.error) {
+      console.warn("Customer email failed, retrying after 700ms:", JSON.stringify((emailResponse as any).error));
+      await new Promise((r) => setTimeout(r, 700));
+      emailResponse = await resend.emails.send({
+        from: "Desert Deal <orders@desertsdeals.com>",
+        to: [orderData.customer_email],
+        subject: customerSubject,
+        html: emailHTML,
+        text: plainTextEmail,
+        attachments: [
+          {
+            filename: `invoice-${orderData.order_number}.pdf`,
+            content: invoicePdfBase64,
+          },
+        ],
+      });
+    }
+
+    if ((emailResponse as any)?.error) {
+      const errMsg = (emailResponse as any).error?.message || JSON.stringify((emailResponse as any).error);
+      console.error("Customer email failed after retry:", errMsg);
+      await logEmail({ email_type: "order_confirmation", recipient_email: orderData.customer_email, subject: customerSubject, order_number: orderData.order_number, status: "failed", error_message: errMsg });
+    } else {
+      console.log("Customer email sent successfully:", emailResponse);
+      await logEmail({ email_type: "order_confirmation", recipient_email: orderData.customer_email, subject: customerSubject, order_number: orderData.order_number, status: "sent", resend_id: (emailResponse as any)?.data?.id || (emailResponse as any)?.id });
+    }
 
     // Send admin and shipping notification email for packing and shipping
     const adminOrderEmailRaw = Deno.env.get("ADMIN_ORDER_EMAIL") || "";
@@ -1152,14 +1200,18 @@ Invoice and shipping label are attached.
           adminResp = await sendAdminEmail();
         }
 
+        const adminSubject = `🚚 NEW ORDER - ${orderData.order_number} - ${orderData.customer_name}`;
         if ((adminResp as any)?.error) {
           console.error("Order notification email failed:", JSON.stringify(adminResp));
+          await logEmail({ email_type: "order_admin_notification", recipient_email: allRecipients.join(", "), subject: adminSubject, order_number: orderData.order_number, status: "failed", error_message: JSON.stringify((adminResp as any).error) });
         } else {
           console.log("Order notification email sent successfully:", JSON.stringify(adminResp));
+          await logEmail({ email_type: "order_admin_notification", recipient_email: allRecipients.join(", "), subject: adminSubject, order_number: orderData.order_number, status: "sent", resend_id: (adminResp as any)?.data?.id || (adminResp as any)?.id });
         }
       } catch (adminError: any) {
         console.error("Failed to send order notification email:", adminError?.message || adminError);
         console.error("Email error details:", JSON.stringify(adminError));
+        await logEmail({ email_type: "order_admin_notification", recipient_email: "admin", subject: "Order notification", order_number: orderData.order_number, status: "failed", error_message: adminError?.message || "Unknown error" });
       }
     } else {
       console.warn("No ADMIN_ORDER_EMAIL or SHIPPING_EMAILS configured, skipping order notification");
