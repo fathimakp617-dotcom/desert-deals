@@ -69,6 +69,7 @@ const AdminBanners = lazy(() => import("./pages/admin/AdminBanners"));
 const AdminSections = lazy(() => import("./pages/admin/AdminSections"));
 const AdminPageBuilder = lazy(() => import("./pages/admin/AdminPageBuilder"));
 const AdminEmails = lazy(() => import("./pages/admin/AdminEmails"));
+const AdminEmailLogs = lazy(() => import("./pages/admin/AdminEmailLogs"));
 
 // Minimal loading fallback
 const PageLoader = () => (
