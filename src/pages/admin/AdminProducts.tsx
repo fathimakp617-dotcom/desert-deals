@@ -553,6 +553,13 @@ const AdminProducts = () => {
       return;
     }
     
+    if (bulkEditField === "description") {
+      bulkUpdateMutation.mutate({ productIds: Array.from(selectedIds), updates: { description: bulkDescription } });
+      setIsBulkDescDialogOpen(false);
+      setBulkDescription("");
+      return;
+    }
+    
     const updates: Record<string, unknown> = {};
     if (bulkEditField === "size") updates.size = bulkEditValue.trim();
     if (bulkEditField === "category") updates.category = bulkEditValue.trim();
