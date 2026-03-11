@@ -252,15 +252,33 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailHtml = generateStatusEmailHTML(request);
 
-    const { data, error } = await resend.emails.send({
+    const emailSubject = `${config.emoji} ${config.title} - Order #${request.order_number}`;
+
+    let sendResult = await resend.emails.send({
       from: "Desert Deal <shipping@desertsdeals.com>",
       to: [request.customer_email],
-      subject: `${config.emoji} ${config.title} - Order #${request.order_number}`,
+      subject: emailSubject,
       html: emailHtml,
     });
 
+    // Retry once on failure
+    if ((sendResult as any)?.error) {
+      console.warn("Status email failed, retrying after 700ms:", JSON.stringify((sendResult as any).error));
+      await new Promise((r) => setTimeout(r, 700));
+      sendResult = await resend.emails.send({
+        from: "Desert Deal <shipping@desertsdeals.com>",
+        to: [request.customer_email],
+        subject: emailSubject,
+        html: emailHtml,
+      });
+    }
+
+    const data = (sendResult as any)?.data;
+    const error = (sendResult as any)?.error;
+
     if (error) {
       console.error("Resend error:", error);
+      await logEmail({ email_type: "status_update", recipient_email: request.customer_email, subject: emailSubject, order_number: request.order_number, status: "failed", error_message: error?.message || JSON.stringify(error) });
       return new Response(
         JSON.stringify({ error: "Failed to send email", details: error }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -268,6 +286,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log(`Status update email sent successfully:`, data);
+    await logEmail({ email_type: "status_update", recipient_email: request.customer_email, subject: emailSubject, order_number: request.order_number, status: "sent", resend_id: data?.id });
 
     return new Response(
       JSON.stringify({ success: true, message: "Email sent successfully" }),
