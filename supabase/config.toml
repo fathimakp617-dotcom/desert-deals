@@ -36,7 +36,9 @@ verify_jwt = false
 [functions.get-activity-logs]
 verify_jwt = false
 
-[functions.get-admin-affiliates]
+[functions.get-email-logs]
+verify_jwt = false
+
 verify_jwt = false
 
 [functions.get-admin-customers]
