@@ -17,7 +17,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, User, RotateCcw, Star, ShoppingBag, Upload, ImageOff, Tags, BarChart3, Image, LayoutTemplate } from "lucide-react";
+import { Package, LayoutDashboard, LogOut, ArrowLeft, Mail, Lock, Loader2, Shield, Users, User, RotateCcw, Star, ShoppingBag, Upload, ImageOff, Tags, BarChart3, Image, LayoutTemplate, FileText } from "lucide-react";
 import InstallAppBanner from "@/components/InstallAppBanner";
 import { motion } from "framer-motion";
 
