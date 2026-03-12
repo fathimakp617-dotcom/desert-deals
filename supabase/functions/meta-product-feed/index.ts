@@ -8,6 +8,73 @@ const corsHeaders = {
 
 const SITE_URL = "https://desertsdeals.com";
 
+const BATCH_SIZE = 500;
+
+async function fetchAllProducts(supabase: any) {
+  const allProducts: any[] = [];
+  let from = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, name, description, price, stock_quantity, category, image_url")
+      .eq("is_active", true)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .range(from, from + BATCH_SIZE - 1);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      allProducts.push(...data);
+      from += BATCH_SIZE;
+      hasMore = data.length === BATCH_SIZE;
+    } else {
+      hasMore = false;
+    }
+  }
+
+  return allProducts;
+}
+
+function stripHtml(str: string): string {
+  return (str || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function escapeXml(str: string): string {
+  return stripHtml(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function escapeCsv(str: string): string {
+  return stripHtml(str).replace(/"/g, '""');
+}
+
+function getBrand(category: string | null): string {
+  if (!category) return "Desert Deal";
+  // Take the first meaningful brand name, skip generic ones
+  const parts = category.split(",").map(s => s.trim()).filter(s => s && s.toLowerCase() !== "all shoes" && s.toLowerCase() !== "all-shoes");
+  return parts[0] || "Desert Deal";
+}
+
+function getImageUrl(imageUrl: string | null): string {
+  if (!imageUrl) return "";
+  const first = imageUrl.split(",")[0].trim();
+  return first.startsWith("http") ? first : `${SITE_URL}${first}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -18,29 +85,20 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { data: products, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("is_active", true)
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
+    const products = await fetchAllProducts(supabase);
 
     const url = new URL(req.url);
     const format = url.searchParams.get("format") || "xml";
 
     if (format === "csv") {
-      // Meta Commerce CSV feed
       const header = "id,title,description,availability,condition,price,link,image_link,brand,google_product_category\n";
-      const rows = (products || []).map((p) => {
-        const imageUrl = p.image_url
-          ? (p.image_url.startsWith("http") ? p.image_url.split(",")[0].trim() : `${SITE_URL}${p.image_url.split(",")[0].trim()}`)
-          : "";
+      const rows = products.map((p: any) => {
+        const imageUrl = getImageUrl(p.image_url);
         const availability = (p.stock_quantity || 0) > 0 ? "in stock" : "out of stock";
         const price = `${p.price} AED`;
-        const title = (p.name || "").replace(/"/g, '""');
-        const desc = (p.description || "").replace(/"/g, '""').substring(0, 500);
-        const brand = (p.category || "Desert Deal").replace(/"/g, '""');
+        const title = escapeCsv(p.name);
+        const desc = escapeCsv(p.description).substring(0, 500);
+        const brand = escapeCsv(getBrand(p.category));
 
         return `"${p.id}","${title}","${desc}","${availability}","new","${price}","${SITE_URL}/product/${p.id}","${imageUrl}","${brand}","Apparel & Accessories > Shoes"`;
       }).join("\n");
@@ -56,14 +114,12 @@ Deno.serve(async (req) => {
     }
 
     // Default: RSS/XML feed for Meta
-    const items = (products || []).map((p) => {
-      const imageUrl = p.image_url
-        ? (p.image_url.startsWith("http") ? p.image_url.split(",")[0].trim() : `${SITE_URL}${p.image_url.split(",")[0].trim()}`)
-        : "";
+    const items = products.map((p: any) => {
+      const imageUrl = getImageUrl(p.image_url);
       const availability = (p.stock_quantity || 0) > 0 ? "in stock" : "out of stock";
-      const brand = p.category || "Desert Deal";
-      const desc = (p.description || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      const title = (p.name || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const brand = escapeXml(getBrand(p.category));
+      const desc = escapeXml(p.description).substring(0, 500);
+      const title = escapeXml(p.name);
 
       return `    <item>
       <g:id>${p.id}</g:id>
