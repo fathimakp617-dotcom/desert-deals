@@ -67,8 +67,9 @@ const fetchAllProducts = async (): Promise<DbProduct[]> => {
   while (hasMore) {
     const { data, error } = await supabase
       .from("products")
-      .select("*")
+      .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, notes, created_at, cross_sell_price")
       .eq("is_active", true)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .range(from, from + BATCH_SIZE - 1);
 
@@ -78,7 +79,7 @@ const fetchAllProducts = async (): Promise<DbProduct[]> => {
     }
 
     if (data && data.length > 0) {
-      allData = allData.concat(data as DbProduct[]);
+      allData = allData.concat(data.map(d => ({ ...d, description: null } as DbProduct)));
       from += BATCH_SIZE;
       hasMore = data.length === BATCH_SIZE;
     } else {
