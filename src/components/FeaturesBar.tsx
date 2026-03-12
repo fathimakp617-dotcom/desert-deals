@@ -26,9 +26,15 @@ const features = [
 
 const FeaturesBar = memo(() => {
   const [current, setCurrent] = useState(0);
+  const [visible, setVisible] = useState(true);
 
-  const next = useCallback(() => setCurrent((p) => (p + 1) % features.length), []);
-  const prev = useCallback(() => setCurrent((p) => (p - 1 + features.length) % features.length), []);
+  const changeTo = useCallback((nextIdx: number) => {
+    setVisible(false);
+    setTimeout(() => { setCurrent(nextIdx); setVisible(true); }, 200);
+  }, []);
+
+  const next = useCallback(() => changeTo((current + 1) % features.length), [current, changeTo]);
+  const prev = useCallback(() => changeTo((current - 1 + features.length) % features.length), [current, changeTo]);
 
   useEffect(() => {
     const timer = setInterval(next, 4000);
