@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
         const price = `${p.price} AED`;
         const title = escapeCsv(p.name);
         const desc = escapeCsv(p.description).substring(0, 500);
-        const brand = escapeCsv(p.category || "Desert Deal");
+        const brand = escapeCsv(getBrand(p.category));
 
         return `"${p.id}","${title}","${desc}","${availability}","new","${price}","${SITE_URL}/product/${p.id}","${imageUrl}","${brand}","Apparel & Accessories > Shoes"`;
       }).join("\n");
