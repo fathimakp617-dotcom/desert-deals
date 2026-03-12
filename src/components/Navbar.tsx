@@ -101,7 +101,7 @@ const Navbar = memo(() => {
             {announcements[announcementIndex]}
           </span>
           <button
-            onClick={nextAnnouncement}
+            onClick={() => changeAnnouncement(1)}
             className="absolute right-4 text-background/70 hover:text-background transition-colors"
             aria-label="Next announcement"
           >
