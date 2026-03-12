@@ -53,18 +53,18 @@ const Navbar = memo(() => {
     return { topLinks: top, bottomLinks: bottom, allLinks: allNavLinks };
   }, [categories]);
 
-  const nextAnnouncement = useCallback(() => {
-    setAnnouncementIndex((prev) => (prev + 1) % announcements.length);
-  }, []);
-
-  const prevAnnouncement = useCallback(() => {
-    setAnnouncementIndex((prev) => (prev - 1 + announcements.length) % announcements.length);
+  const changeAnnouncement = useCallback((direction: 1 | -1) => {
+    setAnnouncementVisible(false);
+    setTimeout(() => {
+      setAnnouncementIndex((prev) => (prev + direction + announcements.length) % announcements.length);
+      setAnnouncementVisible(true);
+    }, 250);
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(nextAnnouncement, 4000);
+    const timer = setInterval(() => changeAnnouncement(1), 4000);
     return () => clearInterval(timer);
-  }, [nextAnnouncement]);
+  }, [changeAnnouncement]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
