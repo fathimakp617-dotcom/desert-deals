@@ -79,7 +79,7 @@ const fetchAllProducts = async (): Promise<DbProduct[]> => {
     }
 
     if (data && data.length > 0) {
-      allData = allData.concat(data.map(d => ({ ...d, description: null } as DbProduct)));
+      allData = allData.concat(data as DbProduct[]);
       from += BATCH_SIZE;
       hasMore = data.length === BATCH_SIZE;
     } else {
