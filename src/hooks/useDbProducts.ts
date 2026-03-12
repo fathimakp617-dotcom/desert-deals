@@ -97,7 +97,7 @@ export const useDbProducts = () => {
       const allData = await fetchAllProducts();
 
       if (allData.length === 0) {
-        return staticProducts;
+        return [];
       }
 
       // Attach stock data so useProductStock can reuse without extra query
