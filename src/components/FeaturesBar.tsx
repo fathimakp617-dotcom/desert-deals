@@ -26,9 +26,15 @@ const features = [
 
 const FeaturesBar = memo(() => {
   const [current, setCurrent] = useState(0);
+  const [visible, setVisible] = useState(true);
 
-  const next = useCallback(() => setCurrent((p) => (p + 1) % features.length), []);
-  const prev = useCallback(() => setCurrent((p) => (p - 1 + features.length) % features.length), []);
+  const changeTo = useCallback((nextIdx: number) => {
+    setVisible(false);
+    setTimeout(() => { setCurrent(nextIdx); setVisible(true); }, 200);
+  }, []);
+
+  const next = useCallback(() => changeTo((current + 1) % features.length), [current, changeTo]);
+  const prev = useCallback(() => changeTo((current - 1 + features.length) % features.length), [current, changeTo]);
 
   useEffect(() => {
     const timer = setInterval(next, 4000);
@@ -60,7 +66,7 @@ const FeaturesBar = memo(() => {
           <button onClick={prev} className="p-1 text-muted-foreground hover:text-foreground shrink-0">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div className="flex-1 flex items-center gap-3 justify-center text-center">
+          <div className={`flex-1 flex items-center gap-3 justify-center text-center transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}>
             <Feature.icon className="w-8 h-8 text-foreground shrink-0" strokeWidth={1.2} />
             <div className="text-left">
               <h4 className="text-sm font-bold text-foreground leading-tight">{Feature.title}</h4>
@@ -77,7 +83,7 @@ const FeaturesBar = memo(() => {
           {features.map((_, idx) => (
             <button
               key={idx}
-              onClick={() => setCurrent(idx)}
+              onClick={() => changeTo(idx)}
               className={`w-1.5 h-1.5 rounded-full transition-all ${current === idx ? "bg-foreground w-3" : "bg-foreground/30"}`}
             />
           ))}

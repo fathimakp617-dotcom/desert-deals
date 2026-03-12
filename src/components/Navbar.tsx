@@ -25,6 +25,7 @@ const Navbar = memo(() => {
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const [announcementVisible, setAnnouncementVisible] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
@@ -52,18 +53,18 @@ const Navbar = memo(() => {
     return { topLinks: top, bottomLinks: bottom, allLinks: allNavLinks };
   }, [categories]);
 
-  const nextAnnouncement = useCallback(() => {
-    setAnnouncementIndex((prev) => (prev + 1) % announcements.length);
-  }, []);
-
-  const prevAnnouncement = useCallback(() => {
-    setAnnouncementIndex((prev) => (prev - 1 + announcements.length) % announcements.length);
+  const changeAnnouncement = useCallback((direction: 1 | -1) => {
+    setAnnouncementVisible(false);
+    setTimeout(() => {
+      setAnnouncementIndex((prev) => (prev + direction + announcements.length) % announcements.length);
+      setAnnouncementVisible(true);
+    }, 250);
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(nextAnnouncement, 4000);
+    const timer = setInterval(() => changeAnnouncement(1), 4000);
     return () => clearInterval(timer);
-  }, [nextAnnouncement]);
+  }, [changeAnnouncement]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -90,17 +91,17 @@ const Navbar = memo(() => {
       <div className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
-            onClick={prevAnnouncement}
+            onClick={() => changeAnnouncement(-1)}
             className="absolute left-4 text-background/70 hover:text-background transition-colors"
             aria-label="Previous announcement"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-xs sm:text-sm font-medium tracking-wide">
+          <span className={`text-xs sm:text-sm font-medium tracking-wide transition-opacity duration-250 ${announcementVisible ? "opacity-100" : "opacity-0"}`}>
             {announcements[announcementIndex]}
           </span>
           <button
-            onClick={nextAnnouncement}
+            onClick={() => changeAnnouncement(1)}
             className="absolute right-4 text-background/70 hover:text-background transition-colors"
             aria-label="Next announcement"
           >
