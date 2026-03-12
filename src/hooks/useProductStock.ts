@@ -13,12 +13,17 @@ export const useProductStock = () => {
   return useQuery({
     queryKey: ["product-stock"],
     queryFn: async () => {
-      // Try to derive stock from already-cached product list to avoid extra query
+      // Reuse cached db-products data if available to avoid an extra network call
       const cachedProducts = queryClient.getQueryData<any[]>(["db-products"]);
       if (cachedProducts && cachedProducts.length > 0) {
+        // db-products already fetches stock_quantity — reuse it
         const stockMap: Record<string, ProductStock> = {};
-        // db-products doesn't have stock_quantity directly, so we still need to fetch
-        // But we can use a lighter query
+        cachedProducts.forEach((p: any) => {
+          if (p._stock != null) {
+            stockMap[p.id] = { id: p.id, stock_quantity: p._stock, is_active: true };
+          }
+        });
+        if (Object.keys(stockMap).length > 0) return stockMap;
       }
 
       const { data, error } = await supabase
@@ -37,8 +42,8 @@ export const useProductStock = () => {
 
       return stockMap;
     },
-    staleTime: 10 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 };

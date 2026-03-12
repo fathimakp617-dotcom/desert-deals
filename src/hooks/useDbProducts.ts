@@ -100,7 +100,12 @@ export const useDbProducts = () => {
         return staticProducts;
       }
 
-      return allData.map(mapDbToProduct);
+      // Attach stock data so useProductStock can reuse without extra query
+      return allData.map(d => {
+        const p = mapDbToProduct(d);
+        (p as any)._stock = d.stock_quantity;
+        return p;
+      });
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
