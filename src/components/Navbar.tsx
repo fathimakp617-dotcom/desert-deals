@@ -25,6 +25,7 @@ const Navbar = memo(() => {
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const [announcementVisible, setAnnouncementVisible] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
