@@ -38,8 +38,20 @@ async function fetchAllProducts(supabase: any) {
   return allProducts;
 }
 
-function escapeXml(str: string): string {
+function stripHtml(str: string): string {
   return (str || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function escapeXml(str: string): string {
+  return stripHtml(str)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -47,7 +59,14 @@ function escapeXml(str: string): string {
 }
 
 function escapeCsv(str: string): string {
-  return (str || "").replace(/"/g, '""');
+  return stripHtml(str).replace(/"/g, '""');
+}
+
+function getBrand(category: string | null): string {
+  if (!category) return "Desert Deal";
+  // Take the first meaningful brand name, skip generic ones
+  const parts = category.split(",").map(s => s.trim()).filter(s => s && s.toLowerCase() !== "all shoes" && s.toLowerCase() !== "all-shoes");
+  return parts[0] || "Desert Deal";
 }
 
 function getImageUrl(imageUrl: string | null): string {
