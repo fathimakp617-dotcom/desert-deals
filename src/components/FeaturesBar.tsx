@@ -66,7 +66,7 @@ const FeaturesBar = memo(() => {
           <button onClick={prev} className="p-1 text-muted-foreground hover:text-foreground shrink-0">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div className="flex-1 flex items-center gap-3 justify-center text-center">
+          <div className={`flex-1 flex items-center gap-3 justify-center text-center transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}>
             <Feature.icon className="w-8 h-8 text-foreground shrink-0" strokeWidth={1.2} />
             <div className="text-left">
               <h4 className="text-sm font-bold text-foreground leading-tight">{Feature.title}</h4>
