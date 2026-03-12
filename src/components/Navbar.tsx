@@ -91,13 +91,13 @@ const Navbar = memo(() => {
       <div className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
-            onClick={prevAnnouncement}
+            onClick={() => changeAnnouncement(-1)}
             className="absolute left-4 text-background/70 hover:text-background transition-colors"
             aria-label="Previous announcement"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-xs sm:text-sm font-medium tracking-wide">
+          <span className={`text-xs sm:text-sm font-medium tracking-wide transition-opacity duration-250 ${announcementVisible ? "opacity-100" : "opacity-0"}`}>
             {announcements[announcementIndex]}
           </span>
           <button
