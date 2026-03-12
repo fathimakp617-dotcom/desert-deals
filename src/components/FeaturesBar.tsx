@@ -83,7 +83,7 @@ const FeaturesBar = memo(() => {
           {features.map((_, idx) => (
             <button
               key={idx}
-              onClick={() => setCurrent(idx)}
+              onClick={() => changeTo(idx)}
               className={`w-1.5 h-1.5 rounded-full transition-all ${current === idx ? "bg-foreground w-3" : "bg-foreground/30"}`}
             />
           ))}
