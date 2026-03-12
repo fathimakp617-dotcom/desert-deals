@@ -93,6 +93,8 @@ export const useBanners = (position?: string) => {
         image_url: resolveImageUrl(b.image_url),
       })) as Banner[];
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };

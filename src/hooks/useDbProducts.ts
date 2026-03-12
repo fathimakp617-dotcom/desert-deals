@@ -67,7 +67,7 @@ const fetchAllProducts = async (): Promise<DbProduct[]> => {
   while (hasMore) {
     const { data, error } = await supabase
       .from("products")
-      .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, notes, created_at, cross_sell_price")
+      .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, notes, created_at, cross_sell_price, description")
       .eq("is_active", true)
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
@@ -79,7 +79,7 @@ const fetchAllProducts = async (): Promise<DbProduct[]> => {
     }
 
     if (data && data.length > 0) {
-      allData = allData.concat(data.map(d => ({ ...d, description: null } as DbProduct)));
+      allData = allData.concat(data as DbProduct[]);
       from += BATCH_SIZE;
       hasMore = data.length === BATCH_SIZE;
     } else {
@@ -100,7 +100,12 @@ export const useDbProducts = () => {
         return staticProducts;
       }
 
-      return allData.map(mapDbToProduct);
+      // Attach stock data so useProductStock can reuse without extra query
+      return allData.map(d => {
+        const p = mapDbToProduct(d);
+        (p as any)._stock = d.stock_quantity;
+        return p;
+      });
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,

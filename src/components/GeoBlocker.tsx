@@ -5,7 +5,11 @@ export const GeoBlocker = ({ children }: { children: React.ReactNode }) => {
   const [blocked, setBlocked] = useState(false);
 
   useEffect(() => {
-    // Run geo check in the background without blocking render
+    // Skip if already checked this session
+    const cached = sessionStorage.getItem("dd_geo_ok");
+    if (cached === "1") return;
+    if (cached === "0") { setBlocked(true); return; }
+
     const checkGeoBlock = async () => {
       try {
         const { data: allowedCountries } = await supabase
@@ -13,7 +17,10 @@ export const GeoBlocker = ({ children }: { children: React.ReactNode }) => {
           .select("country_code")
           .eq("is_active", true);
 
-        if (!allowedCountries || allowedCountries.length === 0) return;
+        if (!allowedCountries || allowedCountries.length === 0) {
+          sessionStorage.setItem("dd_geo_ok", "1");
+          return;
+        }
 
         const allowedCodes = new Set(allowedCountries.map(c => c.country_code));
         let countryCode: string | null = null;
@@ -38,9 +45,14 @@ export const GeoBlocker = ({ children }: { children: React.ReactNode }) => {
         }
 
         if (countryCode && !allowedCodes.has(countryCode)) {
+          sessionStorage.setItem("dd_geo_ok", "0");
           setBlocked(true);
+        } else {
+          sessionStorage.setItem("dd_geo_ok", "1");
         }
-      } catch {}
+      } catch {
+        sessionStorage.setItem("dd_geo_ok", "1");
+      }
     };
 
     checkGeoBlock();

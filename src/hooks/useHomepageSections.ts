@@ -26,6 +26,8 @@ export const useHomepageSections = () => {
       if (error) throw error;
       return (data || []) as HomepageSection[];
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 15 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };
