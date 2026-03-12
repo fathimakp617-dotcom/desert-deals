@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
     const items = products.map((p: any) => {
       const imageUrl = getImageUrl(p.image_url);
       const availability = (p.stock_quantity || 0) > 0 ? "in stock" : "out of stock";
-      const brand = escapeXml(p.category || "Desert Deal");
+      const brand = escapeXml(getBrand(p.category));
       const desc = escapeXml(p.description).substring(0, 500);
       const title = escapeXml(p.name);
 
