@@ -78,12 +78,25 @@ const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]>
 
 const fetchAllProducts = async (): Promise<DbProduct[]> => {
   const BATCH_SIZE = 250;
-  const MAX_BATCHES = 12; // up to 3000 products
 
+  const { count, error: countError } = await supabase
+    .from("products")
+    .select("id", { count: "exact", head: true })
+    .eq("is_active", true)
+    .is("deleted_at", null);
+
+  if (countError) {
+    throw new Error(`Failed to count products: ${countError.message}`);
+  }
+
+  const total = count ?? 0;
+  if (total === 0) return [];
+
+  const totalBatches = Math.ceil(total / BATCH_SIZE);
   const firstBatch = await fetchProductBatch(0, BATCH_SIZE - 1);
-  if (firstBatch.length < BATCH_SIZE) return firstBatch;
+  if (totalBatches === 1 || firstBatch.length < BATCH_SIZE) return firstBatch;
 
-  const remainingRanges = Array.from({ length: MAX_BATCHES - 1 }, (_, i) => {
+  const remainingRanges = Array.from({ length: totalBatches - 1 }, (_, i) => {
     const from = (i + 1) * BATCH_SIZE;
     return [from, from + BATCH_SIZE - 1] as const;
   });
@@ -96,16 +109,12 @@ const fetchAllProducts = async (): Promise<DbProduct[]> => {
   const seenIds = new Set(firstBatch.map((p) => p.id));
 
   for (const batch of remaining) {
-    if (batch.length === 0) break;
-
     for (const item of batch) {
       if (!seenIds.has(item.id)) {
         seenIds.add(item.id);
         allData.push(item);
       }
     }
-
-    if (batch.length < BATCH_SIZE) break;
   }
 
   return allData;
