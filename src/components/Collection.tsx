@@ -8,10 +8,10 @@ import { Loader2 } from "lucide-react";
 
 const Collection = forwardRef<HTMLDivElement>((_, ref) => {
   const { data: products = [], isLoading } = useDbProducts();
-  const featuredIds = ["sporty-night-collection", "sporty-night-combo", "amber-crown-collection"];
-  const featuredProducts = featuredIds
-    .map(id => products.find(p => p.id === id))
-    .filter(Boolean);
+  const excludedCategories = ["socks", "heels", "bags", "jersey", "kids"];
+  const featuredProducts = products
+    .filter(p => p.image && !excludedCategories.some(c => (p.category || "").toLowerCase().includes(c)))
+    .slice(0, 3);
   const { data: stockMap } = useProductStock();
 
   return (
