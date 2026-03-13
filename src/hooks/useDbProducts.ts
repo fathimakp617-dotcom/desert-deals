@@ -57,56 +57,53 @@ const mapDbToProduct = (db: DbProduct): Product => {
   };
 };
 
-// Fetch all products in batches with safety guards to avoid infinite loops
+// Fetch all products using parallel batches for speed
 const fetchAllProducts = async (): Promise<DbProduct[]> => {
-  const BATCH_SIZE = 300;
-  const MAX_BATCHES = 20;
-  const allData: DbProduct[] = [];
-  const seenIds = new Set<string>();
-  let from = 0;
-  let batchCount = 0;
+  const BATCH_SIZE = 500;
 
-  while (batchCount < MAX_BATCHES) {
-    const { data, error } = await supabase
+  // First batch — also tells us the rough total
+  const { data: firstBatch, error: firstErr } = await supabase
+    .from("products")
+    .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, created_at, cross_sell_price")
+    .eq("is_active", true)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false })
+    .range(0, BATCH_SIZE - 1);
+
+  if (firstErr || !firstBatch) {
+    console.error("Error fetching first product batch:", firstErr);
+    return [];
+  }
+
+  const allData: DbProduct[] = firstBatch as DbProduct[];
+
+  // If fewer than BATCH_SIZE returned, we have everything
+  if (firstBatch.length < BATCH_SIZE) return allData;
+
+  // Fetch remaining batches in parallel (up to ~5000 products)
+  const parallelBatches = Array.from({ length: 9 }, (_, i) => {
+    const from = (i + 1) * BATCH_SIZE;
+    return supabase
       .from("products")
       .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, created_at, cross_sell_price")
       .eq("is_active", true)
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
       .range(from, from + BATCH_SIZE - 1);
+  });
 
-    if (error) {
-      console.error("Error fetching products batch:", error);
-      break;
-    }
+  const results = await Promise.all(parallelBatches);
+  const seenIds = new Set(allData.map(p => p.id));
 
-    const batch = (data ?? []) as DbProduct[];
-    if (batch.length === 0) break;
-
-    batchCount += 1;
-
-    let addedThisBatch = 0;
-    for (const item of batch) {
+  for (const { data, error } of results) {
+    if (error || !data || data.length === 0) break;
+    for (const item of data as DbProduct[]) {
       if (!seenIds.has(item.id)) {
         seenIds.add(item.id);
         allData.push(item);
-        addedThisBatch += 1;
       }
     }
-
-    // Prevent infinite loading if backend keeps returning the same page
-    if (addedThisBatch === 0) {
-      console.warn("Stopping product pagination: repeated batch detected.");
-      break;
-    }
-
-    if (batch.length < BATCH_SIZE) break;
-
-    from += BATCH_SIZE;
-  }
-
-  if (batchCount >= MAX_BATCHES) {
-    console.warn("Stopped product pagination after max batches.");
+    if (data.length < BATCH_SIZE) break;
   }
 
   return allData;
