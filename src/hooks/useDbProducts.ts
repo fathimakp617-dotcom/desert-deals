@@ -57,53 +57,64 @@ const mapDbToProduct = (db: DbProduct): Product => {
   };
 };
 
-// Fetch all products using parallel batches for speed
-const fetchAllProducts = async (): Promise<DbProduct[]> => {
-  const BATCH_SIZE = 500;
+// Fetch all products in resilient batches (prevents timeout cache-poisoning with empty arrays)
+const PRODUCT_SELECT = "id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, cross_sell_price";
 
-  // First batch — also tells us the rough total
-  const { data: firstBatch, error: firstErr } = await supabase
+const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
+  const { data, error } = await supabase
     .from("products")
-    .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, created_at, cross_sell_price")
+    .select(PRODUCT_SELECT)
     .eq("is_active", true)
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
-    .range(0, BATCH_SIZE - 1);
+    .range(from, to);
 
-  if (firstErr || !firstBatch) {
-    console.error("Error fetching first product batch:", firstErr);
-    return [];
+  if (error) {
+    throw new Error(`Failed to fetch products ${from}-${to}: ${error.message}`);
   }
 
-  const allData: DbProduct[] = firstBatch as DbProduct[];
+  return (data || []) as DbProduct[];
+};
 
-  // If fewer than BATCH_SIZE returned, we have everything
-  if (firstBatch.length < BATCH_SIZE) return allData;
+const fetchAllProducts = async (): Promise<DbProduct[]> => {
+  const BATCH_SIZE = 250;
 
-  // Fetch remaining batches in parallel (up to ~5000 products)
-  const parallelBatches = Array.from({ length: 9 }, (_, i) => {
+  const { count, error: countError } = await supabase
+    .from("products")
+    .select("id", { count: "exact", head: true })
+    .eq("is_active", true)
+    .is("deleted_at", null);
+
+  if (countError) {
+    throw new Error(`Failed to count products: ${countError.message}`);
+  }
+
+  const total = count ?? 0;
+  if (total === 0) return [];
+
+  const totalBatches = Math.ceil(total / BATCH_SIZE);
+  const firstBatch = await fetchProductBatch(0, BATCH_SIZE - 1);
+  if (totalBatches === 1 || firstBatch.length < BATCH_SIZE) return firstBatch;
+
+  const remainingRanges = Array.from({ length: totalBatches - 1 }, (_, i) => {
     const from = (i + 1) * BATCH_SIZE;
-    return supabase
-      .from("products")
-      .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, created_at, cross_sell_price")
-      .eq("is_active", true)
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false })
-      .range(from, from + BATCH_SIZE - 1);
+    return [from, from + BATCH_SIZE - 1] as const;
   });
 
-  const results = await Promise.all(parallelBatches);
-  const seenIds = new Set(allData.map(p => p.id));
+  const remaining = await Promise.all(
+    remainingRanges.map(([from, to]) => fetchProductBatch(from, to))
+  );
 
-  for (const { data, error } of results) {
-    if (error || !data || data.length === 0) break;
-    for (const item of data as DbProduct[]) {
+  const allData: DbProduct[] = [...firstBatch];
+  const seenIds = new Set(firstBatch.map((p) => p.id));
+
+  for (const batch of remaining) {
+    for (const item of batch) {
       if (!seenIds.has(item.id)) {
         seenIds.add(item.id);
         allData.push(item);
       }
     }
-    if (data.length < BATCH_SIZE) break;
   }
 
   return allData;
@@ -115,12 +126,8 @@ export const useDbProducts = () => {
     queryFn: async () => {
       const allData = await fetchAllProducts();
 
-      if (allData.length === 0) {
-        return [];
-      }
-
       // Attach stock data so useProductStock can reuse without extra query
-      return allData.map(d => {
+      return allData.map((d) => {
         const p = mapDbToProduct(d);
         (p as any)._stock = d.stock_quantity;
         return p;
@@ -129,6 +136,10 @@ export const useDbProducts = () => {
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    refetchOnMount: "always",
+    retry: 8,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 };
 

@@ -20,7 +20,7 @@ export const useHomepageSections = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("homepage_sections")
-        .select("*")
+        .select("id, section_key, title, subtitle, is_visible, sort_order, section_type, config, created_at, updated_at")
         .eq("is_visible", true)
         .order("sort_order");
       if (error) throw error;
@@ -29,5 +29,9 @@ export const useHomepageSections = () => {
     staleTime: 15 * 60 * 1000,
     gcTime: 20 * 60 * 1000,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    refetchOnMount: "always",
+    retry: 6,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 };
