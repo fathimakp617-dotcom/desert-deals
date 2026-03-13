@@ -70,8 +70,9 @@ export const usePaginatedProducts = (options: UsePaginatedProductsOptions) => {
     queryFn: async () => {
       let q = supabase
         .from("products")
-        .select("*", { count: "exact" })
-        .eq("is_active", true);
+        .select("id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,created_at", { count: "planned" })
+        .eq("is_active", true)
+        .is("deleted_at", null);
 
       // Search filter (server-side)
       if (search) {

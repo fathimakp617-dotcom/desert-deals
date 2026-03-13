@@ -77,8 +77,9 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
     queryFn: async ({ pageParam = 0 }) => {
       let q = supabase
         .from("products")
-        .select("*", { count: "exact" })
-        .eq("is_active", true);
+        .select("id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,created_at", { count: "planned" })
+        .eq("is_active", true)
+        .is("deleted_at", null);
 
       if (search) {
         q = q.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
