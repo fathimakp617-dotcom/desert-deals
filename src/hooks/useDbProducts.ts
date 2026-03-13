@@ -57,14 +57,16 @@ const mapDbToProduct = (db: DbProduct): Product => {
   };
 };
 
-// Fetch all products in batches to bypass Supabase 1000-row limit
+// Fetch all products in batches with safety guards to avoid infinite loops
 const fetchAllProducts = async (): Promise<DbProduct[]> => {
   const BATCH_SIZE = 1000;
-  let allData: DbProduct[] = [];
+  const MAX_BATCHES = 20;
+  const allData: DbProduct[] = [];
+  const seenIds = new Set<string>();
   let from = 0;
-  let hasMore = true;
+  let batchCount = 0;
 
-  while (hasMore) {
+  while (batchCount < MAX_BATCHES) {
     const { data, error } = await supabase
       .from("products")
       .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, notes, created_at, cross_sell_price, description")
@@ -78,13 +80,33 @@ const fetchAllProducts = async (): Promise<DbProduct[]> => {
       break;
     }
 
-    if (data && data.length > 0) {
-      allData = allData.concat(data as DbProduct[]);
-      from += BATCH_SIZE;
-      hasMore = data.length === BATCH_SIZE;
-    } else {
-      hasMore = false;
+    const batch = (data ?? []) as DbProduct[];
+    if (batch.length === 0) break;
+
+    batchCount += 1;
+
+    let addedThisBatch = 0;
+    for (const item of batch) {
+      if (!seenIds.has(item.id)) {
+        seenIds.add(item.id);
+        allData.push(item);
+        addedThisBatch += 1;
+      }
     }
+
+    // Prevent infinite loading if backend keeps returning the same page
+    if (addedThisBatch === 0) {
+      console.warn("Stopping product pagination: repeated batch detected.");
+      break;
+    }
+
+    if (batch.length < BATCH_SIZE) break;
+
+    from += BATCH_SIZE;
+  }
+
+  if (batchCount >= MAX_BATCHES) {
+    console.warn("Stopped product pagination after max batches.");
   }
 
   return allData;
