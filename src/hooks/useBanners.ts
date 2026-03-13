@@ -77,7 +77,7 @@ export const useBanners = (position?: string) => {
     queryFn: async () => {
       let query = supabase
         .from("banners")
-        .select("*")
+        .select("id, title, image_url, link_url, position, sort_order, is_active, show_button, created_at, updated_at")
         .eq("is_active", true)
         .order("sort_order");
 
@@ -88,7 +88,7 @@ export const useBanners = (position?: string) => {
       const { data, error } = await query;
       if (error) throw error;
       // Resolve image URLs from relative paths to bundled assets
-      return (data || []).map(b => ({
+      return (data || []).map((b) => ({
         ...b,
         image_url: resolveImageUrl(b.image_url),
       })) as Banner[];
@@ -96,5 +96,9 @@ export const useBanners = (position?: string) => {
     staleTime: 15 * 60 * 1000,
     gcTime: 20 * 60 * 1000,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    refetchOnMount: "always",
+    retry: 6,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 };
