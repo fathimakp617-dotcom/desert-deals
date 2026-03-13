@@ -59,7 +59,7 @@ const mapDbToProduct = (db: DbProduct): Product => {
 
 // Fetch all products in batches with safety guards to avoid infinite loops
 const fetchAllProducts = async (): Promise<DbProduct[]> => {
-  const BATCH_SIZE = 1000;
+  const BATCH_SIZE = 300;
   const MAX_BATCHES = 20;
   const allData: DbProduct[] = [];
   const seenIds = new Set<string>();
@@ -69,7 +69,7 @@ const fetchAllProducts = async (): Promise<DbProduct[]> => {
   while (batchCount < MAX_BATCHES) {
     const { data, error } = await supabase
       .from("products")
-      .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, notes, created_at, cross_sell_price, description")
+      .select("id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, is_active, created_at, cross_sell_price")
       .eq("is_active", true)
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
