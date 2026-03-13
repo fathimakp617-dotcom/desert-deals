@@ -28,7 +28,9 @@ export const useProductStock = () => {
 
       const { data, error } = await supabase
         .from("products")
-        .select("id, stock_quantity, is_active");
+        .select("id, stock_quantity, is_active")
+        .eq("is_active", true)
+        .is("deleted_at", null);
 
       if (error) {
         console.error("Error fetching product stock:", error);

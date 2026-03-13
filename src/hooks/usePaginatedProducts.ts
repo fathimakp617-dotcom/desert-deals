@@ -7,7 +7,6 @@ const PAGE_SIZE = 48;
 interface DbProduct {
   id: string;
   name: string;
-  description: string | null;
   price: number;
   original_price: number | null;
   discount_percent: number | null;
@@ -15,8 +14,6 @@ interface DbProduct {
   category: string | null;
   size: string | null;
   image_url: string | null;
-  is_active: boolean | null;
-  notes: { top?: string[]; middle?: string[]; base?: string[] } | null;
   created_at: string;
 }
 
@@ -37,7 +34,7 @@ export interface SimpleProduct {
 const mapProduct = (db: DbProduct): SimpleProduct => ({
   id: db.id,
   name: db.name,
-  description: db.description || "",
+  description: "",
   price: db.price,
   originalPrice: db.original_price || db.price * 2,
   discountPercent: db.discount_percent || 0,
@@ -46,9 +43,9 @@ const mapProduct = (db: DbProduct): SimpleProduct => ({
   image: db.image_url ? db.image_url.split(",")[0].trim() : "",
   tagline: db.category || "Premium Footwear",
   notes: {
-    top: db.notes?.top || [],
-    heart: db.notes?.middle || [],
-    base: db.notes?.base || [],
+    top: [],
+    heart: [],
+    base: [],
   },
 });
 
