@@ -43,7 +43,10 @@ Deno.serve(async (req) => {
 
     if (error) {
       console.error("Error tracking pageview:", error);
-      throw error;
+      // Never break storefront rendering because analytics logging failed
+      return new Response(JSON.stringify({ success: false, skipped: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     return new Response(JSON.stringify({ success: true }), {
