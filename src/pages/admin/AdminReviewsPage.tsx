@@ -323,6 +323,7 @@ const AdminReviewsPage = () => {
     setImportResult(null);
     setImportProductIds([]);
     setProductSearch("");
+    setUploadedImageUrls([]);
   };
 
   const filteredReviews = reviews.filter(r => {
