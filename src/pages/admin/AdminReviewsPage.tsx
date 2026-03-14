@@ -202,6 +202,30 @@ const AdminReviewsPage = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setIsUploadingImages(true);
+    const urls: string[] = [];
+    try {
+      for (const file of Array.from(files)) {
+        const ext = file.name.split(".").pop() || "jpg";
+        const fileName = `review-images/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from("product-images").upload(fileName, file);
+        if (error) throw error;
+        const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(fileName);
+        urls.push(urlData.publicUrl);
+      }
+      setUploadedImageUrls(prev => [...prev, ...urls]);
+      toast({ title: "Uploaded", description: `${urls.length} image(s) uploaded` });
+    } catch (err: any) {
+      toast({ title: "Upload Error", description: err.message, variant: "destructive" });
+    } finally {
+      setIsUploadingImages(false);
+      if (imageInputRef.current) imageInputRef.current.value = "";
+    }
+  };
+
   const handleParseData = () => {
     if (!rawText.trim()) {
       toast({ title: "Error", description: "Please paste or upload some data first", variant: "destructive" });
