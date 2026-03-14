@@ -88,6 +88,8 @@ const AdminCategories = () => {
       setNewLabel("");
       setNewValue("");
       setNewActive(true);
+      setNewShowInCollection(true);
+      setNewShowInHeader(true);
       toast({ title: "Category created" });
     },
     onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
