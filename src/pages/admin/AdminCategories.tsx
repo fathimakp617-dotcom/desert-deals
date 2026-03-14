@@ -241,6 +241,8 @@ const AdminCategories = () => {
                   label: editingCategory.label,
                   is_active: editingCategory.is_active,
                   sort_order: editingCategory.sort_order,
+                  show_in_collection: editingCategory.show_in_collection,
+                  show_in_header: editingCategory.show_in_header,
                 });
               }}
               className="space-y-4"
