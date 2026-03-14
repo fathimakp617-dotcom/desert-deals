@@ -291,6 +291,7 @@ const AdminReviewsPage = () => {
     setColumnMapping([]);
     setImportResult(null);
     setImportProductIds([]);
+    setProductSearch("");
   };
 
   const filteredReviews = reviews.filter(r => {
