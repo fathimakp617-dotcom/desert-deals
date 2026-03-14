@@ -40,20 +40,26 @@ Deno.serve(async (req) => {
     }
 
     // Check if admin
-    const { data: staff } = await supabaseClient
-      .from("staff_members")
-      .select("role")
-      .eq("email", session.email)
-      .single();
+    const adminEmails = (Deno.env.get("ADMIN_EMAILS") || "").split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+    const isEnvAdmin = adminEmails.includes(session.email.toLowerCase());
 
-    if (!staff || staff.role !== "admin") {
-      return new Response(JSON.stringify({ error: "Admin access required" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!isEnvAdmin) {
+      const { data: staff } = await supabaseClient
+        .from("staff_members")
+        .select("role")
+        .eq("email", session.email)
+        .single();
+
+      if (!staff || staff.role !== "admin") {
+        return new Response(JSON.stringify({ error: "Admin access required" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
-    const { action, reviewId, isApproved } = await req.json();
+    const body = await req.json();
+    const { action, reviewId, isApproved } = body;
 
     switch (action) {
       case "update_status": {
@@ -66,7 +72,6 @@ Deno.serve(async (req) => {
 
         if (error) throw error;
 
-        // Log activity
         await supabaseClient.from("activity_logs").insert({
           actor_email: session.email,
           actor_role: "admin",
@@ -87,7 +92,6 @@ Deno.serve(async (req) => {
 
         if (error) throw error;
 
-        // Log activity
         await supabaseClient.from("activity_logs").insert({
           actor_email: session.email,
           actor_role: "admin",
@@ -96,6 +100,58 @@ Deno.serve(async (req) => {
         });
 
         return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      case "bulk_import": {
+        const { reviews: importReviews, product_id } = body;
+        if (!importReviews || !Array.isArray(importReviews) || !product_id) {
+          return new Response(JSON.stringify({ error: "Missing reviews array or product_id" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        let inserted = 0;
+        let failed = 0;
+        const batchSize = 50;
+
+        for (let i = 0; i < importReviews.length; i += batchSize) {
+          const batch = importReviews.slice(i, i + batchSize).map((r: any) => ({
+            product_id,
+            customer_name: (r.customer_name || r.name || "Verified Buyer").trim(),
+            customer_email: (r.customer_email || r.email || `review-${Date.now()}-${Math.random().toString(36).slice(2)}@imported.local`).trim(),
+            rating: Math.min(5, Math.max(1, parseInt(r.rating) || 5)),
+            title: (r.title || "").trim() || null,
+            comment: (r.comment || r.review || r.body || "").trim() || null,
+            is_approved: true,
+            is_verified_purchase: r.is_verified_purchase === true || r.verified === true || r.verified_purchase === true || false,
+            photos: Array.isArray(r.photos) ? r.photos.filter(Boolean) : (r.photo || r.image || r.photos ? [r.photo || r.image || r.photos].filter(Boolean) : []),
+            created_at: r.created_at || r.date || new Date().toISOString(),
+          }));
+
+          const { error: insertError, data: insertedData } = await supabaseClient
+            .from("product_reviews")
+            .insert(batch)
+            .select("id");
+
+          if (insertError) {
+            console.error("Batch insert error:", insertError);
+            failed += batch.length;
+          } else {
+            inserted += (insertedData?.length || 0);
+          }
+        }
+
+        await supabaseClient.from("activity_logs").insert({
+          actor_email: session.email,
+          actor_role: "admin",
+          action_type: "reviews_bulk_imported",
+          action_details: { product_id, total: importReviews.length, inserted, failed },
+        });
+
+        return new Response(JSON.stringify({ success: true, inserted, failed }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }

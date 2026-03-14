@@ -1,32 +1,23 @@
-import { useEffect, useState, memo } from "react";
+import { useEffect, useState, memo, useRef } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, Loader2, Star, Check, X, Trash2, Search, Eye } from "lucide-react";
-import { products } from "@/data/products";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+  RefreshCw, Loader2, Star, Check, X, Trash2, Search, Eye, Upload, FileUp,
+} from "lucide-react";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface Review {
   id: string;
@@ -39,36 +30,58 @@ interface Review {
   is_verified_purchase: boolean;
   is_approved: boolean;
   created_at: string;
+  photos?: string[] | null;
+}
+
+interface DbProduct {
+  id: string;
+  name: string;
 }
 
 const AdminReviewsPage = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [dbProducts, setDbProducts] = useState<DbProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
   const [productFilter, setProductFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importProductId, setImportProductId] = useState("");
+  const [csvText, setCsvText] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{ inserted: number; failed: number } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchReviews();
+    fetchDbProducts();
   }, []);
+
+  const fetchDbProducts = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select("id, name")
+      .eq("is_active", true)
+      .is("deleted_at", null)
+      .order("name");
+    setDbProducts((data || []) as DbProduct[]);
+  };
 
   const fetchReviews = async () => {
     setIsLoading(true);
     try {
       const sessionData = sessionStorage.getItem("rayn_admin_session");
       if (!sessionData) throw new Error("No admin session found");
-
       const { token } = JSON.parse(sessionData);
-      
+
       const response = await supabase.functions.invoke("get-admin-reviews", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.error) throw response.error;
       if (response.data?.error) throw new Error(response.data.error);
-      
       setReviews(response.data?.reviews || []);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -87,15 +100,12 @@ const AdminReviewsPage = () => {
     try {
       const token = getSessionToken();
       if (!token) throw new Error("No admin session found");
-
       const response = await supabase.functions.invoke("manage-reviews", {
         headers: { Authorization: `Bearer ${token}` },
         body: { action: "update_status", reviewId, isApproved },
       });
-
       if (response.error) throw response.error;
       if (response.data?.error) throw new Error(response.data.error);
-
       setReviews(reviews.map(r => r.id === reviewId ? { ...r, is_approved: isApproved } : r));
       toast({ title: "Updated", description: `Review ${isApproved ? "approved" : "hidden"}` });
     } catch (error: any) {
@@ -105,19 +115,15 @@ const AdminReviewsPage = () => {
 
   const deleteReview = async (reviewId: string) => {
     if (!confirm("Are you sure you want to delete this review?")) return;
-
     try {
       const token = getSessionToken();
       if (!token) throw new Error("No admin session found");
-
       const response = await supabase.functions.invoke("manage-reviews", {
         headers: { Authorization: `Bearer ${token}` },
         body: { action: "delete", reviewId },
       });
-
       if (response.error) throw response.error;
       if (response.data?.error) throw new Error(response.data.error);
-
       setReviews(reviews.filter(r => r.id !== reviewId));
       toast({ title: "Deleted", description: "Review deleted successfully" });
     } catch (error: any) {
@@ -126,16 +132,113 @@ const AdminReviewsPage = () => {
   };
 
   const getProductName = (productId: string) => {
-    const product = products.find(p => p.id === productId);
+    const product = dbProducts.find(p => p.id === productId);
     return product?.name || productId;
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-IN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });
+
+  // CSV parsing
+  const parseCSV = (text: string): Record<string, string>[] => {
+    const lines = text.trim().split("\n");
+    if (lines.length < 2) return [];
+    
+    // Parse header
+    const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase().replace(/['"]/g, ""));
+    
+    return lines.slice(1).map(line => {
+      const values = parseCSVLine(line);
+      const obj: Record<string, string> = {};
+      headers.forEach((h, i) => { obj[h] = (values[i] || "").trim(); });
+      return obj;
+    }).filter(obj => Object.values(obj).some(v => v));
+  };
+
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = "";
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if (char === "," && !inQuotes) {
+        result.push(current); current = "";
+      } else {
+        current += char;
+      }
+    }
+    result.push(current);
+    return result;
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setCsvText((ev.target?.result as string) || "");
+    };
+    reader.readAsText(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleImport = async () => {
+    if (!importProductId) {
+      toast({ title: "Error", description: "Please select a product", variant: "destructive" });
+      return;
+    }
+    if (!csvText.trim()) {
+      toast({ title: "Error", description: "Please paste or upload CSV data", variant: "destructive" });
+      return;
+    }
+
+    const parsed = parseCSV(csvText);
+    if (parsed.length === 0) {
+      toast({ title: "Error", description: "No valid rows found in CSV", variant: "destructive" });
+      return;
+    }
+
+    // Map CSV columns to review fields
+    const mappedReviews = parsed.map(row => ({
+      customer_name: row.customer_name || row.name || row.reviewer || row.author || "Verified Buyer",
+      customer_email: row.customer_email || row.email || "",
+      rating: row.rating || row.stars || "5",
+      title: row.title || row.subject || row.headline || "",
+      comment: row.comment || row.review || row.body || row.text || row.content || "",
+      is_verified_purchase: ["true", "yes", "1"].includes((row.verified || row.verified_purchase || row.is_verified_purchase || "").toLowerCase()),
+      photos: (row.photos || row.images || row.photo || row.image || "").split("|").map((s: string) => s.trim()).filter(Boolean),
+      created_at: row.created_at || row.date || row.review_date || "",
+    }));
+
+    setIsImporting(true);
+    setImportResult(null);
+
+    try {
+      const token = getSessionToken();
+      if (!token) throw new Error("No admin session found");
+
+      const response = await supabase.functions.invoke("manage-reviews", {
+        headers: { Authorization: `Bearer ${token}` },
+        body: { action: "bulk_import", product_id: importProductId, reviews: mappedReviews },
+      });
+
+      if (response.error) throw response.error;
+      if (response.data?.error) throw new Error(response.data.error);
+
+      setImportResult({ inserted: response.data.inserted, failed: response.data.failed });
+      toast({
+        title: "Import Complete",
+        description: `${response.data.inserted} reviews imported, ${response.data.failed} failed`,
+      });
+      fetchReviews();
+    } catch (error: any) {
+      toast({ title: "Import Error", description: error.message, variant: "destructive" });
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   const filteredReviews = reviews.filter(r => {
@@ -146,7 +249,7 @@ const AdminReviewsPage = () => {
     if (productFilter !== "all" && r.product_id !== productFilter) return false;
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      if (!r.customer_name.toLowerCase().includes(query) && 
+      if (!r.customer_name.toLowerCase().includes(query) &&
           !r.customer_email.toLowerCase().includes(query) &&
           !(r.title?.toLowerCase().includes(query)) &&
           !(r.comment?.toLowerCase().includes(query))) {
@@ -163,6 +266,9 @@ const AdminReviewsPage = () => {
     avgRating: reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : "0",
   };
 
+  // Unique product IDs from reviews for filter
+  const reviewProductIds = [...new Set(reviews.map(r => r.product_id))];
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -172,20 +278,22 @@ const AdminReviewsPage = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Product Reviews</h1>
           <p className="text-muted-foreground">Manage customer reviews and ratings</p>
         </div>
-        <Button onClick={fetchReviews} variant="outline" size="sm">
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => { setShowImportDialog(true); setImportResult(null); setCsvText(""); }} variant="outline" size="sm">
+            <Upload className="w-4 h-4 mr-2" />
+            Import CSV
+          </Button>
+          <Button onClick={fetchReviews} variant="outline" size="sm">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -214,17 +322,10 @@ const AdminReviewsPage = () => {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name, email, or content..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+          <Input placeholder="Search by name, email, or content..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-40">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
+          <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="approved">Approved</SelectItem>
@@ -232,13 +333,11 @@ const AdminReviewsPage = () => {
           </SelectContent>
         </Select>
         <Select value={productFilter} onValueChange={setProductFilter}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Product" />
-          </SelectTrigger>
+          <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Product" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Products</SelectItem>
-            {products.map(p => (
-              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+            {reviewProductIds.map(pid => (
+              <SelectItem key={pid} value={pid}>{getProductName(pid)}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -252,6 +351,7 @@ const AdminReviewsPage = () => {
               <TableHead>Customer</TableHead>
               <TableHead>Product</TableHead>
               <TableHead>Rating</TableHead>
+              <TableHead>Photos</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -260,9 +360,7 @@ const AdminReviewsPage = () => {
           <TableBody>
             {filteredReviews.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  No reviews found
-                </TableCell>
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No reviews found</TableCell>
               </TableRow>
             ) : (
               filteredReviews.map((review) => (
@@ -273,66 +371,35 @@ const AdminReviewsPage = () => {
                       <p className="text-sm text-muted-foreground">{review.customer_email}</p>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <span className="text-sm">{getProductName(review.product_id)}</span>
-                  </TableCell>
+                  <TableCell><span className="text-sm">{getProductName(review.product_id)}</span></TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`w-3 h-3 ${star <= review.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`}
-                        />
+                        <Star key={star} className={`w-3 h-3 ${star <= review.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`} />
                       ))}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                      review.is_approved ? "bg-green-500/20 text-green-500" : "bg-amber-500/20 text-amber-500"
-                    }`}>
+                    <span className="text-xs text-muted-foreground">
+                      {review.photos && review.photos.length > 0 ? `${review.photos.length} photo${review.photos.length > 1 ? "s" : ""}` : "—"}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${review.is_approved ? "bg-green-500/20 text-green-500" : "bg-amber-500/20 text-amber-500"}`}>
                       {review.is_approved ? <Check className="w-3 h-3" /> : null}
                       {review.is_approved ? "Approved" : "Pending"}
                     </span>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {formatDate(review.created_at)}
-                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{formatDate(review.created_at)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedReview(review)}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => setSelectedReview(review)}><Eye className="w-4 h-4" /></Button>
                       {review.is_approved ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => updateReviewStatus(review.id, false)}
-                          className="text-amber-500 hover:text-amber-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => updateReviewStatus(review.id, false)} className="text-amber-500 hover:text-amber-600"><X className="w-4 h-4" /></Button>
                       ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => updateReviewStatus(review.id, true)}
-                          className="text-green-500 hover:text-green-600"
-                        >
-                          <Check className="w-4 h-4" />
-                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => updateReviewStatus(review.id, true)} className="text-green-500 hover:text-green-600"><Check className="w-4 h-4" /></Button>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteReview(review.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => deleteReview(review.id)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -345,9 +412,7 @@ const AdminReviewsPage = () => {
       {/* Review Detail Dialog */}
       <Dialog open={!!selectedReview} onOpenChange={() => setSelectedReview(null)}>
         <DialogContent className="max-w-lg" aria-describedby={undefined}>
-          <DialogHeader>
-            <DialogTitle>Review Details</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>Review Details</DialogTitle></DialogHeader>
           {selectedReview && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -357,75 +422,137 @@ const AdminReviewsPage = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-4 h-4 ${star <= selectedReview.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`}
-                    />
+                    <Star key={star} className={`w-4 h-4 ${star <= selectedReview.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`} />
                   ))}
                 </div>
               </div>
-
               <div className="p-4 bg-muted/50 rounded-lg space-y-2">
                 <p className="text-sm text-muted-foreground">Product: {getProductName(selectedReview.product_id)}</p>
                 <p className="text-sm text-muted-foreground">Date: {formatDate(selectedReview.created_at)}</p>
                 {selectedReview.is_verified_purchase && (
-                  <span className="inline-flex items-center px-2 py-1 bg-primary/20 text-primary text-xs rounded">
-                    Verified Purchase
-                  </span>
+                  <span className="inline-flex items-center px-2 py-1 bg-primary/20 text-primary text-xs rounded">Verified Purchase</span>
                 )}
               </div>
-
               {selectedReview.title && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Title</p>
                   <p className="font-medium">{selectedReview.title}</p>
                 </div>
               )}
-
               {selectedReview.comment && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Review</p>
                   <p className="text-sm">{selectedReview.comment}</p>
                 </div>
               )}
-
+              {selectedReview.photos && selectedReview.photos.length > 0 && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Photos</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {selectedReview.photos.map((photo, i) => (
+                      <img key={i} src={photo} alt={`Review photo ${i + 1}`} className="w-16 h-16 object-cover rounded border" />
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="flex gap-2 pt-4 border-t">
                 {selectedReview.is_approved ? (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      updateReviewStatus(selectedReview.id, false);
-                      setSelectedReview({ ...selectedReview, is_approved: false });
-                    }}
-                    className="flex-1"
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    Hide Review
+                  <Button variant="outline" onClick={() => { updateReviewStatus(selectedReview.id, false); setSelectedReview({ ...selectedReview, is_approved: false }); }} className="flex-1">
+                    <X className="w-4 h-4 mr-2" />Hide Review
                   </Button>
                 ) : (
-                  <Button
-                    onClick={() => {
-                      updateReviewStatus(selectedReview.id, true);
-                      setSelectedReview({ ...selectedReview, is_approved: true });
-                    }}
-                    className="flex-1"
-                  >
-                    <Check className="w-4 h-4 mr-2" />
-                    Approve
+                  <Button onClick={() => { updateReviewStatus(selectedReview.id, true); setSelectedReview({ ...selectedReview, is_approved: true }); }} className="flex-1">
+                    <Check className="w-4 h-4 mr-2" />Approve
                   </Button>
                 )}
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    deleteReview(selectedReview.id);
-                    setSelectedReview(null);
-                  }}
-                >
+                <Button variant="destructive" onClick={() => { deleteReview(selectedReview.id); setSelectedReview(null); }}>
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* CSV Import Dialog */}
+      <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
+          <DialogHeader><DialogTitle>Import Reviews from CSV</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            {/* Product selection */}
+            <div className="space-y-2">
+              <Label>Select Product *</Label>
+              <Select value={importProductId} onValueChange={setImportProductId}>
+                <SelectTrigger><SelectValue placeholder="Choose a product..." /></SelectTrigger>
+                <SelectContent>
+                  {dbProducts.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* CSV Upload */}
+            <div className="space-y-2">
+              <Label>Upload CSV File</Label>
+              <div className="flex gap-2">
+                <input ref={fileInputRef} type="file" accept=".csv,.txt" onChange={handleFileUpload} className="hidden" />
+                <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="flex-1">
+                  <FileUp className="w-4 h-4 mr-2" />
+                  Choose CSV File
+                </Button>
+              </div>
+            </div>
+
+            {/* Or paste */}
+            <div className="space-y-2">
+              <Label>Or Paste CSV Data</Label>
+              <Textarea
+                placeholder={`customer_name,rating,title,comment,photos\nJohn Doe,5,Great Product,Loved it!,https://img.url/1.jpg|https://img.url/2.jpg\nJane,4,Good quality,Nice product,`}
+                value={csvText}
+                onChange={(e) => setCsvText(e.target.value)}
+                rows={8}
+                className="font-mono text-xs"
+              />
+            </div>
+
+            {/* Column guide */}
+            <div className="p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground space-y-1">
+              <p className="font-medium text-foreground">Supported CSV columns:</p>
+              <p><strong>Name:</strong> customer_name, name, reviewer, author</p>
+              <p><strong>Rating:</strong> rating, stars (1-5)</p>
+              <p><strong>Title:</strong> title, subject, headline</p>
+              <p><strong>Comment:</strong> comment, review, body, text, content</p>
+              <p><strong>Email:</strong> customer_email, email (optional)</p>
+              <p><strong>Photos:</strong> photos, images, photo, image (separate multiple with <code>|</code>)</p>
+              <p><strong>Verified:</strong> verified, verified_purchase (true/false)</p>
+              <p><strong>Date:</strong> created_at, date, review_date (optional)</p>
+            </div>
+
+            {/* Preview */}
+            {csvText && (
+              <div className="text-sm text-muted-foreground">
+                {parseCSV(csvText).length} review(s) detected in CSV
+              </div>
+            )}
+
+            {/* Result */}
+            {importResult && (
+              <div className="p-3 rounded-lg border bg-card">
+                <p className="text-sm font-medium text-foreground">
+                  Import Result: {importResult.inserted} imported, {importResult.failed} failed
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-2 pt-2">
+              <Button variant="outline" onClick={() => setShowImportDialog(false)} className="flex-1">Cancel</Button>
+              <Button onClick={handleImport} disabled={isImporting || !importProductId || !csvText.trim()} className="flex-1">
+                {isImporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                {isImporting ? "Importing..." : "Import Reviews"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </motion.div>
