@@ -274,6 +274,20 @@ const AdminCategories = () => {
                 />
                 <Label>Active</Label>
               </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={editingCategory.show_in_collection}
+                  onCheckedChange={(checked) => setEditingCategory({ ...editingCategory, show_in_collection: checked })}
+                />
+                <Label>Show in Collection (homepage rows)</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={editingCategory.show_in_header}
+                  onCheckedChange={(checked) => setEditingCategory({ ...editingCategory, show_in_header: checked })}
+                />
+                <Label>Show in Header Navigation</Label>
+              </div>
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setEditingCategory(null)}>Cancel</Button>
                 <Button type="submit" disabled={updateMutation.isPending}>
