@@ -8,7 +8,7 @@ import mindSplit from "@/assets/mind/mind-split.jpeg";
 import mindBottle from "@/assets/mind/mind-bottle.jpeg";
 import mindXray from "@/assets/mind/mind-xray.jpeg";
 
-const POPUP_KEY = "dd_mind_promo_shown_v2";
+const POPUP_KEY = "dd_mind_promo_shown_v3";
 const POPUP_DELAY = 1500;
 const SLIDE_INTERVAL = 3500;
 
@@ -34,7 +34,6 @@ const MindPromoPopup = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Auto-advance slides
   useEffect(() => {
     if (!open) return;
     const timer = setInterval(() => {
@@ -56,7 +55,7 @@ const MindPromoPopup = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-foreground/60 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
           <motion.div
@@ -64,24 +63,24 @@ const MindPromoPopup = () => {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.92, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 22, stiffness: 280 }}
-            className="relative w-full max-w-lg bg-black rounded-2xl overflow-hidden shadow-2xl"
+            className="relative w-full max-w-lg bg-card border border-border rounded-2xl overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close */}
             <button
               onClick={() => setOpen(false)}
-              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 transition-colors z-20"
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-background/80 hover:bg-muted transition-colors z-20"
             >
-              <X className="w-4 h-4 text-white" />
+              <X className="w-4 h-4 text-foreground" />
             </button>
 
             {/* Discount badge */}
-            <div className="absolute top-4 left-4 z-20 bg-red-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-              10% OFF
+            <div className="absolute top-4 left-4 z-20 bg-primary text-primary-foreground text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+              54% OFF
             </div>
 
             {/* Slideshow */}
-            <div className="relative h-60 sm:h-72 overflow-hidden">
+            <div className="relative h-60 sm:h-72 overflow-hidden bg-muted">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={current}
@@ -94,7 +93,7 @@ const MindPromoPopup = () => {
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </AnimatePresence>
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
 
               {/* Caption */}
               <AnimatePresence mode="wait">
@@ -104,7 +103,7 @@ const MindPromoPopup = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.3 }}
-                  className="absolute bottom-12 left-0 right-0 text-center text-white/80 text-xs font-medium tracking-wide uppercase"
+                  className="absolute bottom-12 left-0 right-0 text-center text-primary-foreground text-xs font-medium tracking-wide uppercase drop-shadow-md"
                 >
                   {slides[current].caption}
                 </motion.p>
@@ -113,13 +112,13 @@ const MindPromoPopup = () => {
               {/* Nav arrows */}
               <button
                 onClick={() => goTo(-1)}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-colors z-10"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-background/60 hover:bg-background/80 text-foreground transition-colors z-10"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => goTo(1)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition-colors z-10"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-background/60 hover:bg-background/80 text-foreground transition-colors z-10"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -131,7 +130,7 @@ const MindPromoPopup = () => {
                     key={i}
                     onClick={() => setCurrent(i)}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
-                      i === current ? "w-5 bg-white" : "w-1.5 bg-white/40"
+                      i === current ? "w-5 bg-foreground" : "w-1.5 bg-foreground/30"
                     }`}
                   />
                 ))}
@@ -140,19 +139,19 @@ const MindPromoPopup = () => {
 
             {/* Content */}
             <div className="px-6 pt-4 pb-6 text-center">
-              <h2 className="text-2xl sm:text-3xl font-heading font-black text-white mb-1">
-                Nike Mind<sup className="text-sm font-normal text-neutral-400 ml-0.5">001</sup>
+              <h2 className="text-2xl sm:text-3xl font-heading font-black text-foreground mb-1">
+                Nike Mind<sup className="text-sm font-normal text-muted-foreground ml-0.5">001</sup>
               </h2>
 
               {/* Price display */}
               <div className="flex items-center justify-center gap-2 mb-1">
-                <span className="text-xl font-bold text-white">249 AED</span>
-                <span className="text-sm text-neutral-500 line-through">539 AED</span>
-                <span className="text-xs font-bold text-red-500 uppercase">-54% OFF</span>
+                <span className="text-xl font-bold text-foreground">249 AED</span>
+                <span className="text-sm text-muted-foreground line-through">539 AED</span>
+                <span className="text-xs font-bold text-destructive uppercase">-54% OFF</span>
               </div>
 
-              <p className="text-sm text-neutral-400 mb-5">
-                A mind-altering shoe. Get 10% off the entire collection.
+              <p className="text-sm text-muted-foreground mb-5">
+                A mind-altering shoe. Get 54% off the entire collection.
               </p>
 
               <button
@@ -160,12 +159,12 @@ const MindPromoPopup = () => {
                   setOpen(false);
                   navigate("/shop?search=Mind");
                 }}
-                className="w-full bg-red-600 text-white font-semibold py-3 px-6 rounded-full hover:bg-red-700 transition-colors text-sm"
+                className="w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-full hover:opacity-90 transition-opacity text-sm"
               >
                 Shop Mind Collection →
               </button>
 
-              <p className="text-[10px] text-neutral-500 mt-3">
+              <p className="text-[10px] text-muted-foreground mt-3">
                 Discount applied automatically
               </p>
             </div>
