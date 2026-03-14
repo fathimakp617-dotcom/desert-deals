@@ -43,6 +43,8 @@ const AdminCategories = () => {
   const [newLabel, setNewLabel] = useState("");
   const [newValue, setNewValue] = useState("");
   const [newActive, setNewActive] = useState(true);
+  const [newShowInCollection, setNewShowInCollection] = useState(true);
+  const [newShowInHeader, setNewShowInHeader] = useState(true);
 
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ["admin-categories"],
