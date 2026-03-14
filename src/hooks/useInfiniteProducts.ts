@@ -46,16 +46,17 @@ const mapProduct = (db: DbProduct): SimpleProduct => {
     price: db.price,
     originalPrice,
     discountPercent,
-  category: db.category || "General",
-  size: db.size || "Standard",
-  image: db.image_url ? db.image_url.split(",")[0].trim() : "",
-  tagline: db.category || "Premium Footwear",
-  notes: {
-    top: [],
-    heart: [],
-    base: [],
-  },
-});
+    category: db.category || "General",
+    size: db.size || "Standard",
+    image: db.image_url ? db.image_url.split(",")[0].trim() : "",
+    tagline: db.category || "Premium Footwear",
+    notes: {
+      top: [],
+      heart: [],
+      base: [],
+    },
+  };
+};
 
 interface UseInfiniteProductsOptions {
   search?: string;
