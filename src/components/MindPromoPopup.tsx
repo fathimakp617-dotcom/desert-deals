@@ -143,6 +143,14 @@ const MindPromoPopup = () => {
               <h2 className="text-2xl sm:text-3xl font-heading font-black text-white mb-1">
                 Nike Mind<sup className="text-sm font-normal text-neutral-400 ml-0.5">001</sup>
               </h2>
+
+              {/* Price display */}
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <span className="text-xl font-bold text-white">249 AED</span>
+                <span className="text-sm text-neutral-500 line-through">277 AED</span>
+                <span className="text-xs font-bold text-red-500 uppercase">Save 10%</span>
+              </div>
+
               <p className="text-sm text-neutral-400 mb-5">
                 A mind-altering shoe. Get 10% off the entire collection.
               </p>
