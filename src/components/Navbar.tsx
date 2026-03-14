@@ -34,7 +34,7 @@ const Navbar = memo(() => {
   const { data: categories = [] } = useCategories();
 
   const { topLinks, bottomLinks, allLinks } = useMemo(() => {
-    const activeCategories = categories.filter((c) => c.is_active && c.value !== "all-shoes");
+    const activeCategories = categories.filter((c) => c.is_active && c.value !== "all-shoes" && c.show_in_header !== false);
     const categoryLinks = activeCategories.map((c) => ({
       name: c.label,
       href: `/shop?brand=${c.value}`,
