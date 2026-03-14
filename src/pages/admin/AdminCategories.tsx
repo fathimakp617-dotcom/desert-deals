@@ -20,6 +20,8 @@ interface Category {
   label: string;
   is_active: boolean;
   sort_order: number;
+  show_in_collection: boolean;
+  show_in_header: boolean;
   created_at: string;
 }
 
