@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
-  RefreshCw, Loader2, Star, Check, X, Trash2, Search, Eye, Upload, FileUp, ArrowRight,
+  RefreshCw, Loader2, Star, Check, X, Trash2, Search, Eye, Upload, FileUp, ArrowRight, ImagePlus,
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
