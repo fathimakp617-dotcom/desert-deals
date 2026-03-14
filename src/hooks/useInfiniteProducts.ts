@@ -30,13 +30,22 @@ export interface SimpleProduct {
   notes: { top: string[]; heart: string[]; base: string[] };
 }
 
-const mapProduct = (db: DbProduct): SimpleProduct => ({
-  id: db.id,
-  name: db.name,
-  description: "",
-  price: db.price,
-  originalPrice: db.original_price || db.price * 2,
-  discountPercent: db.discount_percent || 0,
+const isMindProduct = (name: string) => name.toLowerCase().includes("mind");
+
+const mapProduct = (db: DbProduct): SimpleProduct => {
+  const mind = isMindProduct(db.name);
+  const baseOriginal = db.original_price || db.price * 2;
+  // For Mind products: inflate original price by ~10% so it shows a 10% discount badge
+  const originalPrice = mind ? Math.ceil(db.price / 0.9) : baseOriginal;
+  const discountPercent = mind ? 10 : (db.discount_percent || 0);
+
+  return {
+    id: db.id,
+    name: db.name,
+    description: "",
+    price: db.price,
+    originalPrice,
+    discountPercent,
   category: db.category || "General",
   size: db.size || "Standard",
   image: db.image_url ? db.image_url.split(",")[0].trim() : "",
