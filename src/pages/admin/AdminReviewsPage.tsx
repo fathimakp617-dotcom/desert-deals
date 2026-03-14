@@ -111,7 +111,8 @@ const AdminReviewsPage = () => {
   // Import state
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importStep, setImportStep] = useState<"paste" | "map" | "importing">("paste");
-  const [importProductId, setImportProductId] = useState("");
+  const [importProductIds, setImportProductIds] = useState<string[]>([]);
+  const [productSearch, setProductSearch] = useState("");
   const [rawText, setRawText] = useState("");
   const [parsedHeaders, setParsedHeaders] = useState<string[]>([]);
   const [parsedRows, setParsedRows] = useState<string[][]>([]);
@@ -220,8 +221,8 @@ const AdminReviewsPage = () => {
   };
 
   const handleDoImport = async () => {
-    if (!importProductId) {
-      toast({ title: "Error", description: "Please select a product", variant: "destructive" });
+    if (importProductIds.length === 0) {
+      toast({ title: "Error", description: "Please select at least one product", variant: "destructive" });
       return;
     }
 
@@ -254,17 +255,26 @@ const AdminReviewsPage = () => {
     setImportStep("importing");
     setImportResult(null);
 
+    let totalInserted = 0;
+    let totalFailed = 0;
+
     try {
       const token = getSessionToken();
       if (!token) throw new Error("No admin session found");
-      const response = await supabase.functions.invoke("manage-reviews", {
-        headers: { Authorization: `Bearer ${token}` },
-        body: { action: "bulk_import", product_id: importProductId, reviews: mappedReviews },
-      });
-      if (response.error) throw response.error;
-      if (response.data?.error) throw new Error(response.data.error);
-      setImportResult({ inserted: response.data.inserted, failed: response.data.failed });
-      toast({ title: "Import Complete", description: `${response.data.inserted} reviews imported` });
+
+      for (const productId of importProductIds) {
+        const response = await supabase.functions.invoke("manage-reviews", {
+          headers: { Authorization: `Bearer ${token}` },
+          body: { action: "bulk_import", product_id: productId, reviews: mappedReviews },
+        });
+        if (response.error) throw response.error;
+        if (response.data?.error) throw new Error(response.data.error);
+        totalInserted += response.data.inserted || 0;
+        totalFailed += response.data.failed || 0;
+      }
+
+      setImportResult({ inserted: totalInserted, failed: totalFailed });
+      toast({ title: "Import Complete", description: `${totalInserted} reviews imported across ${importProductIds.length} product(s)` });
       fetchReviews();
     } catch (error: any) {
       toast({ title: "Import Error", description: error.message, variant: "destructive" });
@@ -280,7 +290,8 @@ const AdminReviewsPage = () => {
     setParsedRows([]);
     setColumnMapping([]);
     setImportResult(null);
-    setImportProductId("");
+    setImportProductIds([]);
+    setProductSearch("");
   };
 
   const filteredReviews = reviews.filter(r => {
@@ -514,13 +525,56 @@ const AdminReviewsPage = () => {
           {importStep === "paste" && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Select Product *</Label>
-                <Select value={importProductId} onValueChange={setImportProductId}>
-                  <SelectTrigger><SelectValue placeholder="Choose a product..." /></SelectTrigger>
-                  <SelectContent>
-                    {dbProducts.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <Label>Select Products * <span className="text-xs text-muted-foreground">(reviews will be added to all selected)</span></Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search products..."
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                {importProductIds.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {importProductIds.map(pid => {
+                      const name = dbProducts.find(p => p.id === pid)?.name || pid;
+                      return (
+                        <span key={pid} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-primary/15 text-primary border border-primary/30">
+                          {name.length > 30 ? name.slice(0, 30) + "…" : name}
+                          <X className="w-3 h-3 cursor-pointer hover:text-destructive" onClick={() => setImportProductIds(prev => prev.filter(id => id !== pid))} />
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="border rounded-lg max-h-48 overflow-y-auto">
+                  {dbProducts
+                    .filter(p => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase()))
+                    .map(p => {
+                      const selected = importProductIds.includes(p.id);
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => {
+                            setImportProductIds(prev =>
+                              selected ? prev.filter(id => id !== p.id) : [...prev, p.id]
+                            );
+                          }}
+                          className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-muted/50 transition-colors ${selected ? "bg-primary/10" : ""}`}
+                        >
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${selected ? "bg-primary border-primary" : "border-border"}`}>
+                            {selected && <Check className="w-3 h-3 text-primary-foreground" />}
+                          </div>
+                          <span className="truncate">{p.name}</span>
+                        </button>
+                      );
+                    })}
+                  {dbProducts.filter(p => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase())).length === 0 && (
+                    <p className="text-center text-xs text-muted-foreground py-4">No products found</p>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -537,18 +591,18 @@ const AdminReviewsPage = () => {
                   placeholder={`Paste your scraped data here...\n\nExample:\nname\trating\treview\nJohn\t5\tGreat product!\nJane\t4\tLoved it`}
                   value={rawText}
                   onChange={(e) => setRawText(e.target.value)}
-                  rows={10}
+                  rows={8}
                   className="font-mono text-xs"
                 />
               </div>
 
               <p className="text-xs text-muted-foreground">
-                Works with any format — CSV, TSV, pipe-separated, semicolons. Just make sure the first row has column headers. You'll map columns in the next step.
+                Works with any format — CSV, TSV, pipe-separated, semicolons. First row = headers. You'll map columns next.
               </p>
 
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setShowImportDialog(false)} className="flex-1">Cancel</Button>
-                <Button onClick={handleParseData} disabled={!rawText.trim() || !importProductId} className="flex-1">
+                <Button onClick={handleParseData} disabled={!rawText.trim() || importProductIds.length === 0} className="flex-1">
                   Next: Map Columns <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
