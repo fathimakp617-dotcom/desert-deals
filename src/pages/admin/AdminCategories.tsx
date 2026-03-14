@@ -66,7 +66,13 @@ const AdminCategories = () => {
       const { data, error } = await supabase.functions.invoke("manage-categories", {
         body: {
           action: "create",
-          category: { value: newValue || newLabel, label: newLabel, is_active: newActive },
+          category: {
+            value: newValue || newLabel,
+            label: newLabel,
+            is_active: newActive,
+            show_in_collection: newShowInCollection,
+            show_in_header: newShowInHeader,
+          },
           admin_email: session.email,
           admin_token: session.token,
         },
