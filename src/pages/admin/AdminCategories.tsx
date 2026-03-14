@@ -309,11 +309,13 @@ const AdminCategories = () => {
               <TableHead>Name</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Collection</TableHead>
+              <TableHead>Header</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((cat) => (
+            {categories.map((cat: any) => (
               <TableRow key={cat.id}>
                 <TableCell className="text-muted-foreground text-sm">{cat.sort_order}</TableCell>
                 <TableCell className="font-medium">{cat.label}</TableCell>
@@ -321,6 +323,16 @@ const AdminCategories = () => {
                 <TableCell>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${cat.is_active ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
                     {cat.is_active ? "Active" : "Inactive"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${cat.show_in_collection !== false ? "bg-blue-100 text-blue-700" : "bg-muted text-muted-foreground"}`}>
+                    {cat.show_in_collection !== false ? "Yes" : "No"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${cat.show_in_header !== false ? "bg-purple-100 text-purple-700" : "bg-muted text-muted-foreground"}`}>
+                    {cat.show_in_header !== false ? "Yes" : "No"}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
