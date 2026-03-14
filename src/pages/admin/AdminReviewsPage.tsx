@@ -120,7 +120,10 @@ const AdminReviewsPage = () => {
   const [columnMapping, setColumnMapping] = useState<ReviewField[]>([]);
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<{ inserted: number; failed: number } | null>(null);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
