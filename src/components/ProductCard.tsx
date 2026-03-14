@@ -119,10 +119,10 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
           </h2>
         </Link>
         <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-[13px] font-semibold text-foreground">{formatPrice(product.price)}</span>
           {product.originalPrice > product.price && (
-            <span className="text-xs text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
+            <span className="text-[11px] text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
           )}
-          <span className="text-[13px] text-foreground">{formatPrice(product.price)}</span>
         </div>
         <div className="mt-auto pt-1.5 flex items-center gap-1.5">
           {soldOut ? (
