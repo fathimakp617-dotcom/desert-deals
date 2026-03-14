@@ -111,7 +111,8 @@ const AdminReviewsPage = () => {
   // Import state
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importStep, setImportStep] = useState<"paste" | "map" | "importing">("paste");
-  const [importProductId, setImportProductId] = useState("");
+  const [importProductIds, setImportProductIds] = useState<string[]>([]);
+  const [productSearch, setProductSearch] = useState("");
   const [rawText, setRawText] = useState("");
   const [parsedHeaders, setParsedHeaders] = useState<string[]>([]);
   const [parsedRows, setParsedRows] = useState<string[][]>([]);
