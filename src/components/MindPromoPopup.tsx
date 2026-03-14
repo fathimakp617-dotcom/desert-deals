@@ -147,8 +147,8 @@ const MindPromoPopup = () => {
               {/* Price display */}
               <div className="flex items-center justify-center gap-2 mb-1">
                 <span className="text-xl font-bold text-white">249 AED</span>
-                <span className="text-sm text-neutral-500 line-through">277 AED</span>
-                <span className="text-xs font-bold text-red-500 uppercase">Save 10%</span>
+                <span className="text-sm text-neutral-500 line-through">539 AED</span>
+                <span className="text-xs font-bold text-red-500 uppercase">-54% OFF</span>
               </div>
 
               <p className="text-sm text-neutral-400 mb-5">
