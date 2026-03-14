@@ -57,8 +57,9 @@ const mapDbToProduct = (db: DbProduct): Product => {
   };
 };
 
-// Fetch all products in resilient batches (prevents timeout cache-poisoning with empty arrays)
-const PRODUCT_SELECT = "id, name, price, original_price, discount_percent, stock_quantity, category, size, image_url, cross_sell_price";
+// Fetch all products in resilient batches — supports 2000+ products
+const PRODUCT_SELECT = "id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,cross_sell_price";
+const BATCH_SIZE = 500;
 
 const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
   const { data, error } = await supabase
@@ -69,46 +70,38 @@ const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]>
     .order("created_at", { ascending: false })
     .range(from, to);
 
-  if (error) {
-    throw new Error(`Failed to fetch products ${from}-${to}: ${error.message}`);
-  }
-
+  if (error) throw new Error(`Batch ${from}-${to}: ${error.message}`);
   return (data || []) as DbProduct[];
 };
 
 const fetchAllProducts = async (): Promise<DbProduct[]> => {
-  const BATCH_SIZE = 250;
-
+  // 1. Get total count
   const { count, error: countError } = await supabase
     .from("products")
     .select("id", { count: "exact", head: true })
     .eq("is_active", true)
     .is("deleted_at", null);
 
-  if (countError) {
-    throw new Error(`Failed to count products: ${countError.message}`);
-  }
-
+  if (countError) throw new Error(`Count failed: ${countError.message}`);
   const total = count ?? 0;
   if (total === 0) return [];
 
+  // 2. Build all batch ranges
   const totalBatches = Math.ceil(total / BATCH_SIZE);
-  const firstBatch = await fetchProductBatch(0, BATCH_SIZE - 1);
-  if (totalBatches === 1 || firstBatch.length < BATCH_SIZE) return firstBatch;
-
-  const remainingRanges = Array.from({ length: totalBatches - 1 }, (_, i) => {
-    const from = (i + 1) * BATCH_SIZE;
+  const ranges = Array.from({ length: totalBatches }, (_, i) => {
+    const from = i * BATCH_SIZE;
     return [from, from + BATCH_SIZE - 1] as const;
   });
 
-  const remaining = await Promise.all(
-    remainingRanges.map(([from, to]) => fetchProductBatch(from, to))
+  // 3. Fetch ALL batches in parallel (handles 2000+ products in ~4 requests)
+  const results = await Promise.all(
+    ranges.map(([from, to]) => fetchProductBatch(from, to))
   );
 
-  const allData: DbProduct[] = [...firstBatch];
-  const seenIds = new Set(firstBatch.map((p) => p.id));
-
-  for (const batch of remaining) {
+  // 4. Deduplicate
+  const seenIds = new Set<string>();
+  const allData: DbProduct[] = [];
+  for (const batch of results) {
     for (const item of batch) {
       if (!seenIds.has(item.id)) {
         seenIds.add(item.id);

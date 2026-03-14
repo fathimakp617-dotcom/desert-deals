@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-const PAGE_SIZE = 48;
+const PAGE_SIZE = 60;
 
 interface DbProduct {
   id: string;
