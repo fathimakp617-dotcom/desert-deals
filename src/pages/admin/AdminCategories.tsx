@@ -201,10 +201,18 @@ const AdminCategories = () => {
                   onChange={(e) => setNewValue(e.target.value)}
                   placeholder="gucci"
                 />
-              </div>
+               </div>
               <div className="flex items-center gap-2">
                 <Switch checked={newActive} onCheckedChange={setNewActive} />
                 <Label>Active</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={newShowInCollection} onCheckedChange={setNewShowInCollection} />
+                <Label>Show in Collection (homepage rows)</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={newShowInHeader} onCheckedChange={setNewShowInHeader} />
+                <Label>Show in Header Navigation</Label>
               </div>
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
