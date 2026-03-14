@@ -221,8 +221,8 @@ const AdminReviewsPage = () => {
   };
 
   const handleDoImport = async () => {
-    if (!importProductId) {
-      toast({ title: "Error", description: "Please select a product", variant: "destructive" });
+    if (importProductIds.length === 0) {
+      toast({ title: "Error", description: "Please select at least one product", variant: "destructive" });
       return;
     }
 
