@@ -21,6 +21,7 @@ import CustomersAlsoBought from "@/components/CustomersAlsoBought";
 import PageTransition from "@/components/PageTransition";
 import { formatPrice } from "@/data/products";
 import { useDbProduct } from "@/hooks/useDbProducts";
+import { useHomepageSections } from "@/hooks/useHomepageSections";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useProductStock, isProductSoldOut, getProductStock } from "@/hooks/useProductStock";
