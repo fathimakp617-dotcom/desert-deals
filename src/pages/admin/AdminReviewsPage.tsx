@@ -274,7 +274,10 @@ const AdminReviewsPage = () => {
         title: obj.title || "",
         comment: obj.comment || "",
         is_verified_purchase: ["true", "yes", "1"].includes((obj.verified || "").toLowerCase()),
-        photos: (obj.photos || "").split(/[|,;\n]/).map(s => s.trim()).filter(s => s.startsWith("http")),
+        photos: [
+          ...(obj.photos || "").split(/[|,;\n]/).map(s => s.trim()).filter(s => s.startsWith("http")),
+          ...uploadedImageUrls,
+        ],
         created_at: obj.date || "",
       };
     });
