@@ -25,6 +25,14 @@ const MindPromoPopup = () => {
   const [current, setCurrent] = useState(0);
   const navigate = useNavigate();
 
+  // Preload all slide images immediately
+  useEffect(() => {
+    slides.forEach((slide) => {
+      const img = new Image();
+      img.src = slide.image;
+    });
+  }, []);
+
   useEffect(() => {
     if (sessionStorage.getItem(POPUP_KEY)) return;
     const timer = setTimeout(() => {
