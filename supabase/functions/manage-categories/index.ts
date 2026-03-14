@@ -99,6 +99,8 @@ Deno.serve(async (req) => {
           label: category.label.trim(),
           is_active: category.is_active ?? true,
           sort_order: category.sort_order ?? nextOrder,
+          show_in_collection: category.show_in_collection ?? true,
+          show_in_header: category.show_in_header ?? true,
         })
         .select()
         .single();
