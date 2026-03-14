@@ -2,6 +2,7 @@ import { useEffect, useState, memo, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
-  RefreshCw, Loader2, Star, Check, X, Trash2, Search, Eye, Upload, FileUp, ArrowRight,
+  RefreshCw, Loader2, Star, Check, X, Trash2, Search, Eye, Upload, FileUp, ArrowRight, ImagePlus,
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -119,7 +120,10 @@ const AdminReviewsPage = () => {
   const [columnMapping, setColumnMapping] = useState<ReviewField[]>([]);
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<{ inserted: number; failed: number } | null>(null);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -198,6 +202,30 @@ const AdminReviewsPage = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setIsUploadingImages(true);
+    const urls: string[] = [];
+    try {
+      for (const file of Array.from(files)) {
+        const ext = file.name.split(".").pop() || "jpg";
+        const fileName = `review-images/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from("product-images").upload(fileName, file);
+        if (error) throw error;
+        const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(fileName);
+        urls.push(urlData.publicUrl);
+      }
+      setUploadedImageUrls(prev => [...prev, ...urls]);
+      toast({ title: "Uploaded", description: `${urls.length} image(s) uploaded` });
+    } catch (err: any) {
+      toast({ title: "Upload Error", description: err.message, variant: "destructive" });
+    } finally {
+      setIsUploadingImages(false);
+      if (imageInputRef.current) imageInputRef.current.value = "";
+    }
+  };
+
   const handleParseData = () => {
     if (!rawText.trim()) {
       toast({ title: "Error", description: "Please paste or upload some data first", variant: "destructive" });
@@ -246,7 +274,10 @@ const AdminReviewsPage = () => {
         title: obj.title || "",
         comment: obj.comment || "",
         is_verified_purchase: ["true", "yes", "1"].includes((obj.verified || "").toLowerCase()),
-        photos: (obj.photos || "").split(/[|,;\n]/).map(s => s.trim()).filter(s => s.startsWith("http")),
+        photos: [
+          ...(obj.photos || "").split(/[|,;\n]/).map(s => s.trim()).filter(s => s.startsWith("http")),
+          ...uploadedImageUrls,
+        ],
         created_at: obj.date || "",
       };
     });
@@ -292,6 +323,7 @@ const AdminReviewsPage = () => {
     setImportResult(null);
     setImportProductIds([]);
     setProductSearch("");
+    setUploadedImageUrls([]);
   };
 
   const filteredReviews = reviews.filter(r => {
@@ -596,8 +628,35 @@ const AdminReviewsPage = () => {
                 />
               </div>
 
+              {/* Image Upload Section */}
+              <div className="space-y-2">
+                <Label>Attach Review Images <span className="text-xs text-muted-foreground">(optional — added to all imported reviews)</span></Label>
+                <input ref={imageInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+                <Button variant="outline" onClick={() => imageInputRef.current?.click()} disabled={isUploadingImages} className="w-full">
+                  {isUploadingImages ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ImagePlus className="w-4 h-4 mr-2" />}
+                  {isUploadingImages ? "Uploading..." : "Upload Images"}
+                </Button>
+                {uploadedImageUrls.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {uploadedImageUrls.map((url, i) => (
+                      <div key={i} className="relative group">
+                        <img src={url} alt={`Review ${i + 1}`} className="w-14 h-14 object-cover rounded border border-border" />
+                        <button
+                          type="button"
+                          onClick={() => setUploadedImageUrls(prev => prev.filter((_, idx) => idx !== i))}
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    <Badge variant="secondary" className="self-center text-xs">{uploadedImageUrls.length} image(s)</Badge>
+                  </div>
+                )}
+              </div>
+
               <p className="text-xs text-muted-foreground">
-                Works with any format — CSV, TSV, pipe-separated, semicolons. First row = headers. You'll map columns next.
+                Works with any format — CSV, TSV, pipe-separated, semicolons. First row = headers. You'll map columns next. Uploaded images will be attached to every review.
               </p>
 
               <div className="flex gap-2">
