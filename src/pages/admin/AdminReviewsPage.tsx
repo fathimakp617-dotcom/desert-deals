@@ -255,17 +255,26 @@ const AdminReviewsPage = () => {
     setImportStep("importing");
     setImportResult(null);
 
+    let totalInserted = 0;
+    let totalFailed = 0;
+
     try {
       const token = getSessionToken();
       if (!token) throw new Error("No admin session found");
-      const response = await supabase.functions.invoke("manage-reviews", {
-        headers: { Authorization: `Bearer ${token}` },
-        body: { action: "bulk_import", product_id: importProductId, reviews: mappedReviews },
-      });
-      if (response.error) throw response.error;
-      if (response.data?.error) throw new Error(response.data.error);
-      setImportResult({ inserted: response.data.inserted, failed: response.data.failed });
-      toast({ title: "Import Complete", description: `${response.data.inserted} reviews imported` });
+
+      for (const productId of importProductIds) {
+        const response = await supabase.functions.invoke("manage-reviews", {
+          headers: { Authorization: `Bearer ${token}` },
+          body: { action: "bulk_import", product_id: productId, reviews: mappedReviews },
+        });
+        if (response.error) throw response.error;
+        if (response.data?.error) throw new Error(response.data.error);
+        totalInserted += response.data.inserted || 0;
+        totalFailed += response.data.failed || 0;
+      }
+
+      setImportResult({ inserted: totalInserted, failed: totalFailed });
+      toast({ title: "Import Complete", description: `${totalInserted} reviews imported across ${importProductIds.length} product(s)` });
       fetchReviews();
     } catch (error: any) {
       toast({ title: "Import Error", description: error.message, variant: "destructive" });
