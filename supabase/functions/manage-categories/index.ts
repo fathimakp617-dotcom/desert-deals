@@ -124,6 +124,8 @@ Deno.serve(async (req) => {
       if (category.label !== undefined) updates.label = category.label.trim();
       if (category.is_active !== undefined) updates.is_active = category.is_active;
       if (category.sort_order !== undefined) updates.sort_order = category.sort_order;
+      if (category.show_in_collection !== undefined) updates.show_in_collection = category.show_in_collection;
+      if (category.show_in_header !== undefined) updates.show_in_header = category.show_in_header;
 
       const { data, error } = await supabaseClient
         .from("categories")
