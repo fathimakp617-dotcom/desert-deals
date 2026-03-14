@@ -290,7 +290,7 @@ const AdminReviewsPage = () => {
     setParsedRows([]);
     setColumnMapping([]);
     setImportResult(null);
-    setImportProductId("");
+    setImportProductIds([]);
   };
 
   const filteredReviews = reviews.filter(r => {
