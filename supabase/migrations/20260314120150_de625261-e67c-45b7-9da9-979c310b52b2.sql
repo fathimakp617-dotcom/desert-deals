@@ -1,0 +1,2 @@
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS show_in_collection boolean NOT NULL DEFAULT true;
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS show_in_header boolean NOT NULL DEFAULT true;

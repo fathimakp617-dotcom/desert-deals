@@ -250,6 +250,8 @@ export type Database = {
           id: string
           is_active: boolean
           label: string
+          show_in_collection: boolean
+          show_in_header: boolean
           sort_order: number
           value: string
         }
@@ -258,6 +260,8 @@ export type Database = {
           id?: string
           is_active?: boolean
           label: string
+          show_in_collection?: boolean
+          show_in_header?: boolean
           sort_order?: number
           value: string
         }
@@ -266,6 +270,8 @@ export type Database = {
           id?: string
           is_active?: boolean
           label?: string
+          show_in_collection?: boolean
+          show_in_header?: boolean
           sort_order?: number
           value?: string
         }
