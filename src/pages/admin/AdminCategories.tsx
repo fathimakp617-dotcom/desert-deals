@@ -356,7 +356,7 @@ const AdminCategories = () => {
             ))}
             {categories.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   No categories yet. Add your first category.
                 </TableCell>
               </TableRow>
