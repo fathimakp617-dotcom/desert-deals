@@ -553,29 +553,44 @@ const ProductDetail = () => {
                 </motion.div>
 
                 {/* Delivery Estimate */}
-                <motion.div variants={staggerItem} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-                  <Truck className="w-5 h-5 text-primary shrink-0" />
-                  <div className="text-sm">
-                    <span className="font-medium text-foreground">
-                      Estimated Delivery: {(() => {
-                        const now = new Date();
-                        const addBusinessDays = (start: Date, days: number) => {
-                          const result = new Date(start);
-                          let added = 0;
-                          while (added < days) {
-                            result.setDate(result.getDate() + 1);
-                            if (result.getDay() !== 0) added++; // Skip Sunday
-                          }
-                          return result;
-                        };
-                        const from = addBusinessDays(now, 1);
-                        const to = addBusinessDays(now, 2);
-                        const fmt = (d: Date) => d.toLocaleDateString("en-AE", { weekday: "short", month: "short", day: "numeric" });
-                        return `${fmt(from)} – ${fmt(to)}`;
-                      })()}
-                    </span>
-                    <p className="text-xs text-muted-foreground mt-0.5">Order now • No delivery on Sundays</p>
+                <motion.div variants={staggerItem} className="space-y-2">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+                    <Truck className="w-5 h-5 text-primary shrink-0" />
+                    <div className="text-sm">
+                      <span className="font-medium text-foreground">
+                        Estimated Delivery: {(() => {
+                          const now = new Date();
+                          const addBusinessDays = (start: Date, days: number) => {
+                            const result = new Date(start);
+                            let added = 0;
+                            while (added < days) {
+                              result.setDate(result.getDate() + 1);
+                              if (result.getDay() !== 0) added++;
+                            }
+                            return result;
+                          };
+                          const from = addBusinessDays(now, 1);
+                          const to = addBusinessDays(now, 2);
+                          const fmt = (d: Date) => d.toLocaleDateString("en-AE", { weekday: "short", month: "short", day: "numeric" });
+                          return `${fmt(from)} – ${fmt(to)}`;
+                        })()}
+                      </span>
+                      <p className="text-xs text-muted-foreground mt-0.5">Order now • No delivery on Sundays</p>
+                    </div>
                   </div>
+                  {isEidDeliveryEnabled && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
+                      <span className="text-lg shrink-0">🎉</span>
+                      <div className="text-sm">
+                        <span className="font-semibold text-foreground">
+                          {(eidConfig?.config as any)?.badge_text || "Before Eid Delivery Available!"}
+                        </span>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {(eidConfig?.config as any)?.sub_text || "Order now to receive before Eid Al-Fitr"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
 
                 {/* Social Share Bar */}
