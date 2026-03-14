@@ -8,9 +8,9 @@ import SearchSuggestions from "@/components/SearchSuggestions";
 import headerLogo from "@/assets/desert-deal-logo-header.png";
 
 const announcements = [
-  "Ramadan Sale Live Now - Up To 75% Off →",
-  "COD Available Across the UAE →",
-  "Shipping Available Across UAE →",
+  "Premium Brands – Up To 75% Off →",
+  "Cash on Delivery Available Across UAE →",
+  "Fast Delivery – 1-3 Days Across UAE →",
 ];
 
 const staticBottomLinks = [

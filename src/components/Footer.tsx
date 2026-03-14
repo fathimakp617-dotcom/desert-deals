@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Linkedin, ArrowRight } from "lucide-react";
+import { Instagram, ArrowRight } from "lucide-react";
 import desertDealLogo from "@/assets/desert-deal-logo-dark.png";
 import visaLogo from "@/assets/payments/visa.svg";
 import mastercardLogo from "@/assets/payments/mastercard.svg";
