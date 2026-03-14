@@ -1,4 +1,4 @@
-import { useEffect, useState, memo, useRef } from "react";
+import { useEffect, useState, memo, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
-  RefreshCw, Loader2, Star, Check, X, Trash2, Search, Eye, Upload, FileUp,
+  RefreshCw, Loader2, Star, Check, X, Trash2, Search, Eye, Upload, FileUp, ArrowRight,
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -38,6 +38,67 @@ interface DbProduct {
   name: string;
 }
 
+type ReviewField = "customer_name" | "rating" | "title" | "comment" | "customer_email" | "photos" | "verified" | "date" | "skip";
+
+const REVIEW_FIELDS: { value: ReviewField; label: string }[] = [
+  { value: "skip", label: "— Skip —" },
+  { value: "customer_name", label: "Customer Name" },
+  { value: "rating", label: "Rating (1-5)" },
+  { value: "title", label: "Review Title" },
+  { value: "comment", label: "Review Comment" },
+  { value: "customer_email", label: "Email" },
+  { value: "photos", label: "Photos (URLs)" },
+  { value: "verified", label: "Verified Purchase" },
+  { value: "date", label: "Date" },
+];
+
+// Auto-guess column mapping from header name
+const guessField = (header: string): ReviewField => {
+  const h = header.toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (["name", "customername", "reviewer", "author", "reviewername", "username", "displayname"].includes(h)) return "customer_name";
+  if (["rating", "stars", "score", "starrating"].includes(h)) return "rating";
+  if (["title", "subject", "headline", "reviewtitle", "summary"].includes(h)) return "title";
+  if (["comment", "review", "body", "text", "content", "reviewtext", "reviewbody", "description", "reviewcontent", "feedback"].includes(h)) return "comment";
+  if (["email", "customeremail", "revieweremail", "mail"].includes(h)) return "customer_email";
+  if (["photos", "images", "photo", "image", "imageurl", "photourl", "imagelinks", "media"].includes(h)) return "photos";
+  if (["verified", "verifiedpurchase", "isverified", "isverifiedpurchase", "purchase"].includes(h)) return "verified";
+  if (["date", "createdat", "reviewdate", "posteddate", "time", "timestamp", "postedon", "dateposted"].includes(h)) return "date";
+  return "skip";
+};
+
+const parseCSVLine = (line: string, delimiter: string): string[] => {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (char === delimiter && !inQuotes) {
+      result.push(current.trim()); current = "";
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  return result;
+};
+
+const detectDelimiter = (text: string): string => {
+  const firstLine = text.split("\n")[0] || "";
+  const tabs = (firstLine.match(/\t/g) || []).length;
+  const commas = (firstLine.match(/,/g) || []).length;
+  const semicolons = (firstLine.match(/;/g) || []).length;
+  const pipes = (firstLine.match(/\|/g) || []).length;
+  const max = Math.max(tabs, commas, semicolons, pipes);
+  if (max === 0) return ",";
+  if (max === tabs) return "\t";
+  if (max === semicolons) return ";";
+  if (max === pipes) return "|";
+  return ",";
+};
+
 const AdminReviewsPage = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [dbProducts, setDbProducts] = useState<DbProduct[]>([]);
@@ -46,9 +107,15 @@ const AdminReviewsPage = () => {
   const [productFilter, setProductFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+
+  // Import state
   const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importStep, setImportStep] = useState<"paste" | "map" | "importing">("paste");
   const [importProductId, setImportProductId] = useState("");
-  const [csvText, setCsvText] = useState("");
+  const [rawText, setRawText] = useState("");
+  const [parsedHeaders, setParsedHeaders] = useState<string[]>([]);
+  const [parsedRows, setParsedRows] = useState<string[][]>([]);
+  const [columnMapping, setColumnMapping] = useState<ReviewField[]>([]);
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<{ inserted: number; failed: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -60,12 +127,7 @@ const AdminReviewsPage = () => {
   }, []);
 
   const fetchDbProducts = async () => {
-    const { data } = await supabase
-      .from("products")
-      .select("id, name")
-      .eq("is_active", true)
-      .is("deleted_at", null)
-      .order("name");
+    const { data } = await supabase.from("products").select("id, name").eq("is_active", true).is("deleted_at", null).order("name");
     setDbProducts((data || []) as DbProduct[]);
   };
 
@@ -75,11 +137,7 @@ const AdminReviewsPage = () => {
       const sessionData = sessionStorage.getItem("rayn_admin_session");
       if (!sessionData) throw new Error("No admin session found");
       const { token } = JSON.parse(sessionData);
-
-      const response = await supabase.functions.invoke("get-admin-reviews", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      const response = await supabase.functions.invoke("get-admin-reviews", { headers: { Authorization: `Bearer ${token}` } });
       if (response.error) throw response.error;
       if (response.data?.error) throw new Error(response.data.error);
       setReviews(response.data?.reviews || []);
@@ -91,19 +149,15 @@ const AdminReviewsPage = () => {
   };
 
   const getSessionToken = () => {
-    const sessionData = sessionStorage.getItem("rayn_admin_session");
-    if (!sessionData) return null;
-    return JSON.parse(sessionData).token;
+    const s = sessionStorage.getItem("rayn_admin_session");
+    return s ? JSON.parse(s).token : null;
   };
 
   const updateReviewStatus = async (reviewId: string, isApproved: boolean) => {
     try {
       const token = getSessionToken();
       if (!token) throw new Error("No admin session found");
-      const response = await supabase.functions.invoke("manage-reviews", {
-        headers: { Authorization: `Bearer ${token}` },
-        body: { action: "update_status", reviewId, isApproved },
-      });
+      const response = await supabase.functions.invoke("manage-reviews", { headers: { Authorization: `Bearer ${token}` }, body: { action: "update_status", reviewId, isApproved } });
       if (response.error) throw response.error;
       if (response.data?.error) throw new Error(response.data.error);
       setReviews(reviews.map(r => r.id === reviewId ? { ...r, is_approved: isApproved } : r));
@@ -114,131 +168,119 @@ const AdminReviewsPage = () => {
   };
 
   const deleteReview = async (reviewId: string) => {
-    if (!confirm("Are you sure you want to delete this review?")) return;
+    if (!confirm("Delete this review?")) return;
     try {
       const token = getSessionToken();
       if (!token) throw new Error("No admin session found");
-      const response = await supabase.functions.invoke("manage-reviews", {
-        headers: { Authorization: `Bearer ${token}` },
-        body: { action: "delete", reviewId },
-      });
+      const response = await supabase.functions.invoke("manage-reviews", { headers: { Authorization: `Bearer ${token}` }, body: { action: "delete", reviewId } });
       if (response.error) throw response.error;
       if (response.data?.error) throw new Error(response.data.error);
       setReviews(reviews.filter(r => r.id !== reviewId));
-      toast({ title: "Deleted", description: "Review deleted successfully" });
+      toast({ title: "Deleted", description: "Review deleted" });
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
-  const getProductName = (productId: string) => {
-    const product = dbProducts.find(p => p.id === productId);
-    return product?.name || productId;
-  };
+  const getProductName = (productId: string) => dbProducts.find(p => p.id === productId)?.name || productId;
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" });
 
-  // CSV parsing
-  const parseCSV = (text: string): Record<string, string>[] => {
-    const lines = text.trim().split("\n");
-    if (lines.length < 2) return [];
-    
-    // Parse header
-    const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase().replace(/['"]/g, ""));
-    
-    return lines.slice(1).map(line => {
-      const values = parseCSVLine(line);
-      const obj: Record<string, string> = {};
-      headers.forEach((h, i) => { obj[h] = (values[i] || "").trim(); });
-      return obj;
-    }).filter(obj => Object.values(obj).some(v => v));
-  };
-
-  const parseCSVLine = (line: string): string[] => {
-    const result: string[] = [];
-    let current = "";
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
-        else inQuotes = !inQuotes;
-      } else if (char === "," && !inQuotes) {
-        result.push(current); current = "";
-      } else {
-        current += char;
-      }
-    }
-    result.push(current);
-    return result;
-  };
-
+  // ---- Import Logic ----
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      setCsvText((ev.target?.result as string) || "");
-    };
+    reader.onload = (ev) => setRawText((ev.target?.result as string) || "");
     reader.readAsText(file);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleImport = async () => {
+  const handleParseData = () => {
+    if (!rawText.trim()) {
+      toast({ title: "Error", description: "Please paste or upload some data first", variant: "destructive" });
+      return;
+    }
+
+    const delimiter = detectDelimiter(rawText);
+    const lines = rawText.trim().split("\n").filter(l => l.trim());
+    if (lines.length < 2) {
+      toast({ title: "Error", description: "Need at least a header row + 1 data row", variant: "destructive" });
+      return;
+    }
+
+    const headers = parseCSVLine(lines[0], delimiter).map(h => h.replace(/^["']|["']$/g, "").trim());
+    const rows = lines.slice(1).map(l => parseCSVLine(l, delimiter)).filter(r => r.some(c => c));
+
+    setParsedHeaders(headers);
+    setParsedRows(rows);
+    setColumnMapping(headers.map(h => guessField(h)));
+    setImportStep("map");
+  };
+
+  const handleDoImport = async () => {
     if (!importProductId) {
       toast({ title: "Error", description: "Please select a product", variant: "destructive" });
       return;
     }
-    if (!csvText.trim()) {
-      toast({ title: "Error", description: "Please paste or upload CSV data", variant: "destructive" });
-      return;
-    }
 
-    const parsed = parseCSV(csvText);
-    if (parsed.length === 0) {
-      toast({ title: "Error", description: "No valid rows found in CSV", variant: "destructive" });
-      return;
-    }
+    const mappedReviews = parsedRows.map(row => {
+      const obj: Record<string, string> = {};
+      columnMapping.forEach((field, i) => {
+        if (field !== "skip" && row[i]) {
+          // If field already has a value, append (for multiple comment columns etc.)
+          if (obj[field] && field === "comment") {
+            obj[field] += "\n" + row[i];
+          } else {
+            obj[field] = row[i];
+          }
+        }
+      });
 
-    // Map CSV columns to review fields
-    const mappedReviews = parsed.map(row => ({
-      customer_name: row.customer_name || row.name || row.reviewer || row.author || "Verified Buyer",
-      customer_email: row.customer_email || row.email || "",
-      rating: row.rating || row.stars || "5",
-      title: row.title || row.subject || row.headline || "",
-      comment: row.comment || row.review || row.body || row.text || row.content || "",
-      is_verified_purchase: ["true", "yes", "1"].includes((row.verified || row.verified_purchase || row.is_verified_purchase || "").toLowerCase()),
-      photos: (row.photos || row.images || row.photo || row.image || "").split("|").map((s: string) => s.trim()).filter(Boolean),
-      created_at: row.created_at || row.date || row.review_date || "",
-    }));
+      return {
+        customer_name: obj.customer_name || "Verified Buyer",
+        customer_email: obj.customer_email || "",
+        rating: obj.rating || "5",
+        title: obj.title || "",
+        comment: obj.comment || "",
+        is_verified_purchase: ["true", "yes", "1"].includes((obj.verified || "").toLowerCase()),
+        photos: (obj.photos || "").split(/[|,;\n]/).map(s => s.trim()).filter(s => s.startsWith("http")),
+        created_at: obj.date || "",
+      };
+    });
 
     setIsImporting(true);
+    setImportStep("importing");
     setImportResult(null);
 
     try {
       const token = getSessionToken();
       if (!token) throw new Error("No admin session found");
-
       const response = await supabase.functions.invoke("manage-reviews", {
         headers: { Authorization: `Bearer ${token}` },
         body: { action: "bulk_import", product_id: importProductId, reviews: mappedReviews },
       });
-
       if (response.error) throw response.error;
       if (response.data?.error) throw new Error(response.data.error);
-
       setImportResult({ inserted: response.data.inserted, failed: response.data.failed });
-      toast({
-        title: "Import Complete",
-        description: `${response.data.inserted} reviews imported, ${response.data.failed} failed`,
-      });
+      toast({ title: "Import Complete", description: `${response.data.inserted} reviews imported` });
       fetchReviews();
     } catch (error: any) {
       toast({ title: "Import Error", description: error.message, variant: "destructive" });
     } finally {
       setIsImporting(false);
     }
+  };
+
+  const resetImport = () => {
+    setImportStep("paste");
+    setRawText("");
+    setParsedHeaders([]);
+    setParsedRows([]);
+    setColumnMapping([]);
+    setImportResult(null);
+    setImportProductId("");
   };
 
   const filteredReviews = reviews.filter(r => {
@@ -252,9 +294,7 @@ const AdminReviewsPage = () => {
       if (!r.customer_name.toLowerCase().includes(query) &&
           !r.customer_email.toLowerCase().includes(query) &&
           !(r.title?.toLowerCase().includes(query)) &&
-          !(r.comment?.toLowerCase().includes(query))) {
-        return false;
-      }
+          !(r.comment?.toLowerCase().includes(query))) return false;
     }
     return true;
   });
@@ -266,15 +306,22 @@ const AdminReviewsPage = () => {
     avgRating: reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : "0",
   };
 
-  // Unique product IDs from reviews for filter
   const reviewProductIds = [...new Set(reviews.map(r => r.product_id))];
 
+  // Preview of mapped data
+  const previewRows = useMemo(() => {
+    if (parsedRows.length === 0) return [];
+    return parsedRows.slice(0, 3).map(row => {
+      const obj: Record<string, string> = {};
+      columnMapping.forEach((field, i) => {
+        if (field !== "skip" && row[i]) obj[field] = row[i];
+      });
+      return obj;
+    });
+  }, [parsedRows, columnMapping]);
+
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
 
   return (
@@ -285,31 +332,27 @@ const AdminReviewsPage = () => {
           <p className="text-muted-foreground">Manage customer reviews and ratings</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => { setShowImportDialog(true); setImportResult(null); setCsvText(""); }} variant="outline" size="sm">
-            <Upload className="w-4 h-4 mr-2" />
-            Import CSV
+          <Button onClick={() => { setShowImportDialog(true); resetImport(); }} variant="outline" size="sm">
+            <Upload className="w-4 h-4 mr-2" />Import Reviews
           </Button>
           <Button onClick={fetchReviews} variant="outline" size="sm">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
+            <RefreshCw className="w-4 h-4 mr-2" />Refresh
           </Button>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-4 rounded-lg border bg-card">
-          <p className="text-sm text-muted-foreground">Total Reviews</p>
-          <p className="text-2xl font-bold">{stats.total}</p>
-        </div>
-        <div className="p-4 rounded-lg border bg-card">
-          <p className="text-sm text-muted-foreground">Approved</p>
-          <p className="text-2xl font-bold text-green-500">{stats.approved}</p>
-        </div>
-        <div className="p-4 rounded-lg border bg-card">
-          <p className="text-sm text-muted-foreground">Pending</p>
-          <p className="text-2xl font-bold text-amber-500">{stats.pending}</p>
-        </div>
+        {[
+          { label: "Total Reviews", value: stats.total, color: "" },
+          { label: "Approved", value: stats.approved, color: "text-green-500" },
+          { label: "Pending", value: stats.pending, color: "text-amber-500" },
+        ].map(s => (
+          <div key={s.label} className="p-4 rounded-lg border bg-card">
+            <p className="text-sm text-muted-foreground">{s.label}</p>
+            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+          </div>
+        ))}
         <div className="p-4 rounded-lg border bg-card">
           <p className="text-sm text-muted-foreground">Avg Rating</p>
           <p className="text-2xl font-bold text-primary flex items-center gap-1">
@@ -359,30 +402,24 @@ const AdminReviewsPage = () => {
           </TableHeader>
           <TableBody>
             {filteredReviews.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No reviews found</TableCell>
-              </TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No reviews found</TableCell></TableRow>
             ) : (
               filteredReviews.map((review) => (
                 <TableRow key={review.id}>
                   <TableCell>
-                    <div>
-                      <p className="font-medium">{review.customer_name}</p>
-                      <p className="text-sm text-muted-foreground">{review.customer_email}</p>
-                    </div>
+                    <p className="font-medium">{review.customer_name}</p>
+                    <p className="text-sm text-muted-foreground">{review.customer_email}</p>
                   </TableCell>
-                  <TableCell><span className="text-sm">{getProductName(review.product_id)}</span></TableCell>
+                  <TableCell className="text-sm">{getProductName(review.product_id)}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className={`w-3 h-3 ${star <= review.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`} />
+                    <div className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map(s => (
+                        <Star key={s} className={`w-3 h-3 ${s <= review.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`} />
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <span className="text-xs text-muted-foreground">
-                      {review.photos && review.photos.length > 0 ? `${review.photos.length} photo${review.photos.length > 1 ? "s" : ""}` : "—"}
-                    </span>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {review.photos && review.photos.length > 0 ? `${review.photos.length} photo${review.photos.length > 1 ? "s" : ""}` : "—"}
                   </TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${review.is_approved ? "bg-green-500/20 text-green-500" : "bg-amber-500/20 text-amber-500"}`}>
@@ -421,8 +458,8 @@ const AdminReviewsPage = () => {
                   <p className="text-sm text-muted-foreground">{selectedReview.customer_email}</p>
                 </div>
                 <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className={`w-4 h-4 ${star <= selectedReview.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`} />
+                  {[1, 2, 3, 4, 5].map(s => (
+                    <Star key={s} className={`w-4 h-4 ${s <= selectedReview.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`} />
                   ))}
                 </div>
               </div>
@@ -433,18 +470,8 @@ const AdminReviewsPage = () => {
                   <span className="inline-flex items-center px-2 py-1 bg-primary/20 text-primary text-xs rounded">Verified Purchase</span>
                 )}
               </div>
-              {selectedReview.title && (
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Title</p>
-                  <p className="font-medium">{selectedReview.title}</p>
-                </div>
-              )}
-              {selectedReview.comment && (
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Review</p>
-                  <p className="text-sm">{selectedReview.comment}</p>
-                </div>
-              )}
+              {selectedReview.title && <div><p className="text-sm text-muted-foreground mb-1">Title</p><p className="font-medium">{selectedReview.title}</p></div>}
+              {selectedReview.comment && <div><p className="text-sm text-muted-foreground mb-1">Review</p><p className="text-sm">{selectedReview.comment}</p></div>}
               {selectedReview.photos && selectedReview.photos.length > 0 && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Photos</p>
@@ -458,101 +485,174 @@ const AdminReviewsPage = () => {
               <div className="flex gap-2 pt-4 border-t">
                 {selectedReview.is_approved ? (
                   <Button variant="outline" onClick={() => { updateReviewStatus(selectedReview.id, false); setSelectedReview({ ...selectedReview, is_approved: false }); }} className="flex-1">
-                    <X className="w-4 h-4 mr-2" />Hide Review
+                    <X className="w-4 h-4 mr-2" />Hide
                   </Button>
                 ) : (
                   <Button onClick={() => { updateReviewStatus(selectedReview.id, true); setSelectedReview({ ...selectedReview, is_approved: true }); }} className="flex-1">
                     <Check className="w-4 h-4 mr-2" />Approve
                   </Button>
                 )}
-                <Button variant="destructive" onClick={() => { deleteReview(selectedReview.id); setSelectedReview(null); }}>
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                <Button variant="destructive" onClick={() => { deleteReview(selectedReview.id); setSelectedReview(null); }}><Trash2 className="w-4 h-4" /></Button>
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      {/* CSV Import Dialog */}
-      <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
-          <DialogHeader><DialogTitle>Import Reviews from CSV</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            {/* Product selection */}
-            <div className="space-y-2">
-              <Label>Select Product *</Label>
-              <Select value={importProductId} onValueChange={setImportProductId}>
-                <SelectTrigger><SelectValue placeholder="Choose a product..." /></SelectTrigger>
-                <SelectContent>
-                  {dbProducts.map(p => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Import Dialog */}
+      <Dialog open={showImportDialog} onOpenChange={(open) => { if (!open) setShowImportDialog(false); }}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>
+              Import Reviews
+              {importStep === "map" && " — Map Columns"}
+              {importStep === "importing" && " — Results"}
+            </DialogTitle>
+          </DialogHeader>
 
-            {/* CSV Upload */}
-            <div className="space-y-2">
-              <Label>Upload CSV File</Label>
+          {/* Step 1: Paste / Upload */}
+          {importStep === "paste" && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Select Product *</Label>
+                <Select value={importProductId} onValueChange={setImportProductId}>
+                  <SelectTrigger><SelectValue placeholder="Choose a product..." /></SelectTrigger>
+                  <SelectContent>
+                    {dbProducts.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Upload File (CSV, TSV, TXT — any format)</Label>
+                <input ref={fileInputRef} type="file" accept=".csv,.tsv,.txt,.xls,.xlsx" onChange={handleFileUpload} className="hidden" />
+                <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full">
+                  <FileUp className="w-4 h-4 mr-2" />Choose File
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Or Paste Data (any delimiter: comma, tab, semicolon, pipe)</Label>
+                <Textarea
+                  placeholder={`Paste your scraped data here...\n\nExample:\nname\trating\treview\nJohn\t5\tGreat product!\nJane\t4\tLoved it`}
+                  value={rawText}
+                  onChange={(e) => setRawText(e.target.value)}
+                  rows={10}
+                  className="font-mono text-xs"
+                />
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                Works with any format — CSV, TSV, pipe-separated, semicolons. Just make sure the first row has column headers. You'll map columns in the next step.
+              </p>
+
               <div className="flex gap-2">
-                <input ref={fileInputRef} type="file" accept=".csv,.txt" onChange={handleFileUpload} className="hidden" />
-                <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="flex-1">
-                  <FileUp className="w-4 h-4 mr-2" />
-                  Choose CSV File
+                <Button variant="outline" onClick={() => setShowImportDialog(false)} className="flex-1">Cancel</Button>
+                <Button onClick={handleParseData} disabled={!rawText.trim() || !importProductId} className="flex-1">
+                  Next: Map Columns <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
             </div>
+          )}
 
-            {/* Or paste */}
-            <div className="space-y-2">
-              <Label>Or Paste CSV Data</Label>
-              <Textarea
-                placeholder={`customer_name,rating,title,comment,photos\nJohn Doe,5,Great Product,Loved it!,https://img.url/1.jpg|https://img.url/2.jpg\nJane,4,Good quality,Nice product,`}
-                value={csvText}
-                onChange={(e) => setCsvText(e.target.value)}
-                rows={8}
-                className="font-mono text-xs"
-              />
-            </div>
+          {/* Step 2: Map columns */}
+          {importStep === "map" && (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                We detected <strong>{parsedHeaders.length}</strong> columns and <strong>{parsedRows.length}</strong> rows. Map each column to a review field:
+              </p>
 
-            {/* Column guide */}
-            <div className="p-3 bg-muted/50 rounded-lg text-xs text-muted-foreground space-y-1">
-              <p className="font-medium text-foreground">Supported CSV columns:</p>
-              <p><strong>Name:</strong> customer_name, name, reviewer, author</p>
-              <p><strong>Rating:</strong> rating, stars (1-5)</p>
-              <p><strong>Title:</strong> title, subject, headline</p>
-              <p><strong>Comment:</strong> comment, review, body, text, content</p>
-              <p><strong>Email:</strong> customer_email, email (optional)</p>
-              <p><strong>Photos:</strong> photos, images, photo, image (separate multiple with <code>|</code>)</p>
-              <p><strong>Verified:</strong> verified, verified_purchase (true/false)</p>
-              <p><strong>Date:</strong> created_at, date, review_date (optional)</p>
-            </div>
-
-            {/* Preview */}
-            {csvText && (
-              <div className="text-sm text-muted-foreground">
-                {parseCSV(csvText).length} review(s) detected in CSV
+              <div className="border rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="w-[200px]">Your Column</TableHead>
+                      <TableHead className="w-[60px]"></TableHead>
+                      <TableHead className="w-[180px]">Maps To</TableHead>
+                      <TableHead>Sample Data</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {parsedHeaders.map((header, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="font-mono text-xs font-medium">{header}</TableCell>
+                        <TableCell><ArrowRight className="w-4 h-4 text-muted-foreground" /></TableCell>
+                        <TableCell>
+                          <Select value={columnMapping[idx]} onValueChange={(val) => {
+                            const next = [...columnMapping];
+                            next[idx] = val as ReviewField;
+                            setColumnMapping(next);
+                          }}>
+                            <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              {REVIEW_FIELDS.map(f => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground truncate max-w-[200px]">
+                          {parsedRows[0]?.[idx] || "—"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
-            )}
 
-            {/* Result */}
-            {importResult && (
-              <div className="p-3 rounded-lg border bg-card">
-                <p className="text-sm font-medium text-foreground">
-                  Import Result: {importResult.inserted} imported, {importResult.failed} failed
-                </p>
+              {/* Preview */}
+              {previewRows.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-foreground">Preview (first {previewRows.length} rows):</p>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {previewRows.map((row, i) => (
+                      <div key={i} className="p-2 bg-muted/50 rounded text-xs space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{row.customer_name || "Verified Buyer"}</span>
+                          <span className="text-primary">{"★".repeat(Math.min(5, parseInt(row.rating || "5")))}</span>
+                        </div>
+                        {row.title && <p className="font-medium">{row.title}</p>}
+                        {row.comment && <p className="text-muted-foreground line-clamp-2">{row.comment}</p>}
+                        {row.photos && <p className="text-primary/70">📷 {row.photos.split(/[|,;]/).filter(Boolean).length} photo(s)</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setImportStep("paste")} className="flex-1">Back</Button>
+                <Button onClick={handleDoImport} disabled={!columnMapping.some(m => m !== "skip")} className="flex-1">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import {parsedRows.length} Reviews
+                </Button>
               </div>
-            )}
-
-            <div className="flex gap-2 pt-2">
-              <Button variant="outline" onClick={() => setShowImportDialog(false)} className="flex-1">Cancel</Button>
-              <Button onClick={handleImport} disabled={isImporting || !importProductId || !csvText.trim()} className="flex-1">
-                {isImporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-                {isImporting ? "Importing..." : "Import Reviews"}
-              </Button>
             </div>
-          </div>
+          )}
+
+          {/* Step 3: Results */}
+          {importStep === "importing" && (
+            <div className="space-y-4 py-4">
+              {isImporting ? (
+                <div className="flex flex-col items-center gap-4 py-8">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Importing reviews...</p>
+                </div>
+              ) : importResult ? (
+                <div className="text-center space-y-4 py-4">
+                  <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto">
+                    <Check className="w-8 h-8 text-green-500" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-foreground">{importResult.inserted} reviews imported</p>
+                    {importResult.failed > 0 && <p className="text-sm text-destructive">{importResult.failed} failed</p>}
+                  </div>
+                  <div className="flex gap-2 justify-center">
+                    <Button variant="outline" onClick={() => { resetImport(); }}>Import More</Button>
+                    <Button onClick={() => setShowImportDialog(false)}>Done</Button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </motion.div>
