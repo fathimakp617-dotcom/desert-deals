@@ -143,6 +143,7 @@ const App = () => {
                     <GeoBlocker>
                     <ScrollToTop />
                     <CartDrawer />
+                    <Suspense fallback={null}><MindPromoPopup /></Suspense>
                     
                     <RoutePrefetcher />
                     <Suspense fallback={<PageLoader />}>
