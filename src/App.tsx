@@ -16,7 +16,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { GeoBlocker } from "@/components/GeoBlocker";
 import { usePageTracking } from "@/hooks/usePageTracking";
 import RamadanSplash from "@/components/RamadanSplash";
-import WhatsAppButton from "@/components/WhatsAppButton";
+
 
 
 // Eagerly load critical pages
@@ -183,7 +183,6 @@ const App = () => {
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
-                    <WhatsAppButton />
                     </GeoBlocker>
                   </BrowserRouter>
                 </TooltipProvider>
