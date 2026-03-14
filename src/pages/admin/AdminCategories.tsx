@@ -20,6 +20,8 @@ interface Category {
   label: string;
   is_active: boolean;
   sort_order: number;
+  show_in_collection: boolean;
+  show_in_header: boolean;
   created_at: string;
 }
 
@@ -41,6 +43,8 @@ const AdminCategories = () => {
   const [newLabel, setNewLabel] = useState("");
   const [newValue, setNewValue] = useState("");
   const [newActive, setNewActive] = useState(true);
+  const [newShowInCollection, setNewShowInCollection] = useState(true);
+  const [newShowInHeader, setNewShowInHeader] = useState(true);
 
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ["admin-categories"],
@@ -62,7 +66,13 @@ const AdminCategories = () => {
       const { data, error } = await supabase.functions.invoke("manage-categories", {
         body: {
           action: "create",
-          category: { value: newValue || newLabel, label: newLabel, is_active: newActive },
+          category: {
+            value: newValue || newLabel,
+            label: newLabel,
+            is_active: newActive,
+            show_in_collection: newShowInCollection,
+            show_in_header: newShowInHeader,
+          },
           admin_email: session.email,
           admin_token: session.token,
         },
@@ -78,6 +88,8 @@ const AdminCategories = () => {
       setNewLabel("");
       setNewValue("");
       setNewActive(true);
+      setNewShowInCollection(true);
+      setNewShowInHeader(true);
       toast({ title: "Category created" });
     },
     onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
@@ -189,10 +201,18 @@ const AdminCategories = () => {
                   onChange={(e) => setNewValue(e.target.value)}
                   placeholder="gucci"
                 />
-              </div>
+               </div>
               <div className="flex items-center gap-2">
                 <Switch checked={newActive} onCheckedChange={setNewActive} />
                 <Label>Active</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={newShowInCollection} onCheckedChange={setNewShowInCollection} />
+                <Label>Show in Collection (homepage rows)</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={newShowInHeader} onCheckedChange={setNewShowInHeader} />
+                <Label>Show in Header Navigation</Label>
               </div>
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
@@ -221,6 +241,8 @@ const AdminCategories = () => {
                   label: editingCategory.label,
                   is_active: editingCategory.is_active,
                   sort_order: editingCategory.sort_order,
+                  show_in_collection: editingCategory.show_in_collection,
+                  show_in_header: editingCategory.show_in_header,
                 });
               }}
               className="space-y-4"
@@ -252,6 +274,20 @@ const AdminCategories = () => {
                 />
                 <Label>Active</Label>
               </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={editingCategory.show_in_collection}
+                  onCheckedChange={(checked) => setEditingCategory({ ...editingCategory, show_in_collection: checked })}
+                />
+                <Label>Show in Collection (homepage rows)</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={editingCategory.show_in_header}
+                  onCheckedChange={(checked) => setEditingCategory({ ...editingCategory, show_in_header: checked })}
+                />
+                <Label>Show in Header Navigation</Label>
+              </div>
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setEditingCategory(null)}>Cancel</Button>
                 <Button type="submit" disabled={updateMutation.isPending}>
@@ -273,11 +309,13 @@ const AdminCategories = () => {
               <TableHead>Name</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Collection</TableHead>
+              <TableHead>Header</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((cat) => (
+            {categories.map((cat: any) => (
               <TableRow key={cat.id}>
                 <TableCell className="text-muted-foreground text-sm">{cat.sort_order}</TableCell>
                 <TableCell className="font-medium">{cat.label}</TableCell>
@@ -285,6 +323,16 @@ const AdminCategories = () => {
                 <TableCell>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${cat.is_active ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
                     {cat.is_active ? "Active" : "Inactive"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${cat.show_in_collection !== false ? "bg-blue-100 text-blue-700" : "bg-muted text-muted-foreground"}`}>
+                    {cat.show_in_collection !== false ? "Yes" : "No"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${cat.show_in_header !== false ? "bg-purple-100 text-purple-700" : "bg-muted text-muted-foreground"}`}>
+                    {cat.show_in_header !== false ? "Yes" : "No"}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
@@ -308,7 +356,7 @@ const AdminCategories = () => {
             ))}
             {categories.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   No categories yet. Add your first category.
                 </TableCell>
               </TableRow>
