@@ -524,13 +524,56 @@ const AdminReviewsPage = () => {
           {importStep === "paste" && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Select Product *</Label>
-                <Select value={importProductId} onValueChange={setImportProductId}>
-                  <SelectTrigger><SelectValue placeholder="Choose a product..." /></SelectTrigger>
-                  <SelectContent>
-                    {dbProducts.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <Label>Select Products * <span className="text-xs text-muted-foreground">(reviews will be added to all selected)</span></Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search products..."
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                {importProductIds.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {importProductIds.map(pid => {
+                      const name = dbProducts.find(p => p.id === pid)?.name || pid;
+                      return (
+                        <span key={pid} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-primary/15 text-primary border border-primary/30">
+                          {name.length > 30 ? name.slice(0, 30) + "…" : name}
+                          <X className="w-3 h-3 cursor-pointer hover:text-destructive" onClick={() => setImportProductIds(prev => prev.filter(id => id !== pid))} />
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="border rounded-lg max-h-48 overflow-y-auto">
+                  {dbProducts
+                    .filter(p => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase()))
+                    .map(p => {
+                      const selected = importProductIds.includes(p.id);
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => {
+                            setImportProductIds(prev =>
+                              selected ? prev.filter(id => id !== p.id) : [...prev, p.id]
+                            );
+                          }}
+                          className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-muted/50 transition-colors ${selected ? "bg-primary/10" : ""}`}
+                        >
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${selected ? "bg-primary border-primary" : "border-border"}`}>
+                            {selected && <Check className="w-3 h-3 text-primary-foreground" />}
+                          </div>
+                          <span className="truncate">{p.name}</span>
+                        </button>
+                      );
+                    })}
+                  {dbProducts.filter(p => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase())).length === 0 && (
+                    <p className="text-center text-xs text-muted-foreground py-4">No products found</p>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -547,18 +590,18 @@ const AdminReviewsPage = () => {
                   placeholder={`Paste your scraped data here...\n\nExample:\nname\trating\treview\nJohn\t5\tGreat product!\nJane\t4\tLoved it`}
                   value={rawText}
                   onChange={(e) => setRawText(e.target.value)}
-                  rows={10}
+                  rows={8}
                   className="font-mono text-xs"
                 />
               </div>
 
               <p className="text-xs text-muted-foreground">
-                Works with any format — CSV, TSV, pipe-separated, semicolons. Just make sure the first row has column headers. You'll map columns in the next step.
+                Works with any format — CSV, TSV, pipe-separated, semicolons. First row = headers. You'll map columns next.
               </p>
 
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setShowImportDialog(false)} className="flex-1">Cancel</Button>
-                <Button onClick={handleParseData} disabled={!rawText.trim() || !importProductId} className="flex-1">
+                <Button onClick={handleParseData} disabled={!rawText.trim() || importProductIds.length === 0} className="flex-1">
                   Next: Map Columns <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
