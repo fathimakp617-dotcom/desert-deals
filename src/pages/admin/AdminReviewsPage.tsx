@@ -628,8 +628,35 @@ const AdminReviewsPage = () => {
                 />
               </div>
 
+              {/* Image Upload Section */}
+              <div className="space-y-2">
+                <Label>Attach Review Images <span className="text-xs text-muted-foreground">(optional — added to all imported reviews)</span></Label>
+                <input ref={imageInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+                <Button variant="outline" onClick={() => imageInputRef.current?.click()} disabled={isUploadingImages} className="w-full">
+                  {isUploadingImages ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ImagePlus className="w-4 h-4 mr-2" />}
+                  {isUploadingImages ? "Uploading..." : "Upload Images"}
+                </Button>
+                {uploadedImageUrls.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {uploadedImageUrls.map((url, i) => (
+                      <div key={i} className="relative group">
+                        <img src={url} alt={`Review ${i + 1}`} className="w-14 h-14 object-cover rounded border border-border" />
+                        <button
+                          type="button"
+                          onClick={() => setUploadedImageUrls(prev => prev.filter((_, idx) => idx !== i))}
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    <Badge variant="secondary" className="self-center text-xs">{uploadedImageUrls.length} image(s)</Badge>
+                  </div>
+                )}
+              </div>
+
               <p className="text-xs text-muted-foreground">
-                Works with any format — CSV, TSV, pipe-separated, semicolons. First row = headers. You'll map columns next.
+                Works with any format — CSV, TSV, pipe-separated, semicolons. First row = headers. You'll map columns next. Uploaded images will be attached to every review.
               </p>
 
               <div className="flex gap-2">
