@@ -40,6 +40,9 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: product, isLoading } = useDbProduct(id);
+  const { data: sections } = useHomepageSections();
+  const eidConfig = sections?.find(s => s.section_key === "eid_delivery");
+  const isEidDeliveryEnabled = !!eidConfig?.is_visible;
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
