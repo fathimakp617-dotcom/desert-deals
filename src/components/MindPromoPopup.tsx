@@ -8,8 +8,8 @@ import mindSplit from "@/assets/mind/mind-split.jpeg";
 import mindBottle from "@/assets/mind/mind-bottle.jpeg";
 import mindXray from "@/assets/mind/mind-xray.jpeg";
 
-const POPUP_KEY = "dd_mind_promo_shown";
-const POPUP_DELAY = 3000;
+const POPUP_KEY = "dd_mind_promo_shown_v2";
+const POPUP_DELAY = 1500;
 const SLIDE_INTERVAL = 3500;
 
 const slides = [
