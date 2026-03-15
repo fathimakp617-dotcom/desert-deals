@@ -52,7 +52,7 @@ const MobileBottomNav = memo(() => {
         <div className="fixed inset-0 z-[60] bg-background flex flex-col">
           <div className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-border">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
                 autoFocus
