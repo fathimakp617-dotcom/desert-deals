@@ -92,7 +92,7 @@ const Navbar = memo(() => {
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={() => changeAnnouncement(-1)}
-            className="absolute left-4 text-background/70 hover:text-background transition-colors"
+            className="absolute start-4 text-background/70 hover:text-background transition-colors"
             aria-label="Previous announcement"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -102,7 +102,7 @@ const Navbar = memo(() => {
           </span>
           <button
             onClick={() => changeAnnouncement(1)}
-            className="absolute right-4 text-background/70 hover:text-background transition-colors"
+            className="absolute end-4 text-background/70 hover:text-background transition-colors"
             aria-label="Next announcement"
           >
             <ChevronRight className="w-4 h-4" />
@@ -125,7 +125,7 @@ const Navbar = memo(() => {
             {/* Logo – text-based like reference */}
             <Link
               to="/"
-              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:mr-8"
+              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:me-8"
             >
               <img src={headerLogo} alt="Desert Deal" className="h-14 sm:h-20 w-auto" />
             </Link>
@@ -144,20 +144,20 @@ const Navbar = memo(() => {
             </div>
 
             {/* Action icons */}
-            <div className="flex items-center gap-1 sm:gap-2 ml-auto lg:ml-0 shrink-0 relative z-10">
+            <div className="flex items-center gap-1 sm:gap-2 ms-auto lg:ms-0 shrink-0 relative z-10">
               <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
               </button>
               <Link to="/wishlist" className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <Heart size={20} />
                 {wishlistItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
+                  <span className="absolute -top-0.5 -end-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
                 )}
               </Link>
               <button onClick={() => openCart()} className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <ShoppingBag size={20} />
                 {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{totalItems}</span>
+                  <span className="absolute -top-0.5 -end-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{totalItems}</span>
                 )}
               </button>
               <Link to="/account" className="hidden md:flex p-2 text-foreground hover:opacity-60 transition-opacity">

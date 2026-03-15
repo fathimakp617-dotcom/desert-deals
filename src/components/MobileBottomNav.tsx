@@ -52,7 +52,7 @@ const MobileBottomNav = memo(() => {
         <div className="fixed inset-0 z-[60] bg-background flex flex-col">
           <div className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-border">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
                 autoFocus
@@ -60,7 +60,7 @@ const MobileBottomNav = memo(() => {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && searchInput.trim()) handleViewAll(); }}
-                className="w-full pl-10 pr-4 py-2.5 bg-muted rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none"
+                className="w-full ps-10 pe-4 py-2.5 bg-muted rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none"
               />
             </div>
             <button onClick={() => { setSearchOpen(false); setSearchInput(""); }} className="p-2 text-foreground">
@@ -127,7 +127,7 @@ const MobileBottomNav = memo(() => {
             <Heart size={22} strokeWidth={1.8} />
             <span className="text-[10px] font-normal uppercase tracking-wider">Wishlist</span>
             {wishlistItems > 0 && (
-              <span className="absolute -top-1 right-0 w-4 h-4 bg-foreground text-background text-[9px] flex items-center justify-center rounded-full">
+              <span className="absolute -top-1 end-0 w-4 h-4 bg-foreground text-background text-[9px] flex items-center justify-center rounded-full">
                 {wishlistItems}
               </span>
             )}

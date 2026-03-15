@@ -285,7 +285,7 @@ const ProductDetail = () => {
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
               <span className="text-sm tracking-wider">BACK</span>
             </motion.button>
           </div>
@@ -305,7 +305,7 @@ const ProductDetail = () => {
                 {/* Main Image Carousel (Embla) */}
                 <div className="relative w-full aspect-square overflow-hidden bg-card/50">
                   {isSoldOut && (
-                    <div className="absolute top-6 right-6 z-20">
+                    <div className="absolute top-6 end-6 z-20">
                       <Badge variant="destructive" className="text-xs sm:text-sm font-semibold px-3 py-1.5">
                         SOLD OUT
                       </Badge>
@@ -317,13 +317,13 @@ const ProductDetail = () => {
                     <>
                       <button
                         onClick={scrollPrev}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                        className="absolute start-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
                       <button
                         onClick={scrollNext}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                        className="absolute end-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
