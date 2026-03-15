@@ -127,7 +127,7 @@ const MobileBottomNav = memo(() => {
             <Heart size={22} strokeWidth={1.8} />
             <span className="text-[10px] font-normal uppercase tracking-wider">Wishlist</span>
             {wishlistItems > 0 && (
-              <span className="absolute -top-1 right-0 w-4 h-4 bg-foreground text-background text-[9px] flex items-center justify-center rounded-full">
+              <span className="absolute -top-1 end-0 w-4 h-4 bg-foreground text-background text-[9px] flex items-center justify-center rounded-full">
                 {wishlistItems}
               </span>
             )}
