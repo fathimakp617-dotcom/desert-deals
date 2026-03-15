@@ -380,9 +380,9 @@ const Shop = () => {
                 </div>
               )}
 
-              {!isLoading && totalCount > 0 && !hasNextPage && (
+              {!isLoading && totalCount > 0 && (
                 <p className="text-center text-xs text-muted-foreground mb-4 mt-4">
-                  Showing all {products.length} products
+                  Showing {Math.min(products.length, totalCount)} of {totalCount} products
                 </p>
               )}
             </div>
