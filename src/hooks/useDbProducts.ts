@@ -130,9 +130,8 @@ export const useDbProducts = () => {
     gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
-    refetchOnMount: "always",
-    retry: 8,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
   });
 };
 

@@ -144,7 +144,7 @@ const App = () => {
                     <GeoBlocker>
                     <ScrollToTop />
                     <CartDrawer />
-                    <Suspense fallback={null}><MindPromoPopup /></Suspense>
+                    <Suspense fallback={null}>{typeof window !== 'undefined' && !sessionStorage.getItem('dd_mind_promo_shown_v4') && <MindPromoPopup />}</Suspense>
                     
                     <RoutePrefetcher />
                     <Suspense fallback={<PageLoader />}>

@@ -9,7 +9,7 @@ import mindBottle from "@/assets/mind/mind-bottle.jpeg";
 import mindXray from "@/assets/mind/mind-xray.jpeg";
 
 const POPUP_KEY = "dd_mind_promo_shown_v4";
-const POPUP_DELAY = 1500;
+const POPUP_DELAY = 3000;
 const SLIDE_INTERVAL = 3500;
 
 const slides = [
@@ -25,12 +25,16 @@ const MindPromoPopup = () => {
   const [current, setCurrent] = useState(0);
   const navigate = useNavigate();
 
-  // Preload all slide images immediately
+  // Preload slide images only when popup is about to open
   useEffect(() => {
-    slides.forEach((slide) => {
-      const img = new Image();
-      img.src = slide.image;
-    });
+    if (sessionStorage.getItem(POPUP_KEY)) return;
+    const timer = setTimeout(() => {
+      slides.forEach((slide) => {
+        const img = new Image();
+        img.src = slide.image;
+      });
+    }, POPUP_DELAY - 500);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
