@@ -153,7 +153,7 @@ const Shop = () => {
     () => data?.pages.flatMap(p => p.products) || [],
     [data]
   );
-  const totalCount = data?.pages[0]?.totalCount || 0;
+  const totalCount = data?.pages[0]?.totalCount ?? 0;
 
   const handleToggleWishlist = useCallback((id: string) => {
     if (isInWishlist(id)) {
