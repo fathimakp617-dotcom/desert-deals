@@ -110,7 +110,7 @@ const Shop = () => {
     const brand = searchParams.get("brand");
     const search = searchParams.get("search");
     setSelectedCategory((brand && brandSlugToCategory[brand]) || "All");
-    if (search) setSearchInput(search);
+    setSearchInput(search || "");
   }, [searchParams]);
 
   useEffect(() => {
