@@ -125,7 +125,7 @@ const Navbar = memo(() => {
             {/* Logo – text-based like reference */}
             <Link
               to="/"
-              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:mr-8"
+              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:me-8"
             >
               <img src={headerLogo} alt="Desert Deal" className="h-14 sm:h-20 w-auto" />
             </Link>
