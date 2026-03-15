@@ -373,6 +373,12 @@ const Shop = () => {
               {/* Infinite scroll trigger */}
               <div ref={loadMoreRef} className="h-1" />
 
+              {(hasNextPage || isFetchingNextPage) && products.length > 0 && (
+                <p className="text-center text-xs text-muted-foreground mb-2 mt-4">
+                  Loading products… {products.length} loaded
+                </p>
+              )}
+
               {isFetchingNextPage && (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -381,8 +387,14 @@ const Shop = () => {
               )}
 
               {!isLoading && totalCount > 0 && (
-                <p className="text-center text-xs text-muted-foreground mb-4 mt-4">
+                <p className="text-center text-xs text-muted-foreground mb-4 mt-2">
                   Showing {Math.min(products.length, totalCount)} of {totalCount} products
+                </p>
+              )}
+
+              {!isLoading && totalCount === 0 && products.length > 0 && !hasNextPage && (
+                <p className="text-center text-xs text-muted-foreground mb-4 mt-2">
+                  Showing {products.length} products
                 </p>
               )}
             </div>

@@ -124,16 +124,24 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
       const { data, error, count } = await q;
       if (error) throw error;
 
+      const pageProducts = (data as DbProduct[]) || [];
+
       return {
-        products: (data as DbProduct[]).map(mapProduct),
-        totalCount: count || 0,
+        products: pageProducts.map(mapProduct),
+        totalCount: count ?? null,
         page: pageParam,
+        pageSize: pageProducts.length,
       };
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage) => {
-      const nextPage = lastPage.page + 1;
-      return nextPage * PAGE_SIZE < lastPage.totalCount ? nextPage : undefined;
+      // Prefer total count when available; fallback to page-size based continuation
+      if (typeof lastPage.totalCount === "number" && lastPage.totalCount > 0) {
+        const nextPage = lastPage.page + 1;
+        return nextPage * PAGE_SIZE < lastPage.totalCount ? nextPage : undefined;
+      }
+
+      return lastPage.pageSize === PAGE_SIZE ? lastPage.page + 1 : undefined;
     },
     staleTime: 2 * 60 * 1000,
   });
