@@ -305,7 +305,7 @@ const ProductDetail = () => {
                 {/* Main Image Carousel (Embla) */}
                 <div className="relative w-full aspect-square overflow-hidden bg-card/50">
                   {isSoldOut && (
-                    <div className="absolute top-6 right-6 z-20">
+                    <div className="absolute top-6 end-6 z-20">
                       <Badge variant="destructive" className="text-xs sm:text-sm font-semibold px-3 py-1.5">
                         SOLD OUT
                       </Badge>
