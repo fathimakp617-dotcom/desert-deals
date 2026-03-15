@@ -151,7 +151,7 @@ const Navbar = memo(() => {
               <Link to="/wishlist" className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <Heart size={20} />
                 {wishlistItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
+                  <span className="absolute -top-0.5 -end-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
                 )}
               </Link>
               <button onClick={() => openCart()} className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
