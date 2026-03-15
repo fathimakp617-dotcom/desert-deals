@@ -123,31 +123,18 @@ const Shop = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Infinite scroll observer
+  // Continuously auto-load all pages until every product is fetched
   useEffect(() => {
-    if (!loadMoreRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage && !isFetching) {
-          fetchNextPage();
-        }
-      },
-      { rootMargin: "800px" }
-    );
-    observer.observe(loadMoreRef.current);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, isFetching, fetchNextPage]);
+    if (!hasNextPage || isLoading) return;
 
-  // Continuously load all pages for the current filter/category
-  useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage || isFetching || isLoading) return;
+    const interval = setInterval(() => {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }, 200);
 
-    const timer = setTimeout(() => {
-      fetchNextPage();
-    }, 120);
-
-    return () => clearTimeout(timer);
-  }, [data?.pages.length, hasNextPage, isFetchingNextPage, isFetching, isLoading, fetchNextPage]);
+    return () => clearInterval(interval);
+  }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
   const products = useMemo(
     () => data?.pages.flatMap(p => p.products) || [],
