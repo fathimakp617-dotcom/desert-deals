@@ -128,15 +128,29 @@ const Shop = () => {
     if (!loadMoreRef.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage && !isFetching) {
           fetchNextPage();
         }
       },
-      { rootMargin: "400px" }
+      { rootMargin: "800px" }
     );
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, isFetching, fetchNextPage]);
+
+  // Auto-load next page if content doesn't fill viewport
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage || isFetching || isLoading) return;
+    const timer = setTimeout(() => {
+      if (loadMoreRef.current) {
+        const rect = loadMoreRef.current.getBoundingClientRect();
+        if (rect.top < window.innerHeight + 800) {
+          fetchNextPage();
+        }
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [data, hasNextPage, isFetchingNextPage, isFetching, isLoading, fetchNextPage]);
 
   const products = useMemo(
     () => data?.pages.flatMap(p => p.products) || [],
