@@ -60,7 +60,7 @@ const MobileBottomNav = memo(() => {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && searchInput.trim()) handleViewAll(); }}
-                className="w-full pl-10 pr-4 py-2.5 bg-muted rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none"
+                className="w-full ps-10 pe-4 py-2.5 bg-muted rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none"
               />
             </div>
             <button onClick={() => { setSearchOpen(false); setSearchInput(""); }} className="p-2 text-foreground">
