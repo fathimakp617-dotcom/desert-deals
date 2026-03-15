@@ -317,7 +317,7 @@ const ProductDetail = () => {
                     <>
                       <button
                         onClick={scrollPrev}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                        className="absolute start-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
