@@ -92,7 +92,7 @@ const Navbar = memo(() => {
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={() => changeAnnouncement(-1)}
-            className="absolute left-4 text-background/70 hover:text-background transition-colors"
+            className="absolute start-4 text-background/70 hover:text-background transition-colors"
             aria-label="Previous announcement"
           >
             <ChevronLeft className="w-4 h-4" />
