@@ -144,7 +144,7 @@ const Navbar = memo(() => {
             </div>
 
             {/* Action icons */}
-            <div className="flex items-center gap-1 sm:gap-2 ml-auto lg:ml-0 shrink-0 relative z-10">
+            <div className="flex items-center gap-1 sm:gap-2 ms-auto lg:ms-0 shrink-0 relative z-10">
               <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
               </button>
