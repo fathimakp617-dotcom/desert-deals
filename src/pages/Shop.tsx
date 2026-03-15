@@ -138,19 +138,16 @@ const Shop = () => {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, isFetching, fetchNextPage]);
 
-  // Auto-load next page if content doesn't fill viewport
+  // Continuously load all pages for the current filter/category
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage || isFetching || isLoading) return;
+
     const timer = setTimeout(() => {
-      if (loadMoreRef.current) {
-        const rect = loadMoreRef.current.getBoundingClientRect();
-        if (rect.top < window.innerHeight + 800) {
-          fetchNextPage();
-        }
-      }
-    }, 100);
+      fetchNextPage();
+    }, 120);
+
     return () => clearTimeout(timer);
-  }, [data, hasNextPage, isFetchingNextPage, isFetching, isLoading, fetchNextPage]);
+  }, [data?.pages.length, hasNextPage, isFetchingNextPage, isFetching, isLoading, fetchNextPage]);
 
   const products = useMemo(
     () => data?.pages.flatMap(p => p.products) || [],
