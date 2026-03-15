@@ -9,7 +9,7 @@ import mindBottle from "@/assets/mind/mind-bottle.jpeg";
 import mindXray from "@/assets/mind/mind-xray.jpeg";
 
 const POPUP_KEY = "dd_mind_promo_shown_v4";
-const POPUP_DELAY = 1500;
+const POPUP_DELAY = 3000;
 const SLIDE_INTERVAL = 3500;
 
 const slides = [
