@@ -30,8 +30,7 @@ export const useHomepageSections = () => {
     gcTime: 20 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
-    refetchOnMount: "always",
-    retry: 6,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
   });
 };
