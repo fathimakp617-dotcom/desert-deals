@@ -323,7 +323,7 @@ const ProductDetail = () => {
                       </button>
                       <button
                         onClick={scrollNext}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                        className="absolute end-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-background/80 backdrop-blur-sm border border-border rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
