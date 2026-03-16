@@ -144,6 +144,8 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
       // Fallback when count is unavailable
       return lastPage.pageSize === PAGE_SIZE ? lastPage.page + 1 : undefined;
     },
-    staleTime: 2 * 60 * 1000,
+    // Always refresh on mount so newly listed products appear immediately
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 };
