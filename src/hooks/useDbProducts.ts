@@ -57,9 +57,10 @@ const mapDbToProduct = (db: DbProduct): Product => {
   };
 };
 
-// Fetch all products in resilient batches — supports 2000+ products
+// Progressive fetch for smooth initial render + background hydration
 const PRODUCT_SELECT = "id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,cross_sell_price";
 const BATCH_SIZE = 500;
+const BACKGROUND_BATCH_DELAY_MS = 50;
 
 const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
   const { data, error } = await supabase
@@ -74,43 +75,58 @@ const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]>
   return (data || []) as DbProduct[];
 };
 
-const fetchAllProducts = async (): Promise<DbProduct[]> => {
-  // 1. Get total count
-  const { count, error: countError } = await supabase
-    .from("products")
-    .select("id", { count: "exact", head: true })
-    .eq("is_active", true)
-    .is("deleted_at", null);
-
-  if (countError) throw new Error(`Count failed: ${countError.message}`);
-  const total = count ?? 0;
-  if (total === 0) return [];
-
-  // 2. Build all batch ranges
-  const totalBatches = Math.ceil(total / BATCH_SIZE);
-  const ranges = Array.from({ length: totalBatches }, (_, i) => {
-    const from = i * BATCH_SIZE;
-    return [from, from + BATCH_SIZE - 1] as const;
+const mapDbListToProducts = (rows: DbProduct[]): Product[] => {
+  return rows.map((d) => {
+    const p = mapDbToProduct(d);
+    (p as any)._stock = d.stock_quantity;
+    return p;
   });
+};
 
-  // 3. Fetch ALL batches in parallel (handles 2000+ products in ~4 requests)
-  const results = await Promise.all(
-    ranges.map(([from, to]) => fetchProductBatch(from, to))
-  );
+const mergeUniqueProducts = (existing: Product[], incoming: Product[]): Product[] => {
+  if (!incoming.length) return existing;
 
-  // 4. Deduplicate
-  const seenIds = new Set<string>();
-  const allData: DbProduct[] = [];
-  for (const batch of results) {
-    for (const item of batch) {
-      if (!seenIds.has(item.id)) {
-        seenIds.add(item.id);
-        allData.push(item);
-      }
+  const seen = new Set(existing.map((p) => p.id));
+  const merged = [...existing];
+
+  for (const product of incoming) {
+    if (!seen.has(product.id)) {
+      seen.add(product.id);
+      merged.push(product);
     }
   }
 
-  return allData;
+  return merged;
+};
+
+let backgroundHydrationInFlight: Promise<void> | null = null;
+
+const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<typeof useQueryClient>) => {
+  let from = BATCH_SIZE;
+
+  while (true) {
+    const to = from + BATCH_SIZE - 1;
+
+    let batch: DbProduct[] = [];
+    try {
+      batch = await fetchProductBatch(from, to);
+    } catch {
+      // Never block UI on background hydration errors
+      break;
+    }
+
+    if (!batch.length) break;
+
+    const mappedBatch = mapDbListToProducts(batch);
+    queryClient.setQueryData<Product[]>(["db-products"], (prev) =>
+      mergeUniqueProducts(prev || [], mappedBatch)
+    );
+
+    if (batch.length < BATCH_SIZE) break;
+
+    from += BATCH_SIZE;
+    await new Promise((resolve) => setTimeout(resolve, BACKGROUND_BATCH_DELAY_MS));
+  }
 };
 
 export const useDbProducts = () => {
