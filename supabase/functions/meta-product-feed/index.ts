@@ -91,16 +91,18 @@ Deno.serve(async (req) => {
     const format = url.searchParams.get("format") || "xml";
 
     if (format === "csv") {
-      const header = "id,title,description,availability,condition,price,link,image_link,brand,google_product_category\n";
+      const header = "id,title,description,availability,condition,price,sale_price,link,image_link,brand,google_product_category,shipping\n";
       const rows = products.map((p: any) => {
         const imageUrl = getImageUrl(p.image_url);
         const availability = (p.stock_quantity || 0) > 0 ? "in stock" : "out of stock";
-        const price = `${p.price} AED`;
+        const originalPrice = p.original_price ? `${p.original_price} AED` : `${p.price} AED`;
+        const salePrice = `${p.price} AED`;
         const title = escapeCsv(p.name);
         const desc = escapeCsv(p.description).substring(0, 500);
         const brand = escapeCsv(getBrand(p.category));
+        const shipping = "AE:::25 AED";
 
-        return `"${p.id}","${title}","${desc}","${availability}","new","${price}","${SITE_URL}/product/${p.id}","${imageUrl}","${brand}","Apparel & Accessories > Shoes"`;
+        return `"${p.id}","${title}","${desc}","${availability}","new","${originalPrice}","${salePrice}","${SITE_URL}/product/${p.id}","${imageUrl}","${brand}","Apparel & Accessories > Shoes","${shipping}"`;
       }).join("\n");
 
       return new Response(header + rows, {
