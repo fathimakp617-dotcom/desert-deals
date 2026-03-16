@@ -18,7 +18,7 @@ async function fetchAllProducts(supabase: any) {
   while (hasMore) {
     const { data, error } = await supabase
       .from("products")
-      .select("id, name, description, price, stock_quantity, category, image_url")
+      .select("id, name, description, price, original_price, stock_quantity, category, image_url")
       .eq("is_active", true)
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
