@@ -151,6 +151,8 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
 
       return lastPage.pageSize === PAGE_SIZE ? lastPage.page + 1 : undefined;
     },
-    staleTime: 10 * 1000,
+    staleTime: 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
   });
 };
