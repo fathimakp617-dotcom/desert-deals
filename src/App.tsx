@@ -90,12 +90,12 @@ const RoutePrefetcher = () => {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 15 * 60 * 1000,
+      staleTime: 5 * 60 * 1000,
       gcTime: 20 * 60 * 1000,
       refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      retry: 1,
-      // Reduce concurrent network requests
+      refetchOnReconnect: true,
+      retry: 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
       networkMode: "online",
     },
     mutations: {
