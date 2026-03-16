@@ -334,7 +334,7 @@ const Shop = () => {
                     <div key={product.id} className="h-full">
                       <ProductCard
                         product={product}
-                        soldOut={isProductSoldOut(stockMap, product.id)}
+                        soldOut={product.stockQuantity === 0}
                         inWishlist={isInWishlist(product.id)}
                         onToggleWishlist={handleToggleWishlist}
                         onQuickView={setQuickViewId}

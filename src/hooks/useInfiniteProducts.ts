@@ -79,9 +79,14 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
   return useInfiniteQuery({
     queryKey: ["infinite-products", search, category, sortBy, priceMin, priceMax],
     queryFn: async ({ pageParam = 0 }) => {
+      const includeCount = pageParam === 0;
+
       let q = supabase
         .from("products")
-        .select("id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,created_at", { count: "exact" })
+        .select(
+          "id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,created_at",
+          { count: includeCount ? "exact" : undefined }
+        )
         .eq("is_active", true)
         .is("deleted_at", null);
 
