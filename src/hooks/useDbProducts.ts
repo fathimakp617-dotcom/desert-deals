@@ -140,9 +140,9 @@ export const useDbProducts = () => {
       const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
       return mapDbListToProducts(firstBatch);
     },
-    staleTime: 10 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     retry: 2,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
@@ -150,9 +150,9 @@ export const useDbProducts = () => {
 
   useEffect(() => {
     const data = query.data;
-    if (!data) return;
-    // Only start background hydration after the initial page arrives.
-    if (data.length !== INITIAL_BATCH_SIZE) return;
+    if (!data || data.length === 0) return;
+    // Only start background hydration when initial batch is full (more may exist)
+    if (data.length < INITIAL_BATCH_SIZE) return;
     if (backgroundHydrationInFlight) return;
 
     backgroundHydrationInFlight = hydrateRemainingProductsInBackground(queryClient)
