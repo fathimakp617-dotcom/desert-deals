@@ -122,6 +122,7 @@ Deno.serve(async (req) => {
       const brand = escapeXml(getBrand(p.category));
       const desc = escapeXml(p.description).substring(0, 500);
       const title = escapeXml(p.name);
+      const originalPrice = p.original_price || p.price;
 
       return `    <item>
       <g:id>${p.id}</g:id>
@@ -132,8 +133,13 @@ Deno.serve(async (req) => {
       <g:brand>${brand}</g:brand>
       <g:condition>new</g:condition>
       <g:availability>${availability}</g:availability>
-      <g:price>${p.price} AED</g:price>
+      <g:price>${originalPrice} AED</g:price>
+      <g:sale_price>${p.price} AED</g:sale_price>
       <g:google_product_category>Apparel &amp; Accessories &gt; Shoes</g:google_product_category>
+      <g:shipping>
+        <g:country>AE</g:country>
+        <g:price>25 AED</g:price>
+      </g:shipping>
     </item>`;
     }).join("\n");
 
