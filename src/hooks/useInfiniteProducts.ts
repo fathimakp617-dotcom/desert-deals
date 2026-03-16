@@ -27,6 +27,7 @@ export interface SimpleProduct {
   size: string;
   image: string;
   tagline: string;
+  stockQuantity: number;
   notes: { top: string[]; heart: string[]; base: string[] };
 }
 
@@ -40,6 +41,7 @@ const mapProduct = (db: DbProduct): SimpleProduct => {
     discountPercent: db.discount_percent || 0,
     category: db.category || "General",
     size: db.size || "Standard",
+    stockQuantity: db.stock_quantity,
     image: db.image_url ? db.image_url.split(",")[0].trim() : "",
     tagline: db.category || "Premium Footwear",
     notes: {
@@ -77,9 +79,14 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
   return useInfiniteQuery({
     queryKey: ["infinite-products", search, category, sortBy, priceMin, priceMax],
     queryFn: async ({ pageParam = 0 }) => {
+      const includeCount = pageParam === 0;
+
       let q = supabase
         .from("products")
-        .select("id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,created_at", { count: "exact" })
+        .select(
+          "id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,created_at",
+          { count: includeCount ? "exact" : undefined }
+        )
         .eq("is_active", true)
         .is("deleted_at", null);
 
@@ -135,17 +142,15 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
-      // Use cumulative loaded count for robust pagination when count is present
-      if (typeof lastPage.totalCount === "number" && lastPage.totalCount >= 0) {
+      // Keep count lookup from first page only to avoid expensive counting on each page request
+      const totalCount = allPages[0]?.totalCount;
+      if (typeof totalCount === "number" && totalCount >= 0) {
         const loadedCount = allPages.reduce((sum, page) => sum + page.pageSize, 0);
-        return loadedCount < lastPage.totalCount ? lastPage.page + 1 : undefined;
+        return loadedCount < totalCount ? lastPage.page + 1 : undefined;
       }
 
-      // Fallback when count is unavailable
       return lastPage.pageSize === PAGE_SIZE ? lastPage.page + 1 : undefined;
     },
-    // Always refresh on mount so newly listed products appear immediately
-    staleTime: 0,
-    refetchOnMount: "always",
+    staleTime: 10 * 1000,
   });
 };

@@ -17,7 +17,6 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import PageTransition from "@/components/PageTransition";
 import { CollectionPageSchema } from "@/components/seo/JsonLd";
 import { useWishlist } from "@/contexts/WishlistContext";
-import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useInfiniteProducts } from "@/hooks/useInfiniteProducts";
 import ProductCard from "@/components/ProductCard";
@@ -84,7 +83,6 @@ const Shop = () => {
   const debouncedSearch = useDebounce(searchInput, 300);
   const priceRange = priceRanges[selectedPriceRange];
 
-  const { data: stockMap } = useProductStock();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { data: dbCategories } = useCategories();
   const categories = dbCategories?.length
@@ -123,17 +121,22 @@ const Shop = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Continuously auto-load all pages until every product is fetched
+  // Lazy-load next pages only when the user gets near the bottom for smoother UX
   useEffect(() => {
-    if (!hasNextPage || isLoading) return;
+    const target = loadMoreRef.current;
+    if (!target || !hasNextPage || isLoading) return;
 
-    const interval = setInterval(() => {
-      if (hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    }, 200);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "600px 0px" }
+    );
 
-    return () => clearInterval(interval);
+    observer.observe(target);
+    return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
   const products = useMemo(
@@ -336,7 +339,7 @@ const Shop = () => {
                     <div key={product.id} className="h-full">
                       <ProductCard
                         product={product}
-                        soldOut={isProductSoldOut(stockMap, product.id)}
+                        soldOut={product.stockQuantity === 0}
                         inWishlist={isInWishlist(product.id)}
                         onToggleWishlist={handleToggleWishlist}
                         onQuickView={setQuickViewId}
