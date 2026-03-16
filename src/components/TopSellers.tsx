@@ -73,7 +73,7 @@ const TopSellers = memo(() => {
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               {products.slice(0, 20).map((product) => {
-                const soldOut = isProductSoldOut(stockMap, product.id);
+                const soldOut = ((product as any)._stock ?? 1) === 0;
                 const inWishlist = isInWishlist(product.id);
 
                 return (
