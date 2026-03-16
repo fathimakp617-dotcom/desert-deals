@@ -151,8 +151,6 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
 
       return lastPage.pageSize === PAGE_SIZE ? lastPage.page + 1 : undefined;
     },
-    // Always refresh on mount so newly listed products appear immediately
-    staleTime: 0,
-    refetchOnMount: "always",
+    staleTime: 10 * 1000,
   });
 };
