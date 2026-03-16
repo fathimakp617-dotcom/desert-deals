@@ -59,7 +59,8 @@ const mapDbToProduct = (db: DbProduct): Product => {
 
 // Progressive fetch for smooth initial render + background hydration
 const PRODUCT_SELECT = "id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,cross_sell_price";
-const BATCH_SIZE = 500;
+const INITIAL_BATCH_SIZE = 120;
+const HYDRATION_BATCH_SIZE = 500;
 const BACKGROUND_BATCH_DELAY_MS = 50;
 
 const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
@@ -102,10 +103,10 @@ const mergeUniqueProducts = (existing: Product[], incoming: Product[]): Product[
 let backgroundHydrationInFlight: Promise<void> | null = null;
 
 const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<typeof useQueryClient>) => {
-  let from = BATCH_SIZE;
+  let from = INITIAL_BATCH_SIZE;
 
   while (true) {
-    const to = from + BATCH_SIZE - 1;
+    const to = from + HYDRATION_BATCH_SIZE - 1;
 
     let batch: DbProduct[] = [];
     try {
@@ -122,9 +123,9 @@ const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<type
       mergeUniqueProducts(prev || [], mappedBatch)
     );
 
-    if (batch.length < BATCH_SIZE) break;
+    if (batch.length < HYDRATION_BATCH_SIZE) break;
 
-    from += BATCH_SIZE;
+    from += HYDRATION_BATCH_SIZE;
     await new Promise((resolve) => setTimeout(resolve, BACKGROUND_BATCH_DELAY_MS));
   }
 };
@@ -135,8 +136,8 @@ export const useDbProducts = () => {
   const query = useQuery({
     queryKey: ["db-products"],
     queryFn: async () => {
-      // Fast first paint: fetch only first page immediately
-      const firstBatch = await fetchProductBatch(0, BATCH_SIZE - 1);
+      // Faster first paint: fetch a lighter first page immediately
+      const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
       return mapDbListToProducts(firstBatch);
     },
     staleTime: 10 * 60 * 1000,
@@ -149,9 +150,9 @@ export const useDbProducts = () => {
 
   useEffect(() => {
     const data = query.data;
-    if (!data || data.length < BATCH_SIZE) return;
-    // If not a full page, we already reached the end.
-    if (data.length % BATCH_SIZE !== 0) return;
+    if (!data) return;
+    // Only start background hydration after the initial page arrives.
+    if (data.length !== INITIAL_BATCH_SIZE) return;
     if (backgroundHydrationInFlight) return;
 
     backgroundHydrationInFlight = hydrateRemainingProductsInBackground(queryClient)
