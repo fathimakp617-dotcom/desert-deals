@@ -12,7 +12,7 @@ const Collection = forwardRef<HTMLDivElement>((_, ref) => {
   const featuredProducts = products
     .filter(p => p.image && !excludedCategories.some(c => (p.category || "").toLowerCase().includes(c)))
     .slice(0, 3);
-  const { data: stockMap } = useProductStock();
+  
 
   return (
     <section ref={ref} id="collection" className="py-24 sm:py-32 bg-background relative overflow-hidden">
