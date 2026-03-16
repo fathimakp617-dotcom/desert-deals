@@ -141,11 +141,11 @@ export const useDbProducts = () => {
       return mapDbListToProducts(firstBatch);
     },
     staleTime: 2 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
   });
 
   useEffect(() => {
