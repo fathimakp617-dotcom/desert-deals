@@ -5,7 +5,7 @@ import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { Badge } from "@/components/ui/badge";
-import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
+
 import { Loader2 } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
 
