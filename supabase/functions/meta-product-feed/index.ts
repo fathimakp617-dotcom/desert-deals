@@ -18,7 +18,7 @@ async function fetchAllProducts(supabase: any) {
   while (hasMore) {
     const { data, error } = await supabase
       .from("products")
-      .select("id, name, description, price, stock_quantity, category, image_url")
+      .select("id, name, description, price, original_price, stock_quantity, category, image_url")
       .eq("is_active", true)
       .is("deleted_at", null)
       .order("created_at", { ascending: false })
@@ -91,16 +91,18 @@ Deno.serve(async (req) => {
     const format = url.searchParams.get("format") || "xml";
 
     if (format === "csv") {
-      const header = "id,title,description,availability,condition,price,link,image_link,brand,google_product_category\n";
+      const header = "id,title,description,availability,condition,price,sale_price,link,image_link,brand,google_product_category,shipping\n";
       const rows = products.map((p: any) => {
         const imageUrl = getImageUrl(p.image_url);
         const availability = (p.stock_quantity || 0) > 0 ? "in stock" : "out of stock";
-        const price = `${p.price} AED`;
+        const originalPrice = p.original_price ? `${p.original_price} AED` : `${p.price} AED`;
+        const salePrice = `${p.price} AED`;
         const title = escapeCsv(p.name);
         const desc = escapeCsv(p.description).substring(0, 500);
         const brand = escapeCsv(getBrand(p.category));
+        const shipping = "AE:::25 AED";
 
-        return `"${p.id}","${title}","${desc}","${availability}","new","${price}","${SITE_URL}/product/${p.id}","${imageUrl}","${brand}","Apparel & Accessories > Shoes"`;
+        return `"${p.id}","${title}","${desc}","${availability}","new","${originalPrice}","${salePrice}","${SITE_URL}/product/${p.id}","${imageUrl}","${brand}","Apparel & Accessories > Shoes","${shipping}"`;
       }).join("\n");
 
       return new Response(header + rows, {
@@ -120,6 +122,7 @@ Deno.serve(async (req) => {
       const brand = escapeXml(getBrand(p.category));
       const desc = escapeXml(p.description).substring(0, 500);
       const title = escapeXml(p.name);
+      const originalPrice = p.original_price || p.price;
 
       return `    <item>
       <g:id>${p.id}</g:id>
@@ -130,8 +133,13 @@ Deno.serve(async (req) => {
       <g:brand>${brand}</g:brand>
       <g:condition>new</g:condition>
       <g:availability>${availability}</g:availability>
-      <g:price>${p.price} AED</g:price>
+      <g:price>${originalPrice} AED</g:price>
+      <g:sale_price>${p.price} AED</g:sale_price>
       <g:google_product_category>Apparel &amp; Accessories &gt; Shoes</g:google_product_category>
+      <g:shipping>
+        <g:country>AE</g:country>
+        <g:price>25 AED</g:price>
+      </g:shipping>
     </item>`;
     }).join("\n");
 

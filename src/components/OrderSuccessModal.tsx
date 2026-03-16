@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { trackPurchase } from "@/lib/metaPixel";
+import { trackGoogleAdsConversion } from "@/lib/gtag";
 import { playOrderSuccessSound } from "@/lib/orderSuccessSound";
 
 import OrderReceipt from "./OrderReceipt";
@@ -128,6 +129,19 @@ Thank you for choosing *Desert Deal!*`;
         value: orderData.total,
         currency: "AED",
         content_ids: contentIds,
+      });
+
+      // Google Ads conversion tracking
+      trackGoogleAdsConversion({
+        transaction_id: orderData.order_number,
+        value: orderData.total,
+        currency: "AED",
+        items: orderData.items.map((item) => ({
+          id: item.productId || "",
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
       });
     }
   }, [orderData, purchaseTracked]);

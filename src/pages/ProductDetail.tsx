@@ -28,6 +28,7 @@ import { useProductStock, isProductSoldOut, getProductStock } from "@/hooks/useP
 import { fadeInUp, fadeInLeft, staggerContainer, staggerItem } from "@/lib/animations";
 import { toast } from "sonner";
 import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
+import { trackGoogleAdsViewItem, trackGoogleAdsAddToCart } from "@/lib/gtag";
 
 import { supabase } from "@/integrations/supabase/client";
 import { ProductSchema, BreadcrumbSchema } from "@/components/seo/JsonLd";
@@ -102,6 +103,12 @@ const ProductDetail = () => {
       trackViewContent({
         content_ids: [product.id],
         content_name: product.name,
+        value: product.price,
+        currency: "AED",
+      });
+      trackGoogleAdsViewItem({
+        item_id: product.id,
+        item_name: product.name,
         value: product.price,
         currency: "AED",
       });
@@ -182,6 +189,12 @@ const ProductDetail = () => {
     addToCart(product, quantity, sizeLabel);
     trackAddToCart({
       content_ids: [product.id],
+      value: product.price * quantity,
+      currency: "AED",
+    });
+    trackGoogleAdsAddToCart({
+      item_id: product.id,
+      item_name: product.name,
       value: product.price * quantity,
       currency: "AED",
     });

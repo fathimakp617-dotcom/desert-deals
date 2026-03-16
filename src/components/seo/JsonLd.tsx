@@ -51,15 +51,24 @@ interface ProductSchemaProps {
 }
 
 export const ProductSchema = ({ product, averageRating = 0, totalReviews = 0 }: ProductSchemaProps) => {
-  const schema = {
+  // Determine image URL - handle both absolute URLs and relative paths
+  const imageUrl = product.image?.startsWith("http") ? product.image : `${SITE_URL}${product.image}`;
+  
+  // Extract brand from category or default
+  const categoryParts = (product.category || "").split(",").map(s => s.trim()).filter(s => s && !["all shoes", "all-shoes"].includes(s.toLowerCase()));
+  const brandName = categoryParts[0] || "Desert Deal";
+
+  const schema: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: `${SITE_URL}${product.image}`,
+    image: imageUrl,
+    sku: product.id,
+    mpn: product.id,
     brand: {
       "@type": "Brand",
-      name: "Desert Deal",
+      name: brandName,
     },
     offers: {
       "@type": "Offer",
@@ -68,9 +77,37 @@ export const ProductSchema = ({ product, averageRating = 0, totalReviews = 0 }: 
       price: product.price,
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       availability: "https://schema.org/InStock",
+      itemCondition: "https://schema.org/NewCondition",
       seller: {
         "@type": "Organization",
         name: "Desert Deal",
+      },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: "25",
+          currency: "AED",
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "AE",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: {
+            "@type": "QuantitativeValue",
+            minValue: 0,
+            maxValue: 1,
+            unitCode: "DAY",
+          },
+          transitTime: {
+            "@type": "QuantitativeValue",
+            minValue: 1,
+            maxValue: 5,
+            unitCode: "DAY",
+          },
+        },
       },
     },
     ...(totalReviews > 0 && {
@@ -82,8 +119,7 @@ export const ProductSchema = ({ product, averageRating = 0, totalReviews = 0 }: 
         worstRating: 1,
       },
     }),
-    category: product.style,
-    size: product.size,
+    category: product.category || product.style,
   };
 
   return (
