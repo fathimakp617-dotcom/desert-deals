@@ -59,9 +59,9 @@ const mapDbToProduct = (db: DbProduct): Product => {
 
 // Progressive fetch for smooth initial render + background hydration
 const PRODUCT_SELECT = "id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,cross_sell_price";
-const INITIAL_BATCH_SIZE = 120;
-const HYDRATION_BATCH_SIZE = 500;
-const BACKGROUND_BATCH_DELAY_MS = 50;
+const INITIAL_BATCH_SIZE = 200;
+const HYDRATION_BATCH_SIZE = 800;
+const BACKGROUND_BATCH_DELAY_MS = 30;
 
 const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
   const { data, error } = await supabase
@@ -141,11 +141,11 @@ export const useDbProducts = () => {
       return mapDbListToProducts(firstBatch);
     },
     staleTime: 2 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
   });
 
   useEffect(() => {
