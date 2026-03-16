@@ -130,25 +130,37 @@ const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<type
 };
 
 export const useDbProducts = () => {
-  return useQuery({
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
     queryKey: ["db-products"],
     queryFn: async () => {
-      const allData = await fetchAllProducts();
-
-      // Attach stock data so useProductStock can reuse without extra query
-      return allData.map((d) => {
-        const p = mapDbToProduct(d);
-        (p as any)._stock = d.stock_quantity;
-        return p;
-      });
+      // Fast first paint: fetch only first page immediately
+      const firstBatch = await fetchProductBatch(0, BATCH_SIZE - 1);
+      return mapDbListToProducts(firstBatch);
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
-    retry: 3,
+    retry: 2,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
   });
+
+  useEffect(() => {
+    const data = query.data;
+    if (!data || data.length < BATCH_SIZE) return;
+    // If not a full page, we already reached the end.
+    if (data.length % BATCH_SIZE !== 0) return;
+    if (backgroundHydrationInFlight) return;
+
+    backgroundHydrationInFlight = hydrateRemainingProductsInBackground(queryClient)
+      .finally(() => {
+        backgroundHydrationInFlight = null;
+      });
+  }, [query.data, queryClient]);
+
+  return query;
 };
 
 /**
