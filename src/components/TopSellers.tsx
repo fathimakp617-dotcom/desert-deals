@@ -18,7 +18,7 @@ const TopSellers = memo(() => {
     const catLower = p.category.toLowerCase();
     return !excludedCats.some(ex => catLower.includes(ex));
   });
-  const { data: stockMap } = useProductStock();
+  
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
