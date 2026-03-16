@@ -81,7 +81,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
 
             <div ref={scrollRef} className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-2">
               {products.slice(0, 20).map((product) => {
-                const soldOut = isProductSoldOut(stockMap, product.id);
+                const soldOut = ((product as any)._stock ?? 1) === 0;
                 const inWishlist = isInWishlist(product.id);
 
                 return (
