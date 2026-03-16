@@ -59,7 +59,8 @@ const mapDbToProduct = (db: DbProduct): Product => {
 
 // Progressive fetch for smooth initial render + background hydration
 const PRODUCT_SELECT = "id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,cross_sell_price";
-const BATCH_SIZE = 500;
+const INITIAL_BATCH_SIZE = 120;
+const HYDRATION_BATCH_SIZE = 500;
 const BACKGROUND_BATCH_DELAY_MS = 50;
 
 const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
