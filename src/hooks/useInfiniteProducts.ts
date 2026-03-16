@@ -27,6 +27,7 @@ export interface SimpleProduct {
   size: string;
   image: string;
   tagline: string;
+  stockQuantity: number;
   notes: { top: string[]; heart: string[]; base: string[] };
 }
 
@@ -40,6 +41,7 @@ const mapProduct = (db: DbProduct): SimpleProduct => {
     discountPercent: db.discount_percent || 0,
     category: db.category || "General",
     size: db.size || "Standard",
+    stockQuantity: db.stock_quantity,
     image: db.image_url ? db.image_url.split(",")[0].trim() : "",
     tagline: db.category || "Premium Footwear",
     notes: {

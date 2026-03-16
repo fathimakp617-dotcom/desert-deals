@@ -17,7 +17,6 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import PageTransition from "@/components/PageTransition";
 import { CollectionPageSchema } from "@/components/seo/JsonLd";
 import { useWishlist } from "@/contexts/WishlistContext";
-import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useInfiniteProducts } from "@/hooks/useInfiniteProducts";
 import ProductCard from "@/components/ProductCard";
@@ -29,62 +28,10 @@ import { useCategories } from "@/hooks/useCategories";
 
 
 const fallbackCategories = [
-  "All", "Nike", "Jordan", "New Balance", "On Cloud", "Asics", "Adidas",
-  "Hoka", "Puma", "Louis Vuitton", "Gucci", "Onitsuka Tiger", "Loro Piana",
-  "Brooks", "Dior", "Hermes", "Basketball Shoes",
-];
-const priceRanges = [
-  { label: "All Prices", min: 0, max: Infinity },
-  { label: "Under AED 200", min: 0, max: 200 },
-  { label: "AED 200 - AED 350", min: 200, max: 350 },
-  { label: "AED 350 - AED 500", min: 350, max: 500 },
-  { label: "Above AED 500", min: 500, max: Infinity },
-];
-const sortOptions = [
-  { label: "Relevance", value: "featured" },
-  { label: "Sort by popularity", value: "name-asc" },
-  { label: "Sort by average rating", value: "rating" },
-  { label: "Sort by latest", value: "latest" },
-  { label: "Sort by price: low to high", value: "price-asc" },
-  { label: "Sort by price: high to low", value: "price-desc" },
-];
-
-const brandSlugToCategory: Record<string, string> = {
-  "nike": "Nike", "jordan": "Jordan", "new-balance": "New Balance",
-  "on-cloud": "On Cloud", "asics": "Asics", "adidas": "Adidas",
-  "hoka": "Hoka", "puma": "Puma", "louis-vuitton": "Louis Vuitton",
-  "gucci": "Gucci", "onitsuka-tiger": "Onitsuka Tiger", "loro-piana": "Loro Piana",
-  "brooks": "Brooks", "dior": "Dior", "hermes": "Hermes",
-  "basketball": "Basketball Shoes", "running": "Running",
-  "watches": "Watches", "wallets": "Wallets", "sunglasses": "Sunglasses",
-  "heels": "Heels", "rolex": "Rolex", "cartier": "Cartier",
-  "tom-ford": "Tom Ford", "christian-louboutin": "Christian Louboutin",
-  "chanel": "Chanel", "goyard": "Goyard", "socks": "Socks", "jersey": "Jersey",
-  "bags": "Bags", "kids": "Kids",
-};
-
-const Shop = () => {
-  const [searchParams] = useSearchParams();
-  const brandParam = searchParams.get("brand");
-  const searchParam = searchParams.get("search");
-  const initialCategory = (brandParam && brandSlugToCategory[brandParam]) || "All";
-
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [searchInput, setSearchInput] = useState(searchParam || "");
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedPriceRange, setSelectedPriceRange] = useState(0);
-  const [sortBy, setSortBy] = useState("featured");
-  const [showFilters, setShowFilters] = useState(false);
-  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [quickViewId, setQuickViewId] = useState<string | null>(null);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-
+...
   const debouncedSearch = useDebounce(searchInput, 300);
   const priceRange = priceRanges[selectedPriceRange];
 
-  const { data: stockMap } = useProductStock();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { data: dbCategories } = useCategories();
   const categories = dbCategories?.length
