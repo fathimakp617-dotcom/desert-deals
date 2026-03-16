@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { Badge } from "@/components/ui/badge";
-import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
+
 import { Loader2 } from "lucide-react";
 
 const Collection = forwardRef<HTMLDivElement>((_, ref) => {
