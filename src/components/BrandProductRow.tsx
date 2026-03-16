@@ -5,7 +5,7 @@ import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { Badge } from "@/components/ui/badge";
-import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
+
 import { Loader2 } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
 
@@ -17,7 +17,7 @@ interface BrandProductRowProps {
 
 const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) => {
   const { data: allProducts = [], isLoading } = useDbProducts();
-  const { data: stockMap } = useProductStock();
+  
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
@@ -81,7 +81,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
 
             <div ref={scrollRef} className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-2">
               {products.slice(0, 20).map((product) => {
-                const soldOut = isProductSoldOut(stockMap, product.id);
+                const soldOut = ((product as any)._stock ?? 1) === 0;
                 const inWishlist = isInWishlist(product.id);
 
                 return (

@@ -5,7 +5,7 @@ import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { Badge } from "@/components/ui/badge";
-import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
+
 import { Loader2 } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
 
@@ -18,7 +18,7 @@ const TopSellers = memo(() => {
     const catLower = p.category.toLowerCase();
     return !excludedCats.some(ex => catLower.includes(ex));
   });
-  const { data: stockMap } = useProductStock();
+  
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
@@ -73,7 +73,7 @@ const TopSellers = memo(() => {
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               {products.slice(0, 20).map((product) => {
-                const soldOut = isProductSoldOut(stockMap, product.id);
+                const soldOut = ((product as any)._stock ?? 1) === 0;
                 const inWishlist = isInWishlist(product.id);
 
                 return (

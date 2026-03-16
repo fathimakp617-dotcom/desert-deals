@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { Badge } from "@/components/ui/badge";
-import { useProductStock, isProductSoldOut } from "@/hooks/useProductStock";
+
 import { Loader2 } from "lucide-react";
 
 const Collection = forwardRef<HTMLDivElement>((_, ref) => {
@@ -12,7 +12,7 @@ const Collection = forwardRef<HTMLDivElement>((_, ref) => {
   const featuredProducts = products
     .filter(p => p.image && !excludedCategories.some(c => (p.category || "").toLowerCase().includes(c)))
     .slice(0, 3);
-  const { data: stockMap } = useProductStock();
+  
 
   return (
     <section ref={ref} id="collection" className="py-24 sm:py-32 bg-background relative overflow-hidden">
@@ -43,7 +43,7 @@ const Collection = forwardRef<HTMLDivElement>((_, ref) => {
                     <div className="absolute bottom-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-r-2 border-primary/60" />
 
                     <div className="relative aspect-square mb-6 overflow-hidden">
-                      {isProductSoldOut(stockMap, product.id) && (
+                      {((product as any)._stock ?? 1) === 0 && (
                         <div className="absolute top-2 right-2 z-10">
                           <Badge variant="destructive" className="text-xs font-semibold">SOLD OUT</Badge>
                         </div>
@@ -51,7 +51,7 @@ const Collection = forwardRef<HTMLDivElement>((_, ref) => {
                       <img
                         src={product.image}
                         alt={product.name}
-                        className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${isProductSoldOut(stockMap, product.id) ? 'opacity-60' : ''}`}
+                        className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${((product as any)._stock ?? 1) === 0 ? 'opacity-60' : ''}`}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </div>
