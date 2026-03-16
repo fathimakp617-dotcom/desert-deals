@@ -192,6 +192,12 @@ const ProductDetail = () => {
       value: product.price * quantity,
       currency: "AED",
     });
+    trackGoogleAdsAddToCart({
+      item_id: product.id,
+      item_name: product.name,
+      value: product.price * quantity,
+      currency: "AED",
+    });
     setShowBuyNow(true);
   };
 

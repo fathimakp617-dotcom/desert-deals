@@ -130,6 +130,19 @@ Thank you for choosing *Desert Deal!*`;
         currency: "AED",
         content_ids: contentIds,
       });
+
+      // Google Ads conversion tracking
+      trackGoogleAdsConversion({
+        transaction_id: orderData.order_number,
+        value: orderData.total,
+        currency: "AED",
+        items: orderData.items.map((item) => ({
+          id: item.productId || "",
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+      });
     }
   }, [orderData, purchaseTracked]);
 
