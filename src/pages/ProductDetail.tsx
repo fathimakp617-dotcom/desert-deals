@@ -28,6 +28,7 @@ import { useProductStock, isProductSoldOut, getProductStock } from "@/hooks/useP
 import { fadeInUp, fadeInLeft, staggerContainer, staggerItem } from "@/lib/animations";
 import { toast } from "sonner";
 import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
+import { trackGoogleAdsViewItem, trackGoogleAdsAddToCart } from "@/lib/gtag";
 
 import { supabase } from "@/integrations/supabase/client";
 import { ProductSchema, BreadcrumbSchema } from "@/components/seo/JsonLd";
