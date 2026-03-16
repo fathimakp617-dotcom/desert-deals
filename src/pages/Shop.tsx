@@ -121,17 +121,22 @@ const Shop = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Continuously auto-load all pages until every product is fetched
+  // Lazy-load next pages only when the user gets near the bottom for smoother UX
   useEffect(() => {
-    if (!hasNextPage || isLoading) return;
+    const target = loadMoreRef.current;
+    if (!target || !hasNextPage || isLoading) return;
 
-    const interval = setInterval(() => {
-      if (hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    }, 200);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "600px 0px" }
+    );
 
-    return () => clearInterval(interval);
+    observer.observe(target);
+    return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
   const products = useMemo(

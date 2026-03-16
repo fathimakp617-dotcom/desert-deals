@@ -142,13 +142,13 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
-      // Use cumulative loaded count for robust pagination when count is present
-      if (typeof lastPage.totalCount === "number" && lastPage.totalCount >= 0) {
+      // Keep count lookup from first page only to avoid expensive counting on each page request
+      const totalCount = allPages[0]?.totalCount;
+      if (typeof totalCount === "number" && totalCount >= 0) {
         const loadedCount = allPages.reduce((sum, page) => sum + page.pageSize, 0);
-        return loadedCount < lastPage.totalCount ? lastPage.page + 1 : undefined;
+        return loadedCount < totalCount ? lastPage.page + 1 : undefined;
       }
 
-      // Fallback when count is unavailable
       return lastPage.pageSize === PAGE_SIZE ? lastPage.page + 1 : undefined;
     },
     // Always refresh on mount so newly listed products appear immediately
