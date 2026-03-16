@@ -106,6 +106,12 @@ const ProductDetail = () => {
         value: product.price,
         currency: "AED",
       });
+      trackGoogleAdsViewItem({
+        item_id: product.id,
+        item_name: product.name,
+        value: product.price,
+        currency: "AED",
+      });
       addToRecentlyViewed(product);
     }
   }, [product]);
