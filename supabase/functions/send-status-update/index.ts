@@ -209,7 +209,7 @@ const generateStatusEmailHTML = (request: StatusUpdateRequest): string => {
             © 2026 Desert Deal. All rights reserved.
           </p>
           <p style="color: #555; margin: 8px 0 0 0; font-size: 10px;">
-            Malappuram – 673634, Kerala, India | +91 99466 47442
+            Dubai, United Arab Emirates | desertsdeals.com
           </p>
         </div>
       </div>

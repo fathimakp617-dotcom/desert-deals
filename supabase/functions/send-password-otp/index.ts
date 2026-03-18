@@ -147,7 +147,7 @@ const handler = async (req: Request): Promise<Response> => {
                         © 2026 Desert Deal. All rights reserved.
                       </p>
                       <p style="margin: 8px 0 0; font-size: 10px; color: #555;">
-                        Malappuram – 673634, Kerala, India | +91 99466 47442
+                        Dubai, United Arab Emirates | desertsdeals.com
                       </p>
                     </td>
                   </tr>
