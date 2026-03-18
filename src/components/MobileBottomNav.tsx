@@ -58,7 +58,7 @@ const MobileBottomNav = memo(() => {
               <input
                 type="text"
                 autoFocus
-                placeholder="Search products..."
+                placeholder={t("mobile.searchProducts")}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && searchInput.trim()) handleViewAll(); }}
