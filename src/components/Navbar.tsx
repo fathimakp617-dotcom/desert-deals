@@ -22,7 +22,7 @@ const Navbar = memo(() => {
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
   const navigate = useNavigate();
-  const { t, isRtl } = useTranslation();
+  const { t } = useTranslation();
 
   const announcements = useMemo(() => [
     t("announce.1"),
