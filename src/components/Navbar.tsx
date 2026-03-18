@@ -9,10 +9,7 @@ import SearchSuggestions from "@/components/SearchSuggestions";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import headerLogo from "@/assets/desert-deal-logo-header.png";
 
-const staticBottomLinks = [
-  { name: "About Us", href: "/#about" },
-  { name: "Reviews", href: "/#testimonials" },
-];
+// Static bottom links are now built inside the component to access t()
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,17 +41,16 @@ const Navbar = memo(() => {
     }));
 
     const allNavLinks = [
-      { name: "All Shoes", href: "/shop" },
+      { name: t("nav.allShoes"), href: "/shop" },
       ...categoryLinks,
-      ...staticBottomLinks,
+      { name: t("nav.aboutUs"), href: "/#about" },
+      { name: t("nav.reviews"), href: "/#testimonials" },
     ];
-    // "All Shoes" is hardcoded above; DB categories provide the brand links
-    // Fill first row as much as possible (up to 10), rest goes to second row
     const splitAt = Math.min(12, allNavLinks.length);
     const top = allNavLinks.slice(0, splitAt);
     const bottom = allNavLinks.slice(splitAt);
     return { topLinks: top, bottomLinks: bottom, allLinks: allNavLinks };
-  }, [categories]);
+  }, [categories, t]);
 
   const changeAnnouncement = useCallback((direction: 1 | -1) => {
     setAnnouncementVisible(false);
@@ -219,7 +215,7 @@ const Navbar = memo(() => {
               ))}
               <div className="border-t border-border pt-3 mt-1">
                 <Link to="/account" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-sm text-foreground hover:opacity-60 transition-opacity">
-                  <User size={16} /> My Account
+                  <User size={16} /> {t("nav.myAccount")}
                 </Link>
               </div>
             </div>
@@ -233,7 +229,7 @@ const Navbar = memo(() => {
           <div className={`fixed inset-0 z-[70] bg-foreground/30 ${searchClosing ? "animate-fade-out" : "animate-fade-in"}`} onClick={closeSearch} />
           <div className={`fixed top-0 ${isRtl ? "left-0" : "right-0"} bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col ${searchClosing ? (isRtl ? "animate-slide-out-left" : "animate-slide-out-right") : (isRtl ? "animate-slide-in-left" : "animate-slide-in-right")}`}>
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
-              <h2 className="text-xl font-semibold text-foreground">Search</h2>
+              <h2 className="text-xl font-semibold text-foreground">{t("nav.search")}</h2>
               <button onClick={closeSearch} className="p-1 text-foreground hover:opacity-60 transition-opacity">
                 <X size={22} />
               </button>
@@ -255,7 +251,7 @@ const Navbar = memo(() => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search everything..."
+                  placeholder={t("nav.searchEverything")}
                   className={`w-full h-12 text-sm bg-muted rounded-lg focus:outline-none text-foreground placeholder:text-muted-foreground ${isRtl ? "pr-11 pl-4" : "pl-11 pr-4"}`}
                 />
               </form>
