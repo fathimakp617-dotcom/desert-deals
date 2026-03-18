@@ -101,7 +101,7 @@ const MobileBottomNav = memo(() => {
                   );
                 })}
                 <button onClick={handleViewAll} className="w-full py-3 text-sm text-primary font-medium text-center">
-                  View all results for "{searchInput.trim()}"
+                  {t("mobile.viewAllResults")} "{searchInput.trim()}"
                 </button>
               </>
             )}
