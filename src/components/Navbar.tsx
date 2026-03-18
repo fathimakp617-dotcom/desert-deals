@@ -41,17 +41,16 @@ const Navbar = memo(() => {
     }));
 
     const allNavLinks = [
-      { name: "All Shoes", href: "/shop" },
+      { name: t("nav.allShoes"), href: "/shop" },
       ...categoryLinks,
-      ...staticBottomLinks,
+      { name: t("nav.aboutUs"), href: "/#about" },
+      { name: t("nav.reviews"), href: "/#testimonials" },
     ];
-    // "All Shoes" is hardcoded above; DB categories provide the brand links
-    // Fill first row as much as possible (up to 10), rest goes to second row
     const splitAt = Math.min(12, allNavLinks.length);
     const top = allNavLinks.slice(0, splitAt);
     const bottom = allNavLinks.slice(splitAt);
     return { topLinks: top, bottomLinks: bottom, allLinks: allNavLinks };
-  }, [categories]);
+  }, [categories, t]);
 
   const changeAnnouncement = useCallback((direction: 1 | -1) => {
     setAnnouncementVisible(false);
