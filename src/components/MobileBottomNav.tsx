@@ -106,7 +106,7 @@ const MobileBottomNav = memo(() => {
               </>
             )}
             {!isLoading && debouncedSearch && suggestions?.length === 0 && (
-              <p className="text-center text-sm text-muted-foreground py-10">No products found for "{debouncedSearch}"</p>
+              <p className="text-center text-sm text-muted-foreground py-10">{t("mobile.noProducts")} "{debouncedSearch}"</p>
             )}
           </div>
         </div>
