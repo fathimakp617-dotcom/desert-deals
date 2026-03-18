@@ -6,7 +6,6 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useCategories } from "@/hooks/useCategories";
 import { useTranslation } from "@/contexts/DirectionContext";
 import SearchSuggestions from "@/components/SearchSuggestions";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import headerLogo from "@/assets/desert-deal-logo-header.png";
 
 // Static bottom links are now built inside the component to access t()
