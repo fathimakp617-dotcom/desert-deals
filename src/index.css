@@ -267,11 +267,6 @@
   to { opacity: 0; }
 }
 
-/* RTL typography enhancement */
-[dir="rtl"] body {
-  font-family: "Noto Sans Arabic", "Poppins", sans-serif;
-  letter-spacing: 0;
-}
 
 @keyframes slideInLeft {
   from { transform: translateX(-100%); }
