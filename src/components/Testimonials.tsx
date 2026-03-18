@@ -162,7 +162,7 @@ const ImageLightbox = ({
 };
 
 const Testimonials = () => {
-  const { data: reviews } = useQuery({
+  const { t } = useTranslation();
     queryKey: ["testimonial-reviews"],
     queryFn: async () => {
       const { data, error } = await supabase
