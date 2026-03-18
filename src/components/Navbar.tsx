@@ -117,7 +117,7 @@ const Navbar = memo(() => {
       <header className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-1.5">
           {/* Single row: Logo left | Nav center | Icons right */}
-          <div className="relative flex items-center gap-2">
+          <div dir="ltr" className="flex items-center relative">
             {/* Mobile hamburger */}
             <div className="lg:hidden flex items-center">
               <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
@@ -128,13 +128,13 @@ const Navbar = memo(() => {
             {/* Logo */}
             <Link
               to="/"
-              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0"
+              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:me-8"
             >
               <img src={headerLogo} alt="Desert Deal" className="h-14 sm:h-20 w-auto" />
             </Link>
 
             {/* Desktop nav – top row centered between logo and icons */}
-            <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 flex-1 min-w-0 mx-4">
+            <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 flex-1 overflow-x-auto no-scrollbar">
               {topLinks.map((link) => (
                 <Link
                   key={link.name}
