@@ -91,7 +91,7 @@ const Navbar = memo(() => {
   return (
     <>
       {/* Announcement Bar */}
-      <div className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
+      <div dir="ltr" className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={() => changeAnnouncement(-1)}
@@ -117,7 +117,7 @@ const Navbar = memo(() => {
       <header className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-1.5">
           {/* Single row: Logo left | Nav center | Icons right */}
-          <div className="flex items-center gap-2">
+          <div dir="ltr" className="flex items-center gap-2">
             {/* Mobile hamburger */}
             <div className="lg:hidden flex items-center">
               <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
@@ -171,7 +171,7 @@ const Navbar = memo(() => {
           </div>
 
           {/* Desktop nav – bottom row centered */}
-          <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 -mt-2.5">
+          <div dir="ltr" className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 -mt-2.5">
             {bottomLinks.map((link) => (
               <Link
                 key={link.name}
