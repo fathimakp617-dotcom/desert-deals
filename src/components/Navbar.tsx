@@ -91,10 +91,10 @@ const Navbar = memo(() => {
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={() => changeAnnouncement(-1)}
-            className="absolute start-4 text-background/70 hover:text-background transition-colors"
+            className="absolute left-4 text-background/70 hover:text-background transition-colors"
             aria-label="Previous announcement"
           >
-            {isRtl ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <span className={`text-xs sm:text-sm font-medium tracking-wide transition-opacity duration-250 ${announcementVisible ? "opacity-100" : "opacity-0"}`}>
             {announcements[announcementIndex]}
