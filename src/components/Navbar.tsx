@@ -101,10 +101,10 @@ const Navbar = memo(() => {
           </span>
           <button
             onClick={() => changeAnnouncement(1)}
-            className="absolute end-4 text-background/70 hover:text-background transition-colors"
+            className="absolute right-4 text-background/70 hover:text-background transition-colors"
             aria-label="Next announcement"
           >
-            {isRtl ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
