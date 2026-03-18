@@ -6,7 +6,6 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useCategories } from "@/hooks/useCategories";
 import { useTranslation } from "@/contexts/DirectionContext";
 import SearchSuggestions from "@/components/SearchSuggestions";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import headerLogo from "@/assets/desert-deal-logo-header.png";
 
 // Static bottom links are now built inside the component to access t()
@@ -23,7 +22,7 @@ const Navbar = memo(() => {
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
   const navigate = useNavigate();
-  const { t, isRtl } = useTranslation();
+  const { t } = useTranslation();
 
   const announcements = useMemo(() => [
     t("announce.1"),
@@ -87,7 +86,7 @@ const Navbar = memo(() => {
   return (
     <>
       {/* Announcement Bar */}
-      <div dir="ltr" className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
+      <div className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={() => changeAnnouncement(-1)}
@@ -110,10 +109,10 @@ const Navbar = memo(() => {
       </div>
 
       {/* Main Header */}
-      <header dir="ltr" className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
+      <header className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
         <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-1.5">
           {/* Single row: Logo left | Nav center | Icons right */}
-          <div dir="ltr" className="flex items-center relative">
+          <div className="flex items-center relative">
             {/* Mobile hamburger */}
             <div className="lg:hidden flex items-center">
               <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
@@ -144,7 +143,7 @@ const Navbar = memo(() => {
 
             {/* Action icons */}
             <div className="flex items-center gap-1 sm:gap-2 ml-6 shrink-0 relative z-10">
-              <LanguageSwitcher />
+              
               <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
               </button>
@@ -167,7 +166,7 @@ const Navbar = memo(() => {
           </div>
 
           {/* Desktop nav – bottom row centered */}
-          <div dir="ltr" className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 -mt-2.5">
+          <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 -mt-2.5">
             {bottomLinks.map((link) => (
               <Link
                 key={link.name}
@@ -227,7 +226,7 @@ const Navbar = memo(() => {
       {searchOpen && (
         <>
           <div className={`fixed inset-0 z-[70] bg-foreground/30 ${searchClosing ? "animate-fade-out" : "animate-fade-in"}`} onClick={closeSearch} />
-          <div dir="ltr" className={`fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col ${searchClosing ? "animate-slide-out-right" : "animate-slide-in-right"}`}>
+          <div className={`fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col ${searchClosing ? "animate-slide-out-right" : "animate-slide-in-right"}`}>
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <h2 className="text-xl font-semibold text-foreground">{t("nav.search")}</h2>
               <button onClick={closeSearch} className="p-1 text-foreground hover:opacity-60 transition-opacity">
