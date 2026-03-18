@@ -87,6 +87,7 @@ const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands
 MobileBrandCarousel.displayName = "MobileBrandCarousel";
 
 const BrandCategories = memo(() => {
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
