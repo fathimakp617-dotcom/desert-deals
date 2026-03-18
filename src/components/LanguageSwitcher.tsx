@@ -10,7 +10,7 @@ const LanguageSwitcher = memo(() => {
   return (
     <button
       onClick={toggle}
-      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-border bg-muted/50 hover:bg-muted text-foreground transition-all duration-200 text-xs font-medium"
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 border-foreground/20 bg-muted hover:bg-accent text-foreground transition-all duration-200 text-xs font-semibold shadow-sm"
       aria-label={lang === "en" ? "Switch to Arabic" : "Switch to English"}
     >
       <Globe className="w-3.5 h-3.5" />
