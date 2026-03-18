@@ -4,14 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCategories } from "@/hooks/useCategories";
+import { useTranslation } from "@/contexts/DirectionContext";
 import SearchSuggestions from "@/components/SearchSuggestions";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import headerLogo from "@/assets/desert-deal-logo-header.png";
-
-const announcements = [
-  "Premium Brands – Up To 75% Off →",
-  "Cash on Delivery Available Across UAE →",
-  "Fast Delivery – 1-3 Days Across UAE →",
-];
 
 const staticBottomLinks = [
   { name: "About Us", href: "/#about" },
