@@ -13,6 +13,7 @@ const MobileBottomNav = memo(() => {
   const [searchInput, setSearchInput] = useState("");
   const debouncedSearch = useDebounce(searchInput.trim(), 250);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { data: suggestions, isLoading } = useQuery({
     queryKey: ["mobile-search-suggestions", debouncedSearch],
