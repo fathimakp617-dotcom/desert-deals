@@ -267,48 +267,26 @@
   to { opacity: 0; }
 }
 
-/* RTL global overrides */
-[dir="rtl"] {
-  text-align: right;
-}
-
-[dir="rtl"] .flex-row {
-  flex-direction: row-reverse;
-}
-
-/* Flip fixed drawers */
-[dir="rtl"] .fixed.right-0 {
-  right: auto;
-  left: 0;
-}
-
-/* Flip translate-x animations for drawers */
-[dir="rtl"] .translate-x-full {
-  --tw-translate-x: -100%;
-}
-
-/* Mirror scroll margins & paddings where needed */
-[dir="rtl"] .ml-auto {
-  margin-left: 0;
-  margin-right: auto;
-}
-
-[dir="rtl"] .mr-auto {
-  margin-right: 0;
-  margin-left: auto;
-}
-
-/* Flip text-left / text-right */
-[dir="rtl"] .text-left {
-  text-align: right;
-}
-
-[dir="rtl"] .text-right {
-  text-align: left;
-}
-
-/* Arabic font enhancement */
+/* RTL typography enhancement */
 [dir="rtl"] body {
   font-family: "Noto Sans Arabic", "Poppins", sans-serif;
   letter-spacing: 0;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideOutLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-out-left {
+  animation: slideOutLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
