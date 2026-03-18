@@ -42,11 +42,11 @@ const TopSellers = memo(() => {
         <div className="flex items-center justify-between mb-6 border-b border-border pb-3">
           <div className="flex items-center gap-6">
             <h3 className="text-base sm:text-lg font-heading font-semibold text-foreground">
-              Our Collection
+              {t("collection.ourCollection")}
             </h3>
           </div>
           <Link to="/shop" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            View All →
+            {t("collection.viewAllShort")}
           </Link>
         </div>
 
