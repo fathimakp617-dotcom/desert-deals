@@ -137,9 +137,9 @@ const TopSellers = memo(() => {
                         </div>
                         <div className="mt-auto pt-1.5 flex items-center gap-1.5">
                           {soldOut ? (
-                            <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
+                            <span className="text-[11px] font-bold text-red-500 uppercase">{t("collection.outOfStock")}</span>
                           ) : (
-                            <span className="text-[11px] font-bold text-emerald-600 uppercase">In Stock</span>
+                            <span className="text-[11px] font-bold text-emerald-600 uppercase">{t("collection.inStock")}</span>
                           )}
                           <button
                             onClick={(e) => {
