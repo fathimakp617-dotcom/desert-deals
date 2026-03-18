@@ -119,7 +119,7 @@ const MobileBottomNav = memo(() => {
             className="flex flex-col items-center gap-1 text-foreground"
           >
             <Search size={22} strokeWidth={1.8} />
-            <span className="text-[10px] font-normal uppercase tracking-wider">Search</span>
+            <span className="text-[10px] font-normal uppercase tracking-wider">{t("mobile.search")}</span>
           </button>
 
           <Link
