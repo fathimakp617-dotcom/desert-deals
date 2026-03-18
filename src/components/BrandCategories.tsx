@@ -1,6 +1,7 @@
 import { memo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "@/contexts/DirectionContext";
 
 import pumaLogo from "@/assets/brands/puma.webp";
 import onitsukaTigerLogo from "@/assets/brands/onitsuka-tiger.webp";
