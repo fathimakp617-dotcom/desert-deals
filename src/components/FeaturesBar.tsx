@@ -1,40 +1,26 @@
 import { memo, useEffect, useState, useCallback } from "react";
 import { Headphones, Truck, RotateCcw, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
-
-const features = [
-  {
-    icon: Headphones,
-    title: "Customer service",
-    description: "Friendly and responsive support, always ready to assist.",
-  },
-  {
-    icon: Truck,
-    title: "Fast COD Shipping",
-    description: "Express 24-hour delivery across the UAE with COD.",
-  },
-  {
-    icon: RotateCcw,
-    title: "Returns & Exchanges",
-    description: "Free returns for damaged items within days.",
-  },
-  {
-    icon: CreditCard,
-    title: "Secure payment",
-    description: "Secure payment: COD (cash only) or online card payment",
-  },
-];
+import { useTranslation } from "@/contexts/DirectionContext";
 
 const FeaturesBar = memo(() => {
+  const { t } = useTranslation();
   const [current, setCurrent] = useState(0);
   const [visible, setVisible] = useState(true);
+
+  const features = [
+    { icon: Headphones, title: t("feature.customerService"), description: t("feature.customerServiceDesc") },
+    { icon: Truck, title: t("feature.fastShipping"), description: t("feature.fastShippingDesc") },
+    { icon: RotateCcw, title: t("feature.returns"), description: t("feature.returnsDesc") },
+    { icon: CreditCard, title: t("feature.securePayment"), description: t("feature.securePaymentDesc") },
+  ];
 
   const changeTo = useCallback((nextIdx: number) => {
     setVisible(false);
     setTimeout(() => { setCurrent(nextIdx); setVisible(true); }, 200);
   }, []);
 
-  const next = useCallback(() => changeTo((current + 1) % features.length), [current, changeTo]);
-  const prev = useCallback(() => changeTo((current - 1 + features.length) % features.length), [current, changeTo]);
+  const next = useCallback(() => changeTo((current + 1) % features.length), [current, changeTo, features.length]);
+  const prev = useCallback(() => changeTo((current - 1 + features.length) % features.length), [current, changeTo, features.length]);
 
   useEffect(() => {
     const timer = setInterval(next, 4000);
@@ -68,7 +54,7 @@ const FeaturesBar = memo(() => {
           </button>
           <div className={`flex-1 flex items-center gap-3 justify-center text-center transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}>
             <Feature.icon className="w-8 h-8 text-foreground shrink-0" strokeWidth={1.2} />
-            <div className="text-left">
+            <div className="text-start">
               <h4 className="text-sm font-bold text-foreground leading-tight">{Feature.title}</h4>
               <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{Feature.description}</p>
             </div>

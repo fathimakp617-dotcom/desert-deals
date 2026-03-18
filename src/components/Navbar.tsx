@@ -4,14 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCategories } from "@/hooks/useCategories";
+import { useTranslation } from "@/contexts/DirectionContext";
 import SearchSuggestions from "@/components/SearchSuggestions";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import headerLogo from "@/assets/desert-deal-logo-header.png";
-
-const announcements = [
-  "Premium Brands – Up To 75% Off →",
-  "Cash on Delivery Available Across UAE →",
-  "Fast Delivery – 1-3 Days Across UAE →",
-];
 
 const staticBottomLinks = [
   { name: "About Us", href: "/#about" },
@@ -30,6 +26,13 @@ const Navbar = memo(() => {
   const { totalItems, openCart } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const announcements = useMemo(() => [
+    t("announce.1"),
+    t("announce.2"),
+    t("announce.3"),
+  ], [t]);
 
   const { data: categories = [] } = useCategories();
 
@@ -145,6 +148,7 @@ const Navbar = memo(() => {
 
             {/* Action icons */}
             <div className="flex items-center gap-1 sm:gap-2 ms-auto lg:ms-0 shrink-0 relative z-10">
+              <LanguageSwitcher />
               <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
               </button>

@@ -1,6 +1,7 @@
 import { memo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
@@ -11,6 +12,7 @@ import QuickViewDialog from "@/components/QuickViewDialog";
 
 // Matches the "Top Sellers" product-tab-carousel from the original HTML
 const TopSellers = memo(() => {
+  const { t } = useTranslation();
   const { data: allProducts = [], isLoading } = useDbProducts();
   const excludedCats = ["socks", "heels", "bags", "jersey", "kids", "louis vuitton", "dior", "gucci", "hermes", "loro piana"];
   const products = allProducts.filter(p => {
@@ -40,11 +42,11 @@ const TopSellers = memo(() => {
         <div className="flex items-center justify-between mb-6 border-b border-border pb-3">
           <div className="flex items-center gap-6">
             <h3 className="text-base sm:text-lg font-heading font-semibold text-foreground">
-              Our Collection
+              {t("collection.ourCollection")}
             </h3>
           </div>
           <Link to="/shop" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            View All →
+            {t("collection.viewAllShort")}
           </Link>
         </div>
 
@@ -94,7 +96,7 @@ const TopSellers = memo(() => {
 
                         {soldOut && (
                           <div className="absolute top-2 left-2">
-                            <Badge variant="destructive" className="text-[10px]">SOLD OUT</Badge>
+                            <Badge variant="destructive" className="text-[10px]">{t("collection.soldOut")}</Badge>
                           </div>
                         )}
 
@@ -135,9 +137,9 @@ const TopSellers = memo(() => {
                         </div>
                         <div className="mt-auto pt-1.5 flex items-center gap-1.5">
                           {soldOut ? (
-                            <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
+                            <span className="text-[11px] font-bold text-red-500 uppercase">{t("collection.outOfStock")}</span>
                           ) : (
-                            <span className="text-[11px] font-bold text-emerald-600 uppercase">In Stock</span>
+                            <span className="text-[11px] font-bold text-emerald-600 uppercase">{t("collection.inStock")}</span>
                           )}
                           <button
                             onClick={(e) => {

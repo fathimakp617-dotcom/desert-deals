@@ -1,47 +1,74 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
+import translations, { type Lang, type TranslationKey } from "@/i18n/translations";
 
 type Dir = "ltr" | "rtl";
 
-interface DirectionContextType {
+interface LanguageContextType {
+  lang: Lang;
   dir: Dir;
   isRtl: boolean;
-  lang: string;
+  setLang: (lang: Lang) => void;
+  t: (key: TranslationKey) => string;
 }
 
-const DirectionContext = createContext<DirectionContextType>({
+const LANG_KEY = "dd_lang";
+
+const LanguageContext = createContext<LanguageContextType>({
+  lang: "en",
   dir: "ltr",
   isRtl: false,
-  lang: "en",
+  setLang: () => {},
+  t: (key) => key,
 });
 
-/** Detect if browser language is Arabic */
-const detectDirection = (): { dir: Dir; lang: string } => {
+const getInitialLang = (): Lang => {
+  const stored = localStorage.getItem(LANG_KEY);
+  if (stored === "ar" || stored === "en") return stored;
+  // Auto-detect from browser
   const browserLang = navigator.language || (navigator as any).userLanguage || "en";
-  const isArabic = browserLang.startsWith("ar");
-  return { dir: isArabic ? "rtl" : "ltr", lang: isArabic ? "ar" : "en" };
+  return browserLang.startsWith("ar") ? "ar" : "en";
 };
 
 export const DirectionProvider = ({ children }: { children: ReactNode }) => {
-  const [{ dir, lang }] = useState(detectDirection);
+  const [lang, setLangState] = useState<Lang>(getInitialLang);
+
+  const dir: Dir = lang === "ar" ? "rtl" : "ltr";
+  const isRtl = lang === "ar";
+
+  const setLang = useCallback((newLang: Lang) => {
+    localStorage.setItem(LANG_KEY, newLang);
+    setLangState(newLang);
+  }, []);
+
+  const t = useCallback(
+    (key: TranslationKey): string => {
+      const entry = translations[key];
+      if (!entry) return key;
+      return entry[lang] || entry.en || key;
+    },
+    [lang]
+  );
 
   useEffect(() => {
     const html = document.documentElement;
     html.setAttribute("dir", dir);
     html.setAttribute("lang", lang);
-
-    // Add/remove RTL class for Tailwind
-    if (dir === "rtl") {
+    if (isRtl) {
       html.classList.add("rtl");
     } else {
       html.classList.remove("rtl");
     }
-  }, [dir, lang]);
+  }, [dir, lang, isRtl]);
 
   return (
-    <DirectionContext.Provider value={{ dir, isRtl: dir === "rtl", lang }}>
+    <LanguageContext.Provider value={{ lang, dir, isRtl, setLang, t }}>
       {children}
-    </DirectionContext.Provider>
+    </LanguageContext.Provider>
   );
 };
 
-export const useDirection = () => useContext(DirectionContext);
+export const useDirection = () => useContext(LanguageContext);
+export const useTranslation = () => {
+  const ctx = useContext(LanguageContext);
+  return { t: ctx.t, lang: ctx.lang, isRtl: ctx.isRtl, setLang: ctx.setLang };
+};

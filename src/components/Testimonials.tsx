@@ -3,6 +3,7 @@ import { Star, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "@/contexts/DirectionContext";
 import {
   Dialog,
   DialogContent,
@@ -159,6 +160,7 @@ const ImageLightbox = ({
 };
 
 const Testimonials = () => {
+  const { t } = useTranslation();
   const { data: reviews } = useQuery({
     queryKey: ["testimonial-reviews"],
     queryFn: async () => {
@@ -235,26 +237,26 @@ const Testimonials = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-12">
           <div className="text-center mb-10 sm:mb-14">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
-              What Our Customers Say
+              {t("testimonials.title")}
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-              Discover why our customers love shopping with us! Read their experiences and see why Desert Deal is their go-to online store.
+              {t("testimonials.subtitle")}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-8">
             <div className="text-center py-6 sm:py-8 px-4 border border-border rounded-lg bg-card">
               <p className="text-3xl sm:text-4xl font-bold text-muted-foreground/20 mb-1">4.5k</p>
-              <h3 className="text-sm font-bold text-foreground mb-1">Happy Customers</h3>
+              <h3 className="text-sm font-bold text-foreground mb-1">{t("testimonials.happyCustomers")}</h3>
               <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                Desert Deal ensures a seamless shopping experience with top-quality products and excellent service.
+                {t("testimonials.happyDesc")}
               </p>
             </div>
             <div className="text-center py-6 sm:py-8 px-4 border border-border rounded-lg bg-card">
               <p className="text-3xl sm:text-4xl font-bold text-muted-foreground/20 mb-1">456k</p>
-              <h3 className="text-sm font-bold text-foreground mb-1">Total Sales Per Year</h3>
+              <h3 className="text-sm font-bold text-foreground mb-1">{t("testimonials.totalSales")}</h3>
               <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                With thousands of successful transactions every month, Desert Deal is a trusted destination.
+                {t("testimonials.salesDesc")}
               </p>
             </div>
           </div>
