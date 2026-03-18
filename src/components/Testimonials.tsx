@@ -3,6 +3,9 @@ import { Star, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "@/contexts/DirectionContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
