@@ -128,7 +128,7 @@ const Navbar = memo(() => {
             {/* Logo */}
             <Link
               to="/"
-              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:mr-12"
+              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:mr-6"
             >
               <img src={headerLogo} alt="Desert Deal" className="h-14 sm:h-20 w-auto" />
             </Link>
@@ -147,7 +147,7 @@ const Navbar = memo(() => {
             </div>
 
             {/* Action icons */}
-            <div className="flex items-center gap-1 sm:gap-2 ms-auto lg:ms-0 shrink-0 relative z-10">
+            <div className="flex items-center gap-1 sm:gap-2 ml-6 shrink-0 relative z-10">
               <LanguageSwitcher />
               <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
