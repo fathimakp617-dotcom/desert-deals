@@ -75,7 +75,7 @@ const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands
                 </div>
               </div>
               <h3 className="text-[11px] font-heading font-semibold text-foreground tracking-tight leading-tight min-h-[2.5em] flex items-center justify-center">{brand.name}</h3>
-              <span className="text-[10px] text-muted-foreground block">{brand.count} Products</span>
+              <span className="text-[10px] text-muted-foreground block">{brand.count} {t("brands.products")}</span>
             </div>
           </Link>
         ))}
