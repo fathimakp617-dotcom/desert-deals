@@ -87,30 +87,30 @@ const Navbar = memo(() => {
   return (
     <>
       {/* Announcement Bar */}
-      <div className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
+      <div dir="ltr" className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={() => changeAnnouncement(-1)}
-            className="absolute start-4 text-background/70 hover:text-background transition-colors"
+            className="absolute left-4 text-background/70 hover:text-background transition-colors"
             aria-label="Previous announcement"
           >
-            {isRtl ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <span className={`text-xs sm:text-sm font-medium tracking-wide transition-opacity duration-250 ${announcementVisible ? "opacity-100" : "opacity-0"}`}>
             {announcements[announcementIndex]}
           </span>
           <button
             onClick={() => changeAnnouncement(1)}
-            className="absolute end-4 text-background/70 hover:text-background transition-colors"
+            className="absolute right-4 text-background/70 hover:text-background transition-colors"
             aria-label="Next announcement"
           >
-            {isRtl ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {/* Main Header */}
-      <header className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
+      <header dir="ltr" className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
         <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-1.5">
           {/* Single row: Logo left | Nav center | Icons right */}
           <div dir="ltr" className="flex items-center relative">
@@ -151,13 +151,13 @@ const Navbar = memo(() => {
               <Link to="/wishlist" className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <Heart size={20} />
                 {wishlistItems > 0 && (
-                  <span className="absolute -top-0.5 -end-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
                 )}
               </Link>
               <button onClick={() => openCart()} className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <ShoppingBag size={20} />
                 {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -end-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{totalItems}</span>
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{totalItems}</span>
                 )}
               </button>
               <Link to="/account" className="hidden md:flex p-2 text-foreground hover:opacity-60 transition-opacity">
@@ -227,7 +227,7 @@ const Navbar = memo(() => {
       {searchOpen && (
         <>
           <div className={`fixed inset-0 z-[70] bg-foreground/30 ${searchClosing ? "animate-fade-out" : "animate-fade-in"}`} onClick={closeSearch} />
-          <div className={`fixed top-0 ${isRtl ? "left-0" : "right-0"} bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col ${searchClosing ? (isRtl ? "animate-slide-out-left" : "animate-slide-out-right") : (isRtl ? "animate-slide-in-left" : "animate-slide-in-right")}`}>
+          <div dir="ltr" className={`fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col ${searchClosing ? "animate-slide-out-right" : "animate-slide-in-right"}`}>
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
               <h2 className="text-xl font-semibold text-foreground">{t("nav.search")}</h2>
               <button onClick={closeSearch} className="p-1 text-foreground hover:opacity-60 transition-opacity">
@@ -245,14 +245,14 @@ const Navbar = memo(() => {
                 }}
                 className="relative"
               >
-                <Search className={`absolute ${isRtl ? "right-4" : "left-4"} top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4`} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t("nav.searchEverything")}
-                  className={`w-full h-12 text-sm bg-muted rounded-lg focus:outline-none text-foreground placeholder:text-muted-foreground ${isRtl ? "pr-11 pl-4" : "pl-11 pr-4"}`}
+                  className="w-full h-12 text-sm bg-muted rounded-lg focus:outline-none text-foreground placeholder:text-muted-foreground pl-11 pr-4"
                 />
               </form>
             </div>
