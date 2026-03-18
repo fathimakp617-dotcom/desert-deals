@@ -9,10 +9,7 @@ import SearchSuggestions from "@/components/SearchSuggestions";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import headerLogo from "@/assets/desert-deal-logo-header.png";
 
-const staticBottomLinks = [
-  { name: "About Us", href: "/#about" },
-  { name: "Reviews", href: "/#testimonials" },
-];
+// Static bottom links are now built inside the component to access t()
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
