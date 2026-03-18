@@ -245,7 +245,7 @@ const Navbar = memo(() => {
                 }}
                 className="relative"
               >
-                <Search className={`absolute ${isRtl ? "right-4" : "left-4"} top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4`} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <input
                   ref={searchInputRef}
                   type="text"
