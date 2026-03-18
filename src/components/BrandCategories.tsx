@@ -47,6 +47,7 @@ const BrandLogo = memo(({ logo, fallback, name }: { logo: string; fallback: stri
 BrandLogo.displayName = "BrandLogo";
 
 const MobileBrandCarousel = memo(({ brands: brandList }: { brands: typeof brands }) => {
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const scroll = (dir: "left" | "right") => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -200 : 200, behavior: "smooth" });
