@@ -33,9 +33,6 @@ const Navbar = memo(() => {
     t("announce.2"),
     t("announce.3"),
   ], [t]);
-  const { totalItems, openCart } = useCart();
-  const { totalItems: wishlistItems } = useWishlist();
-  const navigate = useNavigate();
 
   const { data: categories = [] } = useCategories();
 
