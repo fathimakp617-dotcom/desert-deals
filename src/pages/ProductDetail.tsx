@@ -592,14 +592,14 @@ const ProductDetail = () => {
                     </div>
                   </div>
                   {isEidDeliveryEnabled && (
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
-                      <span className="text-lg shrink-0">🎉</span>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
+                      <span className="text-lg shrink-0 mt-0.5">📦</span>
                       <div className="text-sm">
                         <span className="font-semibold text-foreground">
-                          {(eidConfig?.config as any)?.badge_text || "Before Eid Delivery Available!"}
+                          {(eidConfig?.config as any)?.badge_text || "Order Update"}
                         </span>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {(eidConfig?.config as any)?.sub_text || "Order now to receive before Eid Al-Fitr"}
+                        <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line leading-relaxed">
+                          {(eidConfig?.config as any)?.sub_text || "Your package is dispatching tonight!"}
                         </p>
                       </div>
                     </div>
