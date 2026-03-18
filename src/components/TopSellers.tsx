@@ -96,7 +96,7 @@ const TopSellers = memo(() => {
 
                         {soldOut && (
                           <div className="absolute top-2 left-2">
-                            <Badge variant="destructive" className="text-[10px]">SOLD OUT</Badge>
+                            <Badge variant="destructive" className="text-[10px]">{t("collection.soldOut")}</Badge>
                           </div>
                         )}
 
