@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { Loader2 } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
+import ConnectionErrorBanner from "@/components/ConnectionErrorBanner";
 
 interface BrandProductRowProps {
   brand: string;
