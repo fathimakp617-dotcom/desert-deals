@@ -64,16 +64,25 @@ const HYDRATION_BATCH_SIZE = 800;
 const BACKGROUND_BATCH_DELAY_MS = 30;
 
 const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
-  const { data, error } = await supabase
-    .from("products")
-    .select(PRODUCT_SELECT)
-    .eq("is_active", true)
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false })
-    .range(from, to);
+  // Race against a 5-second timeout so the UI never hangs on a dead server
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
 
-  if (error) throw new Error(`Batch ${from}-${to}: ${error.message}`);
-  return (data || []) as DbProduct[];
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select(PRODUCT_SELECT)
+      .eq("is_active", true)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .range(from, to)
+      .abortSignal(controller.signal);
+
+    if (error) throw new Error(`Batch ${from}-${to}: ${error.message}`);
+    return (data || []) as DbProduct[];
+  } finally {
+    clearTimeout(timeout);
+  }
 };
 
 const mapDbListToProducts = (rows: DbProduct[]): Product[] => {
