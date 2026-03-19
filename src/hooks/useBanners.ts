@@ -82,18 +82,20 @@ export const useBanners = (position?: string) => {
   return useQuery({
     queryKey: ["banners", position],
     queryFn: async () => {
-      let query = supabase
-        .from("banners")
-        .select("id, title, image_url, link_url, position, sort_order, is_active, show_button, created_at, updated_at")
-        .eq("is_active", true)
-        .order("sort_order");
+      const { signal, clear } = createTimeoutSignal(5000);
+      try {
+        let query = supabase
+          .from("banners")
+          .select("id, title, image_url, link_url, position, sort_order, is_active, show_button, created_at, updated_at")
+          .eq("is_active", true)
+          .order("sort_order");
 
-      if (position) {
-        query = query.eq("position", position);
-      }
+        if (position) {
+          query = query.eq("position", position);
+        }
 
-      const { data, error } = await query;
-      if (error) throw error;
+        const { data, error } = await query.abortSignal(signal);
+        if (error) throw error;
 
       const banners = data || [];
       // Only load asset map if any banner uses relative paths
