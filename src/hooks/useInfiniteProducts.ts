@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const PAGE_SIZE = 60;
-const SKIP_LISTED_PRODUCTS_COUNT = 100;
+const SKIP_LISTED_PRODUCTS_COUNT = 300;
 
 interface DbProduct {
   id: string;
