@@ -351,7 +351,7 @@ let offlineCatalogCache: Product[] | null = null;
 let offlineCatalogPromise: Promise<Product[]> | null = null;
 
 const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<typeof useQueryClient>) => {
-  let from = SKIP_LISTED_PRODUCTS_COUNT + INITIAL_BATCH_SIZE;
+  let from = INITIAL_BATCH_SIZE;
 
   while (true) {
     const to = from + HYDRATION_BATCH_SIZE - 1;
@@ -409,10 +409,8 @@ export const useDbProducts = () => {
     queryKey: ["db-products"],
     queryFn: async () => {
       try {
-        // Faster first paint: fetch a lighter first page immediately (after skipping first listed products)
-        const firstBatchFrom = SKIP_LISTED_PRODUCTS_COUNT;
-        const firstBatchTo = firstBatchFrom + INITIAL_BATCH_SIZE - 1;
-        const firstBatch = await fetchProductBatch(firstBatchFrom, firstBatchTo);
+        // Faster first paint: fetch newest products immediately
+        const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
         return mapDbListToProducts(firstBatch);
       } catch (error) {
         console.error("Primary product fetch failed:", error);

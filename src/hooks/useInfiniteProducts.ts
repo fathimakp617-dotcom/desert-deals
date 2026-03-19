@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const PAGE_SIZE = 60;
-const SKIP_LISTED_PRODUCTS_COUNT = 300;
+// Shop page fetches newest first (created_at DESC), no offset skip needed
 
 interface DbProduct {
   id: string;
@@ -125,7 +125,7 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
           q = q.order("created_at", { ascending: false });
       }
 
-      const from = SKIP_LISTED_PRODUCTS_COUNT + pageParam * PAGE_SIZE;
+      const from = pageParam * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
       q = q.range(from, to);
 
@@ -133,12 +133,10 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
       if (error) throw error;
 
       const pageProducts = (data as DbProduct[]) || [];
-      const adjustedCount =
-        typeof count === "number" ? Math.max(count - SKIP_LISTED_PRODUCTS_COUNT, 0) : null;
 
       return {
         products: pageProducts.map(mapProduct),
-        totalCount: adjustedCount,
+        totalCount: count ?? null,
         page: pageParam,
         pageSize: pageProducts.length,
       };
