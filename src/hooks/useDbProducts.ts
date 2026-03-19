@@ -409,10 +409,8 @@ export const useDbProducts = () => {
     queryKey: ["db-products"],
     queryFn: async () => {
       try {
-        // Faster first paint: fetch a lighter first page immediately (after skipping first listed products)
-        const firstBatchFrom = SKIP_LISTED_PRODUCTS_COUNT;
-        const firstBatchTo = firstBatchFrom + INITIAL_BATCH_SIZE - 1;
-        const firstBatch = await fetchProductBatch(firstBatchFrom, firstBatchTo);
+        // Faster first paint: fetch newest products immediately
+        const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
         return mapDbListToProducts(firstBatch);
       } catch (error) {
         console.error("Primary product fetch failed:", error);
