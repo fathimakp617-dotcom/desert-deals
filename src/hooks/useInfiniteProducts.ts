@@ -137,10 +137,6 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
       return {
         products: pageProducts.map(mapProduct),
         totalCount: count ?? null,
-
-      return {
-        products: pageProducts.map(mapProduct),
-        totalCount: adjustedCount,
         page: pageParam,
         pageSize: pageProducts.length,
       };
