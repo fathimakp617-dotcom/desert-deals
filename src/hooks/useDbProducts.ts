@@ -399,11 +399,77 @@ const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<type
   }
 };
 
+const parseSimpleExportCSVToDbProducts = (text: string): DbProduct[] => {
+  const rows = parseCSV(text);
+  if (rows.length < 2) return [];
+  const headers = rows[0];
+  const col = (name: string): number => headers.findIndex((h) => h.trim() === name);
+
+  const iID = col("ID");
+  const iName = col("Name");
+  const iDesc = col("Description");
+  const iPrice = col("Price");
+  const iOrigPrice = col("Original Price");
+  const iDiscount = col("Discount %");
+  const iStock = col("Stock");
+  const iCategory = col("Category");
+  const iSize = col("Size");
+  const iImage = col("Image URL");
+  const iStatus = col("Status");
+  const iCreated = col("Created At");
+
+  if (iID < 0 || iName < 0 || iPrice < 0) return [];
+
+  const getCol = (row: string[], idx: number): string => (idx >= 0 && idx < row.length ? row[idx] : "");
+  const products: DbProduct[] = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const id = getCol(row, iID).trim();
+    if (!id) continue;
+    const status = getCol(row, iStatus).trim();
+    if (status === "Inactive") continue;
+    const price = parseFloat(getCol(row, iPrice)) || 0;
+    if (price <= 0) continue;
+    const origPrice = parseFloat(getCol(row, iOrigPrice)) || 0;
+
+    products.push({
+      id,
+      name: getCol(row, iName).trim(),
+      description: getCol(row, iDesc).trim() || null,
+      price,
+      original_price: origPrice > 0 ? origPrice : price * 2,
+      discount_percent: parseFloat(getCol(row, iDiscount)) || 0,
+      stock_quantity: parseInt(getCol(row, iStock)) || 50,
+      category: getCol(row, iCategory).trim() || null,
+      size: getCol(row, iSize).trim() || null,
+      image_url: getCol(row, iImage).trim() || null,
+      is_active: true,
+      notes: null,
+      created_at: getCol(row, iCreated).trim() || new Date().toISOString(),
+      cross_sell_price: null,
+    });
+  }
+  return products;
+};
+
 const loadOfflineCatalogFromCsv = async (): Promise<Product[]> => {
   if (offlineCatalogCache) return offlineCatalogCache;
   if (offlineCatalogPromise) return offlineCatalogPromise;
 
   offlineCatalogPromise = (async () => {
+    // Try the simple export format first (has real images), then WooCommerce fallback
+    const simpleRes = await fetch("/data/products-export.csv", { cache: "no-store" });
+    if (simpleRes.ok) {
+      const text = await simpleRes.text();
+      const parsed = parseSimpleExportCSVToDbProducts(text);
+      if (parsed.length > 0) {
+        const mapped = mapDbListToProducts(parsed);
+        offlineCatalogCache = mapped;
+        return mapped;
+      }
+    }
+
     const response = await fetch("/data/wc-product-export.csv", { cache: "no-store" });
     if (!response.ok) {
       throw new Error(`Failed to load offline catalog (${response.status})`);
