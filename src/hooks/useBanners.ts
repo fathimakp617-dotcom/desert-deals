@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { createTimeoutSignal } from "@/lib/supabaseTimeout";
 
 // Lazy asset map — only loaded when a relative path is encountered
 let assetMap: Record<string, string> | null = null;
