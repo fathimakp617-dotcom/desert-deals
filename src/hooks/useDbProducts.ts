@@ -24,8 +24,36 @@ interface DbProduct {
   cross_sell_price: number | null;
 }
 
+const PRODUCT_IMAGE_PLACEHOLDER = "/images/product-placeholder.jpg";
+
+const normalizeImageUrl = (rawUrl: string | null | undefined, fallback = PRODUCT_IMAGE_PLACEHOLDER): string => {
+  if (!rawUrl) return fallback;
+
+  const cleaned = rawUrl.trim().replace(/^"+|"+$/g, "");
+  if (!cleaned) return fallback;
+
+  if (cleaned.startsWith("//")) return `https:${cleaned}`;
+  if (cleaned.startsWith("http://")) return `https://${cleaned.slice(7)}`;
+
+  return cleaned;
+};
+
+const parseImageList = (rawUrls: string | null | undefined): string[] => {
+  if (!rawUrls) return [];
+
+  return rawUrls
+    .split(",")
+    .map((url) => url.trim().replace(/^"+|"+$/g, ""))
+    .filter(Boolean)
+    .map((url) => normalizeImageUrl(url, ""))
+    .filter(Boolean);
+};
+
 const mapDbToProduct = (db: DbProduct): Product => {
   const staticData = staticEnrichmentMap.get(db.id);
+  const dbGallery = parseImageList(db.image_url);
+  const staticGallery = (staticData?.gallery || []).map((url) => normalizeImageUrl(url, "")).filter(Boolean);
+  const image = dbGallery[0] || normalizeImageUrl(staticData?.image || "", PRODUCT_IMAGE_PLACEHOLDER);
 
   return {
     id: db.id,
@@ -38,13 +66,8 @@ const mapDbToProduct = (db: DbProduct): Product => {
     discountPercent: db.discount_percent || 0,
     category: db.category || "Unisex",
     size: db.size || "EU 40-45",
-    image: db.image_url ? db.image_url.split(",")[0].trim() : staticData?.image || "",
-    gallery: db.image_url
-      ? db.image_url
-          .split(",")
-          .map((u) => u.trim())
-          .filter(Boolean)
-      : staticData?.gallery || [],
+    image,
+    gallery: dbGallery.length ? dbGallery : staticGallery.length ? staticGallery : [image],
     construction: {
       upper: db.notes?.top || staticData?.construction?.upper || [],
       midsole: db.notes?.middle || staticData?.construction?.midsole || [],
