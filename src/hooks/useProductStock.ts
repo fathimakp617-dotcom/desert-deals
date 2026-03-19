@@ -49,13 +49,6 @@ export const useProductStock = () => {
       } finally {
         clear();
       }
-
-      const stockMap: Record<string, ProductStock> = {};
-      data?.forEach((product) => {
-        stockMap[product.id] = product;
-      });
-
-      return stockMap;
     },
     staleTime: 15 * 60 * 1000,
     gcTime: 20 * 60 * 1000,
