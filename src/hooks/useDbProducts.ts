@@ -424,6 +424,10 @@ const loadOfflineCatalogFromCsv = async (): Promise<Product[]> => {
   return offlineCatalogPromise;
 };
 
+export const getOfflineCatalogProducts = async (): Promise<Product[]> => {
+  return loadOfflineCatalogFromCsv();
+};
+
 export const useDbProducts = () => {
   const queryClient = useQueryClient();
 
