@@ -136,9 +136,18 @@ export const useDbProducts = () => {
   const query = useQuery({
     queryKey: ["db-products"],
     queryFn: async () => {
-      // Faster first paint: fetch a lighter first page immediately
-      const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
-      return mapDbListToProducts(firstBatch);
+      try {
+        // Faster first paint: fetch a lighter first page immediately
+        const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
+        return mapDbListToProducts(firstBatch);
+      } catch (error) {
+        console.error("Primary product fetch failed, using offline fallback catalog:", error);
+        return staticProducts.map((product) => {
+          const fallback = { ...product } as Product;
+          (fallback as any)._stock = 999;
+          return fallback;
+        });
+      }
     },
     staleTime: 2 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
