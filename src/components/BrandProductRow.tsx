@@ -93,13 +93,18 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                       <div className="relative aspect-square bg-muted overflow-hidden">
                         <Link to={`/product/${product.id}`}>
                           <img
-                            src={product.image}
+                            src={product.image || "/images/product-placeholder.jpg"}
                             alt={product.name}
                             width={220}
                             height={220}
                             className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
                             loading="lazy"
                             decoding="async"
+                            onError={(e) => {
+                              const img = e.currentTarget;
+                              if (img.src.includes("/images/product-placeholder.jpg")) return;
+                              img.src = "/images/product-placeholder.jpg";
+                            }}
                           />
                         </Link>
                         {soldOut && (
