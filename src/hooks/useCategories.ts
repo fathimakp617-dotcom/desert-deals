@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { createTimeoutSignal } from "@/lib/supabaseTimeout";
 
 export interface Category {
   id: string;
@@ -36,13 +37,21 @@ export const useCategories = () => {
   return useQuery({
     queryKey: ["categories"],
     queryFn: async (): Promise<Category[]> => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("*")
-        .order("sort_order", { ascending: true });
+      const { signal, clear } = createTimeoutSignal(5000);
+      try {
+        const { data, error } = await supabase
+          .from("categories")
+          .select("*")
+          .order("sort_order", { ascending: true })
+          .abortSignal(signal);
 
-      if (error || !data || data.length === 0) return fallbackCategories;
-      return (data as any[]);
+        if (error || !data || data.length === 0) return fallbackCategories;
+        return (data as any[]);
+      } catch {
+        return fallbackCategories;
+      } finally {
+        clear();
+      }
     },
     staleTime: 10 * 60 * 1000,
     placeholderData: fallbackCategories,

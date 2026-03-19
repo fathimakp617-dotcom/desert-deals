@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { createTimeoutSignal } from "@/lib/supabaseTimeout";
 
 // Lazy asset map — only loaded when a relative path is encountered
 let assetMap: Record<string, string> | null = null;
@@ -81,18 +82,20 @@ export const useBanners = (position?: string) => {
   return useQuery({
     queryKey: ["banners", position],
     queryFn: async () => {
-      let query = supabase
-        .from("banners")
-        .select("id, title, image_url, link_url, position, sort_order, is_active, show_button, created_at, updated_at")
-        .eq("is_active", true)
-        .order("sort_order");
+      const { signal, clear } = createTimeoutSignal(5000);
+      try {
+        let query = supabase
+          .from("banners")
+          .select("id, title, image_url, link_url, position, sort_order, is_active, show_button, created_at, updated_at")
+          .eq("is_active", true)
+          .order("sort_order");
 
-      if (position) {
-        query = query.eq("position", position);
-      }
+        if (position) {
+          query = query.eq("position", position);
+        }
 
-      const { data, error } = await query;
-      if (error) throw error;
+        const { data, error } = await query.abortSignal(signal);
+        if (error) throw error;
 
       const banners = data || [];
       // Only load asset map if any banner uses relative paths
@@ -109,12 +112,15 @@ export const useBanners = (position?: string) => {
       }
 
       return banners as Banner[];
+      } finally {
+        clear();
+      }
     },
     staleTime: 15 * 60 * 1000,
     gcTime: 20 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+    retry: 1,
+    retryDelay: 2000,
   });
 };

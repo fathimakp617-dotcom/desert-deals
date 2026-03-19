@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { createTimeoutSignal } from "@/lib/supabaseTimeout";
 
 interface ProductStock {
   id: string;
@@ -26,23 +27,28 @@ export const useProductStock = () => {
         if (Object.keys(stockMap).length > 0) return stockMap;
       }
 
-      const { data, error } = await supabase
-        .from("products")
-        .select("id, stock_quantity, is_active")
-        .eq("is_active", true)
-        .is("deleted_at", null);
+      const { signal, clear } = createTimeoutSignal(5000);
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("id, stock_quantity, is_active")
+          .eq("is_active", true)
+          .is("deleted_at", null)
+          .abortSignal(signal);
 
-      if (error) {
-        console.error("Error fetching product stock:", error);
+        if (error) {
+          console.error("Error fetching product stock:", error);
+          return {};
+        }
+        return data?.reduce((map, product) => {
+          map[product.id] = product;
+          return map;
+        }, {} as Record<string, ProductStock>) || {};
+      } catch {
         return {};
+      } finally {
+        clear();
       }
-
-      const stockMap: Record<string, ProductStock> = {};
-      data?.forEach((product) => {
-        stockMap[product.id] = product;
-      });
-
-      return stockMap;
     },
     staleTime: 15 * 60 * 1000,
     gcTime: 20 * 60 * 1000,
