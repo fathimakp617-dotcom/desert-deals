@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { Loader2 } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
+import ConnectionErrorBanner from "@/components/ConnectionErrorBanner";
 
 interface BrandProductRowProps {
   brand: string;
@@ -16,7 +17,7 @@ interface BrandProductRowProps {
 }
 
 const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) => {
-  const { data: allProducts = [], isLoading } = useDbProducts();
+  const { data: allProducts = [], isLoading, isError, refetch } = useDbProducts();
   
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -54,6 +55,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
     }
   };
 
+  if (isError) return <ConnectionErrorBanner onRetry={() => refetch()} />;
   if (!isLoading && products.length === 0) return null;
 
   return (

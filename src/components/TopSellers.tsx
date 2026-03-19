@@ -9,11 +9,12 @@ import { Badge } from "@/components/ui/badge";
 
 import { Loader2 } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
+import ConnectionErrorBanner from "@/components/ConnectionErrorBanner";
 
 // Matches the "Top Sellers" product-tab-carousel from the original HTML
 const TopSellers = memo(() => {
   const { t } = useTranslation();
-  const { data: allProducts = [], isLoading } = useDbProducts();
+  const { data: allProducts = [], isLoading, isError, refetch } = useDbProducts();
   const excludedCats = ["socks", "heels", "bags", "jersey", "kids", "louis vuitton", "dior", "gucci", "hermes", "loro piana"];
   const products = allProducts.filter(p => {
     if (!p.category) return true;
@@ -50,7 +51,9 @@ const TopSellers = memo(() => {
           </Link>
         </div>
 
-        {isLoading ? (
+        {isError ? (
+          <ConnectionErrorBanner onRetry={() => refetch()} />
+        ) : isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
