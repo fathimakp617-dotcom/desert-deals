@@ -112,12 +112,15 @@ export const useBanners = (position?: string) => {
       }
 
       return banners as Banner[];
+      } finally {
+        clear();
+      }
     },
     staleTime: 15 * 60 * 1000,
     gcTime: 20 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+    retry: 1,
+    retryDelay: 2000,
   });
 };
