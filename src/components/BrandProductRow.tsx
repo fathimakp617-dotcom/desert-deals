@@ -17,7 +17,7 @@ interface BrandProductRowProps {
 }
 
 const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) => {
-  const { data: allProducts = [], isLoading } = useDbProducts();
+  const { data: allProducts = [], isLoading, isError, refetch } = useDbProducts();
   
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
