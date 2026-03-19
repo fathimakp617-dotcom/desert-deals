@@ -62,6 +62,7 @@ const mapDbToProduct = (db: DbProduct): Product => {
 
 // Progressive fetch for smooth initial render + background hydration
 const PRODUCT_SELECT = "id,name,price,original_price,discount_percent,stock_quantity,category,size,image_url,cross_sell_price";
+const SKIP_LISTED_PRODUCTS_COUNT = 100;
 const INITIAL_BATCH_SIZE = 200;
 const HYDRATION_BATCH_SIZE = 800;
 const BACKGROUND_BATCH_DELAY_MS = 30;
