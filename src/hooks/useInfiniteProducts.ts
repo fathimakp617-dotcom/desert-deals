@@ -50,6 +50,11 @@ interface InfiniteProductsPage {
   pageSize: number;
 }
 
+type OfflineImageLookup = {
+  byId: Map<string, string>;
+  byName: Map<string, string>;
+};
+
 const brandSearchTerms: Record<string, string> = {
   Nike: "Nike",
   Jordan: "Jordan",
@@ -85,6 +90,8 @@ const brandSearchTerms: Record<string, string> = {
 
 const excludedCategories = ["Louis Vuitton", "Socks", "Heels", "Bags", "Jersey", "Kids"];
 
+let offlineImageLookupPromise: Promise<OfflineImageLookup> | null = null;
+
 const normalizeImageUrl = (rawUrl: string | null | undefined): string => {
   if (!rawUrl) return PRODUCT_IMAGE_PLACEHOLDER;
 
@@ -97,24 +104,58 @@ const normalizeImageUrl = (rawUrl: string | null | undefined): string => {
   return cleaned;
 };
 
-const mapProduct = (db: DbProduct): SimpleProduct => ({
-  id: db.id,
-  name: db.name,
-  description: "",
-  price: db.price,
-  originalPrice: db.original_price || db.price * 2,
-  discountPercent: db.discount_percent || 0,
-  category: db.category || "General",
-  size: db.size || "Standard",
-  stockQuantity: db.stock_quantity,
-  image: normalizeImageUrl(db.image_url ? db.image_url.split(",")[0] : null),
-  tagline: db.category || "Premium Footwear",
-  notes: {
-    top: [],
-    heart: [],
-    base: [],
-  },
-});
+const getOfflineImageLookup = async (): Promise<OfflineImageLookup> => {
+  if (!offlineImageLookupPromise) {
+    offlineImageLookupPromise = getOfflineCatalogProducts()
+      .then((catalog) => {
+        const byId = new Map<string, string>();
+        const byName = new Map<string, string>();
+
+        for (const product of catalog) {
+          const image = normalizeImageUrl(product.image);
+          if (image !== PRODUCT_IMAGE_PLACEHOLDER) {
+            byId.set(product.id, image);
+            byName.set(product.name.trim().toLowerCase(), image);
+          }
+        }
+
+        return { byId, byName };
+      })
+      .catch((error) => {
+        offlineImageLookupPromise = null;
+        throw error;
+      });
+  }
+
+  return offlineImageLookupPromise;
+};
+
+const mapProduct = (db: DbProduct): SimpleProduct => {
+  const primaryImage =
+    db.image_url
+      ?.split(",")
+      .map((url) => url.trim())
+      .find(Boolean) || null;
+
+  return {
+    id: db.id,
+    name: db.name,
+    description: "",
+    price: db.price,
+    originalPrice: db.original_price || db.price * 2,
+    discountPercent: db.discount_percent || 0,
+    category: db.category || "General",
+    size: db.size || "Standard",
+    stockQuantity: db.stock_quantity,
+    image: normalizeImageUrl(primaryImage),
+    tagline: db.category || "Premium Footwear",
+    notes: {
+      top: [],
+      heart: [],
+      base: [],
+    },
+  };
+};
 
 const mapOfflineProduct = (product: Product): SimpleProduct => ({
   id: product.id,
@@ -282,7 +323,27 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
 
         if (error) throw new Error(error.message);
 
-        const pageProducts = (data || []).map(mapProduct);
+        let pageProducts = (data || []).map(mapProduct);
+
+        if (pageProducts.some((product) => !product.image || product.image === PRODUCT_IMAGE_PLACEHOLDER)) {
+          try {
+            const lookup = await getOfflineImageLookup();
+            pageProducts = pageProducts.map((product) => {
+              if (product.image && product.image !== PRODUCT_IMAGE_PLACEHOLDER) return product;
+
+              const fallbackImage =
+                lookup.byId.get(product.id) ||
+                lookup.byName.get(product.name.trim().toLowerCase());
+
+              return {
+                ...product,
+                image: normalizeImageUrl(fallbackImage),
+              };
+            });
+          } catch (lookupError) {
+            console.warn("Could not enrich missing product images from offline catalog:", lookupError);
+          }
+        }
 
         return {
           products: pageProducts,
