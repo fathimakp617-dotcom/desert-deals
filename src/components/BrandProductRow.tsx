@@ -55,6 +55,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
     }
   };
 
+  if (isError) return <ConnectionErrorBanner onRetry={() => refetch()} />;
   if (!isLoading && products.length === 0) return null;
 
   return (
