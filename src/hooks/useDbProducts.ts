@@ -387,7 +387,9 @@ const loadOfflineCatalogFromCsv = async (): Promise<Product[]> => {
     }
 
     const text = await response.text();
-    const parsedRows = parseWooCommerceCSVToDbProducts(text).filter((p) => p.is_active && p.price > 0);
+    const parsedRows = parseWooCommerceCSVToDbProducts(text)
+      .filter((p) => p.is_active && p.price > 0)
+      .slice(SKIP_LISTED_PRODUCTS_COUNT);
     const mapped = mapDbListToProducts(parsedRows);
 
     offlineCatalogCache = mapped;
