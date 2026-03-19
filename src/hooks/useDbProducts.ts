@@ -351,7 +351,7 @@ let offlineCatalogCache: Product[] | null = null;
 let offlineCatalogPromise: Promise<Product[]> | null = null;
 
 const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<typeof useQueryClient>) => {
-  let from = SKIP_LISTED_PRODUCTS_COUNT + INITIAL_BATCH_SIZE;
+  let from = INITIAL_BATCH_SIZE;
 
   while (true) {
     const to = from + HYDRATION_BATCH_SIZE - 1;
