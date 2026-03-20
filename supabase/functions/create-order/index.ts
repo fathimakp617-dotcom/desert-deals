@@ -362,6 +362,49 @@ serve(async (req) => {
 
       if (productError) {
         console.error("Error checking product:", item.productId, productError);
+
+        if (isInfrastructureTimeout(productError)) {
+          const queuedItems: OrderItem[] = orderRequest.items.map((rawItem) => ({
+            productId: sanitizeString(rawItem.productId || 'unknown-product', 120),
+            name: sanitizeName(rawItem.name || rawItem.productId || 'Product', 100),
+            price: Math.max(0, Number(rawItem.price) || 0),
+            quantity: Math.max(1, Math.floor(Number(rawItem.quantity) || 1)),
+            selectedSize: rawItem.selectedSize || null,
+          }));
+
+          const queuedSubtotal = queuedItems.reduce((sum, row) => sum + row.price * row.quantity, 0);
+          const queuedShipping = 20;
+          const queuedTotal = queuedSubtotal + queuedShipping;
+          const queuedOrderNumber = `PEND-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+          await captureEmergencyOrder({
+            orderNumber: queuedOrderNumber,
+            reason: 'Database timeout while validating product stock',
+            customerName,
+            customerEmail,
+            customerPhone,
+            shippingAddress,
+            items: queuedItems,
+            subtotal: queuedSubtotal,
+            shipping: queuedShipping,
+            total: queuedTotal,
+          });
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              queued: true,
+              degraded: true,
+              message: 'Order captured in backup mode due to temporary backend outage. Team will process it manually.',
+              order: {
+                id: null,
+                order_number: queuedOrderNumber,
+                total: queuedTotal,
+              },
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
       }
 
       if (!product) {
