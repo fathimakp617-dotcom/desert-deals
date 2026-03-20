@@ -147,7 +147,6 @@ const Navbar = memo(() => {
 
             {/* Action icons */}
             <div className="flex items-center gap-1 sm:gap-2 ms-auto lg:ms-0 shrink-0">
-              <LanguageSwitcher />
               <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
               </button>
