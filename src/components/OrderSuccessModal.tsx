@@ -39,6 +39,29 @@ interface LoyaltyCoupon {
   expires_at: string | null;
 }
 
+const OFFLINE_ORDER_CACHE_KEY = "offline_pending_orders_v1";
+
+interface OfflinePendingOrder {
+  order_number: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  items: Array<{ productId: string; name: string; price: number; quantity: number; selectedSize: string | null }>;
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  shipping_address: {
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+  };
+  payment_method: string;
+  user_id: string | null;
+  created_at: string;
+}
+
 const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
@@ -47,6 +70,7 @@ const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
   const [loyaltyCoupon, setLoyaltyCoupon] = useState<LoyaltyCoupon | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isOfflineOrder, setIsOfflineOrder] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [copied, setCopied] = useState(false);
   const [purchaseTracked, setPurchaseTracked] = useState(false);
