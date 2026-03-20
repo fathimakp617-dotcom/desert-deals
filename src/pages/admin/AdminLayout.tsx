@@ -86,9 +86,31 @@ const AdminLayout = () => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("verify-admin-password", {
-        body: { email: email.trim(), password },
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      let data: any;
+      let error: any;
+      try {
+        const result = await supabase.functions.invoke("verify-admin-password", {
+          body: { email: email.trim(), password },
+        });
+        data = result.data;
+        error = result.error;
+      } catch (invokeErr: any) {
+        // If SDK invoke fails, try direct fetch
+        const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+        const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const res = await fetch(`https://${projectId}.supabase.co/functions/v1/verify-admin-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: apiKey, Authorization: `Bearer ${apiKey}` },
+          body: JSON.stringify({ email: email.trim(), password }),
+          signal: controller.signal,
+        });
+        data = await res.json();
+        error = res.ok ? null : new Error(data?.error || "Login failed");
+      }
+      clearTimeout(timeoutId);
 
       if (error) throw error;
 
