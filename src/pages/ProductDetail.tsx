@@ -298,7 +298,7 @@ const ProductDetail = () => {
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
               <span className="text-sm tracking-wider">BACK</span>
             </motion.button>
           </div>
@@ -592,14 +592,14 @@ const ProductDetail = () => {
                     </div>
                   </div>
                   {isEidDeliveryEnabled && (
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
-                      <span className="text-lg shrink-0 mt-0.5">📦</span>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
+                      <span className="text-lg shrink-0">🎉</span>
                       <div className="text-sm">
                         <span className="font-semibold text-foreground">
-                          {(eidConfig?.config as any)?.badge_text || "Order Update"}
+                          {(eidConfig?.config as any)?.badge_text || "Before Eid Delivery Available!"}
                         </span>
-                        <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line leading-relaxed">
-                          {(eidConfig?.config as any)?.sub_text || "Your package is dispatching tonight!"}
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {(eidConfig?.config as any)?.sub_text || "Order now to receive before Eid Al-Fitr"}
                         </p>
                       </div>
                     </div>

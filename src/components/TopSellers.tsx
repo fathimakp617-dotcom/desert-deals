@@ -9,12 +9,11 @@ import { Badge } from "@/components/ui/badge";
 
 import { Loader2 } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
-import ConnectionErrorBanner from "@/components/ConnectionErrorBanner";
 
 // Matches the "Top Sellers" product-tab-carousel from the original HTML
 const TopSellers = memo(() => {
   const { t } = useTranslation();
-  const { data: allProducts = [], isLoading, isError, refetch } = useDbProducts();
+  const { data: allProducts = [], isLoading } = useDbProducts();
   const excludedCats = ["socks", "heels", "bags", "jersey", "kids", "louis vuitton", "dior", "gucci", "hermes", "loro piana"];
   const products = allProducts.filter(p => {
     if (!p.category) return true;
@@ -51,9 +50,7 @@ const TopSellers = memo(() => {
           </Link>
         </div>
 
-        {isError ? (
-          <ConnectionErrorBanner onRetry={() => refetch()} />
-        ) : isLoading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
@@ -87,18 +84,13 @@ const TopSellers = memo(() => {
                       <div className="relative aspect-square bg-muted overflow-hidden">
                         <Link to={`/product/${product.id}`}>
                           <img
-                            src={product.image || "/images/product-placeholder.jpg"}
+                            src={product.image}
                             alt={product.name}
                             width={246}
                             height={246}
                             className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
                             loading="lazy"
                             decoding="async"
-                            onError={(e) => {
-                              const img = e.currentTarget;
-                              if (img.src.includes("/images/product-placeholder.jpg")) return;
-                              img.src = "/images/product-placeholder.jpg";
-                            }}
                           />
                         </Link>
 

@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 
 import { Loader2 } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
-import ConnectionErrorBanner from "@/components/ConnectionErrorBanner";
 
 interface BrandProductRowProps {
   brand: string;
@@ -17,7 +16,7 @@ interface BrandProductRowProps {
 }
 
 const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) => {
-  const { data: allProducts = [], isLoading, isError, refetch } = useDbProducts();
+  const { data: allProducts = [], isLoading } = useDbProducts();
   
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -55,7 +54,6 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
     }
   };
 
-  if (isError) return <ConnectionErrorBanner onRetry={() => refetch()} />;
   if (!isLoading && products.length === 0) return null;
 
   return (
@@ -93,18 +91,13 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                       <div className="relative aspect-square bg-muted overflow-hidden">
                         <Link to={`/product/${product.id}`}>
                           <img
-                            src={product.image || "/images/product-placeholder.jpg"}
+                            src={product.image}
                             alt={product.name}
                             width={220}
                             height={220}
                             className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
                             loading="lazy"
                             decoding="async"
-                            onError={(e) => {
-                              const img = e.currentTarget;
-                              if (img.src.includes("/images/product-placeholder.jpg")) return;
-                              img.src = "/images/product-placeholder.jpg";
-                            }}
                           />
                         </Link>
                         {soldOut && (

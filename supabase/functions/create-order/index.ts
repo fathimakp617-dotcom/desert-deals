@@ -280,10 +280,6 @@ serve(async (req) => {
 
       if (productError) {
         console.error("Error checking product:", item.productId, productError);
-        return new Response(
-          JSON.stringify({ error: `Unable to verify product "${item.name || item.productId}". Please try again.` }),
-          { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
       }
 
       if (!product) {

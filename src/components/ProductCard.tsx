@@ -1,12 +1,11 @@
-import { memo, useState, useCallback, useEffect } from "react";
+import { memo, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Heart, Eye } from "lucide-react";
+import { Heart, ImageOff, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/data/products";
 import { usePrefetchProduct } from "@/hooks/useDbProducts";
 import type { SimpleProduct } from "@/hooks/usePaginatedProducts";
 
-const PRODUCT_PLACEHOLDER = "/images/product-placeholder.jpg";
 
 interface ProductCardProps {
   product: SimpleProduct;
@@ -18,23 +17,19 @@ interface ProductCardProps {
 }
 
 const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQuickView, viewMode }: ProductCardProps) => {
-  const [imgSrc, setImgSrc] = useState(product.image || PRODUCT_PLACEHOLDER);
+  const [imgError, setImgError] = useState(false);
   const prefetch = usePrefetchProduct();
   const handlePrefetch = useCallback(() => prefetch(product.id), [prefetch, product.id]);
-
-  useEffect(() => {
-    setImgSrc(product.image || PRODUCT_PLACEHOLDER);
-  }, [product.image]);
-
-  const handleImageError = useCallback(() => {
-    setImgSrc((prev) => (prev === PRODUCT_PLACEHOLDER ? prev : PRODUCT_PLACEHOLDER));
-  }, []);
 
   if (viewMode === "list") {
     return (
       <div className="flex flex-col md:flex-row gap-4 border border-border/50 bg-card/50 p-4 hover:border-primary/30 transition-colors" onMouseEnter={handlePrefetch} onTouchStart={handlePrefetch}>
         <Link to={`/product/${product.id}`} className="w-full md:w-40 h-40 flex-shrink-0 overflow-hidden bg-muted flex items-center justify-center">
-          <img src={imgSrc} alt={product.name} className="w-full h-full object-cover" loading="lazy" onError={handleImageError} />
+          {imgError ? (
+            <ImageOff className="w-8 h-8 text-muted-foreground" />
+          ) : (
+            <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" onError={(e) => { setImgError(true); (e.target as HTMLImageElement).src = "/images/product-placeholder.jpg"; }} />
+          )}
         </Link>
         <div className="flex-1 min-w-0">
           <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
@@ -63,17 +58,25 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
     <div className="group bg-background border border-border/30 rounded-lg overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20" onMouseEnter={handlePrefetch} onTouchStart={handlePrefetch}>
       <div className="relative aspect-square bg-muted overflow-hidden flex-shrink-0">
         <Link to={`/product/${product.id}`} className="w-full h-full flex items-center justify-center">
-          <img
-            src={imgSrc}
-            alt={product.name}
-            width={250}
-            height={250}
-            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
-            loading="lazy"
-            decoding="async"
-            onError={handleImageError}
-          />
+          {imgError ? (
+            <ImageOff className="w-10 h-10 text-muted-foreground" />
+          ) : (
+            <img
+              src={product.image}
+              alt={product.name}
+              width={250}
+              height={250}
+              className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
+              loading="lazy"
+              decoding="async"
+              onError={(e) => {
+                setImgError(true);
+                (e.target as HTMLImageElement).src = "/images/product-placeholder.jpg";
+              }}
+            />
+          )}
         </Link>
+
 
         {!soldOut && product.discountPercent > 0 && product.name?.toLowerCase().includes("mind") && (
           <div className="absolute top-2 left-2 z-10">
@@ -104,8 +107,10 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
         >
           <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-foreground"}`} />
         </button>
+
       </div>
 
+      {/* Product info - #6: Name bold, stock status, adjusted font sizes */}
       <div className="p-3 bg-muted rounded-b-lg flex-1 flex flex-col">
         <span className="text-[10px] text-muted-foreground uppercase">{product.category}</span>
         <Link to={`/product/${product.id}`}>

@@ -6,9 +6,13 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useCategories } from "@/hooks/useCategories";
 import { useTranslation } from "@/contexts/DirectionContext";
 import SearchSuggestions from "@/components/SearchSuggestions";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import headerLogo from "@/assets/desert-deal-logo-header.png";
 
-// Static bottom links are now built inside the component to access t()
+const staticBottomLinks = [
+  { name: "About Us", href: "/#about" },
+  { name: "Reviews", href: "/#testimonials" },
+];
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,16 +44,17 @@ const Navbar = memo(() => {
     }));
 
     const allNavLinks = [
-      { name: t("nav.allShoes"), href: "/shop" },
+      { name: "All Shoes", href: "/shop" },
       ...categoryLinks,
-      { name: t("nav.aboutUs"), href: "/#about" },
-      { name: t("nav.reviews"), href: "/#testimonials" },
+      ...staticBottomLinks,
     ];
+    // "All Shoes" is hardcoded above; DB categories provide the brand links
+    // Fill first row as much as possible (up to 10), rest goes to second row
     const splitAt = Math.min(12, allNavLinks.length);
     const top = allNavLinks.slice(0, splitAt);
     const bottom = allNavLinks.slice(splitAt);
     return { topLinks: top, bottomLinks: bottom, allLinks: allNavLinks };
-  }, [categories, t]);
+  }, [categories]);
 
   const changeAnnouncement = useCallback((direction: 1 | -1) => {
     setAnnouncementVisible(false);
@@ -86,11 +91,11 @@ const Navbar = memo(() => {
   return (
     <>
       {/* Announcement Bar */}
-      <div className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
+      <div dir="ltr" className={`fixed top-0 left-0 right-0 z-[60] bg-foreground text-background rounded-b-2xl mx-1 sm:mx-2 transition-transform duration-300 ${scrolled ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="container mx-auto px-4 flex items-center justify-center h-9 relative">
           <button
             onClick={() => changeAnnouncement(-1)}
-            className="absolute left-4 text-background/70 hover:text-background transition-colors"
+            className="absolute start-4 text-background/70 hover:text-background transition-colors"
             aria-label="Previous announcement"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -100,7 +105,7 @@ const Navbar = memo(() => {
           </span>
           <button
             onClick={() => changeAnnouncement(1)}
-            className="absolute right-4 text-background/70 hover:text-background transition-colors"
+            className="absolute end-4 text-background/70 hover:text-background transition-colors"
             aria-label="Next announcement"
           >
             <ChevronRight className="w-4 h-4" />
@@ -110,9 +115,9 @@ const Navbar = memo(() => {
 
       {/* Main Header */}
       <header className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
-        <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-1.5">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-1.5">
           {/* Single row: Logo left | Nav center | Icons right */}
-          <div className="flex items-center relative">
+          <div dir="ltr" className="flex items-center gap-2">
             {/* Mobile hamburger */}
             <div className="lg:hidden flex items-center">
               <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
@@ -123,13 +128,13 @@ const Navbar = memo(() => {
             {/* Logo */}
             <Link
               to="/"
-              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0 lg:mr-6"
+              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0"
             >
               <img src={headerLogo} alt="Desert Deal" className="h-14 sm:h-20 w-auto" />
             </Link>
 
             {/* Desktop nav – top row centered between logo and icons */}
-            <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 flex-1 overflow-x-auto no-scrollbar">
+            <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 flex-1 min-w-0 mx-4">
               {topLinks.map((link) => (
                 <Link
                   key={link.name}
@@ -142,21 +147,21 @@ const Navbar = memo(() => {
             </div>
 
             {/* Action icons */}
-            <div className="flex items-center gap-1 sm:gap-2 ml-auto lg:ml-6 shrink-0 relative z-10">
-              
+            <div className="flex items-center gap-1 sm:gap-2 ms-auto lg:ms-0 shrink-0">
+              <LanguageSwitcher />
               <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
               </button>
               <Link to="/wishlist" className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <Heart size={20} />
                 {wishlistItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
+                  <span className="absolute -top-0.5 -end-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
                 )}
               </Link>
               <button onClick={() => openCart()} className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <ShoppingBag size={20} />
                 {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{totalItems}</span>
+                  <span className="absolute -top-0.5 -end-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{totalItems}</span>
                 )}
               </button>
               <Link to="/account" className="hidden md:flex p-2 text-foreground hover:opacity-60 transition-opacity">
@@ -166,7 +171,7 @@ const Navbar = memo(() => {
           </div>
 
           {/* Desktop nav – bottom row centered */}
-          <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 -mt-2.5">
+          <div dir="ltr" className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 -mt-2.5">
             {bottomLinks.map((link) => (
               <Link
                 key={link.name}
@@ -192,7 +197,7 @@ const Navbar = memo(() => {
         {/* Mobile Menu */}
         {isOpen && (
           <div className="lg:hidden bg-background border-t border-border max-h-[70vh] overflow-y-auto">
-            <div className="container mx-auto px-6 py-4 flex flex-col gap-3 text-start">
+            <div className="container mx-auto px-6 py-4 flex flex-col gap-3">
               {allLinks.map((link) => (
                 <Link
                   key={link.name}
@@ -214,7 +219,7 @@ const Navbar = memo(() => {
               ))}
               <div className="border-t border-border pt-3 mt-1">
                 <Link to="/account" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-sm text-foreground hover:opacity-60 transition-opacity">
-                  <User size={16} /> {t("nav.myAccount")}
+                  <User size={16} /> My Account
                 </Link>
               </div>
             </div>
@@ -228,7 +233,7 @@ const Navbar = memo(() => {
           <div className={`fixed inset-0 z-[70] bg-foreground/30 ${searchClosing ? "animate-fade-out" : "animate-fade-in"}`} onClick={closeSearch} />
           <div className={`fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col ${searchClosing ? "animate-slide-out-right" : "animate-slide-in-right"}`}>
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
-              <h2 className="text-xl font-semibold text-foreground">{t("nav.search")}</h2>
+              <h2 className="text-xl font-semibold text-foreground">Search</h2>
               <button onClick={closeSearch} className="p-1 text-foreground hover:opacity-60 transition-opacity">
                 <X size={22} />
               </button>
@@ -250,8 +255,8 @@ const Navbar = memo(() => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t("nav.searchEverything")}
-                  className="w-full h-12 text-sm bg-muted rounded-lg focus:outline-none text-foreground placeholder:text-muted-foreground pl-11 pr-4"
+                  placeholder="Search everything..."
+                  className="w-full h-12 pl-11 pr-4 text-sm bg-muted rounded-lg focus:outline-none text-foreground placeholder:text-muted-foreground"
                 />
               </form>
             </div>

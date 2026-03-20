@@ -59,7 +59,7 @@ const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string
                   <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
                     <div className="relative aspect-square bg-muted overflow-hidden">
                       <Link to={`/product/${product.id}`}>
-                        <img src={product.image || "/images/product-placeholder.jpg"} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onError={(e) => { const img = e.currentTarget; if (img.src.includes('/images/product-placeholder.jpg')) return; img.src = '/images/product-placeholder.jpg'; }} />
+                        <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                       </Link>
 
                       {/* Quick view */}

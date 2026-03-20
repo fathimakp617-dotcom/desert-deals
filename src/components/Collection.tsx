@@ -49,14 +49,9 @@ const Collection = forwardRef<HTMLDivElement>((_, ref) => {
                         </div>
                       )}
                       <img
-                        src={product.image || "/images/product-placeholder.jpg"}
+                        src={product.image}
                         alt={product.name}
                         className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${((product as any)._stock ?? 1) === 0 ? 'opacity-60' : ''}`}
-                        onError={(e) => {
-                          const img = e.currentTarget;
-                          if (img.src.includes('/images/product-placeholder.jpg')) return;
-                          img.src = '/images/product-placeholder.jpg';
-                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </div>

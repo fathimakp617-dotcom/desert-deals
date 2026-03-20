@@ -1,1 +1,0 @@
-UPDATE products SET size = 'EU 40,EU 42,EU 43,EU 44,EU 45' WHERE id IN ('new-balance-fuelcell-supercomp-elite-5796','new-balance-fuelcell-supercomp-elite-5775','new-balance-fuelcell-supercomp-elite-5768','new-balance-fuelcell-supercomp-elite-5789','new-balance-fuelcell-supercomp-elite-5782');

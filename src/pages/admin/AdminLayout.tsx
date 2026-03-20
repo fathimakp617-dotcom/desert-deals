@@ -22,7 +22,6 @@ import InstallAppBanner from "@/components/InstallAppBanner";
 import { motion } from "framer-motion";
 
 const ADMIN_SESSION_KEY = "rayn_admin_session";
-const ADMIN_LOGIN_TIMEOUT_MS = 10000;
 
 interface AdminSession {
   token: string;
@@ -30,19 +29,6 @@ interface AdminSession {
   expiry: string | number;
   role?: string;
 }
-
-const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> => {
-  let timeoutId: ReturnType<typeof setTimeout> | undefined;
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
-  });
-
-  try {
-    return await Promise.race([promise, timeoutPromise]);
-  } finally {
-    if (timeoutId) clearTimeout(timeoutId);
-  }
-};
 
 const AdminLayout = () => {
   const [adminSession, setAdminSession] = useState<AdminSession | null>(null);
@@ -100,13 +86,9 @@ const AdminLayout = () => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await withTimeout(
-        supabase.functions.invoke("verify-admin-password", {
-          body: { email: email.trim(), password },
-        }),
-        ADMIN_LOGIN_TIMEOUT_MS,
-        "Login timed out. Please try again."
-      );
+      const { data, error } = await supabase.functions.invoke("verify-admin-password", {
+        body: { email: email.trim(), password },
+      });
 
       if (error) throw error;
 
@@ -143,17 +125,9 @@ const AdminLayout = () => {
         throw new Error(data.error || "Login failed");
       }
     } catch (error: any) {
-      const rawMessage = String(error?.message || "Login request failed");
-      const normalizedMessage = rawMessage.toLowerCase();
-      const isNetworkIssue =
-        normalizedMessage.includes("failed to send a request to the edge function") ||
-        normalizedMessage.includes("timed out") ||
-        normalizedMessage.includes("failed to fetch") ||
-        normalizedMessage.includes("network");
-
       toast({
         title: "Login Failed",
-        description: isNetworkIssue ? "Backend is temporarily slow. Please retry in a few seconds." : rawMessage,
+        description: error.message || "Invalid credentials",
         variant: "destructive",
       });
     } finally {

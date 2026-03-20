@@ -72,18 +72,6 @@ const AdminSections = lazy(() => import("./pages/admin/AdminSections"));
 const AdminPageBuilder = lazy(() => import("./pages/admin/AdminPageBuilder"));
 const AdminEmails = lazy(() => import("./pages/admin/AdminEmails"));
 const AdminEmailLogs = lazy(() => import("./pages/admin/AdminEmailLogs"));
-const AdminCoupons = lazy(() => import("./pages/admin/AdminCoupons"));
-const AdminExpenses = lazy(() => import("./pages/admin/AdminExpenses"));
-const AdminStaff = lazy(() => import("./pages/admin/AdminStaff"));
-const AdminActivityLogs = lazy(() => import("./pages/admin/AdminActivityLogs"));
-const AdminManualOrder = lazy(() => import("./pages/admin/AdminManualOrder"));
-
-// Shipping pages
-const ShippingLayout = lazy(() => import("./pages/shipping/ShippingLayout"));
-const ShippingDashboard = lazy(() => import("./pages/shipping/ShippingDashboard"));
-const ShippingOrders = lazy(() => import("./pages/shipping/ShippingOrders"));
-const ShippingReturns = lazy(() => import("./pages/shipping/ShippingReturns"));
-const ShippingAccount = lazy(() => import("./pages/shipping/ShippingAccount"));
 
 // Minimal loading fallback
 const PageLoader = () => (
@@ -99,19 +87,6 @@ const RoutePrefetcher = () => {
   return null;
 };
 
-// Promo popup guard - only shows on storefront routes
-const PromoPopupGuard = () => {
-  const location = useLocation();
-  const isAdmin = location.pathname.startsWith('/admin');
-  const isShipping = location.pathname.startsWith('/shipping');
-  if (isAdmin || isShipping || sessionStorage.getItem('dd_mind_promo_shown_v4')) return null;
-  return (
-    <Suspense fallback={null}>
-      <MindPromoPopup />
-    </Suspense>
-  );
-};
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -119,9 +94,9 @@ const queryClient = new QueryClient({
       gcTime: 20 * 60 * 1000,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
-      retry: 1,
-      retryDelay: 1500,
-      networkMode: "always",
+      retry: 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
+      networkMode: "online",
     },
     mutations: {
       onError: (error: unknown) => {
@@ -169,7 +144,7 @@ const App = () => {
                     <GeoBlocker>
                     <ScrollToTop />
                     <CartDrawer />
-                    <PromoPopupGuard />
+                    <Suspense fallback={null}>{typeof window !== 'undefined' && !sessionStorage.getItem('dd_mind_promo_shown_v4') && <MindPromoPopup />}</Suspense>
                     
                     <RoutePrefetcher />
                     <Suspense fallback={<PageLoader />}>
@@ -206,17 +181,6 @@ const App = () => {
                           <Route path="emails" element={<AdminEmails />} />
                           <Route path="email-logs" element={<AdminEmailLogs />} />
                           <Route path="fix-images" element={<AdminImageFix />} />
-                          <Route path="coupons" element={<AdminCoupons />} />
-                          <Route path="expenses" element={<AdminExpenses />} />
-                          <Route path="staff" element={<AdminStaff />} />
-                          <Route path="activity-logs" element={<AdminActivityLogs />} />
-                          <Route path="manual-order" element={<AdminManualOrder />} />
-                        </Route>
-                        <Route path="/shipping" element={<ShippingLayout />}>
-                          <Route index element={<ShippingDashboard />} />
-                          <Route path="orders" element={<ShippingOrders />} />
-                          <Route path="returns" element={<ShippingReturns />} />
-                          <Route path="account" element={<ShippingAccount />} />
                         </Route>
                         <Route path="*" element={<NotFound />} />
                       </Routes>
