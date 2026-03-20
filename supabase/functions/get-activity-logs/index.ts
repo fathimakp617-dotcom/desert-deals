@@ -77,8 +77,9 @@ serve(async (req) => {
 
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Validate session token
-    if (!await validateSession(supabaseClient, admin_email, admin_token)) {
+    // Validate session token (allow timeout if email already verified)
+    const sessionResult = await validateSession(supabaseClient, admin_email, admin_token);
+    if (sessionResult === false) {
       console.log(`Invalid or expired session for: ${admin_email}`);
       return new Response(
         JSON.stringify({ error: "Session expired. Please log in again." }),
