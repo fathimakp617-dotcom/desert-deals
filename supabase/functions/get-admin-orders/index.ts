@@ -95,11 +95,32 @@ serve(async (req) => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
-    const { data: orders, error: ordersError } = await supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .range(from, to);
+    const orderedResult = await Promise.race([
+      supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .range(from, to),
+      new Promise((resolve) => setTimeout(() => resolve({ data: null, error: { message: "timeout" } }), 8000)),
+    ]) as any;
+
+    let orders = orderedResult.data as any[] | null;
+    let ordersError = orderedResult.error as any;
+
+    // Fallback query when sorted query is too slow
+    if (ordersError?.message === "timeout") {
+      console.log("Ordered orders query timed out, retrying with unsorted range");
+      const fallbackResult = await Promise.race([
+        supabase
+          .from("orders")
+          .select("*")
+          .range(from, to),
+        new Promise((resolve) => setTimeout(() => resolve({ data: null, error: { message: "timeout" } }), 8000)),
+      ]) as any;
+
+      orders = fallbackResult.data;
+      ordersError = fallbackResult.error;
+    }
 
     if (ordersError) throw ordersError;
 

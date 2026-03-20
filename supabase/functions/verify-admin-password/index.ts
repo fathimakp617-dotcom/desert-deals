@@ -209,19 +209,18 @@ serve(async (req) => {
     const sessionToken = generateSessionToken();
     const sessionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    // Store session in background
-    (async () => {
-      try {
-        await supabaseClient.from("staff_sessions").delete().eq("email", normalizedEmail);
-        await supabaseClient.from("staff_sessions").insert({
-          email: normalizedEmail, session_token: sessionToken, expires_at: sessionExpiry.toISOString(),
-        });
-        await supabaseClient.from("activity_logs").insert({
-          actor_email: normalizedEmail, actor_role: role!, action_type: "login",
-          action_details: { login_time: new Date().toISOString(), source: "environment" },
-        });
-      } catch (e) { console.error("Session/log storage failed:", e); }
-    })();
+    // Persist session before returning to avoid token race conditions
+    const sessionStored = await persistSession(supabaseClient, normalizedEmail, sessionToken, sessionExpiry);
+    if (!sessionStored) {
+      return new Response(JSON.stringify({ error: "Login failed. Please try again." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Log activity in background (non-critical)
+    void supabaseClient.from("activity_logs").insert({
+      actor_email: normalizedEmail, actor_role: role!, action_type: "login",
+      action_details: { login_time: new Date().toISOString(), source: "environment" },
+    }).then(() => undefined).catch((e) => console.error("Activity log storage failed:", e));
 
     console.log(`${role.toUpperCase()} login successful (fast-path)`);
 
