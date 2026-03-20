@@ -137,26 +137,36 @@ const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<type
 
 export const useDbProducts = () => {
   const queryClient = useQueryClient();
+  const [isFallback, setIsFallback] = useState(false);
 
   const query = useQuery({
     queryKey: ["db-products"],
     queryFn: async () => {
-      // Faster first paint: fetch a lighter first page immediately
-      const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
-      return mapDbListToProducts(firstBatch);
+      try {
+        const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
+        setIsFallback(false);
+        return mapDbListToProducts(firstBatch);
+      } catch (err) {
+        console.warn("DB fetch failed, loading CSV fallback:", err);
+        setIsFallback(true);
+        const fallback = await loadFallbackProducts();
+        if (fallback.length > 0) return fallback;
+        // Last resort: static products
+        return staticProducts;
+      }
     },
     staleTime: 2 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 6000),
   });
 
   useEffect(() => {
     const data = query.data;
     if (!data || data.length === 0) return;
-    // Only start background hydration when initial batch is full (more may exist)
+    if (isFallback) return; // Don't hydrate in fallback mode
     if (data.length < INITIAL_BATCH_SIZE) return;
     if (backgroundHydrationInFlight) return;
 
@@ -164,9 +174,9 @@ export const useDbProducts = () => {
       .finally(() => {
         backgroundHydrationInFlight = null;
       });
-  }, [query.data, queryClient]);
+  }, [query.data, queryClient, isFallback]);
 
-  return query;
+  return { ...query, isFallback };
 };
 
 /**
