@@ -156,7 +156,7 @@ const App = () => {
                     <GeoBlocker>
                     <ScrollToTop />
                     <CartDrawer />
-                    <Suspense fallback={null}>{typeof window !== 'undefined' && !sessionStorage.getItem('dd_mind_promo_shown_v4') && <MindPromoPopup />}</Suspense>
+                    <Suspense fallback={null}>{typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin') && !window.location.pathname.startsWith('/shipping') && !sessionStorage.getItem('dd_mind_promo_shown_v4') && <MindPromoPopup />}</Suspense>
                     
                     <RoutePrefetcher />
                     <Suspense fallback={<PageLoader />}>
