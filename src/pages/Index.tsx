@@ -2,6 +2,8 @@ import { Suspense, lazy, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import ConnectionErrorBanner from "@/components/ConnectionErrorBanner";
+import { useDbProducts } from "@/hooks/useDbProducts";
 import Hero from "@/components/Hero";
 import PageTransition from "@/components/PageTransition";
 import { OrganizationSchema, LocalBusinessSchema, WebsiteSchema, FAQSchema } from "@/components/seo/JsonLd";
