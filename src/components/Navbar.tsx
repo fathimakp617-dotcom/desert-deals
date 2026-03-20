@@ -114,9 +114,9 @@ const Navbar = memo(() => {
 
       {/* Main Header */}
       <header className={`fixed left-0 right-0 z-50 bg-background border-b border-border transition-all duration-300 ${scrolled ? "top-0 shadow-md" : "top-9"}`}>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-          {/* Top row: Logo | Nav links | Icons */}
-          <div dir="ltr" className="flex items-center justify-between py-2">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12 py-1.5">
+          {/* Single row: Logo left | Nav center | Icons right */}
+          <div dir="ltr" className="flex items-center gap-2">
             {/* Mobile hamburger */}
             <div className="lg:hidden flex items-center">
               <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
@@ -125,38 +125,41 @@ const Navbar = memo(() => {
             </div>
 
             {/* Logo */}
-            <Link to="/" className="flex items-center shrink-0">
-              <span className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-widest text-foreground uppercase">Desert Deal</span>
+            <Link
+              to="/"
+              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0"
+            >
+              <img src={headerLogo} alt="Desert Deal" className="h-14 sm:h-20 w-auto" />
             </Link>
 
-            {/* Desktop nav – first row */}
-            <nav className="hidden lg:flex items-center gap-x-4 xl:gap-x-6 flex-1 justify-center mx-6">
+            {/* Desktop nav – top row centered between logo and icons */}
+            <div className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 flex-1 min-w-0 mx-4">
               {topLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="text-sm text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
+                  className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
                 >
                   {link.name}
                 </Link>
               ))}
-            </nav>
+            </div>
 
             {/* Action icons */}
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <div className="flex items-center gap-1 sm:gap-2 ms-auto lg:ms-0 shrink-0">
               <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-foreground hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search size={20} />
               </button>
               <Link to="/wishlist" className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <Heart size={20} />
                 {wishlistItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
+                  <span className="absolute -top-0.5 -end-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{wishlistItems}</span>
                 )}
               </Link>
               <button onClick={() => openCart()} className="relative p-2 text-foreground hover:opacity-60 transition-opacity">
                 <ShoppingBag size={20} />
                 {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{totalItems}</span>
+                  <span className="absolute -top-0.5 -end-0.5 w-4 h-4 bg-foreground text-background text-[10px] flex items-center justify-center rounded-full">{totalItems}</span>
                 )}
               </button>
               <Link to="/account" className="hidden md:flex p-2 text-foreground hover:opacity-60 transition-opacity">
@@ -165,30 +168,28 @@ const Navbar = memo(() => {
             </div>
           </div>
 
-          {/* Desktop nav – second row */}
-          {bottomLinks.length > 0 && (
-            <div dir="ltr" className="hidden lg:flex items-center justify-center gap-x-4 xl:gap-x-6 pb-2 -mt-1">
-              {bottomLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.href}
-                  onClick={(e) => {
-                    if (link.href.includes("#")) {
-                      const hash = link.href.split("#")[1];
-                      const el = document.getElementById(hash);
-                      if (el) {
-                        e.preventDefault();
-                        el.scrollIntoView({ behavior: "smooth" });
-                      }
+          {/* Desktop nav – bottom row centered */}
+          <div dir="ltr" className="hidden lg:flex items-center justify-center gap-x-3 xl:gap-x-4 -mt-2.5">
+            {bottomLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.href}
+                onClick={(e) => {
+                  if (link.href.includes("#")) {
+                    const hash = link.href.split("#")[1];
+                    const el = document.getElementById(hash);
+                    if (el) {
+                      e.preventDefault();
+                      el.scrollIntoView({ behavior: "smooth" });
                     }
-                  }}
-                  className="text-sm text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-          )}
+                  }
+                }}
+                className="text-[13px] text-foreground hover:opacity-60 transition-opacity whitespace-nowrap font-medium"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Mobile Menu */}
