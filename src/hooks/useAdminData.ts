@@ -93,30 +93,45 @@ export const useAdminOrders = () => {
       const session = getAdminSession();
       if (!session) throw new Error("No admin session found");
 
-      // Fetch all historical orders (paginated; backend max 1000 per page)
-      const pageSize = 1000;
-      const maxPages = 50; // safety cap
+      // Cursor pagination is more reliable than large offsets for historical data.
+      const pageSize = 200;
+      const maxPages = 100;
       const all: Order[] = [];
+      let cursor: string | null = null;
 
       for (let page = 1; page <= maxPages; page++) {
-        const res = await invokeAdminFn<{ orders: Order[]; has_more?: boolean }>(
-          "get-admin-orders",
-          {
-            admin_email: session.email,
-            admin_token: session.token,
-            page,
-            page_size: pageSize,
-          }
-        );
+        try {
+          const res = await invokeAdminFn<{ orders: Order[]; has_more?: boolean; next_cursor?: string | null }>(
+            "get-admin-orders",
+            {
+              admin_email: session.email,
+              admin_token: session.token,
+              page,
+              page_size: pageSize,
+              cursor_created_at: cursor,
+            }
+          );
 
-        all.push(...(res.orders || []));
-        const hasMore = res.has_more ?? (res.orders?.length === pageSize);
-        if (!hasMore) break;
+          const chunk = res.orders || [];
+          all.push(...chunk);
+
+          const hasMore = res.has_more ?? (chunk.length === pageSize);
+          const nextCursor = res.next_cursor ?? (chunk.length > 0 ? chunk[chunk.length - 1].created_at : null);
+
+          if (!hasMore || !nextCursor) break;
+          cursor = nextCursor;
+        } catch (err) {
+          // Return already-fetched orders instead of failing the whole screen.
+          if (all.length > 0) break;
+          throw err;
+        }
       }
 
-      return all;
+      const deduped = new Map<string, Order>();
+      for (const order of all) deduped.set(order.id, order);
+      return Array.from(deduped.values());
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 };
 
