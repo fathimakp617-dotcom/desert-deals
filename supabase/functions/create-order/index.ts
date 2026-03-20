@@ -353,12 +353,29 @@ serve(async (req) => {
         );
       }
 
-      // Fetch product from DB to get server-side price and validate
-       const { data: product, error: productError } = await supabase
-        .from('products')
-         .select('stock_quantity, is_active, name, price')
-        .eq('id', item.productId)
-        .maybeSingle();
+      // Fetch product from DB with a timeout to prevent hanging
+      let product: { stock_quantity: number; is_active: boolean; name: string; price: number } | null = null;
+      let productError: unknown = null;
+
+      try {
+        const productPromise = supabase
+          .from('products')
+          .select('stock_quantity, is_active, name, price')
+          .eq('id', item.productId)
+          .maybeSingle();
+
+        const result = await Promise.race([
+          productPromise,
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Product lookup timeout (3s)')), 3000)
+          ),
+        ]);
+
+        product = result.data as typeof product;
+        productError = result.error;
+      } catch (err) {
+        productError = err;
+      }
 
       if (productError) {
         console.error("Error checking product:", item.productId, productError);
