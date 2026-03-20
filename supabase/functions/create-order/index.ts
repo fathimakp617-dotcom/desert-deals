@@ -164,6 +164,88 @@ interface OrderRequest {
   affiliate_code?: string | null;
 }
 
+const isInfrastructureTimeout = (error: unknown): boolean => {
+  const message =
+    typeof error === 'string'
+      ? error
+      : error && typeof error === 'object' && 'message' in error
+      ? String((error as { message?: unknown }).message ?? '')
+      : '';
+
+  return /\b522\b|connection timed out|connection timeout|failed to fetch|network|terminated|timeout/i.test(message);
+};
+
+const captureEmergencyOrder = async (params: {
+  orderNumber: string;
+  reason: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  shippingAddress: ShippingAddress;
+  items: OrderItem[];
+  subtotal: number;
+  shipping: number;
+  total: number;
+}): Promise<boolean> => {
+  try {
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
+    if (!resendApiKey) {
+      console.warn('RESEND_API_KEY missing; cannot capture emergency order');
+      return false;
+    }
+
+    const recipients = [
+      ...new Set([
+        ...parseEmailList(Deno.env.get('ADMIN_ORDER_EMAIL')),
+        ...parseEmailList(Deno.env.get('ADMIN_EMAILS')),
+        ...parseEmailList(Deno.env.get('ROUTE_EMAILS')),
+      ]),
+    ];
+
+    if (!recipients.length) {
+      console.warn('No emergency recipients configured; cannot capture emergency order');
+      return false;
+    }
+
+    const resend = new Resend(resendApiKey);
+
+    const itemsHtml = params.items
+      .map(
+        (item) =>
+          `<li><strong>${item.name}</strong> — Qty: ${item.quantity} × AED ${item.price}${item.selectedSize ? ` (Size: ${item.selectedSize})` : ''}</li>`
+      )
+      .join('');
+
+    await resend.emails.send({
+      from: 'Desert Deal <notifications@desertsdeals.com>',
+      to: recipients,
+      subject: `🚨 Manual order capture required: ${params.orderNumber}`,
+      html: `
+        <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; line-height: 1.5;">
+          <h2 style="margin: 0 0 12px;">Order captured during backend outage</h2>
+          <p style="margin: 0 0 8px;"><strong>Reason:</strong> ${params.reason}</p>
+          <p style="margin: 0 0 8px;"><strong>Reference:</strong> ${params.orderNumber}</p>
+          <p style="margin: 0 0 8px;"><strong>Name:</strong> ${params.customerName}</p>
+          <p style="margin: 0 0 8px;"><strong>Email:</strong> ${params.customerEmail}</p>
+          <p style="margin: 0 0 8px;"><strong>Phone:</strong> ${params.customerPhone}</p>
+          <p style="margin: 0 0 8px;"><strong>Address:</strong> ${params.shippingAddress.address}, ${params.shippingAddress.city}, ${params.shippingAddress.state}, ${params.shippingAddress.country}</p>
+          <p style="margin: 16px 0 8px;"><strong>Items:</strong></p>
+          <ul style="margin: 0 0 12px; padding-left: 20px;">${itemsHtml}</ul>
+          <p style="margin: 0 0 8px;"><strong>Subtotal:</strong> AED ${params.subtotal}</p>
+          <p style="margin: 0 0 8px;"><strong>Shipping:</strong> AED ${params.shipping}</p>
+          <p style="margin: 0 0 8px;"><strong>Total:</strong> AED ${params.total}</p>
+          <p style="margin: 16px 0 0; color: #b45309;"><strong>Action needed:</strong> Create this order manually in admin and contact customer.</p>
+        </div>
+      `,
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to capture emergency order:', error);
+    return false;
+  }
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -280,6 +362,49 @@ serve(async (req) => {
 
       if (productError) {
         console.error("Error checking product:", item.productId, productError);
+
+        if (isInfrastructureTimeout(productError)) {
+          const queuedItems: OrderItem[] = orderRequest.items.map((rawItem) => ({
+            productId: sanitizeString(rawItem.productId || 'unknown-product', 120),
+            name: sanitizeName(rawItem.name || rawItem.productId || 'Product', 100),
+            price: Math.max(0, Number(rawItem.price) || 0),
+            quantity: Math.max(1, Math.floor(Number(rawItem.quantity) || 1)),
+            selectedSize: rawItem.selectedSize || null,
+          }));
+
+          const queuedSubtotal = queuedItems.reduce((sum, row) => sum + row.price * row.quantity, 0);
+          const queuedShipping = 20;
+          const queuedTotal = queuedSubtotal + queuedShipping;
+          const queuedOrderNumber = `PEND-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+          await captureEmergencyOrder({
+            orderNumber: queuedOrderNumber,
+            reason: 'Database timeout while validating product stock',
+            customerName,
+            customerEmail,
+            customerPhone,
+            shippingAddress,
+            items: queuedItems,
+            subtotal: queuedSubtotal,
+            shipping: queuedShipping,
+            total: queuedTotal,
+          });
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              queued: true,
+              degraded: true,
+              message: 'Order captured in backup mode due to temporary backend outage. Team will process it manually.',
+              order: {
+                id: null,
+                order_number: queuedOrderNumber,
+                total: queuedTotal,
+              },
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
       }
 
       if (!product) {
@@ -467,6 +592,40 @@ serve(async (req) => {
 
     if (orderError) {
       console.error("Error creating order:", orderError);
+
+      if (isInfrastructureTimeout(orderError)) {
+        const queuedOrderNumber = `PEND-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        const fallbackCaptured = await captureEmergencyOrder({
+          orderNumber: queuedOrderNumber,
+          reason: 'Database timeout while inserting order record',
+          customerName,
+          customerEmail,
+          customerPhone,
+          shippingAddress,
+          items: validatedItems,
+          subtotal,
+          shipping,
+          total,
+        });
+
+        if (fallbackCaptured) {
+          return new Response(
+            JSON.stringify({
+              success: true,
+              queued: true,
+              degraded: true,
+              message: 'Order captured in backup mode due to temporary backend outage. Team will process it manually.',
+              order: {
+                id: null,
+                order_number: queuedOrderNumber,
+                total,
+              },
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+
       return new Response(
         JSON.stringify({ error: "Failed to create order" }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

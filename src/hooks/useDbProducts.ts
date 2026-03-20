@@ -75,7 +75,7 @@ const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]>
     .range(from, to)
     .then((res) => res);
 
-  const { data, error } = await withTimeout(queryPromise, 3000);
+  const { data, error } = await withTimeout(queryPromise, 1800);
 
   if (error) throw new Error(`Batch ${from}-${to}: ${error.message}`);
   return (data || []) as DbProduct[];
@@ -142,10 +142,35 @@ export const useDbProducts = () => {
   const query = useQuery({
     queryKey: ["db-products"],
     queryFn: async () => {
+      const dbPromise = fetchProductBatch(0, INITIAL_BATCH_SIZE - 1).then(mapDbListToProducts);
+
       try {
-        const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
-        setIsFallback(false);
-        return mapDbListToProducts(firstBatch);
+        const fastResult = await Promise.race([
+          dbPromise.then((products) => ({ kind: "db" as const, products })),
+          new Promise<{ kind: "wait" }>((resolve) =>
+            setTimeout(() => resolve({ kind: "wait" }), 700)
+          ),
+        ]);
+
+        if (fastResult.kind === "db") {
+          setIsFallback(false);
+          return fastResult.products;
+        }
+
+        setIsFallback(true);
+        const fallback = await loadFallbackProducts();
+        const fallbackProducts = fallback.length > 0 ? fallback : staticProducts;
+
+        dbPromise
+          .then((products) => {
+            setIsFallback(false);
+            queryClient.setQueryData<Product[]>(["db-products"], products);
+          })
+          .catch((err) => {
+            console.warn("DB fetch failed, loading CSV fallback:", err);
+          });
+
+        return fallbackProducts;
       } catch (err) {
         console.warn("DB fetch failed, loading CSV fallback:", err);
         setIsFallback(true);
