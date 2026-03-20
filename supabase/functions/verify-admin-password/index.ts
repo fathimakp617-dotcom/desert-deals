@@ -176,12 +176,9 @@ serve(async (req) => {
       const sessionToken = generateSessionToken();
       const sessionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      // Persist session before returning to avoid token race conditions
-      const sessionStored = await persistSession(supabaseClient, normalizedEmail, sessionToken, sessionExpiry);
-      if (!sessionStored) {
-        return new Response(JSON.stringify({ error: "Login failed. Please try again." }),
-          { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
+      // Try to persist session in background – don't block login if DB is slow
+      void persistSession(supabaseClient, normalizedEmail, sessionToken, sessionExpiry)
+        .catch(e => console.error("Session persist failed:", e));
 
       // Log activity in background (non-critical)
       void supabaseClient.from("activity_logs").insert({
