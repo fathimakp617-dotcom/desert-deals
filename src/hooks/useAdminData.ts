@@ -122,6 +122,30 @@ const mergeOrders = (existing: Order[], incoming: Order[]): Order[] => {
   );
 };
 
+const ADMIN_ORDERS_CACHE_KEY = "rayn_admin_orders_cache_v1";
+
+const getCachedAdminOrders = (): Order[] => {
+  try {
+    const cached = localStorage.getItem(ADMIN_ORDERS_CACHE_KEY);
+    if (!cached) return [];
+
+    const parsed = JSON.parse(cached);
+    return Array.isArray(parsed) ? (parsed as Order[]) : [];
+  } catch {
+    return [];
+  }
+};
+
+const setCachedAdminOrders = (orders: Order[]) => {
+  try {
+    if (orders.length > 0) {
+      localStorage.setItem(ADMIN_ORDERS_CACHE_KEY, JSON.stringify(orders));
+    }
+  } catch {
+    // Ignore localStorage failures
+  }
+};
+
 export const useAdminOrders = () => {
   const queryClient = useQueryClient();
 
@@ -135,52 +159,73 @@ export const useAdminOrders = () => {
       const pageSize = 250;
       const maxPages = 200;
 
-      const firstPage = await invokeAdminFn<{ orders: Order[]; has_more?: boolean }>(
-        "get-admin-orders",
-        {
-          admin_email: session.email,
-          admin_token: session.token,
-          page: 1,
-          page_size: pageSize,
-        }
-      );
-
-      const initialOrders = firstPage.orders || [];
-      const hasMoreFirstPage = firstPage.has_more ?? (initialOrders.length === pageSize);
-
-      if (hasMoreFirstPage) {
-        void (async () => {
-          let accumulated = initialOrders;
-
-          for (let page = 2; page <= maxPages; page++) {
-            try {
-              const res = await invokeAdminFn<{ orders: Order[]; has_more?: boolean }>(
-                "get-admin-orders",
-                {
-                  admin_email: session.email,
-                  admin_token: session.token,
-                  page,
-                  page_size: pageSize,
-                }
-              );
-
-              const nextOrders = res.orders || [];
-              if (nextOrders.length === 0) break;
-
-              accumulated = mergeOrders(accumulated, nextOrders);
-              queryClient.setQueryData<Order[]>(["admin", "orders"], accumulated);
-
-              const hasMore = res.has_more ?? (nextOrders.length === pageSize);
-              if (!hasMore) break;
-            } catch (backgroundError) {
-              console.error("Background order pagination stopped:", backgroundError);
-              break;
-            }
+      try {
+        const firstPage = await invokeAdminFn<{ orders: Order[]; has_more?: boolean; db_timeout?: boolean }>(
+          "get-admin-orders",
+          {
+            admin_email: session.email,
+            admin_token: session.token,
+            page: 1,
+            page_size: pageSize,
           }
-        })();
-      }
+        );
 
-      return initialOrders;
+        const initialOrders = firstPage.orders || [];
+
+        if (firstPage.db_timeout && initialOrders.length === 0) {
+          const cachedOrders = getCachedAdminOrders();
+          if (cachedOrders.length > 0) {
+            return cachedOrders;
+          }
+        }
+
+        setCachedAdminOrders(initialOrders);
+
+        const hasMoreFirstPage = firstPage.has_more ?? (initialOrders.length === pageSize);
+
+        if (hasMoreFirstPage) {
+          void (async () => {
+            let accumulated = initialOrders;
+
+            for (let page = 2; page <= maxPages; page++) {
+              try {
+                const res = await invokeAdminFn<{ orders: Order[]; has_more?: boolean; db_timeout?: boolean }>(
+                  "get-admin-orders",
+                  {
+                    admin_email: session.email,
+                    admin_token: session.token,
+                    page,
+                    page_size: pageSize,
+                  }
+                );
+
+                if (res.db_timeout) break;
+
+                const nextOrders = res.orders || [];
+                if (nextOrders.length === 0) break;
+
+                accumulated = mergeOrders(accumulated, nextOrders);
+                setCachedAdminOrders(accumulated);
+                queryClient.setQueryData<Order[]>(["admin", "orders"], accumulated);
+
+                const hasMore = res.has_more ?? (nextOrders.length === pageSize);
+                if (!hasMore) break;
+              } catch (backgroundError) {
+                console.error("Background order pagination stopped:", backgroundError);
+                break;
+              }
+            }
+          })();
+        }
+
+        return initialOrders;
+      } catch (error) {
+        const cachedOrders = getCachedAdminOrders();
+        if (cachedOrders.length > 0) {
+          return cachedOrders;
+        }
+        throw error;
+      }
     },
     placeholderData: (previousData) => previousData,
     staleTime: 2 * 60 * 1000,
