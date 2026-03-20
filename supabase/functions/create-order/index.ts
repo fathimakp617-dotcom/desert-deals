@@ -164,6 +164,88 @@ interface OrderRequest {
   affiliate_code?: string | null;
 }
 
+const isInfrastructureTimeout = (error: unknown): boolean => {
+  const message =
+    typeof error === 'string'
+      ? error
+      : error && typeof error === 'object' && 'message' in error
+      ? String((error as { message?: unknown }).message ?? '')
+      : '';
+
+  return /\b522\b|connection timed out|connection timeout|failed to fetch|network|terminated|timeout/i.test(message);
+};
+
+const captureEmergencyOrder = async (params: {
+  orderNumber: string;
+  reason: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  shippingAddress: ShippingAddress;
+  items: OrderItem[];
+  subtotal: number;
+  shipping: number;
+  total: number;
+}): Promise<boolean> => {
+  try {
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
+    if (!resendApiKey) {
+      console.warn('RESEND_API_KEY missing; cannot capture emergency order');
+      return false;
+    }
+
+    const recipients = [
+      ...new Set([
+        ...parseEmailList(Deno.env.get('ADMIN_ORDER_EMAIL')),
+        ...parseEmailList(Deno.env.get('ADMIN_EMAILS')),
+        ...parseEmailList(Deno.env.get('ROUTE_EMAILS')),
+      ]),
+    ];
+
+    if (!recipients.length) {
+      console.warn('No emergency recipients configured; cannot capture emergency order');
+      return false;
+    }
+
+    const resend = new Resend(resendApiKey);
+
+    const itemsHtml = params.items
+      .map(
+        (item) =>
+          `<li><strong>${item.name}</strong> — Qty: ${item.quantity} × AED ${item.price}${item.selectedSize ? ` (Size: ${item.selectedSize})` : ''}</li>`
+      )
+      .join('');
+
+    await resend.emails.send({
+      from: 'Desert Deal <notifications@desertsdeals.com>',
+      to: recipients,
+      subject: `🚨 Manual order capture required: ${params.orderNumber}`,
+      html: `
+        <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; line-height: 1.5;">
+          <h2 style="margin: 0 0 12px;">Order captured during backend outage</h2>
+          <p style="margin: 0 0 8px;"><strong>Reason:</strong> ${params.reason}</p>
+          <p style="margin: 0 0 8px;"><strong>Reference:</strong> ${params.orderNumber}</p>
+          <p style="margin: 0 0 8px;"><strong>Name:</strong> ${params.customerName}</p>
+          <p style="margin: 0 0 8px;"><strong>Email:</strong> ${params.customerEmail}</p>
+          <p style="margin: 0 0 8px;"><strong>Phone:</strong> ${params.customerPhone}</p>
+          <p style="margin: 0 0 8px;"><strong>Address:</strong> ${params.shippingAddress.address}, ${params.shippingAddress.city}, ${params.shippingAddress.state}, ${params.shippingAddress.country}</p>
+          <p style="margin: 16px 0 8px;"><strong>Items:</strong></p>
+          <ul style="margin: 0 0 12px; padding-left: 20px;">${itemsHtml}</ul>
+          <p style="margin: 0 0 8px;"><strong>Subtotal:</strong> AED ${params.subtotal}</p>
+          <p style="margin: 0 0 8px;"><strong>Shipping:</strong> AED ${params.shipping}</p>
+          <p style="margin: 0 0 8px;"><strong>Total:</strong> AED ${params.total}</p>
+          <p style="margin: 16px 0 0; color: #b45309;"><strong>Action needed:</strong> Create this order manually in admin and contact customer.</p>
+        </div>
+      `,
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to capture emergency order:', error);
+    return false;
+  }
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
