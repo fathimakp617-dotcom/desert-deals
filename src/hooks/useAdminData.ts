@@ -118,8 +118,8 @@ export const useAdminOrders = () => {
           const hasMore = res.has_more ?? (chunk.length === pageSize);
           const nextCursor = res.next_cursor ?? (chunk.length > 0 ? chunk[chunk.length - 1].created_at : null);
 
-          if (!hasMore || !nextCursor) break;
-          cursor = nextCursor;
+          if (!hasMore) break;
+          cursor = nextCursor || null;
         } catch (err) {
           // Return already-fetched orders instead of failing the whole screen.
           if (all.length > 0) break;
