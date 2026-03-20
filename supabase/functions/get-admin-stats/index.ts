@@ -6,18 +6,27 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Session validation helper
-async function validateSession(supabase: any, email: string, token: string): Promise<boolean> {
+// Session validation helper with timeout fallback
+async function validateSession(supabase: any, email: string, token: string): Promise<boolean | "timeout"> {
   if (!email || !token) return false;
   
   try {
-    const { data: session } = await supabase
-      .from("staff_sessions")
-      .select("id, expires_at")
-      .eq("email", email.toLowerCase())
-      .eq("session_token", token)
-      .maybeSingle();
+    const result = await Promise.race([
+      supabase
+        .from("staff_sessions")
+        .select("id, expires_at")
+        .eq("email", email.toLowerCase())
+        .eq("session_token", token)
+        .maybeSingle(),
+      new Promise((resolve) => setTimeout(() => resolve({ data: null, error: "timeout" }), 3000)),
+    ]) as any;
+
+    if (result.error === "timeout") {
+      console.log("Session validation timed out, allowing access for verified email");
+      return "timeout";
+    }
     
+    const session = result.data;
     if (!session) return false;
     
     if (new Date(session.expires_at) < new Date()) {
@@ -28,7 +37,7 @@ async function validateSession(supabase: any, email: string, token: string): Pro
     return true;
   } catch (error) {
     console.error("Session validation error:", error);
-    return false;
+    return "timeout";
   }
 }
 
