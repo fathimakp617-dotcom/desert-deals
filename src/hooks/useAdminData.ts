@@ -112,37 +112,78 @@ export interface Order {
   cash_received: boolean;
 }
 
+const mergeOrders = (existing: Order[], incoming: Order[]): Order[] => {
+  const byId = new Map<string, Order>();
+  for (const order of existing) byId.set(order.id, order);
+  for (const order of incoming) byId.set(order.id, order);
+
+  return Array.from(byId.values()).sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+};
+
 export const useAdminOrders = () => {
+  const queryClient = useQueryClient();
+
   return useQuery({
     queryKey: ["admin", "orders"],
     queryFn: async () => {
       const session = getAdminSession();
       if (!session) throw new Error("No admin session found");
 
-      // Fetch all historical orders (paginated; backend max 1000 per page)
-      const pageSize = 1000;
-      const maxPages = 50; // safety cap
-      const all: Order[] = [];
+      // Fast first paint: fetch first page only, hydrate older pages in background
+      const pageSize = 250;
+      const maxPages = 200;
 
-      for (let page = 1; page <= maxPages; page++) {
-        const res = await invokeAdminFn<{ orders: Order[]; has_more?: boolean }>(
-          "get-admin-orders",
-          {
-            admin_email: session.email,
-            admin_token: session.token,
-            page,
-            page_size: pageSize,
+      const firstPage = await invokeAdminFn<{ orders: Order[]; has_more?: boolean }>(
+        "get-admin-orders",
+        {
+          admin_email: session.email,
+          admin_token: session.token,
+          page: 1,
+          page_size: pageSize,
+        }
+      );
+
+      const initialOrders = firstPage.orders || [];
+      const hasMoreFirstPage = firstPage.has_more ?? (initialOrders.length === pageSize);
+
+      if (hasMoreFirstPage) {
+        void (async () => {
+          let accumulated = initialOrders;
+
+          for (let page = 2; page <= maxPages; page++) {
+            try {
+              const res = await invokeAdminFn<{ orders: Order[]; has_more?: boolean }>(
+                "get-admin-orders",
+                {
+                  admin_email: session.email,
+                  admin_token: session.token,
+                  page,
+                  page_size: pageSize,
+                }
+              );
+
+              const nextOrders = res.orders || [];
+              if (nextOrders.length === 0) break;
+
+              accumulated = mergeOrders(accumulated, nextOrders);
+              queryClient.setQueryData<Order[]>(["admin", "orders"], accumulated);
+
+              const hasMore = res.has_more ?? (nextOrders.length === pageSize);
+              if (!hasMore) break;
+            } catch (backgroundError) {
+              console.error("Background order pagination stopped:", backgroundError);
+              break;
+            }
           }
-        );
-
-        all.push(...(res.orders || []));
-        const hasMore = res.has_more ?? (res.orders?.length === pageSize);
-        if (!hasMore) break;
+        })();
       }
 
-      return all;
+      return initialOrders;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    placeholderData: (previousData) => previousData,
+    staleTime: 2 * 60 * 1000,
   });
 };
 
