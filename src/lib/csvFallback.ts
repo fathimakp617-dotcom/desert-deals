@@ -1,6 +1,14 @@
 import { Product } from "@/data/products";
 
 let cachedFallback: Product[] | null = null;
+let prewarmPromise: Promise<Product[]> | null = null;
+
+/** Start fetching + parsing CSV immediately so it's ready when needed */
+export function prewarmFallbackCache(): void {
+  if (!prewarmPromise) {
+    prewarmPromise = loadFallbackProducts();
+  }
+}
 
 function stripHtml(html: string): string {
   return html?.replace(/<[^>]*>/g, "").replace(/&[a-z]+;/gi, " ").replace(/\s+/g, " ").trim() || "";
