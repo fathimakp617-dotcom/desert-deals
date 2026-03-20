@@ -592,6 +592,40 @@ serve(async (req) => {
 
     if (orderError) {
       console.error("Error creating order:", orderError);
+
+      if (isInfrastructureTimeout(orderError)) {
+        const queuedOrderNumber = `PEND-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        const fallbackCaptured = await captureEmergencyOrder({
+          orderNumber: queuedOrderNumber,
+          reason: 'Database timeout while inserting order record',
+          customerName,
+          customerEmail,
+          customerPhone,
+          shippingAddress,
+          items: validatedItems,
+          subtotal,
+          shipping,
+          total,
+        });
+
+        if (fallbackCaptured) {
+          return new Response(
+            JSON.stringify({
+              success: true,
+              queued: true,
+              degraded: true,
+              message: 'Order captured in backup mode due to temporary backend outage. Team will process it manually.',
+              order: {
+                id: null,
+                order_number: queuedOrderNumber,
+                total,
+              },
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+
       return new Response(
         JSON.stringify({ error: "Failed to create order" }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
