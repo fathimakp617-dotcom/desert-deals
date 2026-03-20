@@ -192,6 +192,7 @@ const Index = () => {
       <PageTransition>
         <main className="min-h-screen bg-background relative z-10 pb-14 md:pb-0">
           <Navbar />
+          <ConnectionErrorBanner show={isFallback} />
           {isVisible("hero") && <Hero />}
           
           <Suspense fallback={<SectionLoader />}>
