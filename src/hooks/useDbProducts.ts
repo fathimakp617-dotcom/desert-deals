@@ -1,7 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product, products as staticProducts } from "@/data/products";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { withTimeout } from "@/lib/supabaseTimeout";
+import { loadFallbackProducts } from "@/lib/csvFallback";
 
 // Create a lookup map from static data for enrichment
 const staticEnrichmentMap = new Map<string, Product>();
@@ -64,13 +66,16 @@ const HYDRATION_BATCH_SIZE = 800;
 const BACKGROUND_BATCH_DELAY_MS = 30;
 
 const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
-  const { data, error } = await supabase
+  const queryPromise = supabase
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("is_active", true)
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
-    .range(from, to);
+    .range(from, to)
+    .then((res) => res);
+
+  const { data, error } = await withTimeout(queryPromise, 5500);
 
   if (error) throw new Error(`Batch ${from}-${to}: ${error.message}`);
   return (data || []) as DbProduct[];
@@ -132,26 +137,36 @@ const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<type
 
 export const useDbProducts = () => {
   const queryClient = useQueryClient();
+  const [isFallback, setIsFallback] = useState(false);
 
   const query = useQuery({
     queryKey: ["db-products"],
     queryFn: async () => {
-      // Faster first paint: fetch a lighter first page immediately
-      const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
-      return mapDbListToProducts(firstBatch);
+      try {
+        const firstBatch = await fetchProductBatch(0, INITIAL_BATCH_SIZE - 1);
+        setIsFallback(false);
+        return mapDbListToProducts(firstBatch);
+      } catch (err) {
+        console.warn("DB fetch failed, loading CSV fallback:", err);
+        setIsFallback(true);
+        const fallback = await loadFallbackProducts();
+        if (fallback.length > 0) return fallback;
+        // Last resort: static products
+        return staticProducts;
+      }
     },
     staleTime: 2 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 6000),
   });
 
   useEffect(() => {
     const data = query.data;
     if (!data || data.length === 0) return;
-    // Only start background hydration when initial batch is full (more may exist)
+    if (isFallback) return; // Don't hydrate in fallback mode
     if (data.length < INITIAL_BATCH_SIZE) return;
     if (backgroundHydrationInFlight) return;
 
@@ -159,9 +174,9 @@ export const useDbProducts = () => {
       .finally(() => {
         backgroundHydrationInFlight = null;
       });
-  }, [query.data, queryClient]);
+  }, [query.data, queryClient, isFallback]);
 
-  return query;
+  return { ...query, isFallback };
 };
 
 /**

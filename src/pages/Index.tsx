@@ -2,6 +2,8 @@ import { Suspense, lazy, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import ConnectionErrorBanner from "@/components/ConnectionErrorBanner";
+import { useDbProducts } from "@/hooks/useDbProducts";
 import Hero from "@/components/Hero";
 import PageTransition from "@/components/PageTransition";
 import { OrganizationSchema, LocalBusinessSchema, WebsiteSchema, FAQSchema } from "@/components/seo/JsonLd";
@@ -69,6 +71,7 @@ const BrandAdBanner = ({ position, fallbackImg, fallbackLink, fallbackAlt, child
 };
 
 const Index = () => {
+  const { isFallback } = useDbProducts();
   const { data: sections, isLoading: sectionsLoading } = useHomepageSections();
   
   const visibleKeys = useMemo(() => {
@@ -189,6 +192,7 @@ const Index = () => {
       <PageTransition>
         <main className="min-h-screen bg-background relative z-10 pb-14 md:pb-0">
           <Navbar />
+          <ConnectionErrorBanner show={isFallback} />
           {isVisible("hero") && <Hero />}
           
           <Suspense fallback={<SectionLoader />}>
