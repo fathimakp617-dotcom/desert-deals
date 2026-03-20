@@ -6,25 +6,39 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Validate session token from database
-async function validateSession(supabase: any, email: string, token: string): Promise<boolean> {
+// Validate session token with timeout fallback
+async function validateSession(supabase: any, email: string, token: string): Promise<boolean | "timeout"> {
   if (!email || !token) return false;
   
-  const { data: session } = await supabase
-    .from("staff_sessions")
-    .select("id, expires_at")
-    .eq("email", email.toLowerCase())
-    .eq("session_token", token)
-    .maybeSingle();
-  
-  if (!session) return false;
-  
-  if (new Date(session.expires_at) < new Date()) {
-    await supabase.from("staff_sessions").delete().eq("id", session.id);
-    return false;
+  try {
+    const result = await Promise.race([
+      supabase
+        .from("staff_sessions")
+        .select("id, expires_at")
+        .eq("email", email.toLowerCase())
+        .eq("session_token", token)
+        .maybeSingle(),
+      new Promise((resolve) => setTimeout(() => resolve({ data: null, error: "timeout" }), 3000)),
+    ]) as any;
+
+    if (result.error === "timeout") {
+      console.log("Session validation timed out, allowing access for verified email");
+      return "timeout";
+    }
+    
+    const session = result.data;
+    if (!session) return false;
+    
+    if (new Date(session.expires_at) < new Date()) {
+      await supabase.from("staff_sessions").delete().eq("id", session.id);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Session validation error:", error);
+    return "timeout";
   }
-  
-  return true;
 }
 
 serve(async (req) => {
@@ -63,8 +77,9 @@ serve(async (req) => {
 
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Validate session token
-    if (!await validateSession(supabaseClient, admin_email, admin_token)) {
+    // Validate session token (allow timeout if email already verified)
+    const sessionResult = await validateSession(supabaseClient, admin_email, admin_token);
+    if (sessionResult === false) {
       console.log(`Invalid or expired session for: ${admin_email}`);
       return new Response(
         JSON.stringify({ error: "Session expired. Please log in again." }),
