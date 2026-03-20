@@ -75,7 +75,7 @@ const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]>
     .range(from, to)
     .then((res) => res);
 
-  const { data, error } = await withTimeout(queryPromise, 5500);
+  const { data, error } = await withTimeout(queryPromise, 3000);
 
   if (error) throw new Error(`Batch ${from}-${to}: ${error.message}`);
   return (data || []) as DbProduct[];
@@ -159,8 +159,7 @@ export const useDbProducts = () => {
     gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 6000),
+    retry: 0,
   });
 
   useEffect(() => {
