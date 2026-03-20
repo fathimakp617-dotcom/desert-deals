@@ -61,6 +61,15 @@ export default defineConfig(({ mode }) => ({
   },
   // Optimize dependencies
   optimizeDeps: {
-    include: ["react", "react-dom", "react-router-dom"],
+    include: [
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "react/jsx-runtime",
+      "react-dom/client",
+      "@tanstack/react-query",
+      "framer-motion",
+    ],
+    force: false,
   },
 }));
