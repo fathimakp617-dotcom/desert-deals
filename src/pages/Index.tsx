@@ -71,6 +71,7 @@ const BrandAdBanner = ({ position, fallbackImg, fallbackLink, fallbackAlt, child
 };
 
 const Index = () => {
+  const { isFallback } = useDbProducts();
   const { data: sections, isLoading: sectionsLoading } = useHomepageSections();
   
   const visibleKeys = useMemo(() => {
