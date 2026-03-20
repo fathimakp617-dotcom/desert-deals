@@ -233,6 +233,7 @@ Thank you for choosing *Desert Deal!*`;
         if (data.user_id) {
           fetchLoyaltyCouponWithRetry(data.user_id);
         }
+        setIsLoading(false);
         return;
       }
     } catch (error) {
