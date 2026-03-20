@@ -127,9 +127,9 @@ const Navbar = memo(() => {
             {/* Logo */}
             <Link
               to="/"
-              className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center shrink-0"
+              className="flex items-center shrink-0 mx-auto lg:mx-0"
             >
-              <img src={headerLogo} alt="Desert Deal" className="h-14 sm:h-20 w-auto" />
+              <img src={headerLogo} alt="Desert Deal" className="h-10 sm:h-14 lg:h-16 w-auto" />
             </Link>
 
             {/* Desktop nav – top row centered between logo and icons */}
