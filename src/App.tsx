@@ -193,6 +193,17 @@ const App = () => {
                           <Route path="emails" element={<AdminEmails />} />
                           <Route path="email-logs" element={<AdminEmailLogs />} />
                           <Route path="fix-images" element={<AdminImageFix />} />
+                          <Route path="coupons" element={<AdminCoupons />} />
+                          <Route path="expenses" element={<AdminExpenses />} />
+                          <Route path="staff" element={<AdminStaff />} />
+                          <Route path="activity-logs" element={<AdminActivityLogs />} />
+                          <Route path="manual-order" element={<AdminManualOrder />} />
+                        </Route>
+                        <Route path="/shipping" element={<ShippingLayout />}>
+                          <Route index element={<ShippingDashboard />} />
+                          <Route path="orders" element={<ShippingOrders />} />
+                          <Route path="returns" element={<ShippingReturns />} />
+                          <Route path="account" element={<ShippingAccount />} />
                         </Route>
                         <Route path="*" element={<NotFound />} />
                       </Routes>
