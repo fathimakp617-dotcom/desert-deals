@@ -87,20 +87,33 @@ serve(async (req) => {
       );
     }
 
-    // Fetch activity logs
-    const { data: logs, error } = await supabaseClient
-      .from("activity_logs")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(limit);
+    // Fetch activity logs with timeout
+    const logsResult = await Promise.race([
+      supabaseClient
+        .from("activity_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit),
+      new Promise((resolve) => setTimeout(() => resolve({ data: null, error: "timeout" }), 5000)),
+    ]) as any;
 
-    if (error) {
-      console.error("Error fetching activity logs:", error);
+    if (logsResult.error === "timeout") {
+      console.log("Activity logs query timed out, returning empty");
       return new Response(
-        JSON.stringify({ error: "Failed to fetch activity logs" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ logs: [] }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    if (logsResult.error) {
+      console.error("Error fetching activity logs:", logsResult.error);
+      return new Response(
+        JSON.stringify({ logs: [] }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const logs = logsResult.data;
 
     console.log(`Fetched ${logs?.length || 0} activity logs for admin ${admin_email}`);
 
