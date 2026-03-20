@@ -99,6 +99,19 @@ const RoutePrefetcher = () => {
   return null;
 };
 
+// Promo popup guard - only shows on storefront routes
+const PromoPopupGuard = () => {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
+  const isShipping = location.pathname.startsWith('/shipping');
+  if (isAdmin || isShipping || sessionStorage.getItem('dd_mind_promo_shown_v4')) return null;
+  return (
+    <Suspense fallback={null}>
+      <MindPromoPopup />
+    </Suspense>
+  );
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
