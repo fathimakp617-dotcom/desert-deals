@@ -5,7 +5,7 @@ import { getOfflineCatalogProducts } from "@/hooks/useDbProducts";
 
 const PAGE_SIZE = 60;
 const PRODUCT_IMAGE_PLACEHOLDER = "/images/product-placeholder.jpg";
-const DB_QUERY_TIMEOUT_MS = 5000;
+const DB_QUERY_TIMEOUT_MS = 2500;
 
 interface DbProduct {
   id: string;
