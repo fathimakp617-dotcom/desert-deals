@@ -66,15 +66,16 @@ const HYDRATION_BATCH_SIZE = 800;
 const BACKGROUND_BATCH_DELAY_MS = 30;
 
 const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
-  const query = supabase
+  const queryPromise = supabase
     .from("products")
     .select(PRODUCT_SELECT)
     .eq("is_active", true)
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
-    .range(from, to);
+    .range(from, to)
+    .then((res) => res);
 
-  const { data, error } = await withTimeout(query, 5500);
+  const { data, error } = await withTimeout(queryPromise, 5500);
 
   if (error) throw new Error(`Batch ${from}-${to}: ${error.message}`);
   return (data || []) as DbProduct[];
