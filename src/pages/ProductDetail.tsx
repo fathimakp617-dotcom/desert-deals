@@ -609,10 +609,14 @@ const ProductDetail = () => {
                 {/* Social Share Bar */}
                 <motion.div variants={staggerItem} className="flex items-center gap-4 py-2">
                   <span className="text-sm font-medium text-foreground">Share:</span>
+                  {(() => {
+                    const ogUrl = `https://ttgsrrlhqvtnmtlkvlyi.supabase.co/functions/v1/og-product?id=${product.id}`;
+                    const directUrl = `https://desertsdeals.com/product/${product.id}`;
+                    return (
                   <div className="flex items-center gap-3">
                     {/* Facebook */}
                     <a
-                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://desertsdeals.com/product/${product.id}`)}`}
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogUrl)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-muted transition-colors"
@@ -622,7 +626,7 @@ const ProductDetail = () => {
                     </a>
                     {/* X / Twitter */}
                     <a
-                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`✨ Check out ${product.name} - ${formatPrice(product.price)} at Desert Deal!`)}&url=${encodeURIComponent(`https://desertsdeals.com/product/${product.id}`)}`}
+                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`✨ Check out ${product.name} - ${formatPrice(product.price)} at Desert Deal!`)}&url=${encodeURIComponent(ogUrl)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-muted transition-colors"
@@ -632,7 +636,7 @@ const ProductDetail = () => {
                     </a>
                     {/* Pinterest */}
                     <a
-                      href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(`https://desertsdeals.com/product/${product.id}`)}&media=${encodeURIComponent(product.image.startsWith('http') ? product.image : `https://desertsdeals.com${product.image}`)}&description=${encodeURIComponent(product.name)}`}
+                      href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(directUrl)}&media=${encodeURIComponent(product.image.startsWith('http') ? product.image : `https://desertsdeals.com${product.image}`)}&description=${encodeURIComponent(product.name)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-muted transition-colors"
@@ -642,7 +646,7 @@ const ProductDetail = () => {
                     </a>
                     {/* WhatsApp */}
                     <a
-                      href={`https://wa.me/?text=${encodeURIComponent(`✨ ${product.name}\n💰 ${formatPrice(product.price)}\n🔗 https://desertsdeals.com/product/${product.id}`)}`}
+                      href={`https://wa.me/?text=${encodeURIComponent(`✨ ${product.name}\n💰 ${formatPrice(product.price)}\n🔗 ${ogUrl}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-muted transition-colors"
@@ -652,7 +656,7 @@ const ProductDetail = () => {
                     </a>
                     {/* Telegram */}
                     <a
-                      href={`https://t.me/share/url?url=${encodeURIComponent(`https://desertsdeals.com/product/${product.id}`)}&text=${encodeURIComponent(`✨ ${product.name} - ${formatPrice(product.price)}`)}`}
+                      href={`https://t.me/share/url?url=${encodeURIComponent(ogUrl)}&text=${encodeURIComponent(`✨ ${product.name} - ${formatPrice(product.price)}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-muted transition-colors"
