@@ -159,8 +159,7 @@ export const useDbProducts = () => {
     gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 6000),
+    retry: 0,
   });
 
   useEffect(() => {
