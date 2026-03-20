@@ -22,6 +22,7 @@ import InstallAppBanner from "@/components/InstallAppBanner";
 import { motion } from "framer-motion";
 
 const ADMIN_SESSION_KEY = "rayn_admin_session";
+const ADMIN_LOGIN_TIMEOUT_MS = 10000;
 
 interface AdminSession {
   token: string;
@@ -29,6 +30,19 @@ interface AdminSession {
   expiry: string | number;
   role?: string;
 }
+
+const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> => {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+};
 
 const AdminLayout = () => {
   const [adminSession, setAdminSession] = useState<AdminSession | null>(null);
@@ -86,9 +100,13 @@ const AdminLayout = () => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("verify-admin-password", {
-        body: { email: email.trim(), password },
-      });
+      const { data, error } = await withTimeout(
+        supabase.functions.invoke("verify-admin-password", {
+          body: { email: email.trim(), password },
+        }),
+        ADMIN_LOGIN_TIMEOUT_MS,
+        "Login timed out. Please try again."
+      );
 
       if (error) throw error;
 
