@@ -143,9 +143,17 @@ const AdminLayout = () => {
         throw new Error(data.error || "Login failed");
       }
     } catch (error: any) {
+      const rawMessage = String(error?.message || "Login request failed");
+      const normalizedMessage = rawMessage.toLowerCase();
+      const isNetworkIssue =
+        normalizedMessage.includes("failed to send a request to the edge function") ||
+        normalizedMessage.includes("timed out") ||
+        normalizedMessage.includes("failed to fetch") ||
+        normalizedMessage.includes("network");
+
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials",
+        description: isNetworkIssue ? "Backend is temporarily slow. Please retry in a few seconds." : rawMessage,
         variant: "destructive",
       });
     } finally {
