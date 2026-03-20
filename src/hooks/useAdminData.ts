@@ -14,12 +14,38 @@ const isSessionExpiredError = (err: unknown) => {
 };
 
 const invokeAdminFn = async <T,>(fnName: string, body: Record<string, unknown>): Promise<T> => {
-  const { data, error } = await supabase.functions.invoke(fnName, { body });
-  if (error) {
-    if (isSessionExpiredError(error)) clearAdminSession();
-    throw error;
+  try {
+    const { data, error } = await supabase.functions.invoke(fnName, { body });
+    if (error) {
+      if (isSessionExpiredError(error)) clearAdminSession();
+      throw error;
+    }
+    return data as T;
+  } catch (sdkError: any) {
+    // Fallback: direct fetch with 15s timeout
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    if (!projectId || !apiKey) throw sdkError;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    try {
+      const res = await fetch(`https://${projectId}.supabase.co/functions/v1/${fnName}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", apikey: apiKey, Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      const payload = await res.json();
+      if (!res.ok) {
+        if (res.status === 401) clearAdminSession();
+        throw new Error(payload?.error || `Function ${fnName} failed (${res.status})`);
+      }
+      return payload as T;
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
-  return data as T;
 };
 
 // Helper to get admin session
