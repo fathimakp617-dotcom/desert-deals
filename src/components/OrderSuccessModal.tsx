@@ -382,7 +382,7 @@ Thank you for choosing *Desert Deal!*`;
 
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-6">
                   <Mail className="w-4 h-4" />
-                  <span>Confirmation email sent</span>
+                  <span>{isOfflineOrder ? "Order saved in backup queue" : "Confirmation email sent"}</span>
                 </div>
 
                 {/* Loyalty coupon popup */}
