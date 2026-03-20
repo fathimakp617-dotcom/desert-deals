@@ -93,7 +93,7 @@ const BACKGROUND_BATCH_DELAY_MS = 30;
 const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]> => {
   // Race the backend query against a hard timeout
   const controller = new AbortController();
-  const abortTimeout = setTimeout(() => controller.abort(), 5000);
+  const abortTimeout = setTimeout(() => controller.abort(), 2500);
 
   const queryPromise = supabase
     .from("products")
