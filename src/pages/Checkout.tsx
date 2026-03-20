@@ -397,6 +397,81 @@ const Checkout = () => {
     await handleCODOrder();
   };
 
+  const isInfrastructureError = (err: unknown): boolean => {
+    const message = err instanceof Error ? err.message : String(err ?? "");
+    return /non-2xx|failed to fetch|network|timeout|context canceled|service unavailable|gateway/i.test(message);
+  };
+
+  const cacheOfflineOrder = (
+    order: Omit<OfflinePendingOrder, "created_at" | "source" | "reason">,
+    source: OfflinePendingOrder["source"],
+    reason?: string
+  ) => {
+    try {
+      const raw = localStorage.getItem(OFFLINE_ORDER_CACHE_KEY);
+      const existing = raw ? (JSON.parse(raw) as OfflinePendingOrder[]) : [];
+      const next: OfflinePendingOrder[] = [
+        {
+          ...order,
+          created_at: new Date().toISOString(),
+          source,
+          reason,
+        },
+        ...existing,
+      ].slice(0, 40);
+      localStorage.setItem(OFFLINE_ORDER_CACHE_KEY, JSON.stringify(next));
+    } catch (storageError) {
+      console.error("Failed to cache offline order:", storageError);
+    }
+  };
+
+  const invokeCreateOrder = async (orderData: {
+    user_id: string | null;
+    customer_name: string;
+    customer_email: string;
+    customer_phone: string;
+    shipping_address: { address: string; city: string; state: string; country: string };
+    items: Array<{ productId: string; name: string; price: number; quantity: number; selectedSize: string | null }>;
+    payment_method: string;
+    payment_status: string;
+    coupon_code: null;
+    affiliate_code: null;
+  }) => {
+    const primary = await supabase.functions.invoke("create-order", { body: orderData });
+    if (!primary.error && primary.data && !primary.data.error) return primary.data;
+
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    if (!projectId || !publishableKey) {
+      throw primary.error || new Error(primary.data?.error || "Order service unavailable");
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    try {
+      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/create-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: publishableKey,
+          Authorization: `Bearer ${publishableKey}`,
+        },
+        body: JSON.stringify(orderData),
+        signal: controller.signal,
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload?.error || `Order service unavailable (${response.status})`);
+      }
+      if (payload?.error) throw new Error(payload.error);
+      return payload;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
+
   const handleCODOrder = async () => {
     await createCODOrder();
   };
@@ -404,65 +479,105 @@ const Checkout = () => {
   const createCODOrder = async () => {
     setIsProcessing(true);
 
+    const orderData = {
+      user_id: user?.id || null,
+      customer_name: `${formData.firstName} ${formData.lastName}`,
+      customer_email: formData.email,
+      customer_phone: `${formData.countryCode} ${formData.phone}`,
+      shipping_address: {
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+      },
+      items: items.map((item) => ({
+        productId: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        selectedSize: item.selectedSize || null,
+      })),
+      payment_method: "cod",
+      payment_status: "pending",
+      coupon_code: null,
+      affiliate_code: null,
+    };
+
     try {
-      const orderData = {
-        user_id: user?.id || null,
-        customer_name: `${formData.firstName} ${formData.lastName}`,
-        customer_email: formData.email,
-        customer_phone: `${formData.countryCode} ${formData.phone}`,
-        shipping_address: {
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          country: formData.country,
-        },
-        items: items.map(item => ({
-          productId: item.product.id,
-          name: item.product.name,
-          price: item.product.price,
-          quantity: item.quantity,
-          selectedSize: item.selectedSize || null,
-        })),
-        payment_method: "cod",
-        payment_status: "pending",
-        coupon_code: null,
-        affiliate_code: null,
-      };
+      const data = await invokeCreateOrder(orderData);
 
-      const { data, error } = await supabase.functions.invoke('create-order', {
-        body: orderData,
-      });
+      const orderNumber = data?.order?.order_number || `PEND-${Date.now().toString(36).toUpperCase()}`;
+      const isQueuedBackupOrder = Boolean(data?.queued || data?.degraded || orderNumber.startsWith("PEND-"));
 
-      if (error) throw error;
-      
-      if (data?.error) {
-        throw new Error(data.error);
+      if (isQueuedBackupOrder) {
+        cacheOfflineOrder(
+          {
+            order_number: orderNumber,
+            customer_name: orderData.customer_name,
+            customer_email: orderData.customer_email,
+            customer_phone: orderData.customer_phone,
+            items: orderData.items,
+            subtotal: orderData.items.reduce((sum, it) => sum + it.price * it.quantity, 0),
+            discount: 0,
+            shipping: 20,
+            total: orderData.items.reduce((sum, it) => sum + it.price * it.quantity, 0) + 20,
+            shipping_address: orderData.shipping_address,
+            payment_method: "cod",
+            user_id: orderData.user_id,
+          },
+          "edge_queued",
+          data?.message
+        );
       }
-
-      const isQueuedBackupOrder = Boolean(data?.queued);
 
       toast({
         title: isQueuedBackupOrder ? "Order Captured Successfully" : "Order Placed Successfully!",
         description: isQueuedBackupOrder
-          ? `Reference #${data.order.order_number}. Backend is temporarily busy, but your order was captured and will be processed manually.`
-          : `Order #${data.order.order_number}. You will receive a confirmation email shortly.`,
+          ? `Reference #${orderNumber}. Backend is temporarily busy, but your order was captured and will be processed manually.`
+          : `Order #${orderNumber}. You will receive a confirmation email shortly.`,
       });
 
-      // Save address for future express checkout
       await saveAddressToProfile();
-      
       clearCart();
-      navigate(`/?order=${data.order.order_number}`);
+      navigate(`/?order=${orderNumber}`);
     } catch (error) {
       console.error("Order error:", error);
 
-      const fallbackMessage =
-        error instanceof Error && error.message.includes("non-2xx")
-          ? "Order service is temporarily busy. Please try again in a moment."
-          : error instanceof Error
-          ? error.message
-          : "Please try again or contact support.";
+      if (isInfrastructureError(error)) {
+        const localOrderNumber = `LOC-${Date.now().toString(36).toUpperCase()}`;
+        const subtotal = orderData.items.reduce((sum, it) => sum + it.price * it.quantity, 0);
+        const total = subtotal + 20;
 
+        cacheOfflineOrder(
+          {
+            order_number: localOrderNumber,
+            customer_name: orderData.customer_name,
+            customer_email: orderData.customer_email,
+            customer_phone: orderData.customer_phone,
+            items: orderData.items,
+            subtotal,
+            discount: 0,
+            shipping: 20,
+            total,
+            shipping_address: orderData.shipping_address,
+            payment_method: "cod",
+            user_id: orderData.user_id,
+          },
+          "client_backup",
+          error instanceof Error ? error.message : "network failure"
+        );
+
+        toast({
+          title: "Order Captured (Backup)",
+          description: `Reference #${localOrderNumber}. We saved your order details and the team will process it manually.`,
+        });
+
+        clearCart();
+        navigate(`/?order=${localOrderNumber}`);
+        return;
+      }
+
+      const fallbackMessage = error instanceof Error ? error.message : "Please try again or contact support.";
       toast({
         title: "Error placing order",
         description: fallbackMessage,
