@@ -39,6 +39,29 @@ interface LoyaltyCoupon {
   expires_at: string | null;
 }
 
+const OFFLINE_ORDER_CACHE_KEY = "offline_pending_orders_v1";
+
+interface OfflinePendingOrder {
+  order_number: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  items: Array<{ productId: string; name: string; price: number; quantity: number; selectedSize: string | null }>;
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  shipping_address: {
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+  };
+  payment_method: string;
+  user_id: string | null;
+  created_at: string;
+}
+
 const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
@@ -47,6 +70,7 @@ const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
   const [loyaltyCoupon, setLoyaltyCoupon] = useState<LoyaltyCoupon | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isOfflineOrder, setIsOfflineOrder] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [copied, setCopied] = useState(false);
   const [purchaseTracked, setPurchaseTracked] = useState(false);
@@ -146,6 +170,37 @@ Thank you for choosing *Desert Deal!*`;
     }
   }, [orderData, purchaseTracked]);
 
+  const getOfflineOrder = (targetOrderNumber: string): OrderData | null => {
+    try {
+      const raw = localStorage.getItem(OFFLINE_ORDER_CACHE_KEY);
+      if (!raw) return null;
+      const cached = JSON.parse(raw) as OfflinePendingOrder[];
+      const match = cached.find((entry) => entry.order_number === targetOrderNumber);
+      if (!match) return null;
+
+      return {
+        order_number: match.order_number,
+        customer_name: match.customer_name,
+        customer_email: match.customer_email,
+        items: match.items,
+        subtotal: match.subtotal,
+        discount: match.discount || 0,
+        shipping: match.shipping || 0,
+        total: match.total,
+        shipping_address: {
+          ...match.shipping_address,
+          zipCode: "",
+        },
+        payment_method: match.payment_method,
+        created_at: match.created_at,
+        user_id: match.user_id,
+      };
+    } catch (error) {
+      console.error("Error reading offline order cache:", error);
+      return null;
+    }
+  };
+
   const fetchOrderData = async () => {
     if (!orderNumber) return;
 
@@ -159,6 +214,7 @@ Thank you for choosing *Desert Deal!*`;
       if (error) throw error;
 
       if (data) {
+        setIsOfflineOrder(false);
         setOrderData({
           order_number: data.order_number,
           customer_name: data.customer_name,
@@ -174,16 +230,23 @@ Thank you for choosing *Desert Deal!*`;
           user_id: data.user_id,
         });
 
-        // Loyalty coupons are generated async after order creation, so we retry briefly.
         if (data.user_id) {
           fetchLoyaltyCouponWithRetry(data.user_id);
         }
+        setIsLoading(false);
+        return;
       }
     } catch (error) {
       console.error("Error fetching order:", error);
-    } finally {
-      setIsLoading(false);
     }
+
+    const offlineOrder = getOfflineOrder(orderNumber);
+    if (offlineOrder) {
+      setIsOfflineOrder(true);
+      setOrderData(offlineOrder);
+    }
+
+    setIsLoading(false);
   };
 
   const fetchLoyaltyCoupon = async (userId: string) => {
@@ -319,7 +382,7 @@ Thank you for choosing *Desert Deal!*`;
 
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-6">
                   <Mail className="w-4 h-4" />
-                  <span>Confirmation email sent</span>
+                  <span>{isOfflineOrder ? "Order saved in backup queue" : "Confirmation email sent"}</span>
                 </div>
 
                 {/* Loyalty coupon popup */}
