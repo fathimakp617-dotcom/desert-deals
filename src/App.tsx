@@ -72,6 +72,18 @@ const AdminSections = lazy(() => import("./pages/admin/AdminSections"));
 const AdminPageBuilder = lazy(() => import("./pages/admin/AdminPageBuilder"));
 const AdminEmails = lazy(() => import("./pages/admin/AdminEmails"));
 const AdminEmailLogs = lazy(() => import("./pages/admin/AdminEmailLogs"));
+const AdminCoupons = lazy(() => import("./pages/admin/AdminCoupons"));
+const AdminExpenses = lazy(() => import("./pages/admin/AdminExpenses"));
+const AdminStaff = lazy(() => import("./pages/admin/AdminStaff"));
+const AdminActivityLogs = lazy(() => import("./pages/admin/AdminActivityLogs"));
+const AdminManualOrder = lazy(() => import("./pages/admin/AdminManualOrder"));
+
+// Shipping pages
+const ShippingLayout = lazy(() => import("./pages/shipping/ShippingLayout"));
+const ShippingDashboard = lazy(() => import("./pages/shipping/ShippingDashboard"));
+const ShippingOrders = lazy(() => import("./pages/shipping/ShippingOrders"));
+const ShippingReturns = lazy(() => import("./pages/shipping/ShippingReturns"));
+const ShippingAccount = lazy(() => import("./pages/shipping/ShippingAccount"));
 
 // Minimal loading fallback
 const PageLoader = () => (
