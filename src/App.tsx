@@ -108,7 +108,7 @@ const queryClient = new QueryClient({
       refetchOnReconnect: true,
       retry: 1,
       retryDelay: 1500,
-      networkMode: "online",
+      networkMode: "always",
     },
     mutations: {
       onError: (error: unknown) => {
