@@ -56,6 +56,44 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
   ]);
 }
 
+async function persistSession(
+  supabaseClient: any,
+  email: string,
+  sessionToken: string,
+  sessionExpiry: Date,
+): Promise<boolean> {
+  try {
+    const deleteResult = await withTimeout(
+      supabaseClient.from("staff_sessions").delete().eq("email", email),
+      3000,
+    ) as any;
+
+    if (!deleteResult || deleteResult.error) {
+      console.error("Failed deleting existing session:", deleteResult?.error);
+      return false;
+    }
+
+    const insertResult = await withTimeout(
+      supabaseClient.from("staff_sessions").insert({
+        email,
+        session_token: sessionToken,
+        expires_at: sessionExpiry.toISOString(),
+      }),
+      3000,
+    ) as any;
+
+    if (!insertResult || insertResult.error) {
+      console.error("Failed inserting session:", insertResult?.error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Session persistence error:", error);
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
