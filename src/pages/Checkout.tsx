@@ -415,9 +415,13 @@ const Checkout = () => {
         throw new Error(data.error);
       }
 
+      const isQueuedBackupOrder = Boolean(data?.queued);
+
       toast({
-        title: "Order Placed Successfully!",
-        description: `Order #${data.order.order_number}. You will receive a confirmation email shortly.`,
+        title: isQueuedBackupOrder ? "Order Captured Successfully" : "Order Placed Successfully!",
+        description: isQueuedBackupOrder
+          ? `Reference #${data.order.order_number}. Backend is temporarily busy, but your order was captured and will be processed manually.`
+          : `Order #${data.order.order_number}. You will receive a confirmation email shortly.`,
       });
 
       // Save address for future express checkout
@@ -427,9 +431,17 @@ const Checkout = () => {
       navigate(`/?order=${data.order.order_number}`);
     } catch (error) {
       console.error("Order error:", error);
+
+      const fallbackMessage =
+        error instanceof Error && error.message.includes("non-2xx")
+          ? "Order service is temporarily busy. Please try again in a moment."
+          : error instanceof Error
+          ? error.message
+          : "Please try again or contact support.";
+
       toast({
         title: "Error placing order",
-        description: error instanceof Error ? error.message : "Please try again or contact support.",
+        description: fallbackMessage,
         variant: "destructive",
       });
     } finally {
