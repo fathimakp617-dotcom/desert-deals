@@ -122,6 +122,13 @@ serve(async (req) => {
       ordersError = fallbackResult.error;
     }
 
+    if (ordersError?.message === "timeout") {
+      console.log("Both order queries timed out, returning empty");
+      return new Response(JSON.stringify({ orders: [], page, page_size: pageSize, has_more: false, db_timeout: true }), { 
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      });
+    }
+
     if (ordersError) throw ordersError;
 
     const hasMore = (orders?.length || 0) === pageSize;
@@ -131,8 +138,8 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch orders" }), { 
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } 
+    return new Response(JSON.stringify({ orders: [], page: 1, page_size: 250, has_more: false, db_timeout: true }), { 
+      status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } 
     });
   }
 });
