@@ -170,6 +170,37 @@ Thank you for choosing *Desert Deal!*`;
     }
   }, [orderData, purchaseTracked]);
 
+  const getOfflineOrder = (targetOrderNumber: string): OrderData | null => {
+    try {
+      const raw = localStorage.getItem(OFFLINE_ORDER_CACHE_KEY);
+      if (!raw) return null;
+      const cached = JSON.parse(raw) as OfflinePendingOrder[];
+      const match = cached.find((entry) => entry.order_number === targetOrderNumber);
+      if (!match) return null;
+
+      return {
+        order_number: match.order_number,
+        customer_name: match.customer_name,
+        customer_email: match.customer_email,
+        items: match.items,
+        subtotal: match.subtotal,
+        discount: match.discount || 0,
+        shipping: match.shipping || 0,
+        total: match.total,
+        shipping_address: {
+          ...match.shipping_address,
+          zipCode: "",
+        },
+        payment_method: match.payment_method,
+        created_at: match.created_at,
+        user_id: match.user_id,
+      };
+    } catch (error) {
+      console.error("Error reading offline order cache:", error);
+      return null;
+    }
+  };
+
   const fetchOrderData = async () => {
     if (!orderNumber) return;
 
@@ -183,6 +214,7 @@ Thank you for choosing *Desert Deal!*`;
       if (error) throw error;
 
       if (data) {
+        setIsOfflineOrder(false);
         setOrderData({
           order_number: data.order_number,
           customer_name: data.customer_name,
@@ -198,16 +230,22 @@ Thank you for choosing *Desert Deal!*`;
           user_id: data.user_id,
         });
 
-        // Loyalty coupons are generated async after order creation, so we retry briefly.
         if (data.user_id) {
           fetchLoyaltyCouponWithRetry(data.user_id);
         }
+        return;
       }
     } catch (error) {
       console.error("Error fetching order:", error);
-    } finally {
-      setIsLoading(false);
     }
+
+    const offlineOrder = getOfflineOrder(orderNumber);
+    if (offlineOrder) {
+      setIsOfflineOrder(true);
+      setOrderData(offlineOrder);
+    }
+
+    setIsLoading(false);
   };
 
   const fetchLoyaltyCoupon = async (userId: string) => {
