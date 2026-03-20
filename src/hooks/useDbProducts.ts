@@ -3,7 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product, products as staticProducts } from "@/data/products";
 import { useCallback, useEffect, useState } from "react";
 import { withTimeout } from "@/lib/supabaseTimeout";
-import { loadFallbackProducts } from "@/lib/csvFallback";
+import { loadFallbackProducts, prewarmFallbackCache } from "@/lib/csvFallback";
+
+// Pre-warm CSV cache at module load so fallback is instant
+prewarmFallbackCache();
 
 // Create a lookup map from static data for enrichment
 const staticEnrichmentMap = new Map<string, Product>();
@@ -117,7 +120,6 @@ const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<type
     try {
       batch = await fetchProductBatch(from, to);
     } catch {
-      // Never block UI on background hydration errors
       break;
     }
 
@@ -135,6 +137,20 @@ const hydrateRemainingProductsInBackground = async (queryClient: ReturnType<type
   }
 };
 
+// Immediately start loading fallback so it's ready before the hook even mounts
+let fallbackReady: Promise<Product[]> | null = null;
+const getFallbackProducts = (): Promise<Product[]> => {
+  if (!fallbackReady) {
+    fallbackReady = loadFallbackProducts().then((products) =>
+      products.length > 0 ? products : staticProducts
+    );
+  }
+  return fallbackReady;
+};
+
+// Start loading fallback immediately at module init
+getFallbackProducts();
+
 export const useDbProducts = () => {
   const queryClient = useQueryClient();
   const [isFallback, setIsFallback] = useState(false);
@@ -142,43 +158,38 @@ export const useDbProducts = () => {
   const query = useQuery({
     queryKey: ["db-products"],
     queryFn: async () => {
+      // Start both DB fetch and fallback simultaneously
       const dbPromise = fetchProductBatch(0, INITIAL_BATCH_SIZE - 1).then(mapDbListToProducts);
+      const fallbackPromise = getFallbackProducts();
 
-      try {
-        const fastResult = await Promise.race([
-          dbPromise.then((products) => ({ kind: "db" as const, products })),
-          new Promise<{ kind: "wait" }>((resolve) =>
-            setTimeout(() => resolve({ kind: "wait" }), 700)
-          ),
-        ]);
+      // Race: if DB responds within 500ms, use it; otherwise show fallback instantly
+      const result = await Promise.race([
+        dbPromise.then((products) => ({ source: "db" as const, products })),
+        new Promise<{ source: "timeout" }>((resolve) =>
+          setTimeout(() => resolve({ source: "timeout" }), 500)
+        ),
+      ]);
 
-        if (fastResult.kind === "db") {
-          setIsFallback(false);
-          return fastResult.products;
-        }
-
-        setIsFallback(true);
-        const fallback = await loadFallbackProducts();
-        const fallbackProducts = fallback.length > 0 ? fallback : staticProducts;
-
-        dbPromise
-          .then((products) => {
-            setIsFallback(false);
-            queryClient.setQueryData<Product[]>(["db-products"], products);
-          })
-          .catch((err) => {
-            console.warn("DB fetch failed, loading CSV fallback:", err);
-          });
-
-        return fallbackProducts;
-      } catch (err) {
-        console.warn("DB fetch failed, loading CSV fallback:", err);
-        setIsFallback(true);
-        const fallback = await loadFallbackProducts();
-        if (fallback.length > 0) return fallback;
-        // Last resort: static products
-        return staticProducts;
+      if (result.source === "db") {
+        setIsFallback(false);
+        return result.products;
       }
+
+      // DB too slow — return pre-cached fallback instantly
+      setIsFallback(true);
+      const fallbackProducts = await fallbackPromise;
+
+      // Let DB finish in background and swap in silently
+      dbPromise
+        .then((products) => {
+          setIsFallback(false);
+          queryClient.setQueryData<Product[]>(["db-products"], products);
+        })
+        .catch(() => {
+          // DB failed entirely, fallback stays
+        });
+
+      return fallbackProducts;
     },
     staleTime: 2 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
@@ -190,7 +201,7 @@ export const useDbProducts = () => {
   useEffect(() => {
     const data = query.data;
     if (!data || data.length === 0) return;
-    if (isFallback) return; // Don't hydrate in fallback mode
+    if (isFallback) return;
     if (data.length < INITIAL_BATCH_SIZE) return;
     if (backgroundHydrationInFlight) return;
 
@@ -210,7 +221,6 @@ export const useDbProducts = () => {
 export const useDbProduct = (id: string | undefined) => {
   const queryClient = useQueryClient();
 
-  // Try to find the product in already-cached list data
   const getCachedProduct = (): Product | undefined => {
     const cachedList = queryClient.getQueryData<Product[]>(["db-products"]);
     return cachedList?.find((p) => p.id === id);
@@ -221,22 +231,22 @@ export const useDbProduct = (id: string | undefined) => {
     queryFn: async () => {
       if (!id) return null;
 
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle();
+      try {
+        const { data, error } = await withTimeout(
+          supabase.from("products").select("*").eq("id", id).maybeSingle().then((r) => r),
+          2000
+        );
 
-      if (error) {
-        console.error("Error fetching product:", error);
-        return staticEnrichmentMap.get(id) || null;
+        if (error) {
+          return getCachedProduct() || staticEnrichmentMap.get(id) || null;
+        }
+        if (!data) {
+          return staticEnrichmentMap.get(id) || null;
+        }
+        return mapDbToProduct(data as DbProduct);
+      } catch {
+        return getCachedProduct() || staticEnrichmentMap.get(id) || null;
       }
-
-      if (!data) {
-        return staticEnrichmentMap.get(id) || null;
-      }
-
-      return mapDbToProduct(data as DbProduct);
     },
     enabled: !!id,
     staleTime: 2 * 60 * 1000,
@@ -255,10 +265,8 @@ export const usePrefetchProduct = () => {
 
   return useCallback(
     (productId: string) => {
-      // If already cached, skip
       if (queryClient.getQueryData(["db-product", productId])) return;
 
-      // Check list cache first
       const cachedList = queryClient.getQueryData<Product[]>(["db-products"]);
       const cached = cachedList?.find((p) => p.id === productId);
       if (cached) {
@@ -266,16 +274,18 @@ export const usePrefetchProduct = () => {
         return;
       }
 
-      // Otherwise prefetch from DB
       queryClient.prefetchQuery({
         queryKey: ["db-product", productId],
         queryFn: async () => {
-          const { data } = await supabase
-            .from("products")
-            .select("*")
-            .eq("id", productId)
-            .maybeSingle();
-          if (data) return mapDbToProduct(data as DbProduct);
+          try {
+            const { data } = await withTimeout(
+              supabase.from("products").select("*").eq("id", productId).maybeSingle().then((r) => r),
+              2000
+            );
+            if (data) return mapDbToProduct(data as DbProduct);
+          } catch {
+            // timeout — skip
+          }
           return staticEnrichmentMap.get(productId) || null;
         },
         staleTime: 2 * 60 * 1000,
