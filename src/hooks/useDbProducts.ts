@@ -105,7 +105,7 @@ const fetchProductBatch = async (from: number, to: number): Promise<DbProduct[]>
     .abortSignal(controller.signal);
 
   const timeoutPromise = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error("Query timed out after 5s")), 5500)
+    setTimeout(() => reject(new Error("Query timed out after 2.5s")), 3000)
   );
 
   try {

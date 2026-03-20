@@ -94,8 +94,8 @@ const queryClient = new QueryClient({
       gcTime: 20 * 60 * 1000,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
-      retry: 2,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
+      retry: 1,
+      retryDelay: 1500,
       networkMode: "online",
     },
     mutations: {
