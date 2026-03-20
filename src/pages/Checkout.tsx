@@ -92,6 +92,30 @@ const normalizeSavedAddress = (
 };
 
 const PENDING_PROFILE_SEED_KEY = "pending_profile_seed_v1";
+const OFFLINE_ORDER_CACHE_KEY = "offline_pending_orders_v1";
+
+interface OfflinePendingOrder {
+  order_number: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  items: Array<{ productId: string; name: string; price: number; quantity: number; selectedSize: string | null }>;
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  shipping_address: {
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+  };
+  payment_method: string;
+  user_id: string | null;
+  created_at: string;
+  source: "edge_queued" | "client_backup";
+  reason?: string;
+}
 
 const Checkout = () => {
   const { items, totalPrice, clearCart, totalItems } = useCart();
