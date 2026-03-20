@@ -1,7 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product, products as staticProducts } from "@/data/products";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { withTimeout } from "@/lib/supabaseTimeout";
+import { loadFallbackProducts } from "@/lib/csvFallback";
 
 // Create a lookup map from static data for enrichment
 const staticEnrichmentMap = new Map<string, Product>();
