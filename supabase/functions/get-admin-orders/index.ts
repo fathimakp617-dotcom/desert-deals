@@ -98,27 +98,48 @@ serve(async (req) => {
       });
     }
 
-    let query = supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
 
-    if (cursorCreatedAt) {
-      query = query.lt("created_at", cursorCreatedAt).limit(pageSize);
-    } else {
-      // Backward-compatible offset mode
-      const from = (page - 1) * pageSize;
-      const to = from + pageSize - 1;
-      query = query.range(from, to);
+    let safeOrders: any[] = [];
+    let nextCursor: string | null = null;
+
+    // Preferred strategy: created_at ordered (supports cursor pagination).
+    try {
+      let orderedQuery = supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (cursorCreatedAt) {
+        orderedQuery = orderedQuery.lt("created_at", cursorCreatedAt).limit(pageSize);
+      } else {
+        orderedQuery = orderedQuery.range(from, to);
+      }
+
+      const { data: orderedOrders, error: orderedError } = await withTimeout(orderedQuery, 4500);
+      if (orderedError) throw orderedError;
+
+      safeOrders = orderedOrders || [];
+      nextCursor = safeOrders.length === pageSize ? safeOrders[safeOrders.length - 1]?.created_at ?? null : null;
+    } catch (orderedErr) {
+      // Fallback strategy: offset query without ORDER BY (faster on unindexed/large tables).
+      console.warn("Ordered query timed out, using fallback pagination", orderedErr);
+
+      const { data: fallbackOrders, error: fallbackError } = await withTimeout(
+        supabase.from("orders").select("*").range(from, to),
+        QUERY_TIMEOUT_MS
+      );
+
+      if (fallbackError) throw fallbackError;
+
+      safeOrders = (fallbackOrders || []).sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      nextCursor = null;
     }
 
-    const { data: orders, error: ordersError } = await withTimeout(query);
-
-    if (ordersError) throw ordersError;
-
-    const safeOrders = orders || [];
     const hasMore = safeOrders.length === pageSize;
-    const nextCursor = hasMore ? safeOrders[safeOrders.length - 1]?.created_at ?? null : null;
 
     return new Response(
       JSON.stringify({
