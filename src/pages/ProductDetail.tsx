@@ -410,7 +410,7 @@ const ProductDetail = () => {
                           selectedImage === idx ? "border-primary" : "border-border/50 hover:border-primary/50"
                         }`}
                       >
-                        <img src={img} alt="" className="w-full h-full object-cover" />
+                        <img src={img} alt="" className="w-full h-full object-contain bg-white" />
                       </button>
                     ))}
                   </div>

@@ -54,7 +54,7 @@ const ImageZoom = memo(({ src, alt, className = "" }: ImageZoomProps) => {
       <img
         src={src}
         alt={alt}
-        className="w-full h-full object-cover object-center"
+        className="w-full h-full object-contain object-center"
         draggable={false}
       />
 
