@@ -46,10 +46,10 @@ const CartDrawer = memo(() => {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-md bg-card shadow-xl z-50 flex flex-col transition-transform duration-300 ease-out ${visible ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed top-0 end-0 h-full w-full max-w-md bg-card shadow-xl z-50 flex flex-col transition-transform duration-300 ease-out ${visible ? "translate-x-0" : "ltr:translate-x-full rtl:-translate-x-full"}`}
       >
         {/* Close button */}
-        <button onClick={closeCart} className="absolute top-3 right-3 p-1.5 hover:bg-muted rounded-full transition-colors z-10">
+        <button onClick={closeCart} className="absolute top-3 end-3 p-1.5 hover:bg-muted rounded-full transition-colors z-10">
           <X className="w-5 h-5" />
         </button>
 
