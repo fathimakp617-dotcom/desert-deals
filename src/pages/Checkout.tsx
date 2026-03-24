@@ -696,7 +696,7 @@ const Checkout = () => {
                   onClick={() => setIsExpressMode(false)}
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  Edit Details
+                  {t("checkout.editDetails")}
                 </Button>
               </div>
             </motion.div>
