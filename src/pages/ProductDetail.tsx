@@ -482,7 +482,7 @@ const ProductDetail = () => {
                 {/* Size Selector */}
                 {needsSize && (
                 <motion.div variants={staggerItem} className="space-y-2">
-                  <p className="text-xs sm:text-sm text-muted-foreground">Size <span className="text-destructive">*</span></p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t("common.size")} <span className="text-destructive">*</span></p>
                   <div className="flex flex-wrap gap-1.5">
                     {([...new Set(product.size
                       ? product.size.split(",").map(s => s.trim()).filter(Boolean)
