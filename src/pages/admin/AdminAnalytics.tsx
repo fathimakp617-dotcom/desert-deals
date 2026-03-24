@@ -326,11 +326,11 @@ const AdminAnalytics = () => {
                   <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">New customers</span>
-                      <span className="font-medium text-foreground">{total_orders}</span>
+                      <span className="font-medium text-foreground">{new_customer_count}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Returning customers</span>
-                      <span className="font-medium text-foreground">0</span>
+                      <span className="font-medium text-foreground">{returning_count}</span>
                     </div>
                   </div>
                 ) : (
