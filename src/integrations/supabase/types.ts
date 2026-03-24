@@ -1090,6 +1090,10 @@ export type Database = {
       cleanup_expired_custom_otps: { Args: never; Returns: undefined }
       cleanup_expired_rate_limits: { Args: never; Returns: undefined }
       cleanup_expired_sessions: { Args: never; Returns: undefined }
+      get_analytics_aggregates: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
       get_atc_sessions: {
         Args: { p_from: string; p_to: string }
         Returns: number
