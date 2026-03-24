@@ -98,7 +98,7 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                         <img
                           src={buyNowItem.product.image}
                           alt={buyNowItem.product.name}
-                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                          className="w-20 h-20 object-contain bg-white rounded-lg flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-foreground line-clamp-2">{buyNowItem.product.name}</p>
@@ -113,7 +113,7 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                       </div>
                       {items.filter((item) => item.product.id !== buyNowItem.product.id && (item.product.category?.toLowerCase().includes("socks") || item.product.category?.toLowerCase().includes("kids"))).map((item) => (
                         <div key={item.product.id} className="flex gap-3 p-3 items-center">
-                          <img src={item.product.image} alt={item.product.name} className="w-12 h-12 object-cover rounded-md flex-shrink-0" />
+                          <img src={item.product.image} alt={item.product.name} className="w-12 h-12 object-contain bg-white rounded-md flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-medium text-foreground line-clamp-1">{item.product.name}</p>
                             <p className="text-[10px] text-muted-foreground">
