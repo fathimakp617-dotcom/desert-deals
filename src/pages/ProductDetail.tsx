@@ -677,7 +677,7 @@ const ProductDetail = () => {
                     onClick={() => setShowDescription(!showDescription)}
                     className="text-base font-heading font-semibold text-foreground flex items-center justify-between w-full"
                   >
-                    Description
+                    {t("product.description")}
                     <span className="text-muted-foreground text-sm">{showDescription ? "−" : "+"}</span>
                   </button>
                   {showDescription && (
