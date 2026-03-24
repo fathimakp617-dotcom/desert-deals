@@ -46,9 +46,9 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
           </div>
           <div className="mt-1.5">
             {soldOut ? (
-              <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
+              <span className="text-[11px] font-bold text-red-500 uppercase">{t("product.outOfStock")}</span>
             ) : (
-              <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
+              <span className="text-[11px] font-bold text-emerald-600 uppercase">{t("product.inStock")}</span>
             )}
           </div>
         </div>
