@@ -886,9 +886,9 @@ const Checkout = () => {
                     <div className="w-4 h-4 rounded-full border-2 border-foreground flex items-center justify-center">
                       <div className="w-2 h-2 rounded-full bg-foreground" />
                     </div>
-                    <span className="font-medium text-foreground">Cash On Delivery</span>
+                    <span className="font-medium text-foreground">{t("checkout.cashOnDelivery")}</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6 ms-7">Pay with cash upon delivery.</p>
+                  <p className="text-sm text-muted-foreground mb-6 ms-7">{t("checkout.cashOnDeliveryDesc")}</p>
 
                   {/* Terms checkbox */}
                   <div className="mb-6">
