@@ -573,7 +573,7 @@ const ProductDetail = () => {
                     <Truck className="w-5 h-5 text-primary shrink-0" />
                     <div className="text-sm">
                       <span className="font-medium text-foreground">
-                        Estimated Delivery: {(() => {
+                        {t("product.estimatedDelivery")} {(() => {
                           const now = new Date();
                           const addBusinessDays = (start: Date, days: number) => {
                             const result = new Date(start);
