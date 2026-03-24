@@ -775,7 +775,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="phone">Phone *</Label>
+                  <Label htmlFor="phone">{t("checkout.phone")}</Label>
                   <div className="flex gap-2 mt-1">
                     <Select
                       value={formData.countryCode}
