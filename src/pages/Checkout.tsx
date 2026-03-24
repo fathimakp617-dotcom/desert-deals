@@ -654,9 +654,9 @@ const Checkout = () => {
                     <Zap className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-heading text-foreground">Express Checkout</h3>
+                    <h3 className="font-heading text-foreground">{t("checkout.expressCheckout")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Use your saved address: {savedAddress.address}, {savedAddress.city}
+                      {t("checkout.useSavedAddressDesc")} {savedAddress.address}, {savedAddress.city}
                     </p>
                   </div>
                 </div>
