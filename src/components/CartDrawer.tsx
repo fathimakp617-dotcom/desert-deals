@@ -9,6 +9,7 @@ import { useTranslation } from "@/contexts/DirectionContext";
 
 const CartDrawer = memo(() => {
   const { items, isOpen, closeCart, addToCart, removeFromCart, totalItems } = useCart();
+  const { t } = useTranslation();
   const { data: allProducts } = useDbProducts();
   const [visible, setVisible] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
