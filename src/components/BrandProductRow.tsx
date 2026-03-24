@@ -136,9 +136,9 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                         </div>
                         <div className="mt-1.5 flex items-center justify-between">
                           {soldOut ? (
-                            <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
+                            <span className="text-[11px] font-bold text-red-500 uppercase">{t("product.outOfStock")}</span>
                           ) : (
-                            <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
+                            <span className="text-[11px] font-bold text-emerald-600 uppercase">{t("product.inStock")}</span>
                           )}
                           <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); inWishlist ? removeFromWishlist(product.id) : addToWishlist(product); }} className="p-0">
                             <Heart className={`w-4 h-4 ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
