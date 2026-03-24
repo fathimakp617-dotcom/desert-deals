@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react";
 import { formatPrice, Product } from "@/data/products";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useTranslation } from "@/contexts/DirectionContext";
 import QuickViewDialog from "@/components/QuickViewDialog";
 
 const STORAGE_KEY = "recently_viewed_products";
