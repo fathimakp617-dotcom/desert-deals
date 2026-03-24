@@ -833,8 +833,8 @@ const Checkout = () => {
                 <div className="border border-border rounded-lg p-6 sticky top-24">
                   {/* Product table header */}
                   <div className="flex justify-between text-sm font-medium text-foreground border-b border-border pb-3 mb-3">
-                    <span>Product</span>
-                    <span>Subtotal</span>
+                    <span>{t("checkout.product")}</span>
+                    <span>{t("checkout.subtotal")}</span>
                   </div>
 
                   {/* Product items */}
