@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/data/products";
 import { useTranslation } from "@/contexts/DirectionContext";
-import { CouponInput } from "@/components/CouponInput";
+import CouponInput from "@/components/CouponInput";
 
 const CartDrawer = memo(() => {
   const { items, isOpen, closeCart, updateQuantity, removeFromCart, totalItems, totalPrice } = useCart();
