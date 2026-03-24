@@ -725,7 +725,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="address">Street Address</Label>
+                  <Label htmlFor="address">{t("checkout.address")}</Label>
                   <Input
                     id="address"
                     name="address"
