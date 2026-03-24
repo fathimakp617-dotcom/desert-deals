@@ -33,21 +33,7 @@ const fallbackCategories = [
   "Hoka", "Puma", "Louis Vuitton", "Gucci", "Onitsuka Tiger", "Loro Piana",
   "Brooks", "Dior", "Hermes", "Basketball Shoes",
 ];
-const priceRanges = [
-  { label: "All Prices", min: 0, max: Infinity },
-  { label: "Under AED 200", min: 0, max: 200 },
-  { label: "AED 200 - AED 350", min: 200, max: 350 },
-  { label: "AED 350 - AED 500", min: 350, max: 500 },
-  { label: "Above AED 500", min: 500, max: Infinity },
-];
-const sortOptions = [
-  { label: "Relevance", value: "featured" },
-  { label: "Sort by popularity", value: "name-asc" },
-  { label: "Sort by average rating", value: "rating" },
-  { label: "Sort by latest", value: "latest" },
-  { label: "Sort by price: low to high", value: "price-asc" },
-  { label: "Sort by price: high to low", value: "price-desc" },
-];
+// Price ranges and sort options are built inside the component with t()
 
 const brandSlugToCategory: Record<string, string> = {
   "nike": "Nike", "jordan": "Jordan", "new-balance": "New Balance",
