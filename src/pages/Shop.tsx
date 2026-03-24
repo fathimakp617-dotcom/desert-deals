@@ -281,7 +281,7 @@ const Shop = () => {
                     </SelectContent>
                   </Select>
                   <Select value={selectedPriceRange.toString()} onValueChange={(v) => setSelectedPriceRange(parseInt(v))}>
-                    <SelectTrigger className="w-44 h-10 bg-background border-border/50"><SelectValue placeholder="Price Range" /></SelectTrigger>
+                    <SelectTrigger className="w-44 h-10 bg-background border-border/50"><SelectValue placeholder={t("shop.priceRange")} /></SelectTrigger>
                     <SelectContent>
                       {priceRanges.map((range, idx) => <SelectItem key={idx} value={idx.toString()}>{range.label}</SelectItem>)}
                     </SelectContent>
