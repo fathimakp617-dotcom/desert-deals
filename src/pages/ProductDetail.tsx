@@ -542,7 +542,7 @@ const ProductDetail = () => {
                     disabled={isSoldOut}
                     className="flex-1 bg-foreground hover:bg-foreground/90 text-background py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium transition-all duration-300 rounded-full"
                   >
-                    {isSoldOut ? "SOLD OUT" : "Add to cart"}
+                    {isSoldOut ? t("product.soldOut") : t("product.addToCart")}
                   </Button>
                 </motion.div>
 
