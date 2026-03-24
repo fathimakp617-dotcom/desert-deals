@@ -31,7 +31,7 @@ const CrossSellCard = ({ product, onAdd, onBuyNow, t }: { product: Product; onAd
     <div className="flex-shrink-0 w-[200px] sm:w-[220px] border border-border rounded-lg p-3 bg-background snap-start">
       <Link to={`/product/${product.id}`} className="block">
         <div className="aspect-square bg-muted rounded-md overflow-hidden mb-2">
-          <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+          <img src={product.image} alt={product.name} className="w-full h-full object-contain bg-white" loading="lazy" />
         </div>
         <p className="text-xs font-semibold text-foreground line-clamp-2 uppercase leading-tight min-h-[2.4em]">
           {product.name}
