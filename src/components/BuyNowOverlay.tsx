@@ -98,7 +98,7 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                         <img
                           src={buyNowItem.product.image}
                           alt={buyNowItem.product.name}
-                          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                          className="w-20 h-20 object-contain bg-white rounded-lg flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-foreground line-clamp-2">{buyNowItem.product.name}</p>
