@@ -610,10 +610,10 @@ const Checkout = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-32 text-center">
-          <h1 className="text-3xl font-heading text-foreground mb-4">Your cart is empty</h1>
-          <p className="text-muted-foreground mb-8">Add some products to checkout.</p>
+          <h1 className="text-3xl font-heading text-foreground mb-4">{t("checkout.emptyCart")}</h1>
+          <p className="text-muted-foreground mb-8">{t("checkout.addProducts")}</p>
           <Button asChild>
-            <Link to="/shop">Continue Shopping</Link>
+            <Link to="/shop">{t("common.continueShopping")}</Link>
           </Button>
         </div>
         <Footer />
