@@ -234,7 +234,7 @@ const Shop = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground hidden sm:inline">Sort:</span>
+                  <span className="text-sm text-muted-foreground hidden sm:inline">{t("shop.sort")}:</span>
                   <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger className="w-[180px] h-10 bg-card border-border/50 rounded-full text-sm">
                       <SelectValue placeholder="Sort" />
