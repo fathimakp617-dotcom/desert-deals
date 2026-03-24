@@ -231,7 +231,7 @@ const Navbar = memo(() => {
           <div className={`fixed inset-0 z-[70] bg-foreground/30 ${searchClosing ? "animate-fade-out" : "animate-fade-in"}`} onClick={closeSearch} />
           <div className={`fixed top-0 right-0 bottom-0 z-[80] w-full max-w-md bg-background shadow-2xl flex flex-col ${searchClosing ? "animate-slide-out-right" : "animate-slide-in-right"}`}>
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
-              <h2 className="text-xl font-semibold text-foreground">Search</h2>
+              <h2 className="text-xl font-semibold text-foreground">{t("nav.search")}</h2>
               <button onClick={closeSearch} className="p-1 text-foreground hover:opacity-60 transition-opacity">
                 <X size={22} />
               </button>
