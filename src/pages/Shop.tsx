@@ -297,7 +297,7 @@ const Shop = () => {
                   </Select>
                   {hasActiveFilters && (
                     <Button variant="outline" size="sm" onClick={clearFilters} className="h-10">
-                      <X className="w-3 h-3 mr-1" /> Clear
+                      <X className="w-3 h-3 me-1" /> Clear
                     </Button>
                   )}
                 </div>
