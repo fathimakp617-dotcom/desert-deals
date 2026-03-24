@@ -113,6 +113,7 @@ const AdminAnalytics = () => {
     total_sales = 0, total_orders = 0,
     add_to_cart_count = 0, checkout_count = 0,
     total_sessions = 0, total_views = 0,
+    returning_count = 0, new_customer_count = 0,
     top_products = [], top_products_by_sales = [],
     sources = [], countries = [],
     daily_views = [], daily_sales = [],
