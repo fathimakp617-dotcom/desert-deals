@@ -127,6 +127,10 @@ const AdminAnalytics = () => {
         body: { admin_email: session.email, admin_token: session.token, date_from: dateFrom },
       });
       if (error) throw error;
+      if (data?.error === "Invalid session" || data?.error === "Unauthorized") {
+        window.dispatchEvent(new Event("admin-session-expired"));
+        throw new Error("Session expired");
+      }
       return data;
     },
     refetchInterval: 30000, // Auto-refresh every 30s for live data
