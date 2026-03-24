@@ -8,10 +8,7 @@ import { useTranslation } from "@/contexts/DirectionContext";
 import SearchSuggestions from "@/components/SearchSuggestions";
 import headerLogo from "@/assets/desert-deal-logo-header.png";
 
-const staticBottomLinks = [
-  { name: "About Us", href: "/#about" },
-  { name: "Reviews", href: "/#testimonials" },
-];
+// staticBottomLinks moved inside component to access t()
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
