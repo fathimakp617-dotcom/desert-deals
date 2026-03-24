@@ -813,7 +813,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="email">Email address *</Label>
+                  <Label htmlFor="email">{t("checkout.email")}</Label>
                   <Input
                     id="email"
                     name="email"
