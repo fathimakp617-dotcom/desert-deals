@@ -352,7 +352,7 @@ const AdminSections = () => {
 
       {/* Edit Dialog */}
       <Dialog open={!!editingSection} onOpenChange={(open) => !open && setEditingSection(null)}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Section</DialogTitle>
           </DialogHeader>
@@ -365,6 +365,39 @@ const AdminSections = () => {
               <label className="text-sm font-medium">Description</label>
               <Input value={formData.subtitle} onChange={(e) => setFormData(prev => ({ ...prev, subtitle: e.target.value }))} />
             </div>
+            {isAnnouncementSection(editingSection) && (
+              <div className="space-y-3 border-t pt-4">
+                <h4 className="text-sm font-semibold text-primary">Product Announcement Settings</h4>
+                <p className="text-xs text-muted-foreground">This announcement banner will appear on all product pages when visible.</p>
+                <div>
+                  <label className="text-sm font-medium">Emoji Icon</label>
+                  <Input value={configData.emoji} onChange={(e) => setConfigData(prev => ({ ...prev, emoji: e.target.value }))} placeholder="📢" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Badge Text (headline)</label>
+                  <Input value={configData.badge_text} onChange={(e) => setConfigData(prev => ({ ...prev, badge_text: e.target.value }))} placeholder="e.g. 📦 Order Update" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Details (multi-line)</label>
+                  <Textarea 
+                    value={configData.sub_text} 
+                    onChange={(e) => setConfigData(prev => ({ ...prev, sub_text: e.target.value }))} 
+                    placeholder="Enter announcement details..."
+                    rows={4}
+                  />
+                </div>
+                <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
+                  <p className="text-xs text-muted-foreground mb-1">Preview:</p>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">{configData.emoji || "📢"}</span>
+                    <div className="text-sm">
+                      <span className="font-semibold">{configData.badge_text || "Headline"}</span>
+                      {configData.sub_text && <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">{configData.sub_text}</p>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             <Button onClick={handleSaveEdit} className="w-full">Save Changes</Button>
           </div>
         </DialogContent>
