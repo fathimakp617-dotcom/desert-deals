@@ -275,7 +275,7 @@ const Shop = () => {
                     />
                   </div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-40 h-10 bg-background border-border/50"><SelectValue placeholder="Category" /></SelectTrigger>
+                    <SelectTrigger className="w-40 h-10 bg-background border-border/50"><SelectValue placeholder={t("shop.category")} /></SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
                     </SelectContent>
