@@ -704,7 +704,7 @@ const ProductDetail = () => {
                     onClick={() => setShowAdditional(!showAdditional)}
                     className="text-base font-heading text-primary hover:underline"
                   >
-                    Additional information
+                    {t("product.additionalInfo")}
                   </button>
                   {showAdditional && (
                     <div className="pt-2 space-y-2 text-sm">
