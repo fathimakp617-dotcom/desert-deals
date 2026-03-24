@@ -180,7 +180,7 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (isSoldOut) {
-      toast.error("This product is currently sold out");
+      toast.error(t("product.soldOutMessage"));
       return;
     }
     if (needsSize && !selectedSize) {
