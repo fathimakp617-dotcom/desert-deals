@@ -666,7 +666,7 @@ const Checkout = () => {
                   className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
                 >
                   <Zap className="w-4 h-4" />
-                  Use Saved Address
+                  {t("checkout.useSavedAddress")}
                 </Button>
               </div>
             </motion.div>
