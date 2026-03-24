@@ -25,6 +25,7 @@ import SearchSuggestions from "@/components/SearchSuggestions";
 import MobileFilterSheet from "@/components/MobileFilterSheet";
 import BackToTopButton from "@/components/BackToTopButton";
 import { useCategories } from "@/hooks/useCategories";
+import { useTranslation } from "@/contexts/DirectionContext";
 
 
 const fallbackCategories = [
