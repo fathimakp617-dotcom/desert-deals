@@ -363,20 +363,19 @@ const Checkout = () => {
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
-    if (!formData.firstName.trim()) errors.firstName = "Name is required";
-    if (!formData.state) errors.state = "Please select an emirate";
-    if (!formData.phone.trim()) errors.phone = "Phone is required";
+    if (!formData.firstName.trim()) errors.firstName = t("validation.nameRequired");
+    if (!formData.state) errors.state = t("validation.selectEmirate");
+    if (!formData.phone.trim()) errors.phone = t("validation.phoneRequired");
     else {
       const digitsOnly = formData.phone.replace(/\D/g, "");
-      if (digitsOnly.length < 9 || digitsOnly.length > 10) errors.phone = "Phone must be 9-10 digits";
+      if (digitsOnly.length < 9 || digitsOnly.length > 10) errors.phone = t("validation.phoneInvalid");
     }
-    if (!formData.city.trim()) errors.city = "City is required";
-    if (!formData.email.trim()) errors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Invalid email address";
+    if (!formData.city.trim()) errors.city = t("validation.cityRequired");
+    if (!formData.email.trim()) errors.email = t("validation.emailRequired");
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = t("validation.emailInvalid");
     
-    // Check terms checkbox
     const termsCheckbox = document.getElementById('terms-checkout') as HTMLInputElement;
-    if (termsCheckbox && !termsCheckbox.checked) errors.terms = "You must agree to the terms and conditions";
+    if (termsCheckbox && !termsCheckbox.checked) errors.terms = t("validation.agreeTerms");
     
     setFieldErrors(errors);
     
