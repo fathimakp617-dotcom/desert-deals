@@ -925,10 +925,10 @@ const Checkout = () => {
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                           className="w-5 h-5 border-2 border-background border-t-transparent rounded-full"
                         />
-                        Processing...
+                        {t("checkout.processing")}
                       </span>
                     ) : (
-                      "Place order"
+                      t("checkout.placeOrder")
                     )}
                   </Button>
                 </div>

@@ -750,7 +750,7 @@ const ProductDetail = () => {
                     onClick={() => setShowReviews(!showReviews)}
                     className="text-base font-heading text-primary hover:underline"
                   >
-                    Reviews
+                    {t("product.reviews")}
                   </button>
                   {showReviews && (
                     <div className="pt-2">
