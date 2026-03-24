@@ -63,7 +63,7 @@ const SearchSuggestions = ({ query, onSelect, onClose }: SearchSuggestionsProps)
                   <img
                     src={img}
                     alt={product.name}
-                    className="w-10 h-10 rounded-md object-cover bg-muted shrink-0"
+                    className="w-10 h-10 rounded-md object-contain bg-white shrink-0"
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center shrink-0">

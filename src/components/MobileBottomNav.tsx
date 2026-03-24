@@ -87,7 +87,7 @@ const MobileBottomNav = memo(() => {
                       className="w-full flex items-center gap-3 py-3 border-b border-border/50 text-left"
                     >
                       {img ? (
-                        <img src={img} alt={product.name} className="w-12 h-12 rounded-lg object-cover bg-muted shrink-0" />
+                        <img src={img} alt={product.name} className="w-12 h-12 rounded-lg object-contain bg-white shrink-0" />
                       ) : (
                         <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
                           <Search className="w-4 h-4 text-muted-foreground" />

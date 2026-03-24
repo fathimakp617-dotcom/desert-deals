@@ -64,11 +64,11 @@ const FrequentlyBoughtTogether = ({ currentProduct }: FrequentlyBoughtTogetherPr
                   to={`/product/${item.id}`}
                   className="group border border-border rounded-lg p-3 bg-background hover:border-primary/40 transition-colors w-[130px] sm:w-[160px]"
                 >
-                  <div className="aspect-square bg-muted rounded-md overflow-hidden mb-2">
+                  <div className="aspect-square bg-white rounded-md overflow-hidden mb-2">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                     />
                   </div>
