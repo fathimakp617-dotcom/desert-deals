@@ -71,7 +71,7 @@ const CartDrawer = memo(() => {
             {items.map((item) => (
               <div key={`${item.product.id}-${item.selectedSize || ''}`} className="flex gap-3 p-3 border border-border rounded-lg relative group">
                 <Link to={`/product/${item.product.id}`} onClick={closeCart} className="w-16 h-16 flex-shrink-0">
-                  <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover rounded-md" />
+                  <img src={item.product.image} alt={item.product.name} className="w-full h-full object-contain bg-white rounded-md" />
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link to={`/product/${item.product.id}`} onClick={closeCart} className="text-sm font-medium text-foreground line-clamp-2 hover:underline">
