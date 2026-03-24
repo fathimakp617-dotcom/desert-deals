@@ -238,7 +238,7 @@ const Shop = () => {
 
                   <span className="text-xs text-muted-foreground whitespace-nowrap">
                     {totalCount} items
-                    {isFetching && !isLoading && <Loader2 className="inline-block ml-1 h-3 w-3 animate-spin" />}
+                    {isFetching && !isLoading && <Loader2 className="inline-block ms-1 h-3 w-3 animate-spin" />}
                   </span>
                 </div>
 
