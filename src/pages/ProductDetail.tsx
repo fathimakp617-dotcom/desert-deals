@@ -586,7 +586,7 @@ const ProductDetail = () => {
                           };
                           const from = addBusinessDays(now, 1);
                           const to = addBusinessDays(now, 2);
-                          const fmt = (d: Date) => d.toLocaleDateString("en-AE", { weekday: "short", month: "short", day: "numeric" });
+                          const fmt = (d: Date) => d.toLocaleDateString(lang === "ar" ? "ar-AE" : "en-AE", { weekday: "short", month: "short", day: "numeric" });
                           return `${fmt(from)} – ${fmt(to)}`;
                         })()}
                       </span>
