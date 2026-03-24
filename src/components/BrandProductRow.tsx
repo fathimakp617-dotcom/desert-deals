@@ -20,6 +20,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
   const { data: allProducts = [], isLoading } = useDbProducts();
   
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
