@@ -636,7 +636,7 @@ const Checkout = () => {
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
-            Continue Shopping
+            {t("common.continueShopping")}
           </Link>
 
           <h1 className="text-3xl md:text-4xl font-heading text-foreground mb-8">Checkout</h1>
