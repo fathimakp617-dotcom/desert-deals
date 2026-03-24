@@ -104,10 +104,10 @@ const CartDrawer = memo(() => {
         <div className="p-4 border-t border-border space-y-3">
           <div className="flex gap-3">
             <Button variant="outline" className="flex-1 font-heading" size="lg" onClick={closeCart}>
-              Keep Shopping
+              {t("cart.keepShopping")}
             </Button>
             <Button asChild className="flex-1 font-heading" size="lg" onClick={closeCart}>
-              <Link to="/cart">Go to Cart ({totalItems})</Link>
+              <Link to="/cart">{t("cart.goToCart")} ({totalItems})</Link>
             </Button>
           </div>
         </div>
