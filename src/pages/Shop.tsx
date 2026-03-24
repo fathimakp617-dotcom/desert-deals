@@ -25,6 +25,7 @@ import SearchSuggestions from "@/components/SearchSuggestions";
 import MobileFilterSheet from "@/components/MobileFilterSheet";
 import BackToTopButton from "@/components/BackToTopButton";
 import { useCategories } from "@/hooks/useCategories";
+import { useTranslation } from "@/contexts/DirectionContext";
 
 
 const fallbackCategories = [
@@ -32,21 +33,7 @@ const fallbackCategories = [
   "Hoka", "Puma", "Louis Vuitton", "Gucci", "Onitsuka Tiger", "Loro Piana",
   "Brooks", "Dior", "Hermes", "Basketball Shoes",
 ];
-const priceRanges = [
-  { label: "All Prices", min: 0, max: Infinity },
-  { label: "Under AED 200", min: 0, max: 200 },
-  { label: "AED 200 - AED 350", min: 200, max: 350 },
-  { label: "AED 350 - AED 500", min: 350, max: 500 },
-  { label: "Above AED 500", min: 500, max: Infinity },
-];
-const sortOptions = [
-  { label: "Relevance", value: "featured" },
-  { label: "Sort by popularity", value: "name-asc" },
-  { label: "Sort by average rating", value: "rating" },
-  { label: "Sort by latest", value: "latest" },
-  { label: "Sort by price: low to high", value: "price-asc" },
-  { label: "Sort by price: high to low", value: "price-desc" },
-];
+// Price ranges and sort options are built inside the component with t()
 
 const brandSlugToCategory: Record<string, string> = {
   "nike": "Nike", "jordan": "Jordan", "new-balance": "New Balance",
@@ -63,6 +50,25 @@ const brandSlugToCategory: Record<string, string> = {
 };
 
 const Shop = () => {
+  const { t } = useTranslation();
+
+  const priceRanges = useMemo(() => [
+    { label: t("shop.allPrices"), min: 0, max: Infinity },
+    { label: t("shop.under200"), min: 0, max: 200 },
+    { label: t("shop.200to350"), min: 200, max: 350 },
+    { label: t("shop.350to500"), min: 350, max: 500 },
+    { label: t("shop.above500"), min: 500, max: Infinity },
+  ], [t]);
+
+  const sortOptions = useMemo(() => [
+    { label: t("shop.relevance"), value: "featured" },
+    { label: t("shop.sortByPopularity"), value: "name-asc" },
+    { label: t("shop.sortByRating"), value: "rating" },
+    { label: t("shop.sortByLatest"), value: "latest" },
+    { label: t("shop.sortByPriceLow"), value: "price-asc" },
+    { label: t("shop.sortByPriceHigh"), value: "price-desc" },
+  ], [t]);
+
   const [searchParams] = useSearchParams();
   const brandParam = searchParams.get("brand");
   const searchParam = searchParams.get("search");
@@ -202,9 +208,9 @@ const Shop = () => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
               {/* Breadcrumb */}
               <nav className="text-sm text-muted-foreground mb-6">
-                <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+                <Link to="/" className="hover:text-foreground transition-colors">{t("common.home")}</Link>
                 <span className="mx-2">›</span>
-                <Link to="/shop" className="hover:text-foreground transition-colors">Shop</Link>
+                <Link to="/shop" className="hover:text-foreground transition-colors">{t("common.shop")}</Link>
                 {selectedCategory !== "All" && (
                   <>
                     <span className="mx-2">›</span>
@@ -214,7 +220,7 @@ const Shop = () => {
                 {debouncedSearch && (
                   <>
                     <span className="mx-2">›</span>
-                    <span className="text-foreground font-medium">Search results for "{debouncedSearch}"</span>
+                    <span className="text-foreground font-medium">{t("shop.searchResults")} "{debouncedSearch}"</span>
                   </>
                 )}
               </nav>
@@ -233,17 +239,17 @@ const Shop = () => {
                     className="flex items-center gap-2 text-sm font-medium text-foreground hover:opacity-70 transition-opacity"
                   >
                     <Filter className="w-4 h-4" />
-                    Filter
+                    {t("shop.filter")}
                   </button>
 
                   <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {totalCount} items
+                    {totalCount} {t("common.items")}
                     {isFetching && !isLoading && <Loader2 className="inline-block ms-1 h-3 w-3 animate-spin" />}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground hidden sm:inline">Sort:</span>
+                  <span className="text-sm text-muted-foreground hidden sm:inline">{t("shop.sort")}:</span>
                   <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger className="w-[180px] h-10 bg-card border-border/50 rounded-full text-sm">
                       <SelectValue placeholder="Sort" />
@@ -277,27 +283,27 @@ const Shop = () => {
                     <Search className="absolute start-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       type="text"
-                      placeholder="Search shoes..."
+                      placeholder={t("shop.searchShoes")}
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
                       className="ps-10 h-10 bg-background border-border/50"
                     />
                   </div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-40 h-10 bg-background border-border/50"><SelectValue placeholder="Category" /></SelectTrigger>
+                    <SelectTrigger className="w-40 h-10 bg-background border-border/50"><SelectValue placeholder={t("shop.category")} /></SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
                     </SelectContent>
                   </Select>
                   <Select value={selectedPriceRange.toString()} onValueChange={(v) => setSelectedPriceRange(parseInt(v))}>
-                    <SelectTrigger className="w-44 h-10 bg-background border-border/50"><SelectValue placeholder="Price Range" /></SelectTrigger>
+                    <SelectTrigger className="w-44 h-10 bg-background border-border/50"><SelectValue placeholder={t("shop.priceRange")} /></SelectTrigger>
                     <SelectContent>
                       {priceRanges.map((range, idx) => <SelectItem key={idx} value={idx.toString()}>{range.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
                   {hasActiveFilters && (
                     <Button variant="outline" size="sm" onClick={clearFilters} className="h-10">
-                      <X className="w-3 h-3 me-1" /> Clear
+                      <X className="w-3 h-3 me-1" /> {t("common.clear")}
                     </Button>
                   )}
                 </div>
@@ -306,7 +312,7 @@ const Shop = () => {
               {/* Active Filters */}
               {hasActiveFilters && (
                 <div className="flex items-center gap-2 mb-4 flex-wrap">
-                  <span className="text-sm text-muted-foreground">Active:</span>
+                  <span className="text-sm text-muted-foreground">{t("common.active")}</span>
                   {searchInput && (
                     <span className="px-3 py-1 bg-card border border-border/50 rounded-full text-xs flex items-center gap-2">
                       "{searchInput}" <X className="w-3 h-3 cursor-pointer hover:text-primary" onClick={() => setSearchInput("")} />
@@ -317,7 +323,7 @@ const Shop = () => {
                       {selectedCategory} <X className="w-3 h-3 cursor-pointer hover:text-primary" onClick={() => setSelectedCategory("All")} />
                     </span>
                   )}
-                  <button onClick={clearFilters} className="text-xs text-primary hover:underline">Clear all</button>
+                  <button onClick={clearFilters} className="text-xs text-primary hover:underline">{t("common.clearAll")}</button>
                 </div>
               )}
 
@@ -353,9 +359,9 @@ const Shop = () => {
               {/* Empty State */}
               {!isLoading && products.length === 0 && (
                 <div className="text-center py-20">
-                  <p className="text-muted-foreground text-lg">No products found matching your criteria.</p>
+                  <p className="text-muted-foreground text-lg">{t("shop.noProducts")}</p>
                   <Button onClick={clearFilters} variant="outline" className="mt-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                    Clear Filters
+                    {t("shop.clearFilters")}
                   </Button>
                 </div>
               )}
@@ -365,26 +371,26 @@ const Shop = () => {
 
               {(hasNextPage || isFetchingNextPage) && products.length > 0 && (
                 <p className="text-center text-xs text-muted-foreground mb-2 mt-4">
-                  Loading products… {products.length} loaded
+                  {t("shop.loadingProducts")} {products.length} {t("shop.loaded")}
                 </p>
               )}
 
               {isFetchingNextPage && (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                  <span className="ml-2 text-sm text-muted-foreground">Loading more...</span>
+                  <span className="ml-2 text-sm text-muted-foreground">{t("shop.loadingMore")}</span>
                 </div>
               )}
 
               {!isLoading && totalCount > 0 && (
                 <p className="text-center text-xs text-muted-foreground mb-4 mt-2">
-                  Showing {Math.min(products.length, totalCount)} of {totalCount} products
+                  {t("shop.showing")} {Math.min(products.length, totalCount)} {t("shop.of")} {totalCount} {t("shop.products")}
                 </p>
               )}
 
               {!isLoading && totalCount === 0 && products.length > 0 && !hasNextPage && (
                 <p className="text-center text-xs text-muted-foreground mb-4 mt-2">
-                  Showing {products.length} products
+                  {t("shop.showing")} {products.length} {t("shop.products")}
                 </p>
               )}
             </div>

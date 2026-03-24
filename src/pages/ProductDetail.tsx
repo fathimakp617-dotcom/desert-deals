@@ -28,6 +28,7 @@ import { useProductStock, isProductSoldOut, getProductStock } from "@/hooks/useP
 import { fadeInUp, fadeInLeft, staggerContainer, staggerItem } from "@/lib/animations";
 import { toast } from "sonner";
 import { trackViewContent, trackAddToCart } from "@/lib/metaPixel";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { trackGoogleAdsViewItem, trackGoogleAdsAddToCart } from "@/lib/gtag";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +39,7 @@ import { ProductSchema, BreadcrumbSchema } from "@/components/seo/JsonLd";
 import BuyNowOverlay from "@/components/BuyNowOverlay";
 
 const ProductDetail = () => {
+  const { t, lang } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: product, isLoading } = useDbProduct(id);
@@ -163,9 +165,9 @@ const ProductDetail = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-heading mb-4">Product Not Found</h1>
+          <h1 className="text-4xl font-heading mb-4">{t("product.notFound")}</h1>
           <Link to="/shop" className="text-primary hover:underline">
-            Return to Shop
+            {t("product.returnToShop")}
           </Link>
         </div>
       </div>
@@ -178,11 +180,11 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (isSoldOut) {
-      toast.error("This product is currently sold out");
+      toast.error(t("product.soldOutMessage"));
       return;
     }
     if (needsSize && !selectedSize) {
-      toast.error("Please select a size first");
+      toast.error(t("product.pleaseSelectSize"));
       return;
     }
     const sizeLabel = needsSize && selectedSize ? selectedSize : "One Size";
@@ -204,11 +206,11 @@ const ProductDetail = () => {
 
   const handleBuyNow = () => {
     if (isSoldOut) {
-      toast.error("This product is currently sold out");
+      toast.error(t("product.soldOutMessage"));
       return;
     }
     if (needsSize && !selectedSize) {
-      toast.error("Please select a size first");
+      toast.error(t("product.pleaseSelectSize"));
       return;
     }
     const sizeLabel = needsSize && selectedSize ? selectedSize : "One Size";
@@ -219,7 +221,7 @@ const ProductDetail = () => {
   const handleToggleWishlist = () => {
     toggleWishlist(product);
     toast.success(
-      inWishlist ? `${product.name} removed from wishlist` : `${product.name} added to wishlist`
+      inWishlist ? `${product.name} ${t("product.removedFromWishlist")}` : `${product.name} ${t("product.addedToWishlist")}`
     );
   };
 
@@ -299,7 +301,7 @@ const ProductDetail = () => {
               className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-              <span className="text-sm tracking-wider">BACK</span>
+              <span className="text-sm tracking-wider">{t("common.back")}</span>
             </motion.button>
           </div>
         </section>
@@ -444,9 +446,9 @@ const ProductDetail = () => {
                     )}
                   </div>
                 {!isSoldOut ? (
-                    <span className="text-xs sm:text-sm font-medium text-green-600">IN STOCK</span>
+                    <span className="text-xs sm:text-sm font-medium text-green-600">{t("product.inStock")}</span>
                   ) : (
-                    <span className="text-xs sm:text-sm font-medium text-destructive">Sold Out</span>
+                    <span className="text-xs sm:text-sm font-medium text-destructive">{t("product.soldOut")}</span>
                   )}
                 </motion.div>
 
@@ -472,7 +474,7 @@ const ProductDetail = () => {
                       ))}
                     </div>
                     <span className="text-sm text-muted-foreground underline underline-offset-2">
-                      {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? "review" : "reviews"})
+                      {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? t("product.review") : t("product.reviewsPlural")})
                     </span>
                   </motion.div>
                 )}
@@ -480,7 +482,7 @@ const ProductDetail = () => {
                 {/* Size Selector */}
                 {needsSize && (
                 <motion.div variants={staggerItem} className="space-y-2">
-                  <p className="text-xs sm:text-sm text-muted-foreground">Size <span className="text-destructive">*</span></p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t("common.size")} <span className="text-destructive">*</span></p>
                   <div className="flex flex-wrap gap-1.5">
                     {([...new Set(product.size
                       ? product.size.split(",").map(s => s.trim()).filter(Boolean)
@@ -506,14 +508,14 @@ const ProductDetail = () => {
                 {isSoldOut && (
                   <motion.div variants={staggerItem} className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
                     <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
-                    <span className="text-destructive font-medium text-sm">This product is currently sold out</span>
+                    <span className="text-destructive font-medium text-sm">{t("product.soldOutMessage")}</span>
                   </motion.div>
                 )}
                 
                 {!isSoldOut && stockQuantity > 0 && stockQuantity <= 10 && (
                   <motion.div variants={staggerItem} className="flex items-center gap-2 p-2.5 bg-orange-500/10 border border-orange-500/30 rounded-lg">
                     <AlertCircle className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                    <span className="text-orange-500 text-xs sm:text-sm">Only {stockQuantity} left in stock!</span>
+                    <span className="text-orange-500 text-xs sm:text-sm">{t("product.only")} {stockQuantity} {t("product.onlyLeftInStock")}</span>
                   </motion.div>
                 )}
 
@@ -540,7 +542,7 @@ const ProductDetail = () => {
                     disabled={isSoldOut}
                     className="flex-1 bg-foreground hover:bg-foreground/90 text-background py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium transition-all duration-300 rounded-full"
                   >
-                    {isSoldOut ? "SOLD OUT" : "Add to cart"}
+                    {isSoldOut ? t("product.soldOut") : t("product.addToCart")}
                   </Button>
                 </motion.div>
 
@@ -553,7 +555,7 @@ const ProductDetail = () => {
                     variant="outline"
                     className="flex-1 py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium border-foreground text-foreground hover:bg-foreground hover:text-background transition-all duration-300 rounded-full"
                   >
-                    Buy Now
+                    {t("common.buyNow")}
                   </Button>
                   <Button
                     size="lg"
@@ -571,7 +573,7 @@ const ProductDetail = () => {
                     <Truck className="w-5 h-5 text-primary shrink-0" />
                     <div className="text-sm">
                       <span className="font-medium text-foreground">
-                        Estimated Delivery: {(() => {
+                        {t("product.estimatedDelivery")} {(() => {
                           const now = new Date();
                           const addBusinessDays = (start: Date, days: number) => {
                             const result = new Date(start);
@@ -584,11 +586,11 @@ const ProductDetail = () => {
                           };
                           const from = addBusinessDays(now, 1);
                           const to = addBusinessDays(now, 2);
-                          const fmt = (d: Date) => d.toLocaleDateString("en-AE", { weekday: "short", month: "short", day: "numeric" });
+                          const fmt = (d: Date) => d.toLocaleDateString(lang === "ar" ? "ar-AE" : "en-AE", { weekday: "short", month: "short", day: "numeric" });
                           return `${fmt(from)} – ${fmt(to)}`;
                         })()}
                       </span>
-                      <p className="text-xs text-muted-foreground mt-0.5">Order now • No delivery on Sundays</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{t("product.orderNow")}</p>
                     </div>
                   </div>
                   {isEidDeliveryEnabled && (
@@ -608,7 +610,7 @@ const ProductDetail = () => {
 
                 {/* Social Share Bar */}
                 <motion.div variants={staggerItem} className="flex items-center gap-4 py-2">
-                  <span className="text-sm font-medium text-foreground">Share:</span>
+                  <span className="text-sm font-medium text-foreground">{t("common.share")}</span>
                   {(() => {
                     const ogUrl = `https://ttgsrrlhqvtnmtlkvlyi.supabase.co/functions/v1/og-product?id=${product.id}`;
                     const directUrl = `https://desertsdeals.com/product/${product.id}`;
@@ -675,7 +677,7 @@ const ProductDetail = () => {
                     onClick={() => setShowDescription(!showDescription)}
                     className="text-base font-heading font-semibold text-foreground flex items-center justify-between w-full"
                   >
-                    Description
+                    {t("product.description")}
                     <span className="text-muted-foreground text-sm">{showDescription ? "−" : "+"}</span>
                   </button>
                   {showDescription && (
@@ -702,39 +704,39 @@ const ProductDetail = () => {
                     onClick={() => setShowAdditional(!showAdditional)}
                     className="text-base font-heading text-primary hover:underline"
                   >
-                    Additional information
+                    {t("product.additionalInfo")}
                   </button>
                   {showAdditional && (
                     <div className="pt-2 space-y-2 text-sm">
                       <div className="flex justify-between py-2 border-b border-border/20">
-                        <span className="text-muted-foreground">Category</span>
+                        <span className="text-muted-foreground">{t("product.category")}</span>
                         <span className="text-foreground">{product.category}</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-border/20">
-                        <span className="text-muted-foreground">Available Sizes</span>
+                        <span className="text-muted-foreground">{t("product.availableSizes")}</span>
                         <span className="text-foreground">EU 36 – 45</span>
                       </div>
                       {product.occasion.length > 0 && (
                         <div className="flex justify-between py-2 border-b border-border/20">
-                          <span className="text-muted-foreground">Best For</span>
+                          <span className="text-muted-foreground">{t("product.bestFor")}</span>
                           <span className="text-foreground">{product.occasion.join(", ")}</span>
                         </div>
                       )}
                       {product.materials.length > 0 && (
                         <div className="flex justify-between py-2 border-b border-border/20">
-                          <span className="text-muted-foreground">Materials</span>
+                          <span className="text-muted-foreground">{t("product.materials")}</span>
                           <span className="text-foreground">{product.materials.join(", ")}</span>
                         </div>
                       )}
                       {product.comfort && (
                         <div className="flex justify-between py-2 border-b border-border/20">
-                          <span className="text-muted-foreground">Comfort</span>
+                          <span className="text-muted-foreground">{t("product.comfort")}</span>
                           <span className="text-foreground">{product.comfort}</span>
                         </div>
                       )}
                       {product.fit && (
                         <div className="flex justify-between py-2 border-b border-border/20">
-                          <span className="text-muted-foreground">Fit</span>
+                          <span className="text-muted-foreground">{t("product.fit")}</span>
                           <span className="text-foreground">{product.fit}</span>
                         </div>
                       )}
@@ -748,7 +750,7 @@ const ProductDetail = () => {
                     onClick={() => setShowReviews(!showReviews)}
                     className="text-base font-heading text-primary hover:underline"
                   >
-                    Reviews
+                    {t("product.reviews")}
                   </button>
                   {showReviews && (
                     <div className="pt-2">

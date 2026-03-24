@@ -7,8 +7,10 @@ import { fadeInUp, staggerContainer, staggerItem, lineReveal } from "@/lib/anima
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "@/contexts/DirectionContext";
 
 const Contact = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,15 +26,14 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.subject.trim() || !formData.message.trim()) {
-      toast.error("Please fill in all fields");
+      toast.error(t("contact.fillAll"));
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
+      toast.error(t("contact.invalidEmail"));
       return;
     }
 
@@ -45,11 +46,11 @@ const Contact = () => {
 
       if (error) throw error;
 
-      toast.success("Message sent! We'll get back to you soon.");
+      toast.success(t("contact.success"));
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error: any) {
       console.error("Contact form error:", error);
-      toast.error("Failed to send message. Please try again.");
+      toast.error(t("contact.error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -69,18 +70,17 @@ const Contact = () => {
             className="text-center mb-12 sm:mb-16"
           >
             <motion.p variants={fadeInUp} className="text-sm tracking-[0.4em] text-primary mb-4">
-              GET IN TOUCH
+              {t("contact.getInTouch")}
             </motion.p>
             <motion.h2 variants={fadeInUp} className="text-3xl sm:text-4xl md:text-6xl font-heading tracking-tight">
-              Contact Us
+              {t("contact.title")}
             </motion.h2>
             <motion.div 
               variants={lineReveal}
               className="w-20 h-0.5 bg-primary mx-auto mt-6 origin-center"
             />
             <motion.p variants={fadeInUp} className="text-muted-foreground mt-6 max-w-xl mx-auto">
-              Have questions about our products? We'd love to hear from you. 
-              Send us a message and we'll respond as soon as possible.
+              {t("contact.subtitle")}
             </motion.p>
           </motion.div>
 
@@ -96,28 +96,28 @@ const Contact = () => {
             <motion.div variants={staggerItem} className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
               <div className="space-y-2">
                 <label className="text-sm tracking-wider text-muted-foreground">
-                  NAME
+                  {t("contact.name")}
                 </label>
                 <Input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Your name"
+                  placeholder={t("contact.namePlaceholder")}
                   className="bg-card border-border/50 focus:border-primary h-12 sm:h-14 px-4 sm:px-6 text-foreground placeholder:text-muted-foreground/50 transition-all duration-300"
                   disabled={isSubmitting}
                 />
               </div>
               <div className="space-y-2">
                 <label className="text-sm tracking-wider text-muted-foreground">
-                  EMAIL
+                  {t("contact.email")}
                 </label>
                 <Input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Your email"
+                  placeholder={t("contact.emailPlaceholder")}
                   className="bg-card border-border/50 focus:border-primary h-12 sm:h-14 px-4 sm:px-6 text-foreground placeholder:text-muted-foreground/50 transition-all duration-300"
                   disabled={isSubmitting}
                 />
@@ -126,14 +126,14 @@ const Contact = () => {
 
             <motion.div variants={staggerItem} className="space-y-2">
               <label className="text-sm tracking-wider text-muted-foreground">
-                SUBJECT
+                {t("contact.subject")}
               </label>
               <Input
                 type="text"
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder="Subject"
+                placeholder={t("contact.subjectPlaceholder")}
                 className="bg-card border-border/50 focus:border-primary h-12 sm:h-14 px-4 sm:px-6 text-foreground placeholder:text-muted-foreground/50 transition-all duration-300"
                 disabled={isSubmitting}
               />
@@ -141,13 +141,13 @@ const Contact = () => {
 
             <motion.div variants={staggerItem} className="space-y-2">
               <label className="text-sm tracking-wider text-muted-foreground">
-                MESSAGE
+                {t("contact.message")}
               </label>
               <Textarea
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="Your message"
+                placeholder={t("contact.messagePlaceholder")}
                 rows={6}
                 className="bg-card border-border/50 focus:border-primary px-4 sm:px-6 py-4 text-foreground placeholder:text-muted-foreground/50 resize-none transition-all duration-300"
                 disabled={isSubmitting}
@@ -163,11 +163,11 @@ const Contact = () => {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    SENDING...
+                    <Loader2 className="w-4 h-4 me-2 animate-spin" />
+                    {t("contact.sending")}
                   </>
                 ) : (
-                  "SEND MESSAGE"
+                  t("contact.send")
                 )}
               </Button>
             </motion.div>

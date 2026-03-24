@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import FeaturesBar from "@/components/FeaturesBar";
 import PageTransition from "@/components/PageTransition";
 import { toast } from "sonner";
+import { useTranslation } from "@/contexts/DirectionContext";
 
 const DEFAULT_SIZES = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
 
@@ -22,7 +23,7 @@ const getSizes = (product: Product): number[] => {
 };
 
 /** Cross-sell card with inline size picker */
-const CrossSellCard = ({ product, onAdd, onBuyNow }: { product: Product; onAdd: (product: Product, size: number) => void; onBuyNow: (product: Product, size: number) => void }) => {
+const CrossSellCard = ({ product, onAdd, onBuyNow, t }: { product: Product; onAdd: (product: Product, size: number) => void; onBuyNow: (product: Product, size: number) => void; t: (key: any) => string }) => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const sizes = getSizes(product);
 
@@ -45,7 +46,7 @@ const CrossSellCard = ({ product, onAdd, onBuyNow }: { product: Product; onAdd: 
 
       {/* Size selector */}
       <div className="mt-2">
-        <p className="text-[10px] text-muted-foreground mb-1">Select Size</p>
+        <p className="text-[10px] text-muted-foreground mb-1">{t("common.selectSize")}</p>
         <div className="flex flex-wrap gap-1">
           {sizes.map((size) => (
             <button
@@ -67,22 +68,22 @@ const CrossSellCard = ({ product, onAdd, onBuyNow }: { product: Product; onAdd: 
         <button
           onClick={() => {
             if (!selectedSize) {
-              toast.error("Please select a size");
+              toast.error(t("product.pleaseSelectSize"));
               return;
             }
             onAdd(product, selectedSize);
-            toast.success(`${product.name} added!`);
+            toast.success(`${product.name} ${t("product.added")}`);
           }}
           className="flex items-center gap-1 text-xs text-primary hover:underline font-medium"
         >
           <Plus className="w-3 h-3" />
-          Add to Cart
+          {t("common.addToCart")}
         </button>
         <span className="text-muted-foreground/40">|</span>
         <button
           onClick={() => {
             if (!selectedSize) {
-              toast.error("Please select a size");
+              toast.error(t("product.pleaseSelectSize"));
               return;
             }
             onBuyNow(product, selectedSize);
@@ -90,7 +91,7 @@ const CrossSellCard = ({ product, onAdd, onBuyNow }: { product: Product; onAdd: 
           className="flex items-center gap-1 text-xs text-foreground hover:underline font-semibold"
         >
           <ShoppingBag className="w-3 h-3" />
-          Buy Now
+          {t("common.buyNow")}
         </button>
       </div>
     </div>
@@ -102,12 +103,12 @@ const Cart = memo(() => {
   const { data: allProducts = [] } = useDbProducts();
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const subtotal = totalPrice;
   const shipping = 20;
   const total = subtotal + shipping;
 
-  // Cross-sell: products not in cart
   const cartIds = useMemo(() => new Set(items.map(i => i.product.id)), [items]);
   const crossSellProducts = useMemo(() => {
     return allProducts.filter(p => !cartIds.has(p.id)).slice(0, 10);
@@ -123,7 +124,7 @@ const Cart = memo(() => {
 
   const handleCrossSellBuyNow = (product: Product, size: number) => {
     addToCart(product, 1, `EU ${size}`);
-    toast.success(`${product.name} added!`);
+    toast.success(`${product.name} ${t("product.added")}`);
     navigate("/checkout");
   };
 
@@ -135,16 +136,16 @@ const Cart = memo(() => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-16">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-            <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+            <Link to="/" className="hover:text-foreground transition-colors">{t("common.home")}</Link>
             <span>›</span>
-            <span className="text-foreground">Cart</span>
+            <span className="text-foreground">{t("cart.shoppingCart")}</span>
           </nav>
 
           {items.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-muted-foreground text-lg mb-6">Your cart is empty</p>
+              <p className="text-muted-foreground text-lg mb-6">{t("cart.empty")}</p>
               <Button asChild variant="outline">
-                <Link to="/shop">Continue Shopping</Link>
+                <Link to="/shop">{t("cart.continueShopping")}</Link>
               </Button>
             </div>
           ) : (
@@ -154,10 +155,10 @@ const Cart = memo(() => {
                 <div className="flex-1 min-w-0">
                   {/* Table Header */}
                   <div className="hidden sm:grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 pb-4 border-b border-border text-sm text-muted-foreground">
-                    <span>Product</span>
-                    <span>Price</span>
-                    <span>Quantity</span>
-                    <span>Subtotal</span>
+                    <span>{t("cart.product")}</span>
+                    <span>{t("cart.price")}</span>
+                    <span>{t("cart.quantity")}</span>
+                    <span>{t("cart.subtotal")}</span>
                     <span className="w-8" />
                   </div>
 
@@ -177,12 +178,12 @@ const Cart = memo(() => {
                               {item.product.name}
                             </Link>
                             {item.selectedSize && (
-                              <p className="text-xs text-muted-foreground mt-0.5">Size: {item.selectedSize}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">{t("common.size")}: {item.selectedSize}</p>
                             )}
                           </div>
                         </div>
                         <div className="text-sm text-foreground">
-                          <span className="sm:hidden text-muted-foreground mr-2">Price:</span>
+                          <span className="sm:hidden text-muted-foreground me-2">{t("cart.price")}:</span>
                           {formatPrice(item.product.price)}
                         </div>
                         <div>
@@ -197,7 +198,7 @@ const Cart = memo(() => {
                           </div>
                         </div>
                         <div className="text-sm font-medium text-foreground">
-                          <span className="sm:hidden text-muted-foreground mr-2">Subtotal:</span>
+                          <span className="sm:hidden text-muted-foreground me-2">{t("cart.subtotal")}:</span>
                           {formatPrice(item.product.price * item.quantity)}
                         </div>
                         <button onClick={() => removeFromCart(item.product.id, item.selectedSize)} className="p-1 text-muted-foreground hover:text-destructive transition-colors justify-self-end">
@@ -211,27 +212,25 @@ const Cart = memo(() => {
                 {/* Cart Totals Sidebar */}
                 <div className="w-full lg:w-80 flex-shrink-0">
                   <div className="border border-border rounded-lg p-6 space-y-4 sticky top-24">
-                    <h3 className="text-base font-bold tracking-wider text-foreground">CART TOTALS</h3>
+                    <h3 className="text-base font-bold tracking-wider text-foreground">{t("cart.cartTotals")}</h3>
                     <div className="flex justify-between text-sm py-2 border-b border-border/50">
-                      <span className="text-muted-foreground">Subtotal</span>
+                      <span className="text-muted-foreground">{t("cart.subtotal")}</span>
                       <span className="text-foreground">{formatPrice(subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-sm py-2 border-b border-border/50">
-                      <span className="text-muted-foreground">Shipping</span>
+                      <span className="text-muted-foreground">{t("cart.shipping")}</span>
                       <span className="text-foreground">{formatPrice(shipping)}</span>
                     </div>
                     <div className="flex justify-between text-base font-bold py-2">
-                      <span>Total</span>
+                      <span>{t("cart.total")}</span>
                       <span>{formatPrice(total)}</span>
                     </div>
                     <Button size="lg" asChild className="w-full bg-foreground hover:bg-foreground/90 text-background py-6 text-sm tracking-widest font-medium">
-                      <Link to="/checkout">Proceed to checkout</Link>
+                      <Link to="/checkout">{t("cart.proceedToCheckout")}</Link>
                     </Button>
                   </div>
                 </div>
               </div>
-
-              {/* Cross-selling paused */}
             </>
           )}
         </div>

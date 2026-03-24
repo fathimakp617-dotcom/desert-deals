@@ -1,4 +1,5 @@
 import { useState, useEffect, memo, useCallback, useRef } from "react";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Truck, Check, Lock, Zap, Loader2 } from "lucide-react";
@@ -118,6 +119,7 @@ interface OfflinePendingOrder {
 }
 
 const Checkout = () => {
+  const { t } = useTranslation();
   const { items, totalPrice, clearCart, totalItems } = useCart();
   
   const { user, isLoading: authLoading } = useAuth();
@@ -361,20 +363,19 @@ const Checkout = () => {
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
-    if (!formData.firstName.trim()) errors.firstName = "Name is required";
-    if (!formData.state) errors.state = "Please select an emirate";
-    if (!formData.phone.trim()) errors.phone = "Phone is required";
+    if (!formData.firstName.trim()) errors.firstName = t("validation.nameRequired");
+    if (!formData.state) errors.state = t("validation.selectEmirate");
+    if (!formData.phone.trim()) errors.phone = t("validation.phoneRequired");
     else {
       const digitsOnly = formData.phone.replace(/\D/g, "");
-      if (digitsOnly.length < 9 || digitsOnly.length > 10) errors.phone = "Phone must be 9-10 digits";
+      if (digitsOnly.length < 9 || digitsOnly.length > 10) errors.phone = t("validation.phoneInvalid");
     }
-    if (!formData.city.trim()) errors.city = "City is required";
-    if (!formData.email.trim()) errors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Invalid email address";
+    if (!formData.city.trim()) errors.city = t("validation.cityRequired");
+    if (!formData.email.trim()) errors.email = t("validation.emailRequired");
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = t("validation.emailInvalid");
     
-    // Check terms checkbox
     const termsCheckbox = document.getElementById('terms-checkout') as HTMLInputElement;
-    if (termsCheckbox && !termsCheckbox.checked) errors.terms = "You must agree to the terms and conditions";
+    if (termsCheckbox && !termsCheckbox.checked) errors.terms = t("validation.agreeTerms");
     
     setFieldErrors(errors);
     
@@ -391,7 +392,7 @@ const Checkout = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
-      toast({ title: "Please fill in all required fields", variant: "destructive" });
+      toast({ title: t("checkout.fillRequired"), variant: "destructive" });
       return;
     }
     await handleCODOrder();
@@ -609,10 +610,10 @@ const Checkout = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-32 text-center">
-          <h1 className="text-3xl font-heading text-foreground mb-4">Your cart is empty</h1>
-          <p className="text-muted-foreground mb-8">Add some products to checkout.</p>
+          <h1 className="text-3xl font-heading text-foreground mb-4">{t("checkout.emptyCart")}</h1>
+          <p className="text-muted-foreground mb-8">{t("checkout.addProducts")}</p>
           <Button asChild>
-            <Link to="/shop">Continue Shopping</Link>
+            <Link to="/shop">{t("common.continueShopping")}</Link>
           </Button>
         </div>
         <Footer />
@@ -635,10 +636,10 @@ const Checkout = () => {
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
-            Continue Shopping
+            {t("common.continueShopping")}
           </Link>
 
-          <h1 className="text-3xl md:text-4xl font-heading text-foreground mb-8">Checkout</h1>
+          <h1 className="text-3xl md:text-4xl font-heading text-foreground mb-8">{t("checkout.title")}</h1>
 
           {/* Express Checkout Banner */}
           {savedAddress && !isExpressMode && !loadingSavedAddress && (
@@ -653,9 +654,9 @@ const Checkout = () => {
                     <Zap className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-heading text-foreground">Express Checkout</h3>
+                    <h3 className="font-heading text-foreground">{t("checkout.expressCheckout")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Use your saved address: {savedAddress.address}, {savedAddress.city}
+                      {t("checkout.useSavedAddressDesc")} {savedAddress.address}, {savedAddress.city}
                     </p>
                   </div>
                 </div>
@@ -665,7 +666,7 @@ const Checkout = () => {
                   className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
                 >
                   <Zap className="w-4 h-4" />
-                  Use Saved Address
+                  {t("checkout.useSavedAddress")}
                 </Button>
               </div>
             </motion.div>
@@ -683,9 +684,9 @@ const Checkout = () => {
                   <Check className="w-5 h-5 text-emerald-500" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-heading text-emerald-500">Express Checkout Active</h3>
+                  <h3 className="font-heading text-emerald-500">{t("checkout.expressActive")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Your saved address has been applied. Just select payment and place your order!
+                    {t("checkout.expressActiveDesc")}
                   </p>
                 </div>
                 <Button
@@ -695,7 +696,7 @@ const Checkout = () => {
                   onClick={() => setIsExpressMode(false)}
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  Edit Details
+                  {t("checkout.editDetails")}
                 </Button>
               </div>
             </motion.div>
@@ -706,12 +707,12 @@ const Checkout = () => {
               {/* Left Column - Billing Details */}
               <div className="lg:col-span-2 space-y-6">
                 <div>
-                  <Label>Country / Region *</Label>
-                  <p className="text-foreground font-medium mt-1">United Arab Emirates</p>
+                  <Label>{t("checkout.countryRegion")}</Label>
+                  <p className="text-foreground font-medium mt-1">{t("checkout.uae")}</p>
                 </div>
 
                 <div>
-                  <Label htmlFor="firstName">Name *</Label>
+                  <Label htmlFor="firstName">{t("checkout.firstName")}</Label>
                   <Input
                     id="firstName"
                     name="firstName"
@@ -724,7 +725,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="address">Street Address</Label>
+                  <Label htmlFor="address">{t("checkout.address")}</Label>
                   <Input
                     id="address"
                     name="address"
@@ -736,7 +737,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="state">Emirate *</Label>
+                  <Label htmlFor="state">{t("checkout.state")}</Label>
                   <Select
                     value={formData.state}
                     onValueChange={(value) => {
@@ -745,7 +746,7 @@ const Checkout = () => {
                     }}
                   >
                     <SelectTrigger className={`mt-1 bg-card ${fieldErrors.state ? "border-destructive ring-1 ring-destructive" : "border-border"}`}>
-                      <SelectValue placeholder="Select Emirate" />
+                      <SelectValue placeholder={t("checkout.selectEmirate")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
@@ -761,7 +762,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="city">Town / City *</Label>
+                  <Label htmlFor="city">{t("checkout.city")}</Label>
                   <Input
                     id="city"
                     name="city"
@@ -774,7 +775,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="phone">Phone *</Label>
+                  <Label htmlFor="phone">{t("checkout.phone")}</Label>
                   <div className="flex gap-2 mt-1">
                     <Select
                       value={formData.countryCode}
@@ -812,7 +813,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="email">Email address *</Label>
+                  <Label htmlFor="email">{t("checkout.email")}</Label>
                   <Input
                     id="email"
                     name="email"
@@ -832,8 +833,8 @@ const Checkout = () => {
                 <div className="border border-border rounded-lg p-6 sticky top-24">
                   {/* Product table header */}
                   <div className="flex justify-between text-sm font-medium text-foreground border-b border-border pb-3 mb-3">
-                    <span>Product</span>
-                    <span>Subtotal</span>
+                    <span>{t("checkout.product")}</span>
+                    <span>{t("checkout.subtotal")}</span>
                   </div>
 
                   {/* Product items */}
@@ -843,7 +844,7 @@ const Checkout = () => {
                         <span className="text-muted-foreground flex-1 pe-4">
                           {item.product.name}
                           {item.selectedSize && (
-                            <span className="text-xs block text-muted-foreground/70">Size: {item.selectedSize}</span>
+                            <span className="text-xs block text-muted-foreground/70">{t("common.size")}: {item.selectedSize}</span>
                           )}
                           <span className="text-xs block">× {item.quantity}</span>
                         </span>
@@ -858,7 +859,7 @@ const Checkout = () => {
 
                   {/* Subtotal */}
                   <div className="flex justify-between text-sm py-3">
-                    <span className="text-foreground font-medium">Subtotal</span>
+                    <span className="text-foreground font-medium">{t("checkout.subtotal")}</span>
                     <span className="text-foreground">{formatPrice(totalPrice)}</span>
                   </div>
 
@@ -866,7 +867,7 @@ const Checkout = () => {
 
                   {/* Shipping */}
                   <div className="flex justify-between text-sm py-3">
-                    <span className="text-foreground font-medium">Delivery Charge</span>
+                    <span className="text-foreground font-medium">{t("checkout.deliveryCharge")}</span>
                     <span className="text-foreground">{formatPrice(shipping)}</span>
                   </div>
 
@@ -874,7 +875,7 @@ const Checkout = () => {
 
                   {/* Total */}
                   <div className="flex justify-between py-3">
-                    <span className="text-foreground font-bold">Total</span>
+                    <span className="text-foreground font-bold">{t("checkout.total")}</span>
                     <span className="text-foreground font-bold text-lg">{formatPrice(orderTotal)}</span>
                   </div>
 
@@ -885,9 +886,9 @@ const Checkout = () => {
                     <div className="w-4 h-4 rounded-full border-2 border-foreground flex items-center justify-center">
                       <div className="w-2 h-2 rounded-full bg-foreground" />
                     </div>
-                    <span className="font-medium text-foreground">Cash On Delivery</span>
+                    <span className="font-medium text-foreground">{t("checkout.cashOnDelivery")}</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6 ms-7">Pay with cash upon delivery.</p>
+                  <p className="text-sm text-muted-foreground mb-6 ms-7">{t("checkout.cashOnDeliveryDesc")}</p>
 
                   {/* Terms checkbox */}
                   <div className="mb-6">
@@ -901,9 +902,9 @@ const Checkout = () => {
                         }}
                       />
                       <Label htmlFor="terms-checkout" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                        I have read and agree to the website{" "}
+                        {t("checkout.agreeTerms")}{" "}
                         <Link to="/terms" target="_blank" className="text-primary hover:underline">
-                          terms and conditions
+                          {t("checkout.termsAndConditions")}
                         </Link>{" "}*
                       </Label>
                     </div>
@@ -924,10 +925,10 @@ const Checkout = () => {
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                           className="w-5 h-5 border-2 border-background border-t-transparent rounded-full"
                         />
-                        Processing...
+                        {t("checkout.processing")}
                       </span>
                     ) : (
-                      "Place order"
+                      t("checkout.placeOrder")
                     )}
                   </Button>
                 </div>
