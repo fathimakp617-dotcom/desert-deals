@@ -135,6 +135,7 @@ const AdminSections = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ title: "", subtitle: "", section_key: "" });
+  const [configData, setConfigData] = useState({ badge_text: "", sub_text: "", emoji: "📢" });
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
