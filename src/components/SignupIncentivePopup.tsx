@@ -50,10 +50,10 @@ const SignupIncentivePopup = () => {
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]" onClick={handleClose} />
       <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none">
         <div className="relative w-full max-w-md bg-gradient-to-br from-card via-card to-primary/5 border border-primary/20 rounded-2xl shadow-2xl pointer-events-auto overflow-hidden">
-          <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-secondary/20 to-transparent rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+          <div className="absolute top-0 start-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 end-0 w-40 h-40 bg-gradient-to-tl from-secondary/20 to-transparent rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
           
-          <button onClick={handleClose} className="absolute top-4 right-4 p-2 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors z-10">
+          <button onClick={handleClose} className="absolute top-4 end-4 p-2 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors z-10">
             <X className="w-4 h-4" />
           </button>
 
