@@ -96,7 +96,7 @@ const CartDrawer = memo(() => {
           </div>
 
           {items.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-8">Your cart is empty</p>
+            <p className="text-sm text-muted-foreground text-center py-8">{t("cart.empty")}</p>
           )}
         </div>
 
