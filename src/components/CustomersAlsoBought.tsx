@@ -4,6 +4,7 @@ import { formatPrice, Product } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { Heart, ChevronLeft, ChevronRight, Eye, ShoppingBag } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
 import { toast } from "sonner";
