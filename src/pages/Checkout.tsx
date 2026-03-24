@@ -840,7 +840,7 @@ const Checkout = () => {
                   <div className="space-y-3 mb-4">
                     {items.map((item) => (
                       <div key={item.product.id} className="flex justify-between text-sm">
-                        <span className="text-muted-foreground flex-1 pr-4">
+                        <span className="text-muted-foreground flex-1 pe-4">
                           {item.product.name}
                           {item.selectedSize && (
                             <span className="text-xs block text-muted-foreground/70">Size: {item.selectedSize}</span>
@@ -887,7 +887,7 @@ const Checkout = () => {
                     </div>
                     <span className="font-medium text-foreground">Cash On Delivery</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6 ml-7">Pay with cash upon delivery.</p>
+                  <p className="text-sm text-muted-foreground mb-6 ms-7">Pay with cash upon delivery.</p>
 
                   {/* Terms checkbox */}
                   <div className="mb-6">

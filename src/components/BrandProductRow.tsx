@@ -72,10 +72,10 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
           </div>
         ) : (
           <div className="relative group/scroll">
-            <button onClick={() => scroll("left")} className="absolute -left-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100">
+            <button onClick={() => scroll("left")} className="absolute -start-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button onClick={() => scroll("right")} className="absolute -right-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100">
+            <button onClick={() => scroll("right")} className="absolute -end-3 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-background border border-border rounded-full hidden sm:flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition-colors opacity-0 group-hover/scroll:opacity-100">
               <ChevronRight className="w-4 h-4" />
             </button>
 
@@ -101,7 +101,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                           />
                         </Link>
                         {soldOut && (
-                          <div className="absolute top-2 left-2">
+                          <div className="absolute top-2 start-2">
                             <Badge variant="destructive" className="text-[10px]">SOLD OUT</Badge>
                           </div>
                         )}
@@ -109,14 +109,14 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                         {/* Quick view */}
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQuickViewId(product.id); }}
-                          className="absolute bottom-2 right-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute bottom-2 end-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <Eye className="w-3.5 h-3.5 text-foreground" />
                         </button>
 
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); inWishlist ? removeFromWishlist(product.id) : addToWishlist(product); }}
-                          className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute bottom-2 end-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-foreground"}`} />
                         </button>

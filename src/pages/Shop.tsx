@@ -238,7 +238,7 @@ const Shop = () => {
 
                   <span className="text-xs text-muted-foreground whitespace-nowrap">
                     {totalCount} items
-                    {isFetching && !isLoading && <Loader2 className="inline-block ml-1 h-3 w-3 animate-spin" />}
+                    {isFetching && !isLoading && <Loader2 className="inline-block ms-1 h-3 w-3 animate-spin" />}
                   </span>
                 </div>
 
@@ -274,13 +274,13 @@ const Shop = () => {
               {showFilters && (
                 <div className="hidden lg:flex flex-row gap-4 mb-6 p-4 bg-card rounded-lg border border-border/50">
                   <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Search className="absolute start-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       type="text"
                       placeholder="Search shoes..."
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
-                      className="pl-10 h-10 bg-background border-border/50"
+                      className="ps-10 h-10 bg-background border-border/50"
                     />
                   </div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -297,7 +297,7 @@ const Shop = () => {
                   </Select>
                   {hasActiveFilters && (
                     <Button variant="outline" size="sm" onClick={clearFilters} className="h-10">
-                      <X className="w-3 h-3 mr-1" /> Clear
+                      <X className="w-3 h-3 me-1" /> Clear
                     </Button>
                   )}
                 </div>

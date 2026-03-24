@@ -84,7 +84,7 @@ const MobileBottomNav = memo(() => {
                     <button
                       key={product.id}
                       onClick={() => handleProductClick(product.id)}
-                      className="w-full flex items-center gap-3 py-3 border-b border-border/50 text-left"
+                      className="w-full flex items-center gap-3 py-3 border-b border-border/50 text-start"
                     >
                       {img ? (
                         <img src={img} alt={product.name} className="w-12 h-12 rounded-lg object-contain bg-white shrink-0" />
@@ -112,7 +112,7 @@ const MobileBottomNav = memo(() => {
         </div>
       )}
 
-      <div className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-2 md:hidden">
+      <div className="fixed bottom-0 start-0 end-0 z-50 px-3 pb-2 md:hidden">
         <nav className="flex items-center justify-around h-16 bg-background border border-border rounded-2xl shadow-lg">
           <button
             onClick={() => setSearchOpen(true)}

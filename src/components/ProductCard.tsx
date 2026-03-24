@@ -79,7 +79,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
 
 
         {!soldOut && product.discountPercent > 0 && product.name?.toLowerCase().includes("mind") && (
-          <div className="absolute top-2 left-2 z-10">
+          <div className="absolute top-2 start-2 z-10">
             <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5">
               -{product.discountPercent}%
             </Badge>
@@ -87,7 +87,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
         )}
 
         {soldOut && (
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2 start-2">
             <Badge variant="destructive" className="text-[10px]">SOLD OUT</Badge>
           </div>
         )}
@@ -95,7 +95,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
         {onQuickView && (
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView(product.id); }}
-            className="absolute bottom-2 right-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute bottom-2 end-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
           >
             <Eye className="w-3.5 h-3.5 text-foreground" />
           </button>
@@ -103,7 +103,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
 
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWishlist(product.id); }}
-          className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute bottom-2 end-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
         >
           <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-foreground"}`} />
         </button>
