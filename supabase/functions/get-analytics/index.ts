@@ -81,13 +81,17 @@ Deno.serve(async (req) => {
         .order("country_name"),
     ]);
 
-    const agg = aggregatesRes.data || {};
+    console.log("aggregatesRes type:", typeof aggregatesRes.data, "error:", aggregatesRes.error);
+    console.log("aggregatesRes.data:", JSON.stringify(aggregatesRes.data)?.slice(0, 500));
+    const rawAgg = aggregatesRes.data;
+    const agg = typeof rawAgg === "string" ? JSON.parse(rawAgg) : rawAgg || {};
     const total_views = Number(agg.total_views || 0);
     const total_sessions = Number(agg.unique_sessions || 0) || total_views;
     const live_visitors = Number(agg.live_visitors || 0);
     const live_carts = Number(agg.live_carts || 0);
     const add_to_cart_count = Number(agg.atc_sessions || 0);
     const checkout_count = Number(agg.checkout_sessions || 0);
+    console.log("Parsed: views=", total_views, "sessions=", total_sessions, "live=", live_visitors);
 
     // ===== Orders =====
     const orders = ordersRes.data || [];
