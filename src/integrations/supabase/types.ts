@@ -1090,11 +1090,63 @@ export type Database = {
       cleanup_expired_custom_otps: { Args: never; Returns: undefined }
       cleanup_expired_rate_limits: { Args: never; Returns: undefined }
       cleanup_expired_sessions: { Args: never; Returns: undefined }
+      get_atc_sessions: {
+        Args: { p_from: string; p_to: string }
+        Returns: number
+      }
+      get_checkout_sessions: {
+        Args: { p_from: string; p_to: string }
+        Returns: number
+      }
+      get_country_breakdown: {
+        Args: { p_from: string; p_limit?: number; p_to: string }
+        Returns: {
+          country: string
+          view_count: number
+        }[]
+      }
+      get_daily_views: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          day: string
+          view_count: number
+        }[]
+      }
+      get_live_carts: { Args: never; Returns: number }
+      get_live_visitors: { Args: never; Returns: number }
+      get_page_view_stats: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          total_views: number
+          unique_sessions: number
+        }[]
+      }
       get_product_rating: {
         Args: { p_product_id: string }
         Returns: {
           average_rating: number
           total_reviews: number
+        }[]
+      }
+      get_top_pages: {
+        Args: { p_from: string; p_limit?: number; p_to: string }
+        Returns: {
+          page: string
+          view_count: number
+        }[]
+      }
+      get_top_products_by_views: {
+        Args: { p_from: string; p_limit?: number; p_to: string }
+        Returns: {
+          pid: string
+          view_count: number
+        }[]
+      }
+      get_traffic_sources: {
+        Args: { p_from: string; p_limit?: number; p_to: string }
+        Returns: {
+          source: string
+          view_count: number
         }[]
       }
       has_role: {
