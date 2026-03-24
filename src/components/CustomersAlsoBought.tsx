@@ -4,6 +4,7 @@ import { formatPrice, Product } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { Heart, ChevronLeft, ChevronRight, Eye, ShoppingBag } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
 import { toast } from "sonner";
@@ -16,6 +17,7 @@ const CustomersAlsoBought = ({ currentProduct }: CustomersAlsoBoughtProps) => {
   const { data: products = [] } = useDbProducts();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
@@ -56,7 +58,7 @@ const CustomersAlsoBought = ({ currentProduct }: CustomersAlsoBoughtProps) => {
     <section className="py-6 sm:py-8 bg-background">
       <div className="px-4 sm:px-6">
         <h2 className="text-lg sm:text-xl font-heading font-bold tracking-tight mb-4">
-          Customers Also Bought
+          {t("product.customersAlsoBought")}
         </h2>
 
         <div className="relative group/scroll">

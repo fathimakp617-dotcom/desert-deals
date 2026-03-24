@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
+import { useTranslation } from "@/contexts/DirectionContext";
 
 const CartDrawer = memo(() => {
   const { items, isOpen, closeCart, addToCart, removeFromCart, totalItems } = useCart();
+  const { t } = useTranslation();
   const { data: allProducts } = useDbProducts();
   const [visible, setVisible] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -60,7 +62,7 @@ const CartDrawer = memo(() => {
               <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                 <Check className="w-3 h-3 text-primary-foreground" />
               </div>
-              <span className="font-heading text-sm text-primary">Added to your cart</span>
+              <span className="font-heading text-sm text-primary">{t("cart.addedToCart")}</span>
             </div>
           )}
 
@@ -76,9 +78,9 @@ const CartDrawer = memo(() => {
                     {item.product.name}
                   </Link>
                   {item.selectedSize && (
-                    <p className="text-xs text-muted-foreground mt-0.5">Size: {item.selectedSize}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t("common.size")}: {item.selectedSize}</p>
                   )}
-                  <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t("common.qty")}: {item.quantity}</p>
                 </div>
                 <div className="flex flex-col items-end justify-between">
                   <button
@@ -95,7 +97,7 @@ const CartDrawer = memo(() => {
           </div>
 
           {items.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-8">Your cart is empty</p>
+            <p className="text-sm text-muted-foreground text-center py-8">{t("cart.empty")}</p>
           )}
         </div>
 
@@ -103,10 +105,10 @@ const CartDrawer = memo(() => {
         <div className="p-4 border-t border-border space-y-3">
           <div className="flex gap-3">
             <Button variant="outline" className="flex-1 font-heading" size="lg" onClick={closeCart}>
-              Keep Shopping
+              {t("cart.keepShopping")}
             </Button>
             <Button asChild className="flex-1 font-heading" size="lg" onClick={closeCart}>
-              <Link to="/cart">Go to Cart ({totalItems})</Link>
+              <Link to="/cart">{t("cart.goToCart")} ({totalItems})</Link>
             </Button>
           </div>
         </div>

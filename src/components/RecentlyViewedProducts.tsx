@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react";
 import { formatPrice, Product } from "@/data/products";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useTranslation } from "@/contexts/DirectionContext";
 import QuickViewDialog from "@/components/QuickViewDialog";
 
 const STORAGE_KEY = "recently_viewed_products";
@@ -20,6 +21,7 @@ export const addToRecentlyViewed = (product: Product) => {
 const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
@@ -40,7 +42,7 @@ const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string
     <section className="py-2 sm:py-3 bg-background">
       <div className="px-4 sm:px-6">
         <h2 className="text-xl sm:text-2xl font-heading font-bold tracking-tight mb-3">
-          Recently Viewed
+          {t("product.recentlyViewed")}
         </h2>
 
         <div className="relative group/scroll">

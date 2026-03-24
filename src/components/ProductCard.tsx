@@ -4,6 +4,7 @@ import { Heart, ImageOff, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/data/products";
 import { usePrefetchProduct } from "@/hooks/useDbProducts";
+import { useTranslation } from "@/contexts/DirectionContext";
 import type { SimpleProduct } from "@/hooks/usePaginatedProducts";
 
 
@@ -19,6 +20,7 @@ interface ProductCardProps {
 const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQuickView, viewMode }: ProductCardProps) => {
   const [imgError, setImgError] = useState(false);
   const prefetch = usePrefetchProduct();
+  const { t } = useTranslation();
   const handlePrefetch = useCallback(() => prefetch(product.id), [prefetch, product.id]);
 
   if (viewMode === "list") {
@@ -44,9 +46,9 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
           </div>
           <div className="mt-1.5">
             {soldOut ? (
-              <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
+              <span className="text-[11px] font-bold text-red-500 uppercase">{t("product.outOfStock")}</span>
             ) : (
-              <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
+              <span className="text-[11px] font-bold text-emerald-600 uppercase">{t("product.inStock")}</span>
             )}
           </div>
         </div>
@@ -126,9 +128,9 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
         </div>
         <div className="mt-auto pt-1.5 flex items-center gap-1.5">
           {soldOut ? (
-            <span className="text-[11px] font-bold text-red-500 uppercase">Out of Stock</span>
+            <span className="text-[11px] font-bold text-red-500 uppercase">{t("product.outOfStock")}</span>
           ) : (
-            <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
+            <span className="text-[11px] font-bold text-emerald-600 uppercase">{t("product.inStock")}</span>
           )}
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWishlist(product.id); }}

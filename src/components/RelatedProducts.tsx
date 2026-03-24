@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { formatPrice, Product } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { Heart, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
 
@@ -14,6 +15,7 @@ interface RelatedProductsProps {
 const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsProps) => {
   const { data: products = [] } = useDbProducts();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
     <section className="py-2 sm:py-3 bg-background">
       <div className="px-4 sm:px-6">
         <h2 className="text-xl sm:text-2xl font-heading font-bold tracking-tight mb-6">
-          Complete Your Look
+          {t("product.completeYourLook")}
         </h2>
 
         <div className="relative group/scroll">
@@ -81,7 +83,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                         )}
                       </div>
                       <div className="mt-1.5 flex items-center justify-between">
-                        <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
+                        <span className="text-[11px] font-bold text-emerald-600 uppercase">{t("product.inStock")}</span>
                         <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); inWishlist ? removeFromWishlist(item.id) : addToWishlist(item); }} className="p-0">
                           <Heart className={`w-4 h-4 ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
                         </button>

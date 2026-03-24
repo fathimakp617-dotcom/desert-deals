@@ -4,6 +4,7 @@ import { Plus, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useCart } from "@/contexts/CartContext";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { formatPrice, Product } from "@/data/products";
 import { toast } from "sonner";
 
@@ -14,6 +15,7 @@ interface FrequentlyBoughtTogetherProps {
 const FrequentlyBoughtTogether = ({ currentProduct }: FrequentlyBoughtTogetherProps) => {
   const { data: allProducts = [] } = useDbProducts();
   const { addToCart } = useCart();
+  const { t } = useTranslation();
 
   // Pick 2 products from same category (or random) as cross-sell
   const crossSellProducts = useMemo(() => {
@@ -52,7 +54,7 @@ const FrequentlyBoughtTogether = ({ currentProduct }: FrequentlyBoughtTogetherPr
     <section className="py-10 sm:py-14">
       <div className="px-4 sm:px-6 lg:px-8">
         <h2 className="text-xl sm:text-2xl font-heading font-bold tracking-tight mb-6">
-          Frequently Bought Together
+          {t("product.frequentlyBoughtTogether")}
         </h2>
 
         <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
