@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -132,6 +133,7 @@ const AdminSections = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ title: "", subtitle: "", section_key: "" });
+  const [configData, setConfigData] = useState({ badge_text: "", sub_text: "", emoji: "📢" });
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -169,9 +171,18 @@ const AdminSections = () => {
     }
   };
 
+  const isAnnouncementSection = (s: HomepageSection | null) => 
+    s?.section_key === "product_announcement" || s?.section_key === "eid_delivery";
+
   const handleEdit = (section: HomepageSection) => {
     setEditingSection(section);
     setFormData({ title: section.title, subtitle: section.subtitle, section_key: section.section_key });
+    const cfg = section.config as any;
+    setConfigData({
+      badge_text: cfg?.badge_text || "",
+      sub_text: cfg?.sub_text || "",
+      emoji: cfg?.emoji || "📢",
+    });
   };
 
   const handleSaveEdit = async () => {
@@ -179,12 +190,25 @@ const AdminSections = () => {
     const session = getSession();
     if (!session) return;
     try {
+      const updatedSection: any = { 
+        ...editingSection, 
+        title: formData.title, 
+        subtitle: formData.subtitle,
+      };
+      if (isAnnouncementSection(editingSection)) {
+        updatedSection.config = {
+          ...(editingSection.config as any),
+          badge_text: configData.badge_text,
+          sub_text: configData.sub_text,
+          emoji: configData.emoji,
+        };
+      }
       await supabase.functions.invoke("manage-homepage-sections", {
         body: {
           action: "update",
           email: session.email,
           token: session.token,
-          section: { ...editingSection, title: formData.title, subtitle: formData.subtitle },
+          section: updatedSection,
         },
       });
       toast({ title: "Section updated" });
@@ -326,7 +350,7 @@ const AdminSections = () => {
 
       {/* Edit Dialog */}
       <Dialog open={!!editingSection} onOpenChange={(open) => !open && setEditingSection(null)}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Section</DialogTitle>
           </DialogHeader>
@@ -339,6 +363,39 @@ const AdminSections = () => {
               <label className="text-sm font-medium">Description</label>
               <Input value={formData.subtitle} onChange={(e) => setFormData(prev => ({ ...prev, subtitle: e.target.value }))} />
             </div>
+            {isAnnouncementSection(editingSection) && (
+              <div className="space-y-3 border-t pt-4">
+                <h4 className="text-sm font-semibold text-primary">Product Announcement Settings</h4>
+                <p className="text-xs text-muted-foreground">This announcement banner will appear on all product pages when visible.</p>
+                <div>
+                  <label className="text-sm font-medium">Emoji Icon</label>
+                  <Input value={configData.emoji} onChange={(e) => setConfigData(prev => ({ ...prev, emoji: e.target.value }))} placeholder="📢" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Badge Text (headline)</label>
+                  <Input value={configData.badge_text} onChange={(e) => setConfigData(prev => ({ ...prev, badge_text: e.target.value }))} placeholder="e.g. 📦 Order Update" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Details (multi-line)</label>
+                  <Textarea 
+                    value={configData.sub_text} 
+                    onChange={(e) => setConfigData(prev => ({ ...prev, sub_text: e.target.value }))} 
+                    placeholder="Enter announcement details..."
+                    rows={4}
+                  />
+                </div>
+                <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
+                  <p className="text-xs text-muted-foreground mb-1">Preview:</p>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">{configData.emoji || "📢"}</span>
+                    <div className="text-sm">
+                      <span className="font-semibold">{configData.badge_text || "Headline"}</span>
+                      {configData.sub_text && <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">{configData.sub_text}</p>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             <Button onClick={handleSaveEdit} className="w-full">Save Changes</Button>
           </div>
         </DialogContent>
