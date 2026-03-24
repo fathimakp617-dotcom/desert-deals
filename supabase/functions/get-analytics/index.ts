@@ -105,7 +105,8 @@ Deno.serve(async (req) => {
     ]);
 
     // ===== Extract results =====
-    const pvStats = Array.isArray(pvStatsRes.data) ? pvStatsRes.data[0] : pvStatsRes.data;
+    const pvStats = pvStatsRes.data;
+    console.log("pvStats raw:", JSON.stringify(pvStatsRes.data));
     const total_views = Number(pvStats?.total_views || 0);
     const total_sessions = Number(pvStats?.unique_sessions || 0) || total_views;
     const live_visitors = Number(liveVisitorsRes.data || 0);
