@@ -221,7 +221,7 @@ const ProductDetail = () => {
   const handleToggleWishlist = () => {
     toggleWishlist(product);
     toast.success(
-      inWishlist ? `${product.name} removed from wishlist` : `${product.name} added to wishlist`
+      inWishlist ? `${product.name} ${t("product.removedFromWishlist")}` : `${product.name} ${t("product.addedToWishlist")}`
     );
   };
 
