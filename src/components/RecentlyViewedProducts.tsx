@@ -21,6 +21,7 @@ export const addToRecentlyViewed = (product: Product) => {
 const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
