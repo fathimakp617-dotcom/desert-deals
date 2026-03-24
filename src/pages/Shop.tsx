@@ -193,9 +193,9 @@ const Shop = () => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-12">
               {/* Breadcrumb */}
               <nav className="text-sm text-muted-foreground mb-6">
-                <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+                <Link to="/" className="hover:text-foreground transition-colors">{t("common.home")}</Link>
                 <span className="mx-2">›</span>
-                <Link to="/shop" className="hover:text-foreground transition-colors">Shop</Link>
+                <Link to="/shop" className="hover:text-foreground transition-colors">{t("common.shop")}</Link>
                 {selectedCategory !== "All" && (
                   <>
                     <span className="mx-2">›</span>
@@ -205,7 +205,7 @@ const Shop = () => {
                 {debouncedSearch && (
                   <>
                     <span className="mx-2">›</span>
-                    <span className="text-foreground font-medium">Search results for "{debouncedSearch}"</span>
+                    <span className="text-foreground font-medium">{t("shop.searchResults")} "{debouncedSearch}"</span>
                   </>
                 )}
               </nav>
