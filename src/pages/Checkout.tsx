@@ -1,4 +1,5 @@
 import { useState, useEffect, memo, useCallback, useRef } from "react";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Truck, Check, Lock, Zap, Loader2 } from "lucide-react";
