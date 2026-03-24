@@ -74,6 +74,21 @@ const Shop = () => {
   const searchParam = searchParams.get("search");
   const initialCategory = (brandParam && brandSlugToCategory[brandParam]) || "All";
 
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [searchInput, setSearchInput] = useState(searchParam || "");
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [selectedPriceRange, setSelectedPriceRange] = useState(0);
+  const [sortBy, setSortBy] = useState("featured");
+  const [showFilters, setShowFilters] = useState(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [quickViewId, setQuickViewId] = useState<string | null>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const debouncedSearch = useDebounce(searchInput, 300);
+  const priceRange = priceRanges[selectedPriceRange];
+
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { data: dbCategories } = useCategories();
   const categories = dbCategories?.length
