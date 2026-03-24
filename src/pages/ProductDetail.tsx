@@ -39,6 +39,7 @@ import { ProductSchema, BreadcrumbSchema } from "@/components/seo/JsonLd";
 import BuyNowOverlay from "@/components/BuyNowOverlay";
 
 const ProductDetail = () => {
+  const { t, lang } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: product, isLoading } = useDbProduct(id);
