@@ -639,7 +639,7 @@ const Checkout = () => {
             {t("common.continueShopping")}
           </Link>
 
-          <h1 className="text-3xl md:text-4xl font-heading text-foreground mb-8">Checkout</h1>
+          <h1 className="text-3xl md:text-4xl font-heading text-foreground mb-8">{t("checkout.title")}</h1>
 
           {/* Express Checkout Banner */}
           {savedAddress && !isExpressMode && !loadingSavedAddress && (
