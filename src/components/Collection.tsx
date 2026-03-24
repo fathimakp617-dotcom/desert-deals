@@ -37,10 +37,10 @@ const Collection = forwardRef<HTMLDivElement>((_, ref) => {
               <div key={product.id} className="group">
                 <Link to={`/product/${product.id}`}>
                   <div className="relative overflow-hidden border border-border/50 bg-card/50 p-6 sm:p-8 transition-all duration-500 hover:border-primary/50 hover:bg-card">
-                    <div className="absolute top-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-l-2 border-primary/60" />
-                    <div className="absolute top-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-r-2 border-primary/60" />
-                    <div className="absolute bottom-0 left-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-l-2 border-primary/60" />
-                    <div className="absolute bottom-0 right-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-r-2 border-primary/60" />
+                    <div className="absolute top-0 start-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-s-2 border-primary/60" />
+                    <div className="absolute top-0 end-0 w-6 sm:w-8 h-6 sm:h-8 border-t-2 border-e-2 border-primary/60" />
+                    <div className="absolute bottom-0 start-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-s-2 border-primary/60" />
+                    <div className="absolute bottom-0 end-0 w-6 sm:w-8 h-6 sm:h-8 border-b-2 border-e-2 border-primary/60" />
 
                     <div className="relative aspect-square mb-6 overflow-hidden">
                       {((product as any)._stock ?? 1) === 0 && (
