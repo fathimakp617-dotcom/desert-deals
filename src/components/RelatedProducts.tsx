@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { formatPrice, Product } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { Heart, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import QuickViewDialog from "@/components/QuickViewDialog";
 
