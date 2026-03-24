@@ -392,7 +392,7 @@ const Checkout = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
-      toast({ title: "Please fill in all required fields", variant: "destructive" });
+      toast({ title: t("checkout.fillRequired"), variant: "destructive" });
       return;
     }
     await handleCODOrder();
