@@ -173,9 +173,18 @@ const AdminSections = () => {
     }
   };
 
+  const isAnnouncementSection = (s: HomepageSection | null) => 
+    s?.section_key === "product_announcement" || s?.section_key === "eid_delivery";
+
   const handleEdit = (section: HomepageSection) => {
     setEditingSection(section);
     setFormData({ title: section.title, subtitle: section.subtitle, section_key: section.section_key });
+    const cfg = section.config as any;
+    setConfigData({
+      badge_text: cfg?.badge_text || "",
+      sub_text: cfg?.sub_text || "",
+      emoji: cfg?.emoji || "📢",
+    });
   };
 
   const handleSaveEdit = async () => {
