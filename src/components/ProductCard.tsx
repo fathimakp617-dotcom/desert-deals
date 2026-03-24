@@ -20,6 +20,7 @@ interface ProductCardProps {
 const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQuickView, viewMode }: ProductCardProps) => {
   const [imgError, setImgError] = useState(false);
   const prefetch = usePrefetchProduct();
+  const { t } = useTranslation();
   const handlePrefetch = useCallback(() => prefetch(product.id), [prefetch, product.id]);
 
   if (viewMode === "list") {
