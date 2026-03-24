@@ -859,7 +859,7 @@ const Checkout = () => {
 
                   {/* Subtotal */}
                   <div className="flex justify-between text-sm py-3">
-                    <span className="text-foreground font-medium">Subtotal</span>
+                    <span className="text-foreground font-medium">{t("checkout.subtotal")}</span>
                     <span className="text-foreground">{formatPrice(totalPrice)}</span>
                   </div>
 
