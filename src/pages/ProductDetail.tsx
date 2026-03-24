@@ -736,7 +736,7 @@ const ProductDetail = () => {
                       )}
                       {product.fit && (
                         <div className="flex justify-between py-2 border-b border-border/20">
-                          <span className="text-muted-foreground">Fit</span>
+                          <span className="text-muted-foreground">{t("product.fit")}</span>
                           <span className="text-foreground">{product.fit}</span>
                         </div>
                       )}
