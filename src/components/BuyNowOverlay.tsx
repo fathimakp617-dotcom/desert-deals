@@ -178,8 +178,8 @@ const BuyNowOverlay = memo(({ isOpen, onClose }: BuyNowOverlayProps) => {
                           return (
                             <div key={p.id} className="flex-shrink-0 w-[130px] flex flex-col">
                               <Link to={`/product/${p.id}`} onClick={onClose} className="block">
-                                <div className="aspect-square rounded-lg overflow-hidden bg-muted mb-2">
-                                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
+                                <div className="aspect-square rounded-lg overflow-hidden bg-white mb-2">
+                                  <img src={p.image} alt={p.name} className="w-full h-full object-contain" loading="lazy" />
                                 </div>
                               </Link>
                               <div className="flex flex-col flex-1">

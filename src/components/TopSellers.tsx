@@ -81,14 +81,14 @@ const TopSellers = memo(() => {
                 return (
                   <div key={product.id} className="flex-shrink-0 w-[145px] sm:w-[220px] lg:w-[246px] group">
                     <div className="bg-background border border-border/30 rounded-lg overflow-hidden flex flex-col h-full">
-                      <div className="relative aspect-square bg-muted overflow-hidden">
+                      <div className="relative aspect-square bg-white overflow-hidden">
                         <Link to={`/product/${product.id}`}>
                           <img
                             src={product.image}
                             alt={product.name}
                             width={246}
                             height={246}
-                            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
+                            className={`w-full h-full object-contain transition-transform duration-500 group-hover:scale-105 ${soldOut ? "opacity-60" : ""}`}
                             loading="lazy"
                             decoding="async"
                           />

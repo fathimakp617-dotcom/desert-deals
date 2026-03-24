@@ -57,9 +57,9 @@ const RecentlyViewedProducts = ({ currentProductId }: { currentProductId: string
               return (
                 <div key={product.id} className="group flex-shrink-0 w-[145px] sm:w-[200px] lg:w-[220px]">
                   <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
-                    <div className="relative aspect-square bg-muted overflow-hidden">
+                    <div className="relative aspect-square bg-white overflow-hidden">
                       <Link to={`/product/${product.id}`}>
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                        <img src={product.image} alt={product.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                       </Link>
 
                       {/* Quick view */}
