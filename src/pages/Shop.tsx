@@ -369,7 +369,7 @@ const Shop = () => {
 
               {!isLoading && totalCount > 0 && (
                 <p className="text-center text-xs text-muted-foreground mb-4 mt-2">
-                  Showing {Math.min(products.length, totalCount)} of {totalCount} products
+                  {t("shop.showing")} {Math.min(products.length, totalCount)} {t("shop.of")} {totalCount} {t("shop.products")}
                 </p>
               )}
 
