@@ -54,7 +54,7 @@ const FrequentlyBoughtTogether = ({ currentProduct }: FrequentlyBoughtTogetherPr
     <section className="py-10 sm:py-14">
       <div className="px-4 sm:px-6 lg:px-8">
         <h2 className="text-xl sm:text-2xl font-heading font-bold tracking-tight mb-6">
-          Frequently Bought Together
+          {t("product.frequentlyBoughtTogether")}
         </h2>
 
         <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
