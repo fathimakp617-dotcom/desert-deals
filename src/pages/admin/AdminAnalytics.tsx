@@ -1,4 +1,4 @@
-import { useState, useMemo, memo } from "react";
+import { useState, useMemo, memo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,9 @@ import {
 import {
   Loader2, ExternalLink, ShieldBan, RefreshCw, Globe,
 } from "lucide-react";
+import { MapContainer, TileLayer, CircleMarker, Tooltip as LeafletTooltip, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { getCountryLatLng } from "@/lib/countryCoords";
 
 const getAdminSession = () => {
   const stored = sessionStorage.getItem("rayn_admin_session");
@@ -30,6 +33,23 @@ const formatCompact = (val: number) => {
   if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
   if (val >= 1000) return `${(val / 1000).toFixed(1)}K`;
   return val.toLocaleString();
+};
+
+// Auto-fit map to show all markers
+const MapBounds = ({ positions }: { positions: [number, number][] }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (positions.length > 0) {
+      const L = (window as any).L;
+      if (L && positions.length > 1) {
+        const bounds = L.latLngBounds(positions.map(([lat, lng]: [number, number]) => [lat, lng]));
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6 });
+      } else if (positions.length === 1) {
+        map.setView(positions[0], 5);
+      }
+    }
+  }, [positions, map]);
+  return null;
 };
 
 const AdminAnalytics = () => {
@@ -103,12 +123,23 @@ const AdminAnalytics = () => {
   const salesSparkData = (daily_sales || []).map((d: any) => ({ v: d.revenue || 0 }));
   const ordersSparkData = (daily_sales || []).map((d: any) => ({ v: d.orders || 0 }));
 
-  // Country dots for the map visualization
   const maxCountry = countries.length > 0 ? countries[0].count : 1;
+
+  // Map markers from real country data
+  const mapMarkers = (countries || [])
+    .map((c: any) => {
+      const coords = getCountryLatLng(c.country);
+      if (!coords) return null;
+      return { lat: coords[0], lng: coords[1], country: c.country, count: c.count };
+    })
+    .filter(Boolean) as { lat: number; lng: number; country: string; count: number }[];
+
+  const mapPositions = mapMarkers.map(m => [m.lat, m.lng] as [number, number]);
+  const maxCount = mapMarkers.length > 0 ? Math.max(...mapMarkers.map(m => m.count)) : 1;
 
   return (
     <div className="h-[calc(100vh-80px)] flex flex-col">
-      {/* Tab bar - exactly like Shopify */}
+      {/* Tab bar */}
       <div className="flex items-center border-b border-border bg-card px-0">
         <button
           onClick={() => setActiveTab("live")}
@@ -145,7 +176,7 @@ const AdminAnalytics = () => {
       {/* ===================== LIVE VIEW ===================== */}
       {activeTab === "live" && (
         <div className="flex-1 flex overflow-hidden">
-          {/* Left scrollable panel - Shopify style */}
+          {/* Left scrollable panel */}
           <div className="w-full max-w-[520px] border-r border-border overflow-y-auto bg-background">
             <div className="p-5 space-y-4">
               {/* Live View header */}
@@ -161,16 +192,14 @@ const AdminAnalytics = () => {
 
               {/* 2x2 stat boxes */}
               <div className="grid grid-cols-2 gap-px bg-border rounded-lg overflow-hidden border border-border">
-                {/* Visitors right now */}
                 <div className="bg-card p-3.5">
                   <p className="text-xs text-muted-foreground mb-1">Visitors right now</p>
                   <p className="text-2xl font-semibold text-foreground">{live_visitors}</p>
                 </div>
-                {/* Total sales */}
                 <div className="bg-card p-3.5">
                   <p className="text-xs text-muted-foreground mb-1">Total sales</p>
                   <div className="flex items-end justify-between">
-                    <p className="text-2xl font-semibold text-foreground">{formatCurrency(total_sales)}</p>
+                    <p className="text-lg font-semibold text-foreground">{formatCurrency(total_sales)}</p>
                     {salesSparkData.length > 1 && (
                       <div className="w-16 h-6">
                         <ResponsiveContainer width="100%" height="100%">
@@ -182,7 +211,6 @@ const AdminAnalytics = () => {
                     )}
                   </div>
                 </div>
-                {/* Sessions */}
                 <div className="bg-card p-3.5">
                   <p className="text-xs text-muted-foreground mb-1">Sessions</p>
                   <div className="flex items-end justify-between">
@@ -201,7 +229,6 @@ const AdminAnalytics = () => {
                     )}
                   </div>
                 </div>
-                {/* Orders */}
                 <div className="bg-card p-3.5">
                   <p className="text-xs text-muted-foreground mb-1">Orders</p>
                   <div className="flex items-end justify-between">
@@ -239,7 +266,6 @@ const AdminAnalytics = () => {
                     <p className="text-xl font-semibold text-foreground">{total_orders}</p>
                   </div>
                 </div>
-                {/* Blue stepped area chart like Shopify */}
                 <div className="h-[70px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
@@ -338,46 +364,56 @@ const AdminAnalytics = () => {
             </div>
           </div>
 
-          {/* Right side - Map/Globe area like Shopify */}
-          <div className="flex-1 bg-muted/30 relative overflow-hidden hidden md:flex items-center justify-center">
-            {/* Dotted world map placeholder */}
-            <div className="text-center space-y-4 opacity-60">
-              <Globe className="h-32 w-32 text-primary/20 mx-auto" strokeWidth={0.5} />
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">Visitor Map</p>
-                <p className="text-xs text-muted-foreground">
-                  {countries.length > 0
-                    ? `${countries.length} countries • ${formatCompact(total_views)} views`
-                    : "No visitor data yet"
-                  }
-                </p>
-              </div>
-            </div>
-            {/* Country dots positioned around */}
-            {countries.slice(0, 5).map((c: any, i: number) => (
-              <div
-                key={c.country}
-                className="absolute flex items-center gap-1"
-                style={{
-                  top: `${25 + i * 12}%`,
-                  right: `${15 + (i % 3) * 10}%`,
-                }}
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-50" style={{ animationDelay: `${i * 0.5}s` }} />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500" />
-                </span>
-                <span className="text-[10px] text-muted-foreground">{c.country}</span>
-              </div>
-            ))}
-            {/* Legend at bottom right */}
-            <div className="absolute bottom-4 right-4 flex items-center gap-4 text-xs text-muted-foreground">
+          {/* Right side - REAL Leaflet Map */}
+          <div className="flex-1 relative overflow-hidden hidden md:block">
+            <MapContainer
+              center={[25, 45]}
+              zoom={3}
+              scrollWheelZoom={true}
+              zoomControl={false}
+              attributionControl={false}
+              className="h-full w-full"
+              style={{ background: "#f0f4f8" }}
+            >
+              <TileLayer
+                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
+              />
+              <MapBounds positions={mapPositions} />
+              {mapMarkers.map((marker, i) => {
+                const radius = Math.max(6, Math.min(25, (marker.count / maxCount) * 25));
+                return (
+                  <CircleMarker
+                    key={marker.country}
+                    center={[marker.lat, marker.lng]}
+                    radius={radius}
+                    pathOptions={{
+                      fillColor: "#36a3f7",
+                      fillOpacity: 0.6,
+                      color: "#36a3f7",
+                      weight: 2,
+                      opacity: 0.8,
+                    }}
+                  >
+                    <LeafletTooltip direction="top" offset={[0, -radius]}>
+                      <div className="text-xs">
+                        <strong>{marker.country}</strong>
+                        <br />
+                        {marker.count.toLocaleString()} sessions
+                      </div>
+                    </LeafletTooltip>
+                  </CircleMarker>
+                );
+              })}
+            </MapContainer>
+            {/* Legend */}
+            <div className="absolute bottom-4 right-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 flex items-center gap-4 text-xs text-muted-foreground z-[1000]">
               <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-pink-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-pink-400" />
                 <span>Orders</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-sky-500" />
+                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#36a3f7" }} />
                 <span>Visitors right now</span>
               </div>
             </div>
@@ -389,7 +425,6 @@ const AdminAnalytics = () => {
       {activeTab === "reports" && (
         <div className="flex-1 overflow-y-auto bg-background">
           <div className="max-w-5xl mx-auto p-5 space-y-5">
-            {/* Header */}
             <div className="flex items-center justify-between">
               <h1 className="text-lg font-semibold text-foreground">Reports</h1>
               <Select value={dateRange} onValueChange={setDateRange}>
@@ -427,9 +462,7 @@ const AdminAnalytics = () => {
                       <Area type="monotone" dataKey="revenue" stroke="#5c6ac4" strokeWidth={2} fill="url(#salesG)" />
                     </AreaChart>
                   </ResponsiveContainer>
-                ) : (
-                  <p className="text-xs text-muted-foreground text-center py-10">No data</p>
-                )}
+                ) : <p className="text-xs text-muted-foreground text-center py-10">No data</p>}
               </div>
               <div className="border border-border rounded-lg bg-card p-4">
                 <p className="text-xs text-muted-foreground mb-0.5">Online store sessions</p>
@@ -450,9 +483,7 @@ const AdminAnalytics = () => {
                       <Area type="monotone" dataKey="count" stroke="#5c6ac4" strokeWidth={2} fill="url(#sessG)" />
                     </AreaChart>
                   </ResponsiveContainer>
-                ) : (
-                  <p className="text-xs text-muted-foreground text-center py-10">No data</p>
-                )}
+                ) : <p className="text-xs text-muted-foreground text-center py-10">No data</p>}
               </div>
             </div>
 
