@@ -684,9 +684,9 @@ const Checkout = () => {
                   <Check className="w-5 h-5 text-emerald-500" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-heading text-emerald-500">Express Checkout Active</h3>
+                  <h3 className="font-heading text-emerald-500">{t("checkout.expressActive")}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Your saved address has been applied. Just select payment and place your order!
+                    {t("checkout.expressActiveDesc")}
                   </p>
                 </div>
                 <Button
