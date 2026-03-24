@@ -121,14 +121,14 @@ const CartDrawer = memo(() => {
 
             {/* Estimated total */}
             <div className="flex items-center justify-between pt-2">
-              <span className="text-sm font-medium text-foreground">{t("cart.estimatedTotal") || "Estimated total"}</span>
+              <span className="text-sm font-medium text-foreground">{t("cart.total")}</span>
               <span className="text-base font-bold text-foreground">{formatPrice(totalPrice)} AED</span>
             </div>
-            <p className="text-xs text-muted-foreground">{t("cart.taxesNote") || "Taxes and shipping calculated at checkout."}</p>
+            <p className="text-xs text-muted-foreground">Taxes and shipping calculated at checkout.</p>
 
             {/* Checkout button */}
             <Button asChild className="w-full font-heading" size="lg" onClick={closeCart}>
-              <Link to="/checkout">{t("cart.checkout") || "Check out"}</Link>
+              <Link to="/checkout">{t("cart.proceedToCheckout")}</Link>
             </Button>
           </div>
         )}
