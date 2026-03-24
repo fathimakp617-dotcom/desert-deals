@@ -44,7 +44,7 @@ const Collection = forwardRef<HTMLDivElement>((_, ref) => {
 
                     <div className="relative aspect-square mb-6 overflow-hidden">
                       {((product as any)._stock ?? 1) === 0 && (
-                        <div className="absolute top-2 right-2 z-10">
+                        <div className="absolute top-2 end-2 z-10">
                           <Badge variant="destructive" className="text-xs font-semibold">SOLD OUT</Badge>
                         </div>
                       )}

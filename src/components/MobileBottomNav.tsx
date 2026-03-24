@@ -84,7 +84,7 @@ const MobileBottomNav = memo(() => {
                     <button
                       key={product.id}
                       onClick={() => handleProductClick(product.id)}
-                      className="w-full flex items-center gap-3 py-3 border-b border-border/50 text-left"
+                      className="w-full flex items-center gap-3 py-3 border-b border-border/50 text-start"
                     >
                       {img ? (
                         <img src={img} alt={product.name} className="w-12 h-12 rounded-lg object-contain bg-white shrink-0" />

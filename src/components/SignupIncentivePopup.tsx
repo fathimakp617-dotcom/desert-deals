@@ -89,7 +89,7 @@ const SignupIncentivePopup = () => {
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center">
                   <Sparkles className="w-6 h-6 text-secondary" />
                 </div>
-                <div className="text-left">
+                <div className="text-start">
                   <p className="font-semibold text-foreground">+ Chance to Win 50% OFF</p>
                   <p className="text-sm text-muted-foreground">Lucky members get extra rewards!</p>
                 </div>

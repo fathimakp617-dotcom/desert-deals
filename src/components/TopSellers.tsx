@@ -95,7 +95,7 @@ const TopSellers = memo(() => {
                         </Link>
 
                         {soldOut && (
-                          <div className="absolute top-2 left-2">
+                          <div className="absolute top-2 start-2">
                             <Badge variant="destructive" className="text-[10px]">{t("collection.soldOut")}</Badge>
                           </div>
                         )}
@@ -103,7 +103,7 @@ const TopSellers = memo(() => {
                         {/* Quick view eye icon */}
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQuickViewId(product.id); }}
-                          className="absolute bottom-2 right-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute bottom-2 end-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <Eye className="w-3.5 h-3.5 text-foreground" />
                         </button>
@@ -114,7 +114,7 @@ const TopSellers = memo(() => {
                             e.stopPropagation();
                             inWishlist ? removeFromWishlist(product.id) : addToWishlist(product);
                           }}
-                          className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow opacity-0 group-hover:opacity-100"
+                          className="absolute bottom-2 end-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow opacity-0 group-hover:opacity-100"
                         >
                           <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-foreground"}`} />
                         </button>

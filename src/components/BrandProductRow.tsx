@@ -101,7 +101,7 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                           />
                         </Link>
                         {soldOut && (
-                          <div className="absolute top-2 left-2">
+                          <div className="absolute top-2 start-2">
                             <Badge variant="destructive" className="text-[10px]">SOLD OUT</Badge>
                           </div>
                         )}
@@ -109,14 +109,14 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
                         {/* Quick view */}
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQuickViewId(product.id); }}
-                          className="absolute bottom-2 right-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute bottom-2 end-12 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <Eye className="w-3.5 h-3.5 text-foreground" />
                         </button>
 
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); inWishlist ? removeFromWishlist(product.id) : addToWishlist(product); }}
-                          className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute bottom-2 end-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500 text-red-500" : "text-foreground"}`} />
                         </button>
