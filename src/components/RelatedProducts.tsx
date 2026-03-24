@@ -15,6 +15,7 @@ interface RelatedProductsProps {
 const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsProps) => {
   const { data: products = [] } = useDbProducts();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
