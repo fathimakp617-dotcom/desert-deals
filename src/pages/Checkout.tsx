@@ -119,6 +119,7 @@ interface OfflinePendingOrder {
 }
 
 const Checkout = () => {
+  const { t } = useTranslation();
   const { items, totalPrice, clearCart, totalItems } = useCart();
   
   const { user, isLoading: authLoading } = useAuth();
