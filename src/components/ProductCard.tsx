@@ -4,6 +4,7 @@ import { Heart, ImageOff, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/data/products";
 import { usePrefetchProduct } from "@/hooks/useDbProducts";
+import { useTranslation } from "@/contexts/DirectionContext";
 import type { SimpleProduct } from "@/hooks/usePaginatedProducts";
 
 
