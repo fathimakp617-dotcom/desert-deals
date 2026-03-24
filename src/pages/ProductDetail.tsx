@@ -594,16 +594,18 @@ const ProductDetail = () => {
                       <p className="text-xs text-muted-foreground mt-0.5">{t("product.orderNow")}</p>
                     </div>
                   </div>
-                  {isEidDeliveryEnabled && (
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
-                      <span className="text-lg shrink-0">🎉</span>
+                  {announcementSection && (
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
+                      <span className="text-lg shrink-0">{(announcementSection.config as any)?.emoji || "📢"}</span>
                       <div className="text-sm">
                         <span className="font-semibold text-foreground">
-                          {(eidConfig?.config as any)?.badge_text || "Before Eid Delivery Available!"}
+                          {(announcementSection.config as any)?.badge_text || announcementSection.title}
                         </span>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {(eidConfig?.config as any)?.sub_text || "Order now to receive before Eid Al-Fitr"}
-                        </p>
+                        {((announcementSection.config as any)?.sub_text) && (
+                          <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">
+                            {(announcementSection.config as any)?.sub_text}
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
