@@ -120,7 +120,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain bg-white"
                       onError={() => setImgError(true)}
                     />
                   )

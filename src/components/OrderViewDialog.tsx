@@ -338,7 +338,7 @@ Thank you for choosing *Desert Deal!*`;
                     <img
                       src={productImages[item.productId]}
                       alt={item.name || item.product_name || "Product"}
-                      className="h-14 w-14 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity ring-1 ring-transparent hover:ring-primary"
+                      className="h-14 w-14 rounded-lg object-contain bg-white flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity ring-1 ring-transparent hover:ring-primary"
                       style={{ border: '1px solid #e5e5e5' }}
                       onClick={() => setZoomedImage(productImages[item.productId!])}
                       onError={(e) => { e.currentTarget.src = "/images/product-placeholder.jpg"; }}
