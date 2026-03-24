@@ -375,7 +375,7 @@ const Shop = () => {
 
               {!isLoading && totalCount === 0 && products.length > 0 && !hasNextPage && (
                 <p className="text-center text-xs text-muted-foreground mb-4 mt-2">
-                  Showing {products.length} products
+                  {t("shop.showing")} {products.length} {t("shop.products")}
                 </p>
               )}
             </div>
