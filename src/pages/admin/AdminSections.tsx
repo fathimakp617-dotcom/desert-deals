@@ -192,12 +192,25 @@ const AdminSections = () => {
     const session = getSession();
     if (!session) return;
     try {
+      const updatedSection: any = { 
+        ...editingSection, 
+        title: formData.title, 
+        subtitle: formData.subtitle,
+      };
+      if (isAnnouncementSection(editingSection)) {
+        updatedSection.config = {
+          ...(editingSection.config as any),
+          badge_text: configData.badge_text,
+          sub_text: configData.sub_text,
+          emoji: configData.emoji,
+        };
+      }
       await supabase.functions.invoke("manage-homepage-sections", {
         body: {
           action: "update",
           email: session.email,
           token: session.token,
-          section: { ...editingSection, title: formData.title, subtitle: formData.subtitle },
+          section: updatedSection,
         },
       });
       toast({ title: "Section updated" });
