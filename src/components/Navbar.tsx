@@ -217,7 +217,7 @@ const Navbar = memo(() => {
               ))}
               <div className="border-t border-border pt-3 mt-1">
                 <Link to="/account" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-sm text-foreground hover:opacity-60 transition-opacity">
-                  <User size={16} /> My Account
+                  <User size={16} /> {t("nav.myAccount")}
                 </Link>
               </div>
             </div>
