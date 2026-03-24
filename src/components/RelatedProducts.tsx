@@ -34,7 +34,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
     <section className="py-2 sm:py-3 bg-background">
       <div className="px-4 sm:px-6">
         <h2 className="text-xl sm:text-2xl font-heading font-bold tracking-tight mb-6">
-          Complete Your Look
+          {t("product.completeYourLook")}
         </h2>
 
         <div className="relative group/scroll">
