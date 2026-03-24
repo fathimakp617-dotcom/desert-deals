@@ -707,8 +707,8 @@ const Checkout = () => {
               {/* Left Column - Billing Details */}
               <div className="lg:col-span-2 space-y-6">
                 <div>
-                  <Label>Country / Region *</Label>
-                  <p className="text-foreground font-medium mt-1">United Arab Emirates</p>
+                  <Label>{t("checkout.countryRegion")}</Label>
+                  <p className="text-foreground font-medium mt-1">{t("checkout.uae")}</p>
                 </div>
 
                 <div>
