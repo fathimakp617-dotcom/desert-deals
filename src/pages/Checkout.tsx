@@ -875,7 +875,7 @@ const Checkout = () => {
 
                   {/* Total */}
                   <div className="flex justify-between py-3">
-                    <span className="text-foreground font-bold">Total</span>
+                    <span className="text-foreground font-bold">{t("checkout.total")}</span>
                     <span className="text-foreground font-bold text-lg">{formatPrice(orderTotal)}</span>
                   </div>
 
