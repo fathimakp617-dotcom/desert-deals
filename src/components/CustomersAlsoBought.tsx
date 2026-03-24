@@ -58,7 +58,7 @@ const CustomersAlsoBought = ({ currentProduct }: CustomersAlsoBoughtProps) => {
     <section className="py-6 sm:py-8 bg-background">
       <div className="px-4 sm:px-6">
         <h2 className="text-lg sm:text-xl font-heading font-bold tracking-tight mb-4">
-          Customers Also Bought
+          {t("product.customersAlsoBought")}
         </h2>
 
         <div className="relative group/scroll">

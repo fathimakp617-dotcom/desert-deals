@@ -83,7 +83,7 @@ const RelatedProducts = ({ currentProductId, currentCategory }: RelatedProductsP
                         )}
                       </div>
                       <div className="mt-1.5 flex items-center justify-between">
-                        <span className="text-[11px] font-bold text-emerald-600 uppercase">IN STOCK</span>
+                        <span className="text-[11px] font-bold text-emerald-600 uppercase">{t("product.inStock")}</span>
                         <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); inWishlist ? removeFromWishlist(item.id) : addToWishlist(item); }} className="p-0">
                           <Heart className={`w-4 h-4 ${inWishlist ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
                         </button>
