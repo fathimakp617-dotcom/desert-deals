@@ -105,7 +105,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
                       <div className="flex h-full">
                         {product.gallery.map((img, idx) => (
                           <div key={idx} className="flex-[0_0_100%] min-w-0 h-full">
-                            <img src={img} alt={product.name} className="w-full h-full object-cover" />
+                            <img src={img} alt={product.name} className="w-full h-full object-contain bg-white" />
                           </div>
                         ))}
                       </div>
