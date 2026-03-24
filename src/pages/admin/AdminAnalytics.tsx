@@ -3,32 +3,19 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, BarChart, Bar,
 } from "recharts";
 import {
-  Loader2, Eye, Globe, TrendingUp, ExternalLink, ShieldBan, BarChart3,
-  ShoppingCart, DollarSign, Users, ArrowUpRight, ArrowDownRight,
-  Activity, Package, RefreshCw, Zap, MousePointerClick,
+  Loader2, ExternalLink, ShieldBan, RefreshCw,
 } from "lucide-react";
-import { motion } from "framer-motion";
-
-const CHART_COLORS = [
-  "hsl(var(--primary))",
-  "#22c55e", "#f59e0b", "#3b82f6", "#ef4444",
-  "#8b5cf6", "#ec4899", "#14b8a6", "#f97316", "#6366f1",
-];
 
 const getAdminSession = () => {
   const stored = sessionStorage.getItem("rayn_admin_session");
@@ -40,61 +27,121 @@ const getAdminSession = () => {
   return null;
 };
 
-const formatCurrency = (val: number) => `${Math.round(val).toLocaleString()} AED`;
-const formatPercent = (val: number) => `${val.toFixed(1)}%`;
+const formatCurrency = (val: number) => `AED ${Math.round(val).toLocaleString()}`;
 const formatCompact = (val: number) => {
   if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
   if (val >= 1000) return `${(val / 1000).toFixed(1)}K`;
   return val.toLocaleString();
 };
 
-// Metric card component
-const MetricCard = ({
-  title, value, icon: Icon, trend, subtitle, color = "text-primary", pulse = false,
-}: {
-  title: string; value: string; icon: any; trend?: string; subtitle?: string;
-  color?: string; pulse?: boolean;
-}) => (
-  <Card className="relative overflow-hidden">
-    <CardContent className="p-5">
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{title}</p>
-          <p className="text-2xl font-bold text-foreground">{value}</p>
-          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-        </div>
-        <div className={`p-2 rounded-lg bg-muted/80 ${pulse ? "animate-pulse" : ""}`}>
-          <Icon className={`h-5 w-5 ${color}`} />
-        </div>
-      </div>
-      {trend && (
-        <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-          <span>{trend}</span>
-        </div>
-      )}
-    </CardContent>
-  </Card>
-);
-
-// Live badge
+// Shopify-style live dot
 const LiveDot = () => (
-  <span className="relative flex h-2.5 w-2.5">
+  <span className="relative flex h-2 w-2 ml-2">
     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
   </span>
 );
 
-// Conversion funnel bar
-const FunnelBar = ({ label, value, total, color }: { label: string; value: number; total: number; color: string }) => {
-  const pct = total > 0 ? (value / total) * 100 : 0;
+// Shopify-style mini sparkline using area chart
+const MiniSparkline = ({ data, color = "#5c6ac4" }: { data: number[]; color?: string }) => {
+  const chartData = data.map((v, i) => ({ i, v }));
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="font-medium text-foreground">{value.toLocaleString()} <span className="text-muted-foreground text-xs">({pct.toFixed(1)}%)</span></span>
+    <ResponsiveContainer width={80} height={30}>
+      <AreaChart data={chartData} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
+        <defs>
+          <linearGradient id={`spark-${color}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+            <stop offset="95%" stopColor={color} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <Area type="monotone" dataKey="v" stroke={color} strokeWidth={1.5} fill={`url(#spark-${color})`} dot={false} />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+};
+
+// Shopify-style stat box
+const ShopifyStatBox = ({ label, value, sparkData, suffix, color = "#5c6ac4" }: {
+  label: string; value: string | number; sparkData?: number[]; suffix?: string; color?: string;
+}) => (
+  <div className="border border-border rounded-xl p-4 bg-card">
+    <p className="text-xs text-muted-foreground font-medium mb-1">{label}</p>
+    <div className="flex items-end justify-between">
+      <div>
+        <span className="text-xl font-semibold text-foreground">{value}</span>
+        {suffix && <span className="text-xs text-muted-foreground ml-1">{suffix}</span>}
       </div>
-      <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.max(pct, 1)}%`, backgroundColor: color }} />
+      {sparkData && sparkData.length > 1 && (
+        <MiniSparkline data={sparkData} color={color} />
+      )}
+    </div>
+  </div>
+);
+
+// Customer behavior section like Shopify
+const CustomerBehavior = ({ activeCarts, checkingOut, purchased, funnelData }: {
+  activeCarts: number; checkingOut: number; purchased: number; funnelData: number[];
+}) => (
+  <div className="border border-border rounded-xl p-4 bg-card">
+    <h3 className="text-sm font-semibold text-foreground mb-3">Customer behavior</h3>
+    <div className="grid grid-cols-3 gap-4 mb-4">
+      <div>
+        <p className="text-xs text-muted-foreground">Active carts</p>
+        <p className="text-lg font-semibold text-foreground">{activeCarts}</p>
+      </div>
+      <div>
+        <p className="text-xs text-muted-foreground">Checking out</p>
+        <p className="text-lg font-semibold text-foreground">{checkingOut}</p>
+      </div>
+      <div>
+        <p className="text-xs text-muted-foreground">Purchased</p>
+        <p className="text-lg font-semibold text-foreground">{purchased}</p>
+      </div>
+    </div>
+    {/* Funnel chart like Shopify's stacked area */}
+    {funnelData.length > 0 && (
+      <div className="h-[80px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={funnelData.map((v, i) => ({ i, carts: v, checkout: Math.min(v, funnelData[0] * 0.3) }))} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="funnelGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#5c6ac4" stopOpacity={0.6} />
+                <stop offset="100%" stopColor="#5c6ac4" stopOpacity={0.1} />
+              </linearGradient>
+            </defs>
+            <Area type="stepAfter" dataKey="carts" stroke="#5c6ac4" fill="url(#funnelGrad)" dot={false} />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    )}
+  </div>
+);
+
+// Sessions by location (horizontal bars like Shopify)
+const SessionsByLocation = ({ countries }: { countries: any[] }) => {
+  if (!countries || countries.length === 0) return null;
+  const max = countries[0]?.count || 1;
+  return (
+    <div className="border border-border rounded-xl p-4 bg-card">
+      <h3 className="text-sm font-semibold text-foreground mb-3">Sessions by location</h3>
+      <div className="space-y-3">
+        {countries.slice(0, 8).map((c: any) => (
+          <div key={c.country}>
+            <p className="text-xs text-muted-foreground mb-1">{c.country}</p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-6 bg-muted rounded overflow-hidden">
+                <div
+                  className="h-full rounded"
+                  style={{
+                    width: `${Math.max((c.count / max) * 100, 4)}%`,
+                    backgroundColor: "#36a3f7",
+                  }}
+                />
+              </div>
+              <span className="text-xs font-medium text-foreground w-8 text-right">{c.count}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -104,7 +151,7 @@ const AdminAnalytics = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState("7d");
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("live");
 
   const dateFrom = useMemo(() => {
     const now = new Date();
@@ -133,7 +180,7 @@ const AdminAnalytics = () => {
       }
       return data;
     },
-    refetchInterval: 30000, // Auto-refresh every 30s for live data
+    refetchInterval: 15000,
   });
 
   const toggleBlockMutation = useMutation({
@@ -167,9 +214,8 @@ const AdminAnalytics = () => {
 
   const {
     live_visitors = 0, live_carts = 0,
-    total_sales = 0, total_orders = 0, average_order_value = 0,
-    conversion_rate = 0, add_to_cart_rate = 0, add_to_cart_count = 0,
-    checkout_count = 0, returning_customer_rate = 0,
+    total_sales = 0, total_orders = 0,
+    add_to_cart_count = 0, checkout_count = 0,
     total_sessions = 0, total_views = 0,
     top_products = [], top_products_by_sales = [],
     sources = [], countries = [],
@@ -177,505 +223,336 @@ const AdminAnalytics = () => {
     top_pages = [], blocked_countries = [],
   } = data || {};
 
-  const dateLabels: Record<string, string> = {
-    "1d": "Last 24 hours",
-    "7d": "Last 7 days",
-    "30d": "Last 30 days",
-    "90d": "Last 90 days",
-    "365d": "Last 12 months",
-  };
+  // Generate sparkline data from daily_views
+  const sessionSparkData = (daily_views || []).map((d: any) => d.count || 0);
+  const salesSparkData = (daily_sales || []).map((d: any) => d.revenue || 0);
+  const ordersSparkData = (daily_sales || []).map((d: any) => d.orders || 0);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-heading font-bold text-foreground">Analytics</h1>
-          <p className="text-sm text-muted-foreground">{dateLabels[dateRange] || "Last 7 days"}</p>
-        </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[160px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1d">Today</SelectItem>
-              <SelectItem value="7d">Last 7 days</SelectItem>
-              <SelectItem value="30d">Last 30 days</SelectItem>
-              <SelectItem value="90d">Last 90 days</SelectItem>
-              <SelectItem value="365d">Last 12 months</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm" onClick={() => refetch()}>
-            <RefreshCw className="h-4 w-4 mr-2" /> Refresh
-          </Button>
-          <a href="https://clarity.microsoft.com/projects/view/vkri0s8s8o/dashboard" target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm">
-              <ExternalLink className="h-4 w-4 mr-2" /> Clarity
+    <div className="space-y-0">
+      {/* Shopify-style Tabs at top */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div className="flex items-center justify-between border-b border-border pb-0 mb-0">
+          <TabsList className="bg-transparent border-0 p-0 h-auto gap-0">
+            <TabsTrigger
+              value="live"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-sm font-medium"
+            >
+              Live View
+            </TabsTrigger>
+            <TabsTrigger
+              value="reports"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-sm font-medium"
+            >
+              Reports
+            </TabsTrigger>
+          </TabsList>
+          <div className="flex items-center gap-2 pb-2">
+            <Button variant="ghost" size="sm" onClick={() => refetch()}>
+              <RefreshCw className="h-3.5 w-3.5" />
             </Button>
-          </a>
+            <a href="https://clarity.microsoft.com/projects/view/vkri0s8s8o/dashboard" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="sm">
+                <ExternalLink className="h-3.5 w-3.5" />
+              </Button>
+            </a>
+          </div>
         </div>
-      </div>
 
-      {/* Live View Bar */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-green-500/10 via-green-500/5 to-transparent border border-green-500/20 rounded-xl p-4"
-      >
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-3">
+        {/* =================== LIVE VIEW TAB =================== */}
+        <TabsContent value="live" className="mt-0 pt-5 space-y-5">
+          {/* Header with live dot */}
+          <div className="flex items-center gap-1">
+            <h1 className="text-xl font-semibold text-foreground">Live View</h1>
             <LiveDot />
-            <span className="text-sm font-medium text-foreground">Live View</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-green-500" />
-              <span className="text-lg font-bold text-foreground">{live_visitors}</span>
-              <span className="text-xs text-muted-foreground">visitors online</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <ShoppingCart className="h-4 w-4 text-orange-500" />
-              <span className="text-lg font-bold text-foreground">{live_carts}</span>
-              <span className="text-xs text-muted-foreground">active carts</span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Key Metrics Grid - Shopify style */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <MetricCard
-          title="Total Sales"
-          value={formatCurrency(total_sales)}
-          icon={DollarSign}
-          color="text-green-500"
-          subtitle={`${total_orders} orders`}
-        />
-        <MetricCard
-          title="Sessions"
-          value={formatCompact(total_sessions)}
-          icon={Eye}
-          color="text-blue-500"
-          subtitle={`${formatCompact(total_views)} page views`}
-        />
-        <MetricCard
-          title="Conversion Rate"
-          value={formatPercent(conversion_rate)}
-          icon={TrendingUp}
-          color="text-purple-500"
-          subtitle={`${total_orders} orders from ${formatCompact(total_sessions)} sessions`}
-        />
-        <MetricCard
-          title="Avg Order Value"
-          value={formatCurrency(average_order_value)}
-          icon={Package}
-          color="text-orange-500"
-        />
-        <MetricCard
-          title="Returning Rate"
-          value={formatPercent(returning_customer_rate)}
-          icon={Users}
-          color="text-cyan-500"
-          subtitle="returning customers"
-        />
-      </div>
-
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-muted/50">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="traffic">Traffic</TabsTrigger>
-          <TabsTrigger value="behavior">Behavior</TabsTrigger>
-          <TabsTrigger value="geo">Geo & Blocking</TabsTrigger>
-        </TabsList>
-
-        {/* OVERVIEW */}
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid lg:grid-cols-2 gap-4">
-            {/* Sales Over Time */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
-                <p className="text-2xl font-bold text-foreground">{formatCurrency(total_sales)}</p>
-              </CardHeader>
-              <CardContent>
-                {daily_sales.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <AreaChart data={daily_sales}>
-                      <defs>
-                        <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
-                      <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} />
-                      <YAxis tick={{ fontSize: 10 }} tickFormatter={v => formatCompact(v)} />
-                      <Tooltip formatter={(v: number) => formatCurrency(v)} labelFormatter={l => `Date: ${l}`} />
-                      <Area type="monotone" dataKey="revenue" stroke="#22c55e" strokeWidth={2} fill="url(#salesGradient)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-12">No sales data for this period</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Sessions Over Time */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Online Store Sessions</CardTitle>
-                <p className="text-2xl font-bold text-foreground">{formatCompact(total_sessions)}</p>
-              </CardHeader>
-              <CardContent>
-                {daily_views.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <AreaChart data={daily_views}>
-                      <defs>
-                        <linearGradient id="sessionsGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
-                      <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} />
-                      <YAxis tick={{ fontSize: 10 }} />
-                      <Tooltip />
-                      <Area type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={2} fill="url(#sessionsGradient)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-12">No session data yet</p>
-                )}
-              </CardContent>
-            </Card>
+            <span className="text-xs text-muted-foreground ml-2">Just now</span>
           </div>
 
-          {/* Conversion Funnel */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Zap className="h-4 w-4" />
-                Conversion Funnel
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FunnelBar label="Sessions" value={total_sessions} total={total_sessions} color="#3b82f6" />
-              <FunnelBar label="Added to Cart" value={add_to_cart_count} total={total_sessions} color="#f59e0b" />
-              <FunnelBar label="Reached Checkout" value={checkout_count} total={total_sessions} color="#8b5cf6" />
-              <FunnelBar label="Purchased" value={total_orders} total={total_sessions} color="#22c55e" />
-            </CardContent>
-          </Card>
+          {/* 2x2 stat grid like Shopify */}
+          <div className="grid grid-cols-2 gap-3">
+            <ShopifyStatBox
+              label="Visitors right now"
+              value={live_visitors}
+            />
+            <ShopifyStatBox
+              label="Total sales"
+              value={formatCurrency(total_sales)}
+              sparkData={salesSparkData}
+              color="#5c6ac4"
+            />
+            <ShopifyStatBox
+              label="Sessions"
+              value={formatCompact(total_sessions)}
+              sparkData={sessionSparkData}
+              color="#5c6ac4"
+            />
+            <ShopifyStatBox
+              label="Orders"
+              value={total_orders}
+              sparkData={ordersSparkData}
+              color="#5c6ac4"
+            />
+          </div>
 
-          {/* Top Pages */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Top Pages</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Page</TableHead>
-                    <TableHead className="text-right">Views</TableHead>
-                    <TableHead className="text-right">% of Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {top_pages.slice(0, 10).map((p: any) => (
-                    <TableRow key={p.page}>
-                      <TableCell className="font-mono text-xs">{p.page}</TableCell>
-                      <TableCell className="text-right">{p.count.toLocaleString()}</TableCell>
-                      <TableCell className="text-right text-muted-foreground">
-                        {total_views > 0 ? ((p.count / total_views) * 100).toFixed(1) : 0}%
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {top_pages.length === 0 && (
-                    <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">No data yet</TableCell></TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          {/* Customer behavior */}
+          <CustomerBehavior
+            activeCarts={live_carts}
+            checkingOut={checkout_count}
+            purchased={total_orders}
+            funnelData={[live_carts, checkout_count, total_orders]}
+          />
+
+          {/* Sessions by location */}
+          <SessionsByLocation countries={countries} />
+
+          {/* New vs returning customers */}
+          <div className="border border-border rounded-xl p-4 bg-card">
+            <h3 className="text-sm font-semibold text-foreground mb-3">New vs returning customers</h3>
+            {total_orders > 0 ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">New customers</span>
+                  <span className="font-medium text-foreground">{total_orders}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Returning customers</span>
+                  <span className="font-medium text-foreground">0</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">No data for this date range</p>
+            )}
+          </div>
+
+          {/* Total sales by product */}
+          <div className="border border-border rounded-xl p-4 bg-card">
+            <h3 className="text-sm font-semibold text-foreground mb-3">Total sales by product</h3>
+            {top_products_by_sales.length > 0 ? (
+              <div className="space-y-3">
+                {top_products_by_sales.slice(0, 5).map((p: any) => (
+                  <div key={p.product_id} className="flex items-center gap-3">
+                    {p.image && (
+                      <img src={p.image} alt="" className="w-10 h-10 rounded object-contain bg-white border" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
+                      <p className="text-xs text-muted-foreground">{p.units_sold} sold</p>
+                    </div>
+                    <span className="text-sm font-medium text-foreground">{formatCurrency(p.revenue || p.price * p.units_sold)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">No data for this date range</p>
+            )}
+          </div>
         </TabsContent>
 
-        {/* PRODUCTS */}
-        <TabsContent value="products" className="space-y-4">
-          <div className="grid lg:grid-cols-2 gap-4">
-            {/* Top by Sales */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Top Products by Units Sold</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {top_products_by_sales.length > 0 ? (
-                  <div className="space-y-3">
-                    {top_products_by_sales.slice(0, 10).map((p: any, i: number) => (
-                      <div key={p.product_id} className="flex items-center gap-3">
-                        <span className="text-xs font-medium text-muted-foreground w-5">{i + 1}</span>
-                        {p.image && (
-                          <img src={p.image} alt="" className="w-10 h-10 rounded-lg object-contain bg-white border" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
-                          <p className="text-xs text-muted-foreground">{formatCurrency(p.price)}</p>
-                        </div>
-                        <Badge variant="secondary" className="shrink-0">
-                          {p.units_sold} sold
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-8">No sales data yet</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Top by Views */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Top Products by Views</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {top_products.length > 0 ? (
-                  <div className="space-y-3">
-                    {top_products.slice(0, 10).map((p: any, i: number) => (
-                      <div key={p.product_id} className="flex items-center gap-3">
-                        <span className="text-xs font-medium text-muted-foreground w-5">{i + 1}</span>
-                        {p.image && (
-                          <img src={p.image} alt="" className="w-10 h-10 rounded-lg object-contain bg-white border" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
-                          <p className="text-xs text-muted-foreground">{p.units_sold > 0 ? `${p.units_sold} sold` : "—"}</p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-sm font-medium text-foreground">{p.views}</p>
-                          <p className="text-xs text-muted-foreground">views</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-8">No product views yet</p>
-                )}
-              </CardContent>
-            </Card>
+        {/* =================== REPORTS TAB =================== */}
+        <TabsContent value="reports" className="mt-0 pt-5 space-y-5">
+          {/* Date range selector */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold text-foreground">Reports</h1>
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger className="w-[150px] h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1d">Today</SelectItem>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="365d">Last 12 months</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Products chart */}
-          {top_products_by_sales.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Units Sold - Top 10</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={top_products_by_sales.slice(0, 10)} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
-                    <XAxis type="number" tick={{ fontSize: 11 }} />
-                    <YAxis dataKey="name" type="category" width={140} tick={{ fontSize: 10 }} />
-                    <Tooltip />
-                    <Bar dataKey="units_sold" fill="#22c55e" radius={[0, 4, 4, 0]} name="Units Sold" />
-                  </BarChart>
+          {/* Sales & Sessions charts side by side */}
+          <div className="grid lg:grid-cols-2 gap-4">
+            <div className="border border-border rounded-xl p-4 bg-card">
+              <p className="text-xs text-muted-foreground font-medium mb-0.5">Total sales</p>
+              <p className="text-xl font-semibold text-foreground mb-3">{formatCurrency(total_sales)}</p>
+              {daily_sales.length > 0 ? (
+                <ResponsiveContainer width="100%" height={180}>
+                  <AreaChart data={daily_sales}>
+                    <defs>
+                      <linearGradient id="salesG" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#5c6ac4" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#5c6ac4" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" tickFormatter={v => formatCompact(v)} />
+                    <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                    <Area type="monotone" dataKey="revenue" stroke="#5c6ac4" strokeWidth={2} fill="url(#salesG)" />
+                  </AreaChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-12">No sales data</p>
+              )}
+            </div>
 
-        {/* TRAFFIC */}
-        <TabsContent value="traffic" className="space-y-4">
+            <div className="border border-border rounded-xl p-4 bg-card">
+              <p className="text-xs text-muted-foreground font-medium mb-0.5">Online store sessions</p>
+              <p className="text-xl font-semibold text-foreground mb-3">{formatCompact(total_sessions)}</p>
+              {daily_views.length > 0 ? (
+                <ResponsiveContainer width="100%" height={180}>
+                  <AreaChart data={daily_views}>
+                    <defs>
+                      <linearGradient id="sessG" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#5c6ac4" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#5c6ac4" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="count" stroke="#5c6ac4" strokeWidth={2} fill="url(#sessG)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-12">No session data</p>
+              )}
+            </div>
+          </div>
+
+          {/* Conversion funnel */}
+          <div className="border border-border rounded-xl p-4 bg-card">
+            <h3 className="text-sm font-semibold text-foreground mb-4">Online store conversion rate</h3>
+            <div className="space-y-3">
+              {[
+                { label: "Sessions", value: total_sessions, pct: 100 },
+                { label: "Added to cart", value: add_to_cart_count, pct: total_sessions > 0 ? (add_to_cart_count / total_sessions) * 100 : 0 },
+                { label: "Reached checkout", value: checkout_count, pct: total_sessions > 0 ? (checkout_count / total_sessions) * 100 : 0 },
+                { label: "Sessions converted", value: total_orders, pct: total_sessions > 0 ? (total_orders / total_sessions) * 100 : 0 },
+              ].map((item) => (
+                <div key={item.label} className="space-y-1">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">{item.label}</span>
+                    <span className="font-medium text-foreground">
+                      {item.value.toLocaleString()}
+                      <span className="text-muted-foreground text-xs ml-1">({item.pct.toFixed(1)}%)</span>
+                    </span>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.max(item.pct, 0.5)}%`, backgroundColor: "#5c6ac4" }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Top products side by side */}
           <div className="grid lg:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Traffic Sources</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {sources.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={sources.slice(0, 8)}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={3}
-                        dataKey="count"
-                        nameKey="source"
-                      >
-                        {sources.slice(0, 8).map((_: any, i: number) => (
-                          <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-12">No traffic data yet</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Source Breakdown</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="border border-border rounded-xl p-4 bg-card">
+              <h3 className="text-sm font-semibold text-foreground mb-3">Top products by units sold</h3>
+              {top_products_by_sales.length > 0 ? (
                 <div className="space-y-3">
-                  {sources.map((s: any, i: number) => {
-                    const pct = total_views > 0 ? ((s.count / total_views) * 100).toFixed(1) : "0";
-                    return (
-                      <div key={s.source} className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
-                        <span className="text-sm flex-1 text-foreground">{s.source}</span>
-                        <span className="text-sm font-medium text-foreground">{s.count.toLocaleString()}</span>
-                        <span className="text-xs text-muted-foreground w-12 text-right">{pct}%</span>
-                      </div>
-                    );
-                  })}
-                  {sources.length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">No data</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        {/* BEHAVIOR */}
-        <TabsContent value="behavior" className="space-y-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard
-              title="Add to Cart Rate"
-              value={formatPercent(add_to_cart_rate)}
-              icon={ShoppingCart}
-              color="text-orange-500"
-              subtitle={`${add_to_cart_count} sessions`}
-            />
-            <MetricCard
-              title="Checkout Rate"
-              value={total_sessions > 0 ? formatPercent((checkout_count / total_sessions) * 100) : "0%"}
-              icon={MousePointerClick}
-              color="text-purple-500"
-              subtitle={`${checkout_count} sessions`}
-            />
-            <MetricCard
-              title="Purchase Rate"
-              value={formatPercent(conversion_rate)}
-              icon={DollarSign}
-              color="text-green-500"
-              subtitle={`${total_orders} orders`}
-            />
-            <MetricCard
-              title="Cart Abandonment"
-              value={add_to_cart_count > 0 ? formatPercent(((add_to_cart_count - total_orders) / add_to_cart_count) * 100) : "0%"}
-              icon={ShoppingCart}
-              color="text-red-500"
-              subtitle={`${Math.max(0, add_to_cart_count - total_orders)} abandoned`}
-            />
-          </div>
-
-          {/* Funnel again in detail */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Shopping Funnel</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <FunnelBar label="All Sessions" value={total_sessions} total={total_sessions} color="#3b82f6" />
-              <FunnelBar label="Added to Cart" value={add_to_cart_count} total={total_sessions} color="#f59e0b" />
-              <FunnelBar label="Reached Checkout" value={checkout_count} total={total_sessions} color="#8b5cf6" />
-              <FunnelBar label="Completed Purchase" value={total_orders} total={total_sessions} color="#22c55e" />
-            </CardContent>
-          </Card>
-
-          {/* Orders chart */}
-          {daily_sales.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Orders Over Time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={daily_sales}>
-                    <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
-                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={d => d.slice(5)} />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip />
-                    <Bar dataKey="orders" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Orders" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
-        {/* GEO & BLOCKING */}
-        <TabsContent value="geo" className="space-y-4">
-          <div className="grid lg:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Visitor Countries</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                  {countries.map((c: any, i: number) => {
-                    const pct = total_views > 0 ? ((c.count / total_views) * 100).toFixed(1) : "0";
-                    return (
-                      <div key={c.country} className="flex items-center gap-3 py-1.5">
-                        <span className="text-sm flex-1 text-foreground">{c.country}</span>
-                        <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-primary"
-                            style={{ width: `${Math.max(parseFloat(pct), 2)}%` }}
-                          />
-                        </div>
-                        <span className="text-sm font-medium text-foreground w-16 text-right">{c.count.toLocaleString()}</span>
-                        <span className="text-xs text-muted-foreground w-10 text-right">{pct}%</span>
-                      </div>
-                    );
-                  })}
-                  {countries.length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">No geo data yet</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <ShieldBan className="h-4 w-4" />
-                  Blocked Countries
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Toggle to block visitors from specific countries.
-                </p>
-                <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                  {blocked_countries.map((bc: any) => (
-                    <div key={bc.country_code} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted/50">
-                      <span className="text-sm">{bc.country_name} ({bc.country_code})</span>
-                      <Switch
-                        checked={bc.is_active}
-                        onCheckedChange={(checked) =>
-                          toggleBlockMutation.mutate({ country_code: bc.country_code, is_active: checked })
-                        }
-                      />
+                  {top_products_by_sales.slice(0, 8).map((p: any, i: number) => (
+                    <div key={p.product_id} className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
+                      {p.image && <img src={p.image} alt="" className="w-8 h-8 rounded object-contain bg-white border" />}
+                      <p className="text-sm flex-1 text-foreground truncate">{p.name}</p>
+                      <span className="text-sm font-medium text-foreground">{p.units_sold}</span>
                     </div>
                   ))}
-                  {blocked_countries.length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">No blocked countries configured</p>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-6">No data</p>
+              )}
+            </div>
+            <div className="border border-border rounded-xl p-4 bg-card">
+              <h3 className="text-sm font-semibold text-foreground mb-3">Top products by page views</h3>
+              {top_products.length > 0 ? (
+                <div className="space-y-3">
+                  {top_products.slice(0, 8).map((p: any, i: number) => (
+                    <div key={p.product_id} className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
+                      {p.image && <img src={p.image} alt="" className="w-8 h-8 rounded object-contain bg-white border" />}
+                      <p className="text-sm flex-1 text-foreground truncate">{p.name}</p>
+                      <span className="text-sm font-medium text-foreground">{p.views}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-6">No data</p>
+              )}
+            </div>
+          </div>
+
+          {/* Traffic sources */}
+          <div className="border border-border rounded-xl p-4 bg-card">
+            <h3 className="text-sm font-semibold text-foreground mb-3">Traffic sources</h3>
+            {sources.length > 0 ? (
+              <div className="space-y-2">
+                {sources.map((s: any) => {
+                  const pct = total_views > 0 ? ((s.count / total_views) * 100) : 0;
+                  return (
+                    <div key={s.source} className="flex items-center gap-3">
+                      <span className="text-sm flex-1 text-foreground">{s.source}</span>
+                      <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: "#5c6ac4" }} />
+                      </div>
+                      <span className="text-sm font-medium text-foreground w-12 text-right">{s.count}</span>
+                      <span className="text-xs text-muted-foreground w-10 text-right">{pct.toFixed(1)}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-6">No traffic data</p>
+            )}
+          </div>
+
+          {/* Top pages */}
+          <div className="border border-border rounded-xl p-4 bg-card">
+            <h3 className="text-sm font-semibold text-foreground mb-3">Top landing pages</h3>
+            <div className="space-y-2">
+              {top_pages.slice(0, 10).map((p: any) => (
+                <div key={p.page} className="flex items-center gap-3 text-sm">
+                  <span className="flex-1 text-foreground font-mono text-xs truncate">{p.page}</span>
+                  <span className="font-medium text-foreground">{p.count.toLocaleString()}</span>
+                  <span className="text-xs text-muted-foreground w-10 text-right">
+                    {total_views > 0 ? ((p.count / total_views) * 100).toFixed(1) : 0}%
+                  </span>
+                </div>
+              ))}
+              {top_pages.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">No data</p>
+              )}
+            </div>
+          </div>
+
+          {/* Geo blocking */}
+          <div className="grid lg:grid-cols-2 gap-4">
+            <SessionsByLocation countries={countries} />
+            <div className="border border-border rounded-xl p-4 bg-card">
+              <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                <ShieldBan className="h-4 w-4" />
+                Blocked countries
+              </h3>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {blocked_countries.map((bc: any) => (
+                  <div key={bc.country_code} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted/50">
+                    <span className="text-sm text-foreground">{bc.country_name} ({bc.country_code})</span>
+                    <Switch
+                      checked={bc.is_active}
+                      onCheckedChange={(checked) =>
+                        toggleBlockMutation.mutate({ country_code: bc.country_code, is_active: checked })
+                      }
+                    />
+                  </div>
+                ))}
+                {blocked_countries.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">No blocked countries</p>
+                )}
+              </div>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
