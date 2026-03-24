@@ -56,7 +56,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
 
   return (
     <div className="group bg-background border border-border/30 rounded-lg overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20" onMouseEnter={handlePrefetch} onTouchStart={handlePrefetch}>
-      <div className="relative aspect-square bg-muted overflow-hidden flex-shrink-0">
+      <div className="relative aspect-square bg-white overflow-hidden flex-shrink-0">
         <Link to={`/product/${product.id}`} className="w-full h-full flex items-center justify-center">
           {imgError ? (
             <ImageOff className="w-10 h-10 text-muted-foreground" />
