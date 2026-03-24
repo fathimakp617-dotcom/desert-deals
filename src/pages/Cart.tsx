@@ -171,7 +171,7 @@ const Cart = memo(() => {
                       >
                         <div className="flex items-center gap-4">
                           <Link to={`/product/${item.product.id}`} className="w-16 h-16 flex-shrink-0 bg-muted overflow-hidden rounded">
-                            <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover" />
+                            <img src={item.product.image} alt={item.product.name} className="w-full h-full object-contain bg-white" />
                           </Link>
                           <div>
                             <Link to={`/product/${item.product.id}`} className="text-sm font-medium text-foreground hover:text-primary transition-colors">
