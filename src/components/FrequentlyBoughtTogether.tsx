@@ -4,6 +4,7 @@ import { Plus, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useCart } from "@/contexts/CartContext";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { formatPrice, Product } from "@/data/products";
 import { toast } from "sonner";
 
