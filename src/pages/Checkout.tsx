@@ -902,9 +902,9 @@ const Checkout = () => {
                         }}
                       />
                       <Label htmlFor="terms-checkout" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                        I have read and agree to the website{" "}
+                        {t("checkout.agreeTerms")}{" "}
                         <Link to="/terms" target="_blank" className="text-primary hover:underline">
-                          terms and conditions
+                          {t("checkout.termsAndConditions")}
                         </Link>{" "}*
                       </Label>
                     </div>
