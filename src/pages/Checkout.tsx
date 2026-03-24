@@ -737,7 +737,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="state">Emirate *</Label>
+                  <Label htmlFor="state">{t("checkout.state")}</Label>
                   <Select
                     value={formData.state}
                     onValueChange={(value) => {
