@@ -762,7 +762,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="city">Town / City *</Label>
+                  <Label htmlFor="city">{t("checkout.city")}</Label>
                   <Input
                     id="city"
                     name="city"
