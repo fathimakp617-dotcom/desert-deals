@@ -508,7 +508,7 @@ const ProductDetail = () => {
                 {isSoldOut && (
                   <motion.div variants={staggerItem} className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
                     <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
-                    <span className="text-destructive font-medium text-sm">This product is currently sold out</span>
+                    <span className="text-destructive font-medium text-sm">{t("product.soldOutMessage")}</span>
                   </motion.div>
                 )}
                 
