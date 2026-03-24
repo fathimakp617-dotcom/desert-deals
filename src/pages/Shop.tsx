@@ -268,7 +268,7 @@ const Shop = () => {
                     <Search className="absolute start-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       type="text"
-                      placeholder="Search shoes..."
+                      placeholder={t("shop.searchShoes")}
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
                       className="ps-10 h-10 bg-background border-border/50"
