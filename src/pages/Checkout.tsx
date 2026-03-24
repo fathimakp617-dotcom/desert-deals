@@ -887,7 +887,7 @@ const Checkout = () => {
                     </div>
                     <span className="font-medium text-foreground">Cash On Delivery</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6 ml-7">Pay with cash upon delivery.</p>
+                  <p className="text-sm text-muted-foreground mb-6 ms-7">Pay with cash upon delivery.</p>
 
                   {/* Terms checkbox */}
                   <div className="mb-6">
