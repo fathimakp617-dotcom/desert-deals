@@ -297,7 +297,7 @@ const Shop = () => {
               {/* Active Filters */}
               {hasActiveFilters && (
                 <div className="flex items-center gap-2 mb-4 flex-wrap">
-                  <span className="text-sm text-muted-foreground">Active:</span>
+                  <span className="text-sm text-muted-foreground">{t("common.active")}</span>
                   {searchInput && (
                     <span className="px-3 py-1 bg-card border border-border/50 rounded-full text-xs flex items-center gap-2">
                       "{searchInput}" <X className="w-3 h-3 cursor-pointer hover:text-primary" onClick={() => setSearchInput("")} />
