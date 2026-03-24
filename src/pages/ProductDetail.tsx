@@ -210,7 +210,7 @@ const ProductDetail = () => {
       return;
     }
     if (needsSize && !selectedSize) {
-      toast.error("Please select a size first");
+      toast.error(t("product.pleaseSelectSize"));
       return;
     }
     const sizeLabel = needsSize && selectedSize ? selectedSize : "One Size";
