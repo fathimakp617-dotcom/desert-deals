@@ -724,7 +724,7 @@ const ProductDetail = () => {
                       )}
                       {product.materials.length > 0 && (
                         <div className="flex justify-between py-2 border-b border-border/20">
-                          <span className="text-muted-foreground">Materials</span>
+                          <span className="text-muted-foreground">{t("product.materials")}</span>
                           <span className="text-foreground">{product.materials.join(", ")}</span>
                         </div>
                       )}
