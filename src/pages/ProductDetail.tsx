@@ -165,9 +165,9 @@ const ProductDetail = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-heading mb-4">Product Not Found</h1>
+          <h1 className="text-4xl font-heading mb-4">{t("product.notFound")}</h1>
           <Link to="/shop" className="text-primary hover:underline">
-            Return to Shop
+            {t("product.returnToShop")}
           </Link>
         </div>
       </div>
