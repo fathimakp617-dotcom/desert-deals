@@ -61,32 +61,9 @@ Deno.serve(async (req) => {
     const from = date_from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const to = date_to || new Date().toISOString();
 
-    // ===== Run all DB aggregations in parallel =====
-    const [
-      pvStatsRes,
-      liveVisitorsRes,
-      liveCartsRes,
-      dailyViewsRes,
-      topPagesRes,
-      trafficSourcesRes,
-      countryBreakdownRes,
-      topProductViewsRes,
-      atcSessionsRes,
-      checkoutSessionsRes,
-      ordersRes,
-      returningOrdersRes,
-      blockedCountriesRes,
-    ] = await Promise.all([
-      supabaseClient.rpc("get_page_view_stats", { p_from: from, p_to: to }).single(),
-      supabaseClient.rpc("get_live_visitors"),
-      supabaseClient.rpc("get_live_carts"),
-      supabaseClient.rpc("get_daily_views", { p_from: from, p_to: to }),
-      supabaseClient.rpc("get_top_pages", { p_from: from, p_to: to, p_limit: 15 }),
-      supabaseClient.rpc("get_traffic_sources", { p_from: from, p_to: to, p_limit: 15 }),
-      supabaseClient.rpc("get_country_breakdown", { p_from: from, p_to: to, p_limit: 20 }),
-      supabaseClient.rpc("get_top_products_by_views", { p_from: from, p_to: to, p_limit: 20 }),
-      supabaseClient.rpc("get_atc_sessions", { p_from: from, p_to: to }),
-      supabaseClient.rpc("get_checkout_sessions", { p_from: from, p_to: to }),
+    // ===== Single DB call for all page view aggregations =====
+    const [aggregatesRes, ordersRes, returningOrdersRes, blockedCountriesRes] = await Promise.all([
+      supabaseClient.rpc("get_analytics_aggregates", { p_from: from, p_to: to }).single(),
       supabaseClient
         .from("orders")
         .select("id, total, order_status, created_at, items, customer_email")
@@ -104,15 +81,13 @@ Deno.serve(async (req) => {
         .order("country_name"),
     ]);
 
-    // ===== Extract results =====
-    const pvStats = pvStatsRes.data;
-    console.log("pvStats raw:", JSON.stringify(pvStatsRes.data));
-    const total_views = Number(pvStats?.total_views || 0);
-    const total_sessions = Number(pvStats?.unique_sessions || 0) || total_views;
-    const live_visitors = Number(liveVisitorsRes.data || 0);
-    const live_carts = Number(liveCartsRes.data || 0);
-    const add_to_cart_count = Number(atcSessionsRes.data || 0);
-    const checkout_count = Number(checkoutSessionsRes.data || 0);
+    const agg = aggregatesRes.data || {};
+    const total_views = Number(agg.total_views || 0);
+    const total_sessions = Number(agg.unique_sessions || 0) || total_views;
+    const live_visitors = Number(agg.live_visitors || 0);
+    const live_carts = Number(agg.live_carts || 0);
+    const add_to_cart_count = Number(agg.atc_sessions || 0);
+    const checkout_count = Number(agg.checkout_sessions || 0);
 
     // ===== Orders =====
     const orders = ordersRes.data || [];
@@ -132,19 +107,19 @@ Deno.serve(async (req) => {
     const returning_customer_rate = periodEmails.length > 0 ? (returningCount / periodEmails.length) * 100 : 0;
 
     // ===== Daily views =====
-    const daily_views = (dailyViewsRes.data || []).map((r: any) => ({ date: r.day, count: Number(r.view_count) }));
+    const daily_views = (agg.daily_views || []).map((r: any) => ({ date: r.day, count: Number(r.view_count) }));
 
     // ===== Top pages =====
-    const top_pages = (topPagesRes.data || []).map((r: any) => ({ page: r.page, count: Number(r.view_count) }));
+    const top_pages = (agg.top_pages || []).map((r: any) => ({ page: r.page, count: Number(r.view_count) }));
 
     // ===== Traffic sources =====
-    const sources = (trafficSourcesRes.data || []).map((r: any) => ({ source: r.source, count: Number(r.view_count) }));
+    const sources = (agg.sources || []).map((r: any) => ({ source: r.source, count: Number(r.view_count) }));
 
     // ===== Countries =====
-    const countries = (countryBreakdownRes.data || []).map((r: any) => ({ country: r.country, count: Number(r.view_count) }));
+    const countries = (agg.countries || []).map((r: any) => ({ country: r.country, count: Number(r.view_count) }));
 
     // ===== Top products by views =====
-    const topProductViewsList = (topProductViewsRes.data || []).map((r: any) => ({
+    const topProductViewsList = (agg.top_product_views || []).map((r: any) => ({
       product_id: r.pid,
       views: Number(r.view_count),
     }));
