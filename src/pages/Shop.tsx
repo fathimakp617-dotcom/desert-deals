@@ -50,25 +50,29 @@ const brandSlugToCategory: Record<string, string> = {
 };
 
 const Shop = () => {
+  const { t } = useTranslation();
+
+  const priceRanges = useMemo(() => [
+    { label: t("shop.allPrices"), min: 0, max: Infinity },
+    { label: t("shop.under200"), min: 0, max: 200 },
+    { label: t("shop.200to350"), min: 200, max: 350 },
+    { label: t("shop.350to500"), min: 350, max: 500 },
+    { label: t("shop.above500"), min: 500, max: Infinity },
+  ], [t]);
+
+  const sortOptions = useMemo(() => [
+    { label: t("shop.relevance"), value: "featured" },
+    { label: t("shop.sortByPopularity"), value: "name-asc" },
+    { label: t("shop.sortByRating"), value: "rating" },
+    { label: t("shop.sortByLatest"), value: "latest" },
+    { label: t("shop.sortByPriceLow"), value: "price-asc" },
+    { label: t("shop.sortByPriceHigh"), value: "price-desc" },
+  ], [t]);
+
   const [searchParams] = useSearchParams();
   const brandParam = searchParams.get("brand");
   const searchParam = searchParams.get("search");
   const initialCategory = (brandParam && brandSlugToCategory[brandParam]) || "All";
-
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [searchInput, setSearchInput] = useState(searchParam || "");
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedPriceRange, setSelectedPriceRange] = useState(0);
-  const [sortBy, setSortBy] = useState("featured");
-  const [showFilters, setShowFilters] = useState(false);
-  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [quickViewId, setQuickViewId] = useState<string | null>(null);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-
-  const debouncedSearch = useDebounce(searchInput, 300);
-  const priceRange = priceRanges[selectedPriceRange];
 
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { data: dbCategories } = useCategories();
