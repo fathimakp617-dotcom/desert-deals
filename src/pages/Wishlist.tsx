@@ -11,21 +11,23 @@ import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/data/products";
 import { fadeInUp, staggerContainer, staggerItem } from "@/lib/animations";
 import { toast } from "sonner";
+import { useTranslation } from "@/contexts/DirectionContext";
 
 const Wishlist = () => {
   const { items, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const { t } = useTranslation();
 
   const handleAddToCart = (product: typeof items[0]) => {
     addToCart(product);
-    toast.success(`${product.name} added to cart`);
+    toast.success(`${product.name} ${t("wishlist.addedToCart")}`);
   };
 
   return (
     <>
       <Helmet>
-        <title>My Wishlist | Desert Deal</title>
-        <meta name="description" content="View your saved products at Desert Deal. Add items to cart or continue shopping." />
+        <title>{t("wishlist.title")} | Desert Deal</title>
+        <meta name="description" content="View your saved products at Desert Deal." />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
@@ -41,24 +43,24 @@ const Wishlist = () => {
               className="space-y-12"
             >
               <motion.div variants={fadeInUp} className="text-center">
-                <p className="text-sm tracking-[0.3em] text-primary mb-4">MY WISHLIST</p>
+                <p className="text-sm tracking-[0.3em] text-primary mb-4">{t("wishlist.title")}</p>
                 <h1 className="text-4xl md:text-5xl font-heading tracking-tight">
-                  Saved Products
+                  {t("wishlist.savedProducts")}
                 </h1>
                 <p className="text-muted-foreground mt-4">
-                  {items.length} {items.length === 1 ? "item" : "items"} in your wishlist
+                  {items.length} {items.length === 1 ? t("common.item") : t("common.items")} {t("wishlist.itemsInWishlist")}
                 </p>
               </motion.div>
 
               {items.length === 0 ? (
                 <motion.div variants={fadeInUp} className="text-center py-20">
                   <Heart className="w-20 h-20 text-muted-foreground/20 mx-auto mb-6" />
-                  <h2 className="text-2xl font-heading mb-4">Your wishlist is empty</h2>
+                  <h2 className="text-2xl font-heading mb-4">{t("wishlist.empty")}</h2>
                   <p className="text-muted-foreground mb-8">
-                    Save your favorite products to revisit them later
+                    {t("wishlist.emptyDesc")}
                   </p>
                   <Button asChild className="bg-primary hover:bg-primary/90">
-                    <Link to="/shop">Explore Collection</Link>
+                    <Link to="/shop">{t("wishlist.browseCollection")}</Link>
                   </Button>
                 </motion.div>
               ) : (
@@ -101,8 +103,8 @@ const Wishlist = () => {
                             className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
                             size="sm"
                           >
-                            <ShoppingBag className="w-4 h-4 mr-2" />
-                            Add to Cart
+                            <ShoppingBag className="w-4 h-4 me-2" />
+                            {t("common.addToCart")}
                           </Button>
                           <Button
                             onClick={() => removeFromWishlist(product.id)}

@@ -253,7 +253,7 @@ const Navbar = memo(() => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search everything..."
+                  placeholder={t("nav.searchEverything")}
                   className="w-full h-12 pl-11 pr-4 text-sm bg-muted rounded-lg focus:outline-none text-foreground placeholder:text-muted-foreground"
                 />
               </form>

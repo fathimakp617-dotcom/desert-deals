@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Search, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "@/contexts/DirectionContext";
 
 interface SearchSuggestionsProps {
   query: string;
@@ -13,12 +14,12 @@ interface SearchSuggestionsProps {
 const SearchSuggestions = ({ query, onSelect, onClose }: SearchSuggestionsProps) => {
   const debouncedQuery = useDebounce(query.trim(), 250);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { data: suggestions, isLoading } = useQuery({
     queryKey: ["search-suggestions", debouncedQuery],
     queryFn: async () => {
       if (!debouncedQuery) return [];
-      // Split query into words and search each word to handle extra spaces in product names
       const words = debouncedQuery.split(/\s+/).filter(Boolean);
       let query = supabase
         .from("products")
@@ -57,7 +58,7 @@ const SearchSuggestions = ({ query, onSelect, onClose }: SearchSuggestionsProps)
                 key={product.id}
                 type="button"
                 onClick={() => handleClick(product)}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors text-start"
               >
                 {img ? (
                   <img
@@ -86,12 +87,12 @@ const SearchSuggestions = ({ query, onSelect, onClose }: SearchSuggestionsProps)
             }}
             className="w-full px-4 py-2.5 text-xs text-primary font-medium hover:bg-accent/50 transition-colors border-t border-border"
           >
-            View all results for "{query.trim()}"
+            {t("search.viewAllResults")} "{query.trim()}"
           </button>
         </>
       ) : debouncedQuery.length >= 1 ? (
         <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-          No products found for "{debouncedQuery}"
+          {t("search.noProducts")} "{debouncedQuery}"
         </div>
       ) : null}
     </div>
