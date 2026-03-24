@@ -228,7 +228,7 @@ const Shop = () => {
                   </button>
 
                   <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {totalCount} items
+                    {totalCount} {t("common.items")}
                     {isFetching && !isLoading && <Loader2 className="inline-block ms-1 h-3 w-3 animate-spin" />}
                   </span>
                 </div>
