@@ -344,9 +344,9 @@ const Shop = () => {
               {/* Empty State */}
               {!isLoading && products.length === 0 && (
                 <div className="text-center py-20">
-                  <p className="text-muted-foreground text-lg">No products found matching your criteria.</p>
+                  <p className="text-muted-foreground text-lg">{t("shop.noProducts")}</p>
                   <Button onClick={clearFilters} variant="outline" className="mt-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                    Clear Filters
+                    {t("shop.clearFilters")}
                   </Button>
                 </div>
               )}
