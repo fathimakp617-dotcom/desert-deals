@@ -301,7 +301,7 @@ const ProductDetail = () => {
               className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-              <span className="text-sm tracking-wider">BACK</span>
+              <span className="text-sm tracking-wider">{t("common.back")}</span>
             </motion.button>
           </div>
         </section>
