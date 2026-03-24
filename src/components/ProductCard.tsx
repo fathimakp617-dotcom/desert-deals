@@ -79,7 +79,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
 
 
         {!soldOut && product.discountPercent > 0 && product.name?.toLowerCase().includes("mind") && (
-          <div className="absolute top-2 left-2 z-10">
+          <div className="absolute top-2 start-2 z-10">
             <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5">
               -{product.discountPercent}%
             </Badge>
@@ -87,7 +87,7 @@ const ProductCard = memo(({ product, soldOut, inWishlist, onToggleWishlist, onQu
         )}
 
         {soldOut && (
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2 start-2">
             <Badge variant="destructive" className="text-[10px]">SOLD OUT</Badge>
           </div>
         )}
