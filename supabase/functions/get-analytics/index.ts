@@ -61,16 +61,94 @@ Deno.serve(async (req) => {
     const from = date_from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const to = date_to || new Date().toISOString();
 
-    // Top viewed products
-    const { data: topProducts } = await supabaseClient
+    // ===== PAGE VIEWS =====
+    const { data: allViews } = await supabaseClient
       .from("page_views")
-      .select("product_id, page_path")
-      .not("product_id", "is", null)
+      .select("referrer, utm_source, utm_medium, utm_campaign, country_code, page_path, created_at, session_id, product_id")
+      .gte("created_at", from)
+      .lte("created_at", to)
+      .order("created_at", { ascending: false })
+      .limit(5000);
+
+    // ===== LIVE VISITORS (last 5 min) =====
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { data: liveViews } = await supabaseClient
+      .from("page_views")
+      .select("session_id")
+      .gte("created_at", fiveMinAgo);
+
+    const liveSessionIds = new Set((liveViews || []).map(v => v.session_id).filter(Boolean));
+    const live_visitors = liveSessionIds.size;
+
+    // ===== LIVE CARTS (cart_active events in last 5 min) =====
+    const { data: liveCartEvents } = await supabaseClient
+      .from("analytics_events")
+      .select("session_id")
+      .eq("event_type", "cart_active")
+      .gte("created_at", fiveMinAgo);
+
+    const liveCartSessions = new Set((liveCartEvents || []).map(e => e.session_id).filter(Boolean));
+    const live_carts = liveCartSessions.size;
+
+    // ===== ORDERS (for sales metrics) =====
+    const { data: orders } = await supabaseClient
+      .from("orders")
+      .select("id, total, order_status, created_at, items, customer_email")
+      .gte("created_at", from)
+      .lte("created_at", to)
+      .order("created_at", { ascending: false });
+
+    const activeOrders = (orders || []).filter(o => o.order_status !== "cancelled");
+    const total_sales = activeOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+    const total_orders = activeOrders.length;
+    const average_order_value = total_orders > 0 ? total_sales / total_orders : 0;
+
+    // ===== UNIQUE SESSIONS =====
+    const uniqueSessions = new Set((allViews || []).map(v => v.session_id).filter(Boolean));
+    const total_sessions = uniqueSessions.size || (allViews || []).length;
+
+    // ===== CONVERSION RATE =====
+    // Sessions that resulted in an order
+    const conversion_rate = total_sessions > 0 ? (total_orders / total_sessions) * 100 : 0;
+
+    // ===== ADD TO CART EVENTS =====
+    const { data: addToCartEvents } = await supabaseClient
+      .from("analytics_events")
+      .select("session_id")
+      .eq("event_type", "add_to_cart")
       .gte("created_at", from)
       .lte("created_at", to);
 
+    const addToCartSessions = new Set((addToCartEvents || []).map(e => e.session_id).filter(Boolean));
+    const add_to_cart_count = addToCartSessions.size;
+    const add_to_cart_rate = total_sessions > 0 ? (add_to_cart_count / total_sessions) * 100 : 0;
+
+    // ===== CHECKOUT EVENTS =====
+    const { data: checkoutEvents } = await supabaseClient
+      .from("analytics_events")
+      .select("session_id")
+      .eq("event_type", "checkout_started")
+      .gte("created_at", from)
+      .lte("created_at", to);
+
+    const checkoutSessions = new Set((checkoutEvents || []).map(e => e.session_id).filter(Boolean));
+    const checkout_count = checkoutSessions.size;
+
+    // ===== RETURNING CUSTOMERS =====
+    const { data: allOrdersForReturning } = await supabaseClient
+      .from("orders")
+      .select("customer_email")
+      .lt("created_at", from)
+      .limit(5000);
+
+    const previousEmails = new Set((allOrdersForReturning || []).map(o => o.customer_email?.toLowerCase()).filter(Boolean));
+    const periodEmails = activeOrders.map(o => o.customer_email?.toLowerCase()).filter(Boolean);
+    const returningCount = periodEmails.filter(e => previousEmails.has(e)).length;
+    const returning_customer_rate = periodEmails.length > 0 ? (returningCount / periodEmails.length) * 100 : 0;
+
+    // ===== TOP PRODUCTS BY VIEWS =====
     const productCounts: Record<string, number> = {};
-    (topProducts || []).forEach(v => {
+    (allViews || []).forEach(v => {
       if (v.product_id) productCounts[v.product_id] = (productCounts[v.product_id] || 0) + 1;
     });
     const topProductsList = Object.entries(productCounts)
@@ -78,34 +156,70 @@ Deno.serve(async (req) => {
       .slice(0, 20)
       .map(([id, views]) => ({ product_id: id, views }));
 
-    // Enrich with product names
     const productIds = topProductsList.map(p => p.product_id);
     const { data: productNames } = await supabaseClient
       .from("products")
-      .select("id, name, image_url")
+      .select("id, name, image_url, price")
       .in("id", productIds.length ? productIds : ["__none__"]);
 
-    const nameMap: Record<string, { name: string; image: string }> = {};
+    const nameMap: Record<string, { name: string; image: string; price: number }> = {};
     (productNames || []).forEach(p => {
-      nameMap[p.id] = { name: p.name, image: (p.image_url || "").split(",")[0].trim() };
+      nameMap[p.id] = { name: p.name, image: (p.image_url || "").split(",")[0].trim(), price: p.price };
+    });
+
+    // Calculate units sold per product
+    const unitsSold: Record<string, number> = {};
+    activeOrders.forEach(o => {
+      const items = o.items as any[];
+      if (Array.isArray(items)) {
+        items.forEach(item => {
+          const pid = item.productId || item.product_id;
+          if (pid) unitsSold[pid] = (unitsSold[pid] || 0) + (item.quantity || 1);
+        });
+      }
     });
 
     const enrichedProducts = topProductsList.map(p => ({
       ...p,
       name: nameMap[p.product_id]?.name || p.product_id,
       image: nameMap[p.product_id]?.image || "",
+      price: nameMap[p.product_id]?.price || 0,
+      units_sold: unitsSold[p.product_id] || 0,
     }));
 
-    // Traffic sources
-    const { data: allViews } = await supabaseClient
-      .from("page_views")
-      .select("referrer, utm_source, utm_medium, utm_campaign, country_code, page_path, created_at")
-      .gte("created_at", from)
-      .lte("created_at", to)
-      .order("created_at", { ascending: false })
-      .limit(5000);
+    // ===== TOP PRODUCTS BY SALES =====
+    const topBySales = Object.entries(unitsSold)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([id, units]) => {
+        const info = nameMap[id];
+        return {
+          product_id: id,
+          name: info?.name || id,
+          image: info?.image || "",
+          price: info?.price || 0,
+          units_sold: units,
+        };
+      });
 
-    // Source breakdown
+    // Enrich top by sales if product info not in nameMap
+    const missingIds = topBySales.filter(p => !nameMap[p.product_id]).map(p => p.product_id);
+    if (missingIds.length > 0) {
+      const { data: missingProducts } = await supabaseClient
+        .from("products")
+        .select("id, name, image_url, price")
+        .in("id", missingIds);
+      (missingProducts || []).forEach(p => {
+        const found = topBySales.find(x => x.product_id === p.id);
+        if (found) {
+          found.name = p.name;
+          found.image = (p.image_url || "").split(",")[0].trim();
+          found.price = p.price;
+        }
+      });
+    }
+
+    // ===== TRAFFIC SOURCES =====
     const sourceCounts: Record<string, number> = {};
     (allViews || []).forEach(v => {
       let source = "Direct";
@@ -123,7 +237,7 @@ Deno.serve(async (req) => {
       .slice(0, 15)
       .map(([source, count]) => ({ source, count }));
 
-    // Country breakdown
+    // ===== COUNTRY BREAKDOWN =====
     const countryCounts: Record<string, number> = {};
     (allViews || []).forEach(v => {
       const cc = v.country_code || "Unknown";
@@ -134,39 +248,72 @@ Deno.serve(async (req) => {
       .slice(0, 20)
       .map(([country, count]) => ({ country, count }));
 
-    // Daily views
+    // ===== DAILY VIEWS =====
     const dailyCounts: Record<string, number> = {};
     (allViews || []).forEach(v => {
       const day = v.created_at.slice(0, 10);
       dailyCounts[day] = (dailyCounts[day] || 0) + 1;
     });
-    const dailyViews = Object.entries(dailyCounts)
+    const daily_views = Object.entries(dailyCounts)
       .sort((a, b) => a[0].localeCompare(b[0]))
       .map(([date, count]) => ({ date, count }));
 
-    // Top pages
+    // ===== DAILY SALES =====
+    const dailySales: Record<string, { revenue: number; orders: number }> = {};
+    activeOrders.forEach(o => {
+      const day = o.created_at.slice(0, 10);
+      if (!dailySales[day]) dailySales[day] = { revenue: 0, orders: 0 };
+      dailySales[day].revenue += o.total || 0;
+      dailySales[day].orders += 1;
+    });
+    const daily_sales = Object.entries(dailySales)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, data]) => ({ date, ...data }));
+
+    // ===== TOP PAGES =====
     const pageCounts: Record<string, number> = {};
     (allViews || []).forEach(v => {
       pageCounts[v.page_path] = (pageCounts[v.page_path] || 0) + 1;
     });
-    const topPages = Object.entries(pageCounts)
+    const top_pages = Object.entries(pageCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 15)
       .map(([page, count]) => ({ page, count }));
 
-    // Get blocked countries
+    // ===== BLOCKED COUNTRIES =====
     const { data: blockedCountries } = await supabaseClient
       .from("blocked_countries")
       .select("*")
       .order("country_name");
 
     return new Response(JSON.stringify({
+      // Live
+      live_visitors,
+      live_carts,
+      // Sales metrics
+      total_sales,
+      total_orders,
+      average_order_value,
+      conversion_rate,
+      add_to_cart_rate,
+      add_to_cart_count,
+      checkout_count,
+      returning_customer_rate,
+      // Sessions
+      total_sessions,
       total_views: (allViews || []).length,
+      // Products
       top_products: enrichedProducts,
+      top_products_by_sales: topBySales,
+      // Traffic
       sources,
       countries,
-      daily_views: dailyViews,
-      top_pages: topPages,
+      // Time series
+      daily_views,
+      daily_sales,
+      // Pages
+      top_pages,
+      // Geo blocking
       blocked_countries: blockedCountries || [],
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

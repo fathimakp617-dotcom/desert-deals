@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { Product } from "@/data/products";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CartItem {
   product: Product;
@@ -65,7 +66,27 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const getCartKey = (productId: string, size?: string) => `${productId}__${size || ''}`;
 
+  // Track cart events
+  const trackEvent = (eventType: string, productId?: string) => {
+    const sid = sessionStorage.getItem("dd_session_id");
+    supabase.functions.invoke("track-event", {
+      body: { event_type: eventType, session_id: sid || "", product_id: productId || "" },
+    }).catch(() => {});
+  };
+
+  // Send cart_active heartbeat every 2 min when cart has items
+  const heartbeatRef = useRef<ReturnType<typeof setInterval>>();
+  useEffect(() => {
+    if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+    if (items.length > 0) {
+      trackEvent("cart_active");
+      heartbeatRef.current = setInterval(() => trackEvent("cart_active"), 2 * 60 * 1000);
+    }
+    return () => { if (heartbeatRef.current) clearInterval(heartbeatRef.current); };
+  }, [items.length]);
+
   const addToCart = (product: Product, quantity = 1, selectedSize?: string) => {
+    trackEvent("add_to_cart", product.id);
     setItems((prev) => {
       const existing = prev.find((item) => item.product.id === product.id && item.selectedSize === selectedSize);
       if (existing) {
@@ -77,7 +98,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
       return [...prev, { product, quantity, selectedSize }];
     });
-    // No drawer — callers handle navigation directly
   };
 
   const removeFromCart = (productId: string, selectedSize?: string) => {

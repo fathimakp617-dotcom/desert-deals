@@ -147,6 +147,14 @@ const Checkout = () => {
   // Track if we've already loaded address to prevent multiple loads
   const hasLoadedAddress = useRef(false);
 
+  // Track checkout start
+  useEffect(() => {
+    const sid = sessionStorage.getItem("dd_session_id");
+    supabase.functions.invoke("track-event", {
+      body: { event_type: "checkout_started", session_id: sid || "" },
+    }).catch(() => {});
+  }, []);
+
   // Load saved address for returning customers and auto-fill - runs ONCE when user is available
   useEffect(() => {
     // Skip if already loaded or no user
