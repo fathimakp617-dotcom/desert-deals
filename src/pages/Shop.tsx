@@ -308,7 +308,7 @@ const Shop = () => {
                       {selectedCategory} <X className="w-3 h-3 cursor-pointer hover:text-primary" onClick={() => setSelectedCategory("All")} />
                     </span>
                   )}
-                  <button onClick={clearFilters} className="text-xs text-primary hover:underline">Clear all</button>
+                  <button onClick={clearFilters} className="text-xs text-primary hover:underline">{t("common.clearAll")}</button>
                 </div>
               )}
 
