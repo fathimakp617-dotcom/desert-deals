@@ -63,6 +63,7 @@ const CartDrawer = memo(() => {
                 <Check className="w-3 h-3 text-primary-foreground" />
               </div>
               <span className="font-heading text-sm text-primary">{t("cart.addedToCart")}</span>
+            </div>
           )}
 
           {/* All cart items */}
