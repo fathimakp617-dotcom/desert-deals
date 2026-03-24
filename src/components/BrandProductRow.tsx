@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react";
 import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useTranslation } from "@/contexts/DirectionContext";
 import { Badge } from "@/components/ui/badge";
 
 import { Loader2 } from "lucide-react";
