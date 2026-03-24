@@ -712,7 +712,7 @@ const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="firstName">Name *</Label>
+                  <Label htmlFor="firstName">{t("checkout.firstName")}</Label>
                   <Input
                     id="firstName"
                     name="firstName"
