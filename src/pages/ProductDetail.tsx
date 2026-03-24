@@ -590,7 +590,7 @@ const ProductDetail = () => {
                           return `${fmt(from)} – ${fmt(to)}`;
                         })()}
                       </span>
-                      <p className="text-xs text-muted-foreground mt-0.5">Order now • No delivery on Sundays</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{t("product.orderNow")}</p>
                     </div>
                   </div>
                   {isEidDeliveryEnabled && (
