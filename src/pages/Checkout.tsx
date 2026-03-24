@@ -844,7 +844,7 @@ const Checkout = () => {
                         <span className="text-muted-foreground flex-1 pe-4">
                           {item.product.name}
                           {item.selectedSize && (
-                            <span className="text-xs block text-muted-foreground/70">Size: {item.selectedSize}</span>
+                            <span className="text-xs block text-muted-foreground/70">{t("common.size")}: {item.selectedSize}</span>
                           )}
                           <span className="text-xs block">× {item.quantity}</span>
                         </span>
