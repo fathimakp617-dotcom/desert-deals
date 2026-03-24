@@ -40,7 +40,7 @@ const CartDrawer = memo(() => {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-lg font-heading font-bold text-foreground">
-            {t("cart.title") || "Cart"} <span className="text-muted-foreground font-normal text-base">{totalItems}</span>
+            {t("cart.shoppingCart")} <span className="text-muted-foreground font-normal text-base">{totalItems}</span>
           </h2>
           <button onClick={closeCart} className="p-1.5 hover:bg-muted rounded-full transition-colors">
             <X className="w-5 h-5" />
