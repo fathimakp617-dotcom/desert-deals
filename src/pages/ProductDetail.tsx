@@ -474,7 +474,7 @@ const ProductDetail = () => {
                       ))}
                     </div>
                     <span className="text-sm text-muted-foreground underline underline-offset-2">
-                      {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? "review" : "reviews"})
+                      {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? t("product.review") : t("product.reviewsPlural")})
                     </span>
                   </motion.div>
                 )}
