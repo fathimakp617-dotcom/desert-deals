@@ -610,7 +610,7 @@ const ProductDetail = () => {
 
                 {/* Social Share Bar */}
                 <motion.div variants={staggerItem} className="flex items-center gap-4 py-2">
-                  <span className="text-sm font-medium text-foreground">Share:</span>
+                  <span className="text-sm font-medium text-foreground">{t("common.share")}</span>
                   {(() => {
                     const ogUrl = `https://ttgsrrlhqvtnmtlkvlyi.supabase.co/functions/v1/og-product?id=${product.id}`;
                     const directUrl = `https://desertsdeals.com/product/${product.id}`;
