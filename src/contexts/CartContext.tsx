@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { Product } from "@/data/products";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CartItem {
   product: Product;
