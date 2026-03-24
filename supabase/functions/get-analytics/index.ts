@@ -209,6 +209,8 @@ Deno.serve(async (req) => {
       add_to_cart_count,
       checkout_count,
       returning_customer_rate,
+      returning_count: returningCount,
+      new_customer_count: periodEmails.length - returningCount,
       total_sessions,
       total_views,
       top_products,

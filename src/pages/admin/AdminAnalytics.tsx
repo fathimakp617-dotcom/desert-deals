@@ -113,6 +113,7 @@ const AdminAnalytics = () => {
     total_sales = 0, total_orders = 0,
     add_to_cart_count = 0, checkout_count = 0,
     total_sessions = 0, total_views = 0,
+    returning_count = 0, new_customer_count = 0,
     top_products = [], top_products_by_sales = [],
     sources = [], countries = [],
     daily_views = [], daily_sales = [],
@@ -325,11 +326,11 @@ const AdminAnalytics = () => {
                   <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">New customers</span>
-                      <span className="font-medium text-foreground">{total_orders}</span>
+                      <span className="font-medium text-foreground">{new_customer_count}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Returning customers</span>
-                      <span className="font-medium text-foreground">0</span>
+                      <span className="font-medium text-foreground">{returning_count}</span>
                     </div>
                   </div>
                 ) : (
