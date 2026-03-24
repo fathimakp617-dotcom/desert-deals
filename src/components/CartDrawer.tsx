@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/data/products";
 import { useDbProducts } from "@/hooks/useDbProducts";
+import { useTranslation } from "@/contexts/DirectionContext";
 
 const CartDrawer = memo(() => {
   const { items, isOpen, closeCart, addToCart, removeFromCart, totalItems } = useCart();
