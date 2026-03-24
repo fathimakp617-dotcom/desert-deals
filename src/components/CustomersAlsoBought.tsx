@@ -17,6 +17,7 @@ const CustomersAlsoBought = ({ currentProduct }: CustomersAlsoBoughtProps) => {
   const { data: products = [] } = useDbProducts();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
