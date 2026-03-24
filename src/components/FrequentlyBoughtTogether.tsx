@@ -15,6 +15,7 @@ interface FrequentlyBoughtTogetherProps {
 const FrequentlyBoughtTogether = ({ currentProduct }: FrequentlyBoughtTogetherProps) => {
   const { data: allProducts = [] } = useDbProducts();
   const { addToCart } = useCart();
+  const { t } = useTranslation();
 
   // Pick 2 products from same category (or random) as cross-sell
   const crossSellProducts = useMemo(() => {
