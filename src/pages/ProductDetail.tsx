@@ -446,9 +446,9 @@ const ProductDetail = () => {
                     )}
                   </div>
                 {!isSoldOut ? (
-                    <span className="text-xs sm:text-sm font-medium text-green-600">IN STOCK</span>
+                    <span className="text-xs sm:text-sm font-medium text-green-600">{t("product.inStock")}</span>
                   ) : (
-                    <span className="text-xs sm:text-sm font-medium text-destructive">Sold Out</span>
+                    <span className="text-xs sm:text-sm font-medium text-destructive">{t("product.soldOut")}</span>
                   )}
                 </motion.div>
 
