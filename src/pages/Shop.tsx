@@ -224,7 +224,7 @@ const Shop = () => {
                     className="flex items-center gap-2 text-sm font-medium text-foreground hover:opacity-70 transition-opacity"
                   >
                     <Filter className="w-4 h-4" />
-                    Filter
+                    {t("shop.filter")}
                   </button>
 
                   <span className="text-xs text-muted-foreground whitespace-nowrap">
