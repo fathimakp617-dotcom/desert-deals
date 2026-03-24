@@ -77,9 +77,9 @@ const CartDrawer = memo(() => {
                     {item.product.name}
                   </Link>
                   {item.selectedSize && (
-                    <p className="text-xs text-muted-foreground mt-0.5">Size: {item.selectedSize}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t("common.size")}: {item.selectedSize}</p>
                   )}
-                  <p className="text-xs text-muted-foreground mt-0.5">Qty: {item.quantity}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t("common.qty")}: {item.quantity}</p>
                 </div>
                 <div className="flex flex-col items-end justify-between">
                   <button
