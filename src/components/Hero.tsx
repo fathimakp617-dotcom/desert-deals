@@ -51,7 +51,7 @@ const Hero = memo(() => {
 
         <div className="absolute inset-x-0 top-0 h-24 sm:h-32 bg-gradient-to-b from-black/40 to-transparent z-10 pointer-events-none rounded-t-2xl" />
 
-        <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 z-10 flex justify-center gap-2">
+        <div className="absolute bottom-3 sm:bottom-6 inset-x-0 z-10 flex justify-center gap-2">
           {slides.map((_, index) => (
             <button
               key={index}
