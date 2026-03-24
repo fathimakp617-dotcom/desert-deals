@@ -44,6 +44,7 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { data: product, isLoading } = useDbProduct(id);
   const { data: sections } = useHomepageSections();
+  const announcementSection = sections?.find(s => s.section_key === "product_announcement" && s.is_visible);
   const eidConfig = sections?.find(s => s.section_key === "eid_delivery");
   const isEidDeliveryEnabled = !!eidConfig?.is_visible;
   const [selectedImage, setSelectedImage] = useState(0);
