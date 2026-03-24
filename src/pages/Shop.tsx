@@ -356,7 +356,7 @@ const Shop = () => {
 
               {(hasNextPage || isFetchingNextPage) && products.length > 0 && (
                 <p className="text-center text-xs text-muted-foreground mb-2 mt-4">
-                  Loading products… {products.length} loaded
+                  {t("shop.loadingProducts")} {products.length} {t("shop.loaded")}
                 </p>
               )}
 
