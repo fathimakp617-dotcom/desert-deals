@@ -515,7 +515,7 @@ const ProductDetail = () => {
                 {!isSoldOut && stockQuantity > 0 && stockQuantity <= 10 && (
                   <motion.div variants={staggerItem} className="flex items-center gap-2 p-2.5 bg-orange-500/10 border border-orange-500/30 rounded-lg">
                     <AlertCircle className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                    <span className="text-orange-500 text-xs sm:text-sm">Only {stockQuantity} left in stock!</span>
+                    <span className="text-orange-500 text-xs sm:text-sm">{t("product.only")} {stockQuantity} {t("product.onlyLeftInStock")}</span>
                   </motion.div>
                 )}
 
