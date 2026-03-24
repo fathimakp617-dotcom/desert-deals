@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
       returningOrdersRes,
       blockedCountriesRes,
     ] = await Promise.all([
-      supabaseClient.rpc("get_page_view_stats", { p_from: from, p_to: to }),
+      supabaseClient.rpc("get_page_view_stats", { p_from: from, p_to: to }).single(),
       supabaseClient.rpc("get_live_visitors"),
       supabaseClient.rpc("get_live_carts"),
       supabaseClient.rpc("get_daily_views", { p_from: from, p_to: to }),
