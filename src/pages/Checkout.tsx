@@ -746,7 +746,7 @@ const Checkout = () => {
                     }}
                   >
                     <SelectTrigger className={`mt-1 bg-card ${fieldErrors.state ? "border-destructive ring-1 ring-destructive" : "border-border"}`}>
-                      <SelectValue placeholder="Select Emirate" />
+                      <SelectValue placeholder={t("checkout.selectEmirate")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Abu Dhabi">Abu Dhabi</SelectItem>
