@@ -40,6 +40,7 @@ const Navbar = memo(() => {
     }));
 
     const staticBottom = [
+      { name: "Mind", href: "/shop?search=Mind" },
       { name: t("nav.aboutUs"), href: "/#about" },
       { name: t("nav.reviews"), href: "/#testimonials" },
     ];
