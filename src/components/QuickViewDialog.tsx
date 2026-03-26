@@ -70,7 +70,11 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       return;
     }
     buyNow(product, quantity, selectedSize);
-    setShowBuyNow(true);
+    if (isMind001(product.name)) {
+      setShowMind001Warning(true);
+    } else {
+      setShowBuyNow(true);
+    }
   };
 
   const handleToggleWishlist = () => {
