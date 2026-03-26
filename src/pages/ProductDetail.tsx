@@ -179,6 +179,8 @@ const ProductDetail = () => {
   const categoryLower = (product.category || "").toLowerCase();
   const needsSize = !["bags", "bag"].some(c => categoryLower.includes(c));
 
+  const [showMind001Warning, setShowMind001Warning] = useState(false);
+
   const handleAddToCart = () => {
     if (isSoldOut) {
       toast.error(t("product.soldOutMessage"));
@@ -201,7 +203,11 @@ const ProductDetail = () => {
       value: product.price * quantity,
       currency: "AED",
     });
-    setShowBuyNow(true);
+    if (isMind001(product.name)) {
+      setShowMind001Warning(true);
+    } else {
+      setShowBuyNow(true);
+    }
   };
 
 

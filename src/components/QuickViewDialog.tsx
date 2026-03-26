@@ -46,6 +46,8 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
     return sizeStr.split(",").map(s => s.trim()).filter(Boolean);
   };
 
+  const [showMind001Warning, setShowMind001Warning] = useState(false);
+
   const handleAddToCart = () => {
     if (!product || isSoldOut) return;
     if (!selectedSize) {
@@ -55,6 +57,9 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
     addToCart(product, quantity, selectedSize);
     trackAddToCart({ content_ids: [product.id], value: product.price * quantity, currency: "AED" });
     toast.success(`${product.name} added to cart`, { description: `Size: ${selectedSize} · Qty: ${quantity}` });
+    if (isMind001(product.name)) {
+      setShowMind001Warning(true);
+    }
   };
 
   const handleBuyNow = () => {
