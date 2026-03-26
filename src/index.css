@@ -110,9 +110,9 @@
     @apply font-heading;
   }
 
-  /* Optimize images */
+  /* Optimize images - avoid content-visibility:auto which causes scroll jank */
   img, video {
-    content-visibility: auto;
+    will-change: auto;
   }
 
   /* Custom Scrollbar Styling */
