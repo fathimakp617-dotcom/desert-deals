@@ -223,7 +223,11 @@ const ProductDetail = () => {
     }
     const sizeLabel = needsSize && selectedSize ? selectedSize : "One Size";
     buyNow(product, quantity, sizeLabel);
-    setShowBuyNow(true);
+    if (isMind001(product.name)) {
+      setShowMind001Warning(true);
+    } else {
+      setShowBuyNow(true);
+    }
   };
 
   const handleToggleWishlist = () => {

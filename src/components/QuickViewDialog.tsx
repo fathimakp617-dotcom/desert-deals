@@ -70,7 +70,11 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       return;
     }
     buyNow(product, quantity, selectedSize);
-    setShowBuyNow(true);
+    if (isMind001(product.name)) {
+      setShowMind001Warning(true);
+    } else {
+      setShowBuyNow(true);
+    }
   };
 
   const handleToggleWishlist = () => {
@@ -237,7 +241,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       {showBuyNow && product && (
         <BuyNowOverlay isOpen={showBuyNow} onClose={() => setShowBuyNow(false)} />
       )}
-      <Mind001SizeWarning open={showMind001Warning} onClose={() => setShowMind001Warning(false)} />
+      <Mind001SizeWarning open={showMind001Warning} onClose={() => { setShowMind001Warning(false); setShowBuyNow(true); }} />
     </>
   );
 };
