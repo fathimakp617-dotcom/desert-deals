@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { trackAddToCart } from "@/lib/metaPixel";
 import useEmblaCarousel from "embla-carousel-react";
 import BuyNowOverlay from "@/components/BuyNowOverlay";
+import Mind001SizeWarning, { isMind001 } from "@/components/Mind001SizeWarning";
 
 interface QuickViewDialogProps {
   productId: string | null;
@@ -46,6 +47,8 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
     return sizeStr.split(",").map(s => s.trim()).filter(Boolean);
   };
 
+  const [showMind001Warning, setShowMind001Warning] = useState(false);
+
   const handleAddToCart = () => {
     if (!product || isSoldOut) return;
     if (!selectedSize) {
@@ -55,6 +58,9 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
     addToCart(product, quantity, selectedSize);
     trackAddToCart({ content_ids: [product.id], value: product.price * quantity, currency: "AED" });
     toast.success(`${product.name} added to cart`, { description: `Size: ${selectedSize} · Qty: ${quantity}` });
+    if (isMind001(product.name)) {
+      setShowMind001Warning(true);
+    }
   };
 
   const handleBuyNow = () => {
@@ -231,6 +237,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       {showBuyNow && product && (
         <BuyNowOverlay isOpen={showBuyNow} onClose={() => setShowBuyNow(false)} />
       )}
+      <Mind001SizeWarning open={showMind001Warning} onClose={() => setShowMind001Warning(false)} />
     </>
   );
 };

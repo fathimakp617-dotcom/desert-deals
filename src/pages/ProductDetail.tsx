@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Heart, Share2, Truck, Shield, RotateCcw, Star, ShoppingBag, PenLine, Zap, AlertCircle, Loader2, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import Mind001SizeWarning, { isMind001 } from "@/components/Mind001SizeWarning";
 import useEmblaCarousel from "embla-carousel-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -90,6 +91,7 @@ const ProductDetail = () => {
   const [showAdditional, setShowAdditional] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [showBuyNow, setShowBuyNow] = useState(false);
+  const [showMind001Warning, setShowMind001Warning] = useState(false);
   const { addToCart, buyNow } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { data: stockMap } = useProductStock();
@@ -179,6 +181,7 @@ const ProductDetail = () => {
   const categoryLower = (product.category || "").toLowerCase();
   const needsSize = !["bags", "bag"].some(c => categoryLower.includes(c));
 
+
   const handleAddToCart = () => {
     if (isSoldOut) {
       toast.error(t("product.soldOutMessage"));
@@ -201,7 +204,11 @@ const ProductDetail = () => {
       value: product.price * quantity,
       currency: "AED",
     });
-    setShowBuyNow(true);
+    if (isMind001(product.name)) {
+      setShowMind001Warning(true);
+    } else {
+      setShowBuyNow(true);
+    }
   };
 
 
@@ -787,6 +794,7 @@ const ProductDetail = () => {
         </main>
       </PageTransition>
       <BuyNowOverlay isOpen={showBuyNow} onClose={() => setShowBuyNow(false)} />
+      <Mind001SizeWarning open={showMind001Warning} onClose={() => { setShowMind001Warning(false); setShowBuyNow(true); }} />
     </>
   );
 };
