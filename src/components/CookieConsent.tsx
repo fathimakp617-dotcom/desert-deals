@@ -30,7 +30,7 @@ const CookieConsent = memo(() => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6 animate-in slide-in-from-bottom duration-300">
-      <div className="max-w-4xl mx-auto <div className="max-w-4xl mx-auto bg-card border border-border rounded-xl shadow-2xl"> border-border rounded-xl shadow-2xl">
+      <div className="max-w-4xl mx-auto bg-card border border-border rounded-xl shadow-2xl">
         <div className="p-4 sm:p-6">
           <div className="flex items-start gap-4">
             <div className="hidden sm:flex w-12 h-12 rounded-full bg-primary/10 items-center justify-center flex-shrink-0">
