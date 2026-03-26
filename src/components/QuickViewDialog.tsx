@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { trackAddToCart } from "@/lib/metaPixel";
 import useEmblaCarousel from "embla-carousel-react";
 import BuyNowOverlay from "@/components/BuyNowOverlay";
+import Mind001SizeWarning, { isMind001 } from "@/components/Mind001SizeWarning";
 
 interface QuickViewDialogProps {
   productId: string | null;
