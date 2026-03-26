@@ -241,7 +241,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       {showBuyNow && product && (
         <BuyNowOverlay isOpen={showBuyNow} onClose={() => setShowBuyNow(false)} />
       )}
-      <Mind001SizeWarning open={showMind001Warning} onClose={() => setShowMind001Warning(false)} />
+      <Mind001SizeWarning open={showMind001Warning} onClose={() => { setShowMind001Warning(false); setShowBuyNow(true); }} />
     </>
   );
 };
