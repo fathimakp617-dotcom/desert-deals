@@ -794,6 +794,7 @@ const ProductDetail = () => {
         </main>
       </PageTransition>
       <BuyNowOverlay isOpen={showBuyNow} onClose={() => setShowBuyNow(false)} />
+      <Mind001SizeWarning open={showMind001Warning} onClose={() => { setShowMind001Warning(false); setShowBuyNow(true); }} />
     </>
   );
 };
