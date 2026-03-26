@@ -181,7 +181,6 @@ const ProductDetail = () => {
   const categoryLower = (product.category || "").toLowerCase();
   const needsSize = !["bags", "bag"].some(c => categoryLower.includes(c));
 
-  const [showMind001Warning, setShowMind001Warning] = useState(false);
 
   const handleAddToCart = () => {
     if (isSoldOut) {
