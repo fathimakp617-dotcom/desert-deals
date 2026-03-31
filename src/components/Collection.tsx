@@ -35,8 +35,9 @@ const Collection = forwardRef<HTMLDivElement>((_, ref) => {
           _stock: p.stock_quantity,
         }));
     },
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
   });
   
 
