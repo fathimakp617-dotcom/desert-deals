@@ -39,11 +39,13 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
     
     return brandLower
       ? filteredBase.filter((p) => {
-          if (!p.category) return false;
-          const cats = p.category.toLowerCase().split(",").map((c) => c.trim());
-          return cats.some(
+          const cats = (p.category || "").toLowerCase().split(",").map((c) => c.trim());
+          const matchesCategory = cats.some(
             (cat) => cat === brandLower || cat === brandLower.replace(/\s+/g, "-")
           );
+          // Also match by product name for brands like "mind" that aren't in the category field
+          const matchesName = p.name?.toLowerCase().includes(brandLower);
+          return matchesCategory || matchesName;
         })
       : filteredBase;
   }, [allProducts, brandLower, isExcludedCategory]);
