@@ -166,7 +166,7 @@ export const useDbProducts = () => {
       const result = await Promise.race([
         dbPromise.then((products) => ({ source: "db" as const, products })),
         new Promise<{ source: "timeout" }>((resolve) =>
-          setTimeout(() => resolve({ source: "timeout" }), 500)
+          setTimeout(() => resolve({ source: "timeout" }), 1200)
         ),
       ]);
 
