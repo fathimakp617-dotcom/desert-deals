@@ -1,17 +1,43 @@
 import { forwardRef, memo } from "react";
 import { Link } from "react-router-dom";
 import { formatPrice } from "@/data/products";
-import { useDbProducts } from "@/hooks/useDbProducts";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 import { Loader2 } from "lucide-react";
 
+const excludedCategories = ["socks", "heels", "bags", "jersey", "kids"];
+
 const Collection = forwardRef<HTMLDivElement>((_, ref) => {
-  const { data: products = [], isLoading } = useDbProducts();
-  const excludedCategories = ["socks", "heels", "bags", "jersey", "kids"];
-  const featuredProducts = products
-    .filter(p => p.image && !excludedCategories.some(c => (p.category || "").toLowerCase().includes(c)))
-    .slice(0, 3);
+  const { data: featuredProducts = [], isLoading } = useQuery({
+    queryKey: ["collection-newest"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, name, price, original_price, discount_percent, category, image_url, stock_quantity")
+        .eq("is_active", true)
+        .is("deleted_at", null)
+        .not("image_url", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return (data || [])
+        .filter(p => p.image_url && !excludedCategories.some(c => (p.category || "").toLowerCase().includes(c)))
+        .slice(0, 3)
+        .map(p => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          originalPrice: p.original_price || p.price,
+          image: (p.image_url || "").split(",")[0]?.trim(),
+          tagline: (p.category || "").split(",")[0]?.trim() || "",
+          _stock: p.stock_quantity,
+        }));
+    },
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
   
 
   return (
