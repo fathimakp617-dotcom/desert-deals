@@ -155,7 +155,11 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
         )}
       </div>
 
-      <QuickViewDialog productId={quickViewId} open={!!quickViewId} onOpenChange={(open) => { if (!open) setQuickViewId(null); }} />
+      {quickViewId && (
+        <Suspense fallback={null}>
+          <QuickViewDialog productId={quickViewId} open={!!quickViewId} onOpenChange={(open) => { if (!open) setQuickViewId(null); }} />
+        </Suspense>
+      )}
     </section>
   );
 });
