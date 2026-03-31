@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from "react";
+import { memo, useRef, useState, useMemo, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react";
 import { formatPrice } from "@/data/products";
@@ -8,13 +8,15 @@ import { useTranslation } from "@/contexts/DirectionContext";
 import { Badge } from "@/components/ui/badge";
 
 import { Loader2 } from "lucide-react";
-import QuickViewDialog from "@/components/QuickViewDialog";
+const QuickViewDialog = lazy(() => import("@/components/QuickViewDialog"));
 
 interface BrandProductRowProps {
   brand: string;
   title: string;
   shopLink?: string;
 }
+
+const excludedCategories = ["socks", "heels", "bags", "jersey", "kids"];
 
 const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) => {
   const { data: allProducts = [], isLoading } = useDbProducts();
@@ -25,27 +27,26 @@ const BrandProductRow = memo(({ brand, title, shopLink }: BrandProductRowProps) 
   const [quickViewId, setQuickViewId] = useState<string | null>(null);
 
   const brandLower = brand.toLowerCase().trim();
-  const excludedCategories = ["socks", "heels", "bags", "jersey", "kids"];
   const isExcludedCategory = excludedCategories.includes(brandLower);
-  
-  const filteredBase = allProducts.filter(p => {
-    if (!p.category) return true;
-    const cats = p.category.toLowerCase();
-    // If this row IS for an excluded category, don't filter it out
-    if (isExcludedCategory) return true;
-    // Otherwise exclude these categories from appearing in other brand rows
-    return !excludedCategories.some(ex => cats.includes(ex));
-  });
-  
-  const products = brandLower
-    ? filteredBase.filter((p) => {
-        if (!p.category) return false;
-        const cats = p.category.toLowerCase().split(",").map((c) => c.trim());
-        return cats.some(
-          (cat) => cat === brandLower || cat === brandLower.replace(/\s+/g, "-")
-        );
-      })
-    : filteredBase;
+
+  const products = useMemo(() => {
+    const filteredBase = allProducts.filter(p => {
+      if (!p.category) return true;
+      const cats = p.category.toLowerCase();
+      if (isExcludedCategory) return true;
+      return !excludedCategories.some(ex => cats.includes(ex));
+    });
+    
+    return brandLower
+      ? filteredBase.filter((p) => {
+          if (!p.category) return false;
+          const cats = p.category.toLowerCase().split(",").map((c) => c.trim());
+          return cats.some(
+            (cat) => cat === brandLower || cat === brandLower.replace(/\s+/g, "-")
+          );
+        })
+      : filteredBase;
+  }, [allProducts, brandLower, isExcludedCategory]);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
