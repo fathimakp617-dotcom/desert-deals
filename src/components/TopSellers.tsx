@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from "react";
+import { memo, useRef, useState, useMemo, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react";
 import { useTranslation } from "@/contexts/DirectionContext";
@@ -8,18 +8,18 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { Badge } from "@/components/ui/badge";
 
 import { Loader2 } from "lucide-react";
-import QuickViewDialog from "@/components/QuickViewDialog";
+const QuickViewDialog = lazy(() => import("@/components/QuickViewDialog"));
 
-// Matches the "Top Sellers" product-tab-carousel from the original HTML
+const excludedCats = ["socks", "heels", "bags", "jersey", "kids", "louis vuitton", "dior", "gucci", "hermes", "loro piana"];
+
 const TopSellers = memo(() => {
   const { t } = useTranslation();
   const { data: allProducts = [], isLoading } = useDbProducts();
-  const excludedCats = ["socks", "heels", "bags", "jersey", "kids", "louis vuitton", "dior", "gucci", "hermes", "loro piana"];
-  const products = allProducts.filter(p => {
+  const products = useMemo(() => allProducts.filter(p => {
     if (!p.category) return true;
     const catLower = p.category.toLowerCase();
     return !excludedCats.some(ex => catLower.includes(ex));
-  });
+  }), [allProducts]);
   
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -162,7 +162,11 @@ const TopSellers = memo(() => {
         )}
       </div>
 
-      <QuickViewDialog productId={quickViewId} open={!!quickViewId} onOpenChange={(open) => { if (!open) setQuickViewId(null); }} />
+      {quickViewId && (
+        <Suspense fallback={null}>
+          <QuickViewDialog productId={quickViewId} open={!!quickViewId} onOpenChange={(open) => { if (!open) setQuickViewId(null); }} />
+        </Suspense>
+      )}
     </section>
   );
 });
