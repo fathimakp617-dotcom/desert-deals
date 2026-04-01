@@ -25,7 +25,7 @@ import Index from "./pages/Index";
 // Lazy load non-critical pages with prefetch hints
 const Shop = lazy(() => import("./pages/Shop"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
-const MindPromoPopup = lazy(() => import("./components/MindPromoPopup"));
+
 const Wishlist = lazy(() => import("./pages/Wishlist"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/Checkout"));
@@ -144,7 +144,7 @@ const App = () => {
                     <GeoBlocker>
                     <ScrollToTop />
                     <CartDrawer />
-                    <Suspense fallback={null}>{typeof window !== 'undefined' && !sessionStorage.getItem('dd_mind_promo_shown_v4') && <MindPromoPopup />}</Suspense>
+                    
                     
                     <RoutePrefetcher />
                     <Suspense fallback={<PageLoader />}>
