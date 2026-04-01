@@ -36,7 +36,7 @@ const registerPwa = () => {
     return;
   }
 
-  window.setTimeout(startRegistration, 3000);
+  setTimeout(startRegistration, 3000);
 };
 
 const bootstrap = async () => {
