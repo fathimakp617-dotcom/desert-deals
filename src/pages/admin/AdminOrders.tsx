@@ -1199,30 +1199,6 @@ const AdminOrders = () => {
                       </div>
                     </div>
 
-                    {/* Return Initiation for Delivered Orders */}
-                    {selectedOrder.order_status === "delivered" && !selectedOrder.return_status && (
-                      <div className="border border-orange-500/20 bg-orange-500/5 rounded-lg p-4 space-y-3">
-                        <Label className="text-sm font-medium flex items-center gap-2">
-                          <Package className="h-4 w-4 text-orange-500" />
-                          Initiate Return
-                        </Label>
-                        <Input
-                          value={returnReason}
-                          onChange={(e) => setReturnReason(e.target.value)}
-                          placeholder="Enter return reason (optional)"
-                        />
-                        <Button
-                          onClick={handleInitiateReturn}
-                          disabled={isInitiatingReturn}
-                          variant="outline"
-                          className="w-full border-orange-500/30 text-orange-600 hover:bg-orange-500/10"
-                        >
-                          {isInitiatingReturn ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Package className="h-4 w-4 mr-2" />}
-                          Mark as Return Requested
-                        </Button>
-                      </div>
-                    )}
-
                     {/* Show current return status */}
                     {selectedOrder.return_status && (
                       <div className="border border-orange-500/20 bg-orange-500/5 rounded-lg p-4 space-y-2">
@@ -1342,6 +1318,43 @@ const AdminOrders = () => {
                   </>
                 )}
               </div>
+
+              {/* Return Initiation - Available at any stage */}
+              {selectedOrder.order_status !== "cancelled" && !selectedOrder.return_status && (
+                <div className="border border-orange-500/20 bg-orange-500/5 rounded-lg p-4 space-y-3">
+                  <Label className="text-sm font-medium flex items-center gap-2">
+                    <Package className="h-4 w-4 text-orange-500" />
+                    Initiate Return
+                  </Label>
+                  <Input
+                    value={returnReason}
+                    onChange={(e) => setReturnReason(e.target.value)}
+                    placeholder="Enter return reason (optional)"
+                  />
+                  <Button
+                    onClick={handleInitiateReturn}
+                    disabled={isInitiatingReturn}
+                    variant="outline"
+                    className="w-full border-orange-500/30 text-orange-600 hover:bg-orange-500/10"
+                  >
+                    {isInitiatingReturn ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Package className="h-4 w-4 mr-2" />}
+                    Mark as Return Requested
+                  </Button>
+                </div>
+              )}
+
+              {/* Show current return status */}
+              {selectedOrder.return_status && (
+                <div className="border border-orange-500/20 bg-orange-500/5 rounded-lg p-4 space-y-2">
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    <Package className="h-4 w-4 text-orange-500" />
+                    Return Status: <span className="capitalize text-orange-600">{selectedOrder.return_status}</span>
+                  </p>
+                  {selectedOrder.return_reason && (
+                    <p className="text-xs text-muted-foreground">Reason: {selectedOrder.return_reason}</p>
+                  )}
+                </div>
+              )}
 
               {/* Customer Info */}
               <div>
