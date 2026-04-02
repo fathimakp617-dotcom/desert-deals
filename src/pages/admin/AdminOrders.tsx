@@ -1140,8 +1140,8 @@ const AdminOrders = () => {
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleViewOrder(order)}
-                          title="Edit order"
-                          disabled={isOrderLocked(order.order_status)}
+                          title={order.order_status === "delivered" ? "Manage return" : "Edit order"}
+                          disabled={order.order_status === "cancelled"}
                         >
                           <Truck className="h-4 w-4" />
                         </Button>
