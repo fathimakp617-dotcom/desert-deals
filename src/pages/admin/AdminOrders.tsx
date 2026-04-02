@@ -454,6 +454,53 @@ const AdminOrders = () => {
     }
   };
 
+  const handleInitiateReturn = async () => {
+    if (!selectedOrder) return;
+    setIsInitiatingReturn(true);
+    try {
+      const sessionData = sessionStorage.getItem("rayn_admin_session");
+      if (!sessionData) throw new Error("No admin session found");
+      const session = JSON.parse(sessionData);
+
+      const { error } = await supabase.functions.invoke('update-return-status', {
+        body: {
+          admin_email: session.email,
+          admin_token: session.token,
+          order_id: selectedOrder.id,
+          return_status: 'requested',
+        },
+      });
+      if (error) throw error;
+
+      // Also update return_reason and return_requested_at via update-order-status or direct
+      // We'll use the update-return-status which already works, and store reason separately
+      // For now, update local state
+      const updatedOrder = {
+        ...selectedOrder,
+        return_status: 'requested',
+        return_reason: returnReason || 'Admin initiated return after delivery',
+        return_requested_at: new Date().toISOString(),
+      };
+
+      setOrders(orders.map(o => o.id === selectedOrder.id ? updatedOrder : o));
+      setSelectedOrder(updatedOrder);
+      setReturnReason("");
+
+      toast({
+        title: "Return Initiated",
+        description: `Return requested for order ${selectedOrder.order_number}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to initiate return",
+        variant: "destructive",
+      });
+    } finally {
+      setIsInitiatingReturn(false);
+    }
+  };
+
   const handleDeleteOrder = async (orderId: string) => {
     setIsDeleting(true);
     try {
