@@ -916,7 +916,8 @@ const AdminOrders = () => {
       )}
 
       {/* Orders Table */}
-      <div className="border border-border rounded-lg overflow-hidden">
+      <div className="border border-border rounded-lg overflow-x-auto">
+        <div className="min-w-[1200px]">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
