@@ -74,6 +74,8 @@ const AdminOrders = () => {
   const [bulkAction, setBulkAction] = useState<string | null>(null);
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
   const [manualOrderOpen, setManualOrderOpen] = useState(false);
+  const [returnReason, setReturnReason] = useState("");
+  const [isInitiatingReturn, setIsInitiatingReturn] = useState(false);
   const { toast } = useToast();
 
   // Handle expired admin session (avoid blank/error loops)
