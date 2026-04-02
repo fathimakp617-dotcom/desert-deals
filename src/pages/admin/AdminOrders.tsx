@@ -1163,6 +1163,7 @@ const AdminOrders = () => {
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       {/* Order Detail Modal */}
