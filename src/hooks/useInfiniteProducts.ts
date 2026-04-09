@@ -77,7 +77,7 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
   const { search = "", category = "All", sortBy = "featured", priceMin = 0, priceMax = Infinity } = options;
 
   return useInfiniteQuery({
-    queryKey: ["infinite-products", search, category, sortBy, priceMin, priceMax],
+    queryKey: ["infinite-products", "in-stock-only", search, category, sortBy, priceMin, priceMax],
     queryFn: async ({ pageParam = 0 }) => {
       const includeCount = pageParam === 0;
 
@@ -88,7 +88,8 @@ export const useInfiniteProducts = (options: UseInfiniteProductsOptions) => {
           { count: includeCount ? "exact" : undefined }
         )
         .eq("is_active", true)
-        .is("deleted_at", null);
+        .is("deleted_at", null)
+        .gt("stock_quantity", 0);
 
       if (search) {
         q = q.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
