@@ -466,15 +466,29 @@ const ProductForm = ({
                     {sizeOptions.map((size) => {
                       const selected = formData.size.split(",").map(s => s.trim()).filter(Boolean);
                       const isChecked = selected.includes(size);
+                      const isOutOfStock = size === "Out of Stock";
                       return (
-                        <label key={size} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                        <label key={size} className={`flex items-center gap-1.5 text-sm cursor-pointer ${isOutOfStock ? "text-destructive font-semibold" : ""}`}>
                           <Checkbox
                             checked={isChecked}
                             onCheckedChange={(checked) => {
                               const current = formData.size.split(",").map(s => s.trim()).filter(Boolean);
-                              const updated = checked
+                              let updated = checked
                                 ? [...current, size]
                                 : current.filter(s => s !== size);
+
+                              if (isOutOfStock && checked) {
+                                // When "Out of Stock" is selected, clear other sizes and set stock to 0
+                                updated = ["Out of Stock"];
+                                setFormData(prev => ({ ...prev, size: updated.join(", "), stock_quantity: "0" }));
+                                return;
+                              }
+
+                              if (!isOutOfStock && checked) {
+                                // Remove "Out of Stock" when selecting a real size
+                                updated = updated.filter(s => s !== "Out of Stock");
+                              }
+
                               setFormData(prev => ({ ...prev, size: updated.join(", ") }));
                             }}
                           />
@@ -483,6 +497,11 @@ const ProductForm = ({
                       );
                     })}
                   </div>
+                  {formData.size.split(",").map(s => s.trim()).includes("Out of Stock") && (
+                    <div className="flex items-center gap-2 mt-1 p-2 rounded bg-destructive/10 border border-destructive/30">
+                      <span className="text-xs font-semibold text-destructive">⚠ This product is marked as Out of Stock — stock set to 0</span>
+                    </div>
+                  )}
                 </>
               );
             })()}
