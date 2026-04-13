@@ -127,6 +127,7 @@ const Checkout = () => {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "ziina">("cod");
   
   
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
