@@ -127,6 +127,7 @@ const Checkout = () => {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "ziina">("cod");
   
   
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
@@ -153,6 +154,19 @@ const Checkout = () => {
     supabase.functions.invoke("track-event", {
       body: { event_type: "checkout_started", session_id: sid || "" },
     }).catch(() => {});
+  }, []);
+
+  // Handle payment return status
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentStatus = params.get("payment");
+    if (paymentStatus === "cancelled") {
+      toast({ title: "Payment Cancelled", description: "Your payment was cancelled. You can try again.", variant: "destructive" });
+      window.history.replaceState({}, "", "/checkout");
+    } else if (paymentStatus === "failed") {
+      toast({ title: "Payment Failed", description: "Your payment could not be processed. Please try again.", variant: "destructive" });
+      window.history.replaceState({}, "", "/checkout");
+    }
   }, []);
 
   // Load saved address for returning customers and auto-fill - runs ONCE when user is available
@@ -403,7 +417,69 @@ const Checkout = () => {
       toast({ title: t("checkout.fillRequired"), variant: "destructive" });
       return;
     }
-    await handleCODOrder();
+    if (paymentMethod === "ziina") {
+      await handleZiinaPayment();
+    } else {
+      await handleCODOrder();
+    }
+  };
+
+  const handleZiinaPayment = async () => {
+    setIsProcessing(true);
+    try {
+      const orderNumber = `DD-${Date.now().toString(36).toUpperCase()}`;
+      const orderItems = items.map((item) => ({
+        productId: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        selectedSize: item.selectedSize || null,
+      }));
+
+      const { data, error } = await supabase.functions.invoke("create-ziina-payment", {
+        body: {
+          amount: orderTotal,
+          order_number: orderNumber,
+          customer_name: `${formData.firstName} ${formData.lastName}`,
+          customer_email: formData.email,
+          customer_phone: `${formData.countryCode} ${formData.phone}`,
+          items: orderItems,
+          shipping_address: {
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            country: formData.country,
+          },
+          user_id: user?.id || null,
+          success_url: `${window.location.origin}/?order=${orderNumber}&payment=success`,
+          cancel_url: `${window.location.origin}/checkout?payment=cancelled`,
+        },
+      });
+
+      if (error || data?.error) {
+        throw new Error(data?.error || error?.message || "Payment service unavailable");
+      }
+
+      // Save address before redirecting
+      await saveAddressToProfile();
+      clearCart();
+
+      // Redirect to Ziina hosted payment page
+      if (data?.redirect_url) {
+        window.location.href = data.redirect_url;
+      } else {
+        throw new Error("No payment URL returned");
+      }
+    } catch (error) {
+      console.error("Ziina payment error:", error);
+      toast({
+        title: "Payment Error",
+        description: error instanceof Error ? error.message : "Could not start payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const isInfrastructureError = (err: unknown): boolean => {
@@ -889,14 +965,52 @@ const Checkout = () => {
 
                   <Separator className="mb-4" />
 
-                  {/* Cash on Delivery */}
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-4 h-4 rounded-full border-2 border-foreground flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-foreground" />
-                    </div>
-                    <span className="font-medium text-foreground">{t("checkout.cashOnDelivery")}</span>
+                  {/* Payment Method Selection */}
+                  <div className="space-y-3 mb-4" id="payment-section">
+                    <p className="text-sm font-medium text-foreground">Payment Method</p>
+
+                    {/* Pay Online with Ziina */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("ziina")}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                        paymentMethod === "ziina"
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-muted-foreground/30"
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        paymentMethod === "ziina" ? "border-primary" : "border-muted-foreground"
+                      }`}>
+                        {paymentMethod === "ziina" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-medium text-foreground text-sm">💳 Pay Online</span>
+                        <p className="text-xs text-muted-foreground">Card, Apple Pay, Google Pay via Ziina</p>
+                      </div>
+                    </button>
+
+                    {/* Cash on Delivery */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("cod")}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                        paymentMethod === "cod"
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-muted-foreground/30"
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        paymentMethod === "cod" ? "border-primary" : "border-muted-foreground"
+                      }`}>
+                        {paymentMethod === "cod" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-medium text-foreground text-sm">🚚 {t("checkout.cashOnDelivery")}</span>
+                        <p className="text-xs text-muted-foreground">{t("checkout.cashOnDeliveryDesc")}</p>
+                      </div>
+                    </button>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6 ms-7">{t("checkout.cashOnDeliveryDesc")}</p>
 
                   {/* Terms checkbox */}
                   <div className="mb-6">
@@ -928,13 +1042,11 @@ const Checkout = () => {
                   >
                     {isProcessing ? (
                       <span className="flex items-center gap-2">
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-5 h-5 border-2 border-background border-t-transparent rounded-full"
-                        />
+                        <Loader2 className="w-5 h-5 animate-spin" />
                         {t("checkout.processing")}
                       </span>
+                    ) : paymentMethod === "ziina" ? (
+                      "💳 Pay Online Now"
                     ) : (
                       t("checkout.placeOrder")
                     )}
