@@ -1029,12 +1029,14 @@ const Checkout = () => {
                   >
                     {isProcessing ? (
                       <span className="flex items-center gap-2">
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-5 h-5 border-2 border-background border-t-transparent rounded-full"
-                        />
+                        <Loader2 className="w-5 h-5 animate-spin" />
                         {t("checkout.processing")}
+                      </span>
+                    ) : paymentMethod === "ziina" ? (
+                      "💳 Pay Online Now"
+                    ) : (
+                      t("checkout.placeOrder")
+                    )}
                       </span>
                     ) : (
                       t("checkout.placeOrder")
