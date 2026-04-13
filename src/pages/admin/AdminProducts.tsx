@@ -993,6 +993,25 @@ const AdminProducts = () => {
                 <SelectItem value="false">Inactive</SelectItem>
               </SelectContent>
             </Select>
+          ) : bulkEditField === "size" ? (
+            <Select value={bulkEditValue} onValueChange={setBulkEditValue}>
+              <SelectTrigger className="w-[200px] h-8 text-sm">
+                <SelectValue placeholder="Choose size template..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="EU 36, EU 37, EU 38, EU 39, EU 40, EU 41, EU 42, EU 43, EU 44, EU 45">EU 36–45</SelectItem>
+                <SelectItem value="EU 36, EU 37, EU 38, EU 39, EU 40">EU 36–40</SelectItem>
+                <SelectItem value="EU 40, EU 41, EU 42, EU 43, EU 44, EU 45">EU 40–45</SelectItem>
+                <SelectItem value="EU 38, EU 39, EU 40, EU 41, EU 42, EU 43, EU 44">EU 38–44</SelectItem>
+                <SelectItem value="EU 36, EU 37, EU 38, EU 39, EU 40, EU 41, EU 42, EU 43, EU 44, EU 45, EU 46, Free Size">All Sizes</SelectItem>
+                <SelectItem value="Free Size">Free Size Only</SelectItem>
+                <SelectItem value="EU 24, EU 25, EU 26, EU 27, EU 28, EU 29, EU 30">Kids EU 24–30</SelectItem>
+                <SelectItem value="EU 30, EU 31, EU 32, EU 33, EU 34, EU 35, EU 36">Kids EU 30–36</SelectItem>
+                <SelectItem value="S, M, L, XL">Jersey S–XL</SelectItem>
+                <SelectItem value="S, M, L, XL, XXL">Jersey All</SelectItem>
+                <SelectItem value="Out of Stock">Out of Stock</SelectItem>
+              </SelectContent>
+            </Select>
           ) : bulkEditField === "category" || bulkEditField === "add_category" ? (
             <Select value={bulkEditValue} onValueChange={setBulkEditValue}>
               <SelectTrigger className="w-[160px] h-8 text-sm">
