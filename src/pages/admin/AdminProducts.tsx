@@ -1004,16 +1004,17 @@ const AdminProducts = () => {
                 <SelectValue placeholder="Choose size template..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="EU 36, EU 37, EU 38, EU 39, EU 40, EU 41, EU 42, EU 43, EU 44, EU 45">EU 36–45</SelectItem>
-                <SelectItem value="EU 36, EU 37, EU 38, EU 39, EU 40">EU 36–40</SelectItem>
-                <SelectItem value="EU 40, EU 41, EU 42, EU 43, EU 44, EU 45">EU 40–45</SelectItem>
-                <SelectItem value="EU 38, EU 39, EU 40, EU 41, EU 42, EU 43, EU 44">EU 38–44</SelectItem>
-                <SelectItem value="EU 36, EU 37, EU 38, EU 39, EU 40, EU 41, EU 42, EU 43, EU 44, EU 45, EU 46, Free Size">All Sizes</SelectItem>
+                <SelectItem value="36,37,38,39,40,41,42,43,44,45">EU 36–45</SelectItem>
+                <SelectItem value="36,37,38,39,40">EU 36–40</SelectItem>
+                <SelectItem value="40,41,42,43,44,45">EU 40–45</SelectItem>
+                <SelectItem value="38,39,40,41,42,43,44">EU 38–44</SelectItem>
+                <SelectItem value="35,36,37,38,39,40,41,42,43,44,45,46">All Sizes</SelectItem>
                 <SelectItem value="Free Size">Free Size Only</SelectItem>
-                <SelectItem value="EU 24, EU 25, EU 26, EU 27, EU 28, EU 29, EU 30">Kids EU 24–30</SelectItem>
-                <SelectItem value="EU 30, EU 31, EU 32, EU 33, EU 34, EU 35, EU 36">Kids EU 30–36</SelectItem>
-                <SelectItem value="S, M, L, XL">Jersey S–XL</SelectItem>
-                <SelectItem value="S, M, L, XL, XXL">Jersey All</SelectItem>
+                <SelectItem value="24,25,26,27,28,29,30">Kids 24–30</SelectItem>
+                <SelectItem value="30,31,32,33,34,35,36">Kids 30–36</SelectItem>
+                <SelectItem value="S,M,L,XL">Jersey S–XL</SelectItem>
+                <SelectItem value="S,M,L,XL,XXL">Jersey All</SelectItem>
+                <SelectItem value="One Size">One Size</SelectItem>
                 <SelectItem value="Out of Stock">Out of Stock</SelectItem>
               </SelectContent>
             </Select>
