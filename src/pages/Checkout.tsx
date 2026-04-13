@@ -156,6 +156,19 @@ const Checkout = () => {
     }).catch(() => {});
   }, []);
 
+  // Handle payment return status
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentStatus = params.get("payment");
+    if (paymentStatus === "cancelled") {
+      toast({ title: "Payment Cancelled", description: "Your payment was cancelled. You can try again.", variant: "destructive" });
+      window.history.replaceState({}, "", "/checkout");
+    } else if (paymentStatus === "failed") {
+      toast({ title: "Payment Failed", description: "Your payment could not be processed. Please try again.", variant: "destructive" });
+      window.history.replaceState({}, "", "/checkout");
+    }
+  }, []);
+
   // Load saved address for returning customers and auto-fill - runs ONCE when user is available
   useEffect(() => {
     // Skip if already loaded or no user
