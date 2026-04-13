@@ -565,6 +565,9 @@ const AdminProducts = () => {
       updates.size = bulkEditValue.trim();
       if (bulkEditValue.trim() === "Out of Stock") {
         updates.stock_quantity = 0;
+      } else {
+        // Ensure products become visible on storefront by setting stock > 0
+        updates.stock_quantity = 10;
       }
     }
     if (bulkEditField === "category") updates.category = bulkEditValue.trim();
