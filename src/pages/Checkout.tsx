@@ -952,14 +952,52 @@ const Checkout = () => {
 
                   <Separator className="mb-4" />
 
-                  {/* Cash on Delivery */}
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-4 h-4 rounded-full border-2 border-foreground flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-foreground" />
-                    </div>
-                    <span className="font-medium text-foreground">{t("checkout.cashOnDelivery")}</span>
+                  {/* Payment Method Selection */}
+                  <div className="space-y-3 mb-4" id="payment-section">
+                    <p className="text-sm font-medium text-foreground">{t("checkout.paymentMethod") || "Payment Method"}</p>
+
+                    {/* Pay Online with Ziina */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("ziina")}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                        paymentMethod === "ziina"
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-muted-foreground/30"
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        paymentMethod === "ziina" ? "border-primary" : "border-muted-foreground"
+                      }`}>
+                        {paymentMethod === "ziina" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-medium text-foreground text-sm">💳 Pay Online</span>
+                        <p className="text-xs text-muted-foreground">Card, Apple Pay, Google Pay via Ziina</p>
+                      </div>
+                    </button>
+
+                    {/* Cash on Delivery */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("cod")}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                        paymentMethod === "cod"
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-muted-foreground/30"
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        paymentMethod === "cod" ? "border-primary" : "border-muted-foreground"
+                      }`}>
+                        {paymentMethod === "cod" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-medium text-foreground text-sm">🚚 {t("checkout.cashOnDelivery")}</span>
+                        <p className="text-xs text-muted-foreground">{t("checkout.cashOnDeliveryDesc")}</p>
+                      </div>
+                    </button>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6 ms-7">{t("checkout.cashOnDeliveryDesc")}</p>
 
                   {/* Terms checkbox */}
                   <div className="mb-6">
