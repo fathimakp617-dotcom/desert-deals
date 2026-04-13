@@ -230,6 +230,21 @@ const ProductDetail = () => {
     }
   };
 
+  const handleCashOnDelivery = () => {
+    if (isSoldOut) {
+      toast.error(t("product.soldOutMessage"));
+      return;
+    }
+    if (needsSize && !selectedSize) {
+      toast.error(t("product.pleaseSelectSize"));
+      return;
+    }
+    const sizeLabel = needsSize && selectedSize ? selectedSize : "One Size";
+    buyNow(product, quantity, sizeLabel);
+    trackAddToCart({ content_ids: [product.id], value: product.price * quantity, currency: "AED" });
+    navigate("/checkout");
+  };
+
   const handleToggleWishlist = () => {
     toggleWishlist(product);
     toast.success(
