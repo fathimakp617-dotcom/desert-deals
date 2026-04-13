@@ -404,7 +404,69 @@ const Checkout = () => {
       toast({ title: t("checkout.fillRequired"), variant: "destructive" });
       return;
     }
-    await handleCODOrder();
+    if (paymentMethod === "ziina") {
+      await handleZiinaPayment();
+    } else {
+      await handleCODOrder();
+    }
+  };
+
+  const handleZiinaPayment = async () => {
+    setIsProcessing(true);
+    try {
+      const orderNumber = `DD-${Date.now().toString(36).toUpperCase()}`;
+      const orderItems = items.map((item) => ({
+        productId: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        selectedSize: item.selectedSize || null,
+      }));
+
+      const { data, error } = await supabase.functions.invoke("create-ziina-payment", {
+        body: {
+          amount: orderTotal,
+          order_number: orderNumber,
+          customer_name: `${formData.firstName} ${formData.lastName}`,
+          customer_email: formData.email,
+          customer_phone: `${formData.countryCode} ${formData.phone}`,
+          items: orderItems,
+          shipping_address: {
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            country: formData.country,
+          },
+          user_id: user?.id || null,
+          success_url: `${window.location.origin}/?order=${orderNumber}&payment=success`,
+          cancel_url: `${window.location.origin}/checkout?payment=cancelled`,
+        },
+      });
+
+      if (error || data?.error) {
+        throw new Error(data?.error || error?.message || "Payment service unavailable");
+      }
+
+      // Save address before redirecting
+      await saveAddressToProfile();
+      clearCart();
+
+      // Redirect to Ziina hosted payment page
+      if (data?.redirect_url) {
+        window.location.href = data.redirect_url;
+      } else {
+        throw new Error("No payment URL returned");
+      }
+    } catch (error) {
+      console.error("Ziina payment error:", error);
+      toast({
+        title: "Payment Error",
+        description: error instanceof Error ? error.message : "Could not start payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const isInfrastructureError = (err: unknown): boolean => {
