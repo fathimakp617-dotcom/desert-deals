@@ -954,7 +954,7 @@ const Checkout = () => {
 
                   {/* Payment Method Selection */}
                   <div className="space-y-3 mb-4" id="payment-section">
-                    <p className="text-sm font-medium text-foreground">{t("checkout.paymentMethod") || "Payment Method"}</p>
+                    <p className="text-sm font-medium text-foreground">Payment Method</p>
 
                     {/* Pay Online with Ziina */}
                     <button
