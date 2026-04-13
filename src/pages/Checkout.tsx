@@ -1037,10 +1037,6 @@ const Checkout = () => {
                     ) : (
                       t("checkout.placeOrder")
                     )}
-                      </span>
-                    ) : (
-                      t("checkout.placeOrder")
-                    )}
                   </Button>
                 </div>
               </div>
