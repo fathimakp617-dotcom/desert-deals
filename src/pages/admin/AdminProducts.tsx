@@ -561,7 +561,12 @@ const AdminProducts = () => {
     }
     
     const updates: Record<string, unknown> = {};
-    if (bulkEditField === "size") updates.size = bulkEditValue.trim();
+    if (bulkEditField === "size") {
+      updates.size = bulkEditValue.trim();
+      if (bulkEditValue.trim() === "Out of Stock") {
+        updates.stock_quantity = 0;
+      }
+    }
     if (bulkEditField === "category") updates.category = bulkEditValue.trim();
     if (bulkEditField === "is_active") updates.is_active = bulkEditValue === "true";
     if (bulkEditField === "discount_percent") updates.discount_percent = parseInt(bulkEditValue) || 0;
