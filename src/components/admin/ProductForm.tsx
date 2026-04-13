@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Loader2, Upload, Eye, X, Plus, ExternalLink, GripVertical } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RichTextEditor from "./RichTextEditor";
 import { cn } from "@/lib/utils";
 
@@ -421,46 +422,56 @@ const ProductForm = ({
               const isJersey = catLower.includes("jersey");
               const isKids = catLower.includes("kids");
               const sizeOptions = isJersey ? JERSEY_SIZES : isKids ? KIDS_SIZES : ALL_SIZES;
+
+              const templates = isJersey ? [
+                { label: "S–XL", sizes: JERSEY_SIZES.filter(s => ["S","M","L","XL"].includes(s)) },
+                { label: "All Jersey Sizes", sizes: JERSEY_SIZES.filter(s => s !== "Out of Stock") },
+                { label: "Out of Stock", sizes: ["Out of Stock"] },
+                { label: "Clear All", sizes: [] as string[] },
+              ] : isKids ? [
+                { label: "EU 24–30", sizes: KIDS_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 24 && n <= 30; }) },
+                { label: "EU 30–36", sizes: KIDS_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 30 && n <= 36; }) },
+                { label: "All Kids Sizes", sizes: KIDS_SIZES.filter(s => s !== "Out of Stock") },
+                { label: "Out of Stock", sizes: ["Out of Stock"] },
+                { label: "Clear All", sizes: [] as string[] },
+              ] : [
+                { label: "EU 36–40", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 40; }) },
+                { label: "EU 36–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 45; }) },
+                { label: "EU 40–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 45; }) },
+                { label: "EU 38–44", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 38 && n <= 44; }) },
+                { label: "All Sizes", sizes: ALL_SIZES.filter(s => s !== "Out of Stock") },
+                { label: "Free Size Only", sizes: ["Free Size"] },
+                { label: "Out of Stock", sizes: ["Out of Stock"] },
+                { label: "Clear All", sizes: [] as string[] },
+              ];
+
               return (
                 <>
-                  <div className="flex items-center gap-2 mt-2 mb-2">
-                    <span className="text-xs text-muted-foreground">Quick select:</span>
-                    {isJersey ? (
-                      <>
-                        {[
-                          { label: "S–XL", sizes: JERSEY_SIZES.filter(s => ["S","M","L","XL"].includes(s)) },
-                          { label: "All", sizes: JERSEY_SIZES },
-                          { label: "None", sizes: [] as string[] },
-                        ].map((preset) => (
-                          <Button key={preset.label} type="button" variant="outline" size="sm" className="h-7 text-xs px-2.5"
-                            onClick={() => setFormData(prev => ({ ...prev, size: preset.sizes.join(", ") }))}>{preset.label}</Button>
+                  <div className="flex items-center gap-2 mt-2 mb-3">
+                    <span className="text-xs text-muted-foreground font-medium">Size Template:</span>
+                    <Select
+                      value=""
+                      onValueChange={(val) => {
+                        const tpl = templates.find(t => t.label === val);
+                        if (!tpl) return;
+                        if (tpl.label === "Out of Stock") {
+                          setFormData(prev => ({ ...prev, size: "Out of Stock", stock_quantity: "0" }));
+                        } else {
+                          setFormData(prev => ({ ...prev, size: tpl.sizes.join(", ") }));
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-[200px] h-8 text-xs">
+                        <SelectValue placeholder="Choose a template…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {templates.map(t => (
+                          <SelectItem key={t.label} value={t.label} className="text-xs">
+                            {t.label}
+                          </SelectItem>
                         ))}
-                      </>
-                    ) : isKids ? (
-                      <>
-                        {[
-                          { label: "24–30", sizes: KIDS_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 24 && n <= 30; }) },
-                          { label: "30–36", sizes: KIDS_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 30 && n <= 36; }) },
-                          { label: "All", sizes: KIDS_SIZES },
-                          { label: "None", sizes: [] as string[] },
-                        ].map((preset) => (
-                          <Button key={preset.label} type="button" variant="outline" size="sm" className="h-7 text-xs px-2.5"
-                            onClick={() => setFormData(prev => ({ ...prev, size: preset.sizes.join(", ") }))}>{preset.label}</Button>
-                        ))}
-                      </>
-                    ) : (
-                      <>
-                        {[
-                          { label: "36–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 45; }) },
-                          { label: "40–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 45; }) },
-                          { label: "All", sizes: ALL_SIZES },
-                          { label: "None", sizes: [] as string[] },
-                        ].map((preset) => (
-                          <Button key={preset.label} type="button" variant="outline" size="sm" className="h-7 text-xs px-2.5"
-                            onClick={() => setFormData(prev => ({ ...prev, size: preset.sizes.join(", ") }))}>{preset.label}</Button>
-                        ))}
-                      </>
-                    )}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex flex-wrap gap-3">
                     {sizeOptions.map((size) => {
@@ -478,14 +489,12 @@ const ProductForm = ({
                                 : current.filter(s => s !== size);
 
                               if (isOutOfStock && checked) {
-                                // When "Out of Stock" is selected, clear other sizes and set stock to 0
                                 updated = ["Out of Stock"];
                                 setFormData(prev => ({ ...prev, size: updated.join(", "), stock_quantity: "0" }));
                                 return;
                               }
 
                               if (!isOutOfStock && checked) {
-                                // Remove "Out of Stock" when selecting a real size
                                 updated = updated.filter(s => s !== "Out of Stock");
                               }
 
