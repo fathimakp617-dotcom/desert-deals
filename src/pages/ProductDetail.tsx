@@ -594,7 +594,20 @@ const ProductDetail = () => {
                   </Button>
                 </motion.div>
 
-                {/* Delivery Estimate */}
+                {/* Cash on Delivery */}
+                <motion.div variants={staggerItem}>
+                  <Button
+                    size="lg"
+                    onClick={handleCashOnDelivery}
+                    disabled={isSoldOut}
+                    className="w-full py-5 sm:py-6 text-xs sm:text-sm tracking-widest font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-300 rounded-full gap-2"
+                  >
+                    <Truck className="w-4 h-4" />
+                    Cash on Delivery – Order Now
+                  </Button>
+                </motion.div>
+
+
                 <motion.div variants={staggerItem} className="space-y-2">
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
                     <Truck className="w-5 h-5 text-primary shrink-0" />
