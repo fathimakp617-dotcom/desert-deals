@@ -13,6 +13,7 @@ import { trackAddToCart } from "@/lib/metaPixel";
 import useEmblaCarousel from "embla-carousel-react";
 import BuyNowOverlay from "@/components/BuyNowOverlay";
 import Mind001SizeWarning, { isMind001 } from "@/components/Mind001SizeWarning";
+import MiindPricePopup, { isMiindProduct } from "@/components/MiindPricePopup";
 
 interface QuickViewDialogProps {
   productId: string | null;
@@ -48,6 +49,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
   };
 
   const [showMind001Warning, setShowMind001Warning] = useState(false);
+  const [showMiindPrice, setShowMiindPrice] = useState(false);
 
   const handleAddToCart = () => {
     if (!product || isSoldOut) return;
@@ -58,7 +60,9 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
     addToCart(product, quantity, selectedSize);
     trackAddToCart({ content_ids: [product.id], value: product.price * quantity, currency: "AED" });
     toast.success(`${product.name} added to cart`, { description: `Size: ${selectedSize} · Qty: ${quantity}` });
-    if (isMind001(product.name)) {
+    if (isMiindProduct(product.name)) {
+      setShowMiindPrice(true);
+    } else if (isMind001(product.name)) {
       setShowMind001Warning(true);
     }
   };
@@ -70,7 +74,9 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
       return;
     }
     buyNow(product, quantity, selectedSize);
-    if (isMind001(product.name)) {
+    if (isMiindProduct(product.name)) {
+      setShowMiindPrice(true);
+    } else if (isMind001(product.name)) {
       setShowMind001Warning(true);
     } else {
       setShowBuyNow(true);
@@ -242,6 +248,7 @@ const QuickViewDialog = ({ productId, open, onOpenChange }: QuickViewDialogProps
         <BuyNowOverlay isOpen={showBuyNow} onClose={() => setShowBuyNow(false)} />
       )}
       <Mind001SizeWarning open={showMind001Warning} onClose={() => { setShowMind001Warning(false); setShowBuyNow(true); }} />
+      <MiindPricePopup open={showMiindPrice} onClose={() => { setShowMiindPrice(false); setShowBuyNow(true); }} />
     </>
   );
 };
