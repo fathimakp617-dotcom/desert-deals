@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Heart, Share2, Truck, Shield, RotateCcw, Star, ShoppingBag, PenLine, Zap, AlertCircle, Loader2, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import Mind001SizeWarning, { isMind001 } from "@/components/Mind001SizeWarning";
+import MiindPricePopup, { isMiindProduct } from "@/components/MiindPricePopup";
 import useEmblaCarousel from "embla-carousel-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -92,6 +93,7 @@ const ProductDetail = () => {
   const [showReviews, setShowReviews] = useState(false);
   const [showBuyNow, setShowBuyNow] = useState(false);
   const [showMind001Warning, setShowMind001Warning] = useState(false);
+  const [showMiindPrice, setShowMiindPrice] = useState(false);
   const { addToCart, buyNow } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { data: stockMap } = useProductStock();
@@ -204,7 +206,9 @@ const ProductDetail = () => {
       value: product.price * quantity,
       currency: "AED",
     });
-    if (isMind001(product.name)) {
+    if (isMiindProduct(product.name)) {
+      setShowMiindPrice(true);
+    } else if (isMind001(product.name)) {
       setShowMind001Warning(true);
     } else {
       setShowBuyNow(true);
@@ -223,7 +227,9 @@ const ProductDetail = () => {
     }
     const sizeLabel = needsSize && selectedSize ? selectedSize : "One Size";
     buyNow(product, quantity, sizeLabel);
-    if (isMind001(product.name)) {
+    if (isMiindProduct(product.name)) {
+      setShowMiindPrice(true);
+    } else if (isMind001(product.name)) {
       setShowMind001Warning(true);
     } else {
       setShowBuyNow(true);
@@ -827,6 +833,7 @@ const ProductDetail = () => {
       </PageTransition>
       <BuyNowOverlay isOpen={showBuyNow} onClose={() => setShowBuyNow(false)} />
       <Mind001SizeWarning open={showMind001Warning} onClose={() => { setShowMind001Warning(false); setShowBuyNow(true); }} />
+      <MiindPricePopup open={showMiindPrice} onClose={() => { setShowMiindPrice(false); setShowBuyNow(true); }} />
     </>
   );
 };
