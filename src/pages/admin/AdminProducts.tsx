@@ -144,7 +144,7 @@ const AdminProducts = () => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
-        (p) => p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q)
+        (p) => p.name.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q) || p.id.toLowerCase() === q
       );
     }
 
