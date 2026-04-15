@@ -134,20 +134,31 @@ Deno.serve(async (req) => {
       case "list": {
         // By default exclude trashed products; include_trashed returns all
         const includeDeleted = body.include_deleted === true;
-        let query = supabaseClient
-          .from("products")
-          .select("*")
-          .order("created_at", { ascending: false });
+        
+        // Fetch all products using pagination to bypass the 1000-row default limit
+        const allProducts: any[] = [];
+        const PAGE_SIZE = 1000;
+        let from = 0;
+        while (true) {
+          let query = supabaseClient
+            .from("products")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .range(from, from + PAGE_SIZE - 1);
 
-        if (!includeDeleted) {
-          query = query.is("deleted_at", null);
+          if (!includeDeleted) {
+            query = query.is("deleted_at", null);
+          }
+
+          const { data: batch, error } = await query;
+          if (error) throw error;
+          if (!batch || batch.length === 0) break;
+          allProducts.push(...batch);
+          if (batch.length < PAGE_SIZE) break;
+          from += PAGE_SIZE;
         }
 
-        const { data: products, error } = await query;
-
-        if (error) throw error;
-
-        return new Response(JSON.stringify({ products }), {
+        return new Response(JSON.stringify({ products: allProducts }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
