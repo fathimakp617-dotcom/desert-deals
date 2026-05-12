@@ -11,6 +11,8 @@ const RATE_LIMITS = {
   login: { maxAttempts: 5, windowMinutes: 15, blockMinutes: 30 },
   signup: { maxAttempts: 3, windowMinutes: 60, blockMinutes: 60 },
   password_reset: { maxAttempts: 3, windowMinutes: 60, blockMinutes: 60 },
+  otp_send: { maxAttempts: 3, windowMinutes: 60, blockMinutes: 60 },
+  otp_verify: { maxAttempts: 5, windowMinutes: 15, blockMinutes: 30 },
 };
 
 serve(async (req) => {
