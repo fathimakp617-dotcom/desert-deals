@@ -737,7 +737,7 @@ const ProductDetail = () => {
                         return isHtml ? (
                           <div
                             className="text-muted-foreground leading-relaxed text-xs prose prose-xs max-w-none [&_img]:rounded-lg [&_img]:w-[160px] [&_img]:h-auto [&_img]:inline-block [&_img]:m-1 [&_p]:text-xs [&_p]:mb-2 [&_span]:text-xs"
-                            dangerouslySetInnerHTML={{ __html: desc }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(desc) }}
                           />
                         ) : (
                           <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{desc}</p>
