@@ -439,6 +439,7 @@ const ProductForm = ({
                 { label: "EU 36–40", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 40; }) },
                 { label: "EU 36–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 45; }) },
                 { label: "EU 40–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 45; }) },
+                { label: "EU 40–47", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 47; }) },
                 { label: "EU 38–44", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 38 && n <= 44; }) },
                 { label: "All Sizes", sizes: ALL_SIZES.filter(s => s !== "Out of Stock") },
                 { label: "Free Size Only", sizes: ["Free Size"] },
