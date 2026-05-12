@@ -44,6 +44,31 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Rate limit OTP sends per email (max 3 per hour)
+    try {
+      const rl = await fetch(
+        `${Deno.env.get("SUPABASE_URL")}/functions/v1/check-rate-limit`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            identifier: email.toLowerCase(),
+            attempt_type: "otp_send",
+            action: "record_failure",
+          }),
+        }
+      );
+      const rlData = await rl.json().catch(() => ({}));
+      if (rlData?.allowed === false) {
+        return new Response(
+          JSON.stringify({ error: rlData.message || "Too many requests. Please try again later." }),
+          { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+    } catch (e) {
+      console.error("Rate limit check failed (allowing request):", e);
+    }
+
     // Initialize Supabase admin client
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
