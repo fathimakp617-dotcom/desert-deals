@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 const ALL_SIZES = [
   "EU 36", "EU 37", "EU 38", "EU 39", "EU 40",
-  "EU 41", "EU 42", "EU 43", "EU 44", "EU 45", "EU 46",
+  "EU 41", "EU 42", "EU 43", "EU 44", "EU 45", "EU 46", "EU 47",
   "Free Size", "Out of Stock",
 ];
 
@@ -439,6 +439,7 @@ const ProductForm = ({
                 { label: "EU 36–40", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 40; }) },
                 { label: "EU 36–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 45; }) },
                 { label: "EU 40–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 45; }) },
+                { label: "EU 40–47", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 47; }) },
                 { label: "EU 38–44", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 38 && n <= 44; }) },
                 { label: "All Sizes", sizes: ALL_SIZES.filter(s => s !== "Out of Stock") },
                 { label: "Free Size Only", sizes: ["Free Size"] },
