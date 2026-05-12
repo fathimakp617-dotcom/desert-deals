@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { Slider } from "@/components/ui/slider";
 import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
