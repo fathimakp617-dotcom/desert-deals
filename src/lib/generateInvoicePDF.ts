@@ -216,10 +216,10 @@ export const generateInvoicePDF = async (data: InvoiceData): Promise<jsPDF> => {
   const imgSize = 10;
 
   const tableData = data.items.map((item) => {
-    const sizeText = (item as any).selectedSize ? ` (${(item as any).selectedSize})` : "";
+    const name = formatItemNameWithSize(item.name, (item as any).selectedSize);
     return [
       "", // image placeholder
-      `${item.name}${sizeText}`,
+      name,
       item.quantity.toString(),
       formatCurrency(item.price),
       formatCurrency(item.price * item.quantity),
