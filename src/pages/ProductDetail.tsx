@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, memo } from "react";
 import ImageZoom from "@/components/ImageZoom";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
@@ -736,7 +737,7 @@ const ProductDetail = () => {
                         return isHtml ? (
                           <div
                             className="text-muted-foreground leading-relaxed text-xs prose prose-xs max-w-none [&_img]:rounded-lg [&_img]:w-[160px] [&_img]:h-auto [&_img]:inline-block [&_img]:m-1 [&_p]:text-xs [&_p]:mb-2 [&_span]:text-xs"
-                            dangerouslySetInnerHTML={{ __html: desc }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(desc) }}
                           />
                         ) : (
                           <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line">{desc}</p>

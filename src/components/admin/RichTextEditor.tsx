@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -272,7 +273,7 @@ const RichTextEditor = ({ value, onChange, placeholder, productId }: RichTextEdi
       {showPreview ? (
         <div
           className="min-h-[200px] max-h-[400px] overflow-y-auto p-3 prose prose-sm max-w-none"
-          dangerouslySetInnerHTML={{ __html: value || '<p class="text-muted-foreground">No content yet</p>' }}
+          dangerouslySetInnerHTML={{ __html: value ? sanitizeHtml(value) : '<p class="text-muted-foreground">No content yet</p>' }}
         />
       ) : (
         <div

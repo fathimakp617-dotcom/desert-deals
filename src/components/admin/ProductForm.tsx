@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { Slider } from "@/components/ui/slider";
 import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
@@ -760,7 +761,7 @@ const ProductForm = ({
                 <p className="text-sm font-medium">Description</p>
                 <div
                   className="text-sm text-muted-foreground prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: formData.description }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(formData.description) }}
                 />
               </div>
             )}

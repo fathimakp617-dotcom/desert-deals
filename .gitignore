@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables (VITE_* are publishable but keep .env out of git)
+.env
+.env.local
+.env.*.local

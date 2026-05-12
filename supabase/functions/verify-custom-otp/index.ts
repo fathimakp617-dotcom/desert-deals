@@ -69,6 +69,33 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    const rateLimitId = email.toLowerCase();
+
+    // Pre-check: are they already blocked?
+    try {
+      const preCheck = await fetch(
+        `${Deno.env.get("SUPABASE_URL")}/functions/v1/check-rate-limit`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            identifier: rateLimitId,
+            attempt_type: "otp_verify",
+            action: "check",
+          }),
+        }
+      );
+      const pre = await preCheck.json().catch(() => ({}));
+      if (pre?.allowed === false) {
+        return new Response(
+          JSON.stringify({ error: pre.message || "Too many attempts. Please try again later." }),
+          { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+    } catch (e) {
+      console.error("Rate limit pre-check failed (allowing):", e);
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -91,6 +118,30 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (fetchError || !otpRecord) {
       console.error("OTP verification failed:", fetchError);
+      // Record the failed attempt for rate limiting
+      try {
+        const failResp = await fetch(
+          `${Deno.env.get("SUPABASE_URL")}/functions/v1/check-rate-limit`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              identifier: rateLimitId,
+              attempt_type: "otp_verify",
+              action: "record_failure",
+            }),
+          }
+        );
+        const failData = await failResp.json().catch(() => ({}));
+        if (failData?.allowed === false) {
+          return new Response(
+            JSON.stringify({ error: failData.message || "Too many attempts. Please try again later.", valid: false }),
+            { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+          );
+        }
+      } catch (e) {
+        console.error("Failed to record rate-limit failure:", e);
+      }
       return new Response(
         JSON.stringify({ error: "Invalid or expired OTP", valid: false }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -98,6 +149,24 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     await supabaseAdmin.from("custom_otps").update({ used_at: new Date().toISOString() }).eq("id", otpRecord.id);
+
+    // Reset rate limit counter on success
+    try {
+      await fetch(
+        `${Deno.env.get("SUPABASE_URL")}/functions/v1/check-rate-limit`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            identifier: rateLimitId,
+            attempt_type: "otp_verify",
+            action: "reset",
+          }),
+        }
+      );
+    } catch (e) {
+      console.error("Failed to reset rate limit:", e);
+    }
 
     console.log("OTP verified successfully");
 
