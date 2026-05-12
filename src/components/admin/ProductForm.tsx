@@ -19,20 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RichTextEditor from "./RichTextEditor";
 import { cn } from "@/lib/utils";
-
-const ALL_SIZES = [
-  "EU 36", "EU 37", "EU 38", "EU 39", "EU 40",
-  "EU 41", "EU 42", "EU 43", "EU 44", "EU 45", "EU 46", "EU 47",
-  "Free Size", "Out of Stock",
-];
-
-const KIDS_SIZES = [
-  "EU 24", "EU 25", "EU 26", "EU 27", "EU 28", "EU 29",
-  "EU 30", "EU 31", "EU 32", "EU 33", "EU 34", "EU 35", "EU 36",
-  "Out of Stock",
-];
-
-const JERSEY_SIZES = ["S", "M", "L", "XL", "XXL", "Out of Stock"];
+import { ALL_SIZES, KIDS_SIZES, JERSEY_SIZES, getEuRangeSizes } from "@/lib/sizes";
 
 const FALLBACK_CATEGORIES = [
   { value: "all-shoes", label: "All Shoes" },
@@ -436,11 +423,11 @@ const ProductForm = ({
                 { label: "Out of Stock", sizes: ["Out of Stock"] },
                 { label: "Clear All", sizes: [] as string[] },
               ] : [
-                { label: "EU 36–40", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 40; }) },
-                { label: "EU 36–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 36 && n <= 45; }) },
-                { label: "EU 40–45", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 45; }) },
-                { label: "EU 40–47", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 40 && n <= 47; }) },
-                { label: "EU 38–44", sizes: ALL_SIZES.filter(s => { const n = parseInt(s.replace("EU ", "")); return n >= 38 && n <= 44; }) },
+                { label: "EU 36–40", sizes: getEuRangeSizes(36, 40) },
+                { label: "EU 36–45", sizes: getEuRangeSizes(36, 45) },
+                { label: "EU 40–45", sizes: getEuRangeSizes(40, 45) },
+                { label: "EU 40–47", sizes: getEuRangeSizes(40, 47) },
+                { label: "EU 38–44", sizes: getEuRangeSizes(38, 44) },
                 { label: "All Sizes", sizes: ALL_SIZES.filter(s => s !== "Out of Stock") },
                 { label: "Free Size Only", sizes: ["Free Size"] },
                 { label: "Out of Stock", sizes: ["Out of Stock"] },

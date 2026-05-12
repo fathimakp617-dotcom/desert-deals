@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ALL_EU_NUMERIC_FILTER_VALUE } from "@/lib/sizes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -1011,7 +1012,7 @@ const AdminProducts = () => {
                 <SelectItem value="36,37,38,39,40">EU 36–40</SelectItem>
                 <SelectItem value="40,41,42,43,44,45">EU 40–45</SelectItem>
                 <SelectItem value="38,39,40,41,42,43,44">EU 38–44</SelectItem>
-                <SelectItem value="35,36,37,38,39,40,41,42,43,44,45,46,47">All Sizes</SelectItem>
+                <SelectItem value={ALL_EU_NUMERIC_FILTER_VALUE}>All Sizes</SelectItem>
                 <SelectItem value="Free Size">Free Size Only</SelectItem>
                 <SelectItem value="24,25,26,27,28,29,30">Kids 24–30</SelectItem>
                 <SelectItem value="30,31,32,33,34,35,36">Kids 30–36</SelectItem>
