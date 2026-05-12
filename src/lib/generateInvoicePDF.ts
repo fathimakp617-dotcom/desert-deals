@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
+import { formatItemNameWithSize } from "@/lib/sizes";
 
 interface OrderItem {
   name: string;
