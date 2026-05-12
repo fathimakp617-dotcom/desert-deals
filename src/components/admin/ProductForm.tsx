@@ -19,20 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RichTextEditor from "./RichTextEditor";
 import { cn } from "@/lib/utils";
-
-const ALL_SIZES = [
-  "EU 36", "EU 37", "EU 38", "EU 39", "EU 40",
-  "EU 41", "EU 42", "EU 43", "EU 44", "EU 45", "EU 46", "EU 47",
-  "Free Size", "Out of Stock",
-];
-
-const KIDS_SIZES = [
-  "EU 24", "EU 25", "EU 26", "EU 27", "EU 28", "EU 29",
-  "EU 30", "EU 31", "EU 32", "EU 33", "EU 34", "EU 35", "EU 36",
-  "Out of Stock",
-];
-
-const JERSEY_SIZES = ["S", "M", "L", "XL", "XXL", "Out of Stock"];
+import { ALL_SIZES, KIDS_SIZES, JERSEY_SIZES, getEuRangeSizes } from "@/lib/sizes";
 
 const FALLBACK_CATEGORIES = [
   { value: "all-shoes", label: "All Shoes" },
