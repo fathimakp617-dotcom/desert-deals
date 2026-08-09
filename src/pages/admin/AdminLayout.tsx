@@ -91,26 +91,39 @@ const AdminLayout = () => {
 
       let data: any;
       let error: any;
-      try {
-        const result = await supabase.functions.invoke("verify-admin-password", {
-          body: { email: email.trim(), password },
-        });
-        data = result.data;
-        error = result.error;
-      } catch (invokeErr: any) {
-        // If SDK invoke fails, try direct fetch
-        const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-        const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+      const directLogin = async () => {
         const res = await fetch(`https://${projectId}.supabase.co/functions/v1/verify-admin-password`, {
           method: "POST",
           headers: { "Content-Type": "application/json", apikey: apiKey, Authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({ email: email.trim(), password }),
           signal: controller.signal,
         });
-        data = await res.json();
-        error = res.ok ? null : new Error(data?.error || "Login failed");
+        const json = await res.json().catch(() => ({}));
+        return { data: json, error: res.ok ? null : new Error(json?.error || "Login failed") };
+      };
+
+      try {
+        const result = await supabase.functions.invoke("verify-admin-password", {
+          body: { email: email.trim(), password },
+        });
+        data = result.data;
+        error = result.error;
+        // SDK swallows non-2xx and network errors — retry with a direct request
+        if (error || !data) {
+          const fallback = await directLogin();
+          data = fallback.data;
+          error = fallback.error;
+        }
+      } catch {
+        const fallback = await directLogin();
+        data = fallback.data;
+        error = fallback.error;
       }
       clearTimeout(timeoutId);
+
 
       if (error) throw error;
 
