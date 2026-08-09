@@ -149,3 +149,6 @@ verify_jwt = false
 
 [functions.manage-blocked-countries]
 verify_jwt = false
+
+[functions.confirm-order-link]
+verify_jwt = false
