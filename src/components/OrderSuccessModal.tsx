@@ -12,6 +12,7 @@ import { playOrderSuccessSound } from "@/lib/orderSuccessSound";
 import OrderReceipt from "./OrderReceipt";
 
 interface OrderData {
+  id?: string;
   order_number: string;
   customer_name: string;
   customer_email: string;
@@ -81,8 +82,21 @@ const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
     }
   }, [orderNumber]);
 
-  const buildWhatsAppMessage = (): string => {
+  const buildWhatsAppMessage = (orderId?: string): string => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://www.desertsdeals.com";
+    const actionLinks = orderId
+      ? `
+
+✅ *CONFIRM YOUR ORDER (1 tap):*
+${origin}/confirm-order?token=${orderId}&action=confirm
+
+❌ *Cancel order:*
+${origin}/confirm-order?token=${orderId}&action=cancel
+`
+      : "";
+
     return `*Order Received* ✅
+${actionLinks}
 
 Thank you for shopping with Desert Deal!
 
@@ -141,7 +155,7 @@ Thank you for choosing *Desert Deal!*`;
       const phone = (orderData as any).customer_phone;
       if (phone) {
         const cleanPhone = phone.replace(/[^0-9]/g, "");
-        const message = encodeURIComponent(buildWhatsAppMessage());
+        const message = encodeURIComponent(buildWhatsAppMessage(orderData.id));
         window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
       }
 
@@ -216,6 +230,7 @@ Thank you for choosing *Desert Deal!*`;
       if (data) {
         setIsOfflineOrder(false);
         setOrderData({
+          id: data.id,
           order_number: data.order_number,
           customer_name: data.customer_name,
           customer_email: data.customer_email,

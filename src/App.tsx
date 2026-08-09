@@ -37,6 +37,7 @@ const CancellationRefundPolicy = lazy(() => import("./pages/CancellationRefundPo
 const ShippingPolicy = lazy(() => import("./pages/ShippingPolicy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Contact = lazy(() => import("./pages/Contact"));
+const ConfirmOrder = lazy(() => import("./pages/ConfirmOrder"));
 
 // Prefetch Shop page when user is on homepage
 const usePrefetchRoutes = () => {
@@ -164,6 +165,7 @@ const App = () => {
                         <Route path="/cancellation-policy" element={<CancellationRefundPolicy />} />
                         <Route path="/shipping-policy" element={<ShippingPolicy />} />
                         <Route path="/contact" element={<Contact />} />
+                        <Route path="/confirm-order" element={<ConfirmOrder />} />
                         <Route path="/admin" element={<AdminLayout />}>
                           <Route index element={<AdminDashboard />} />
                           <Route path="orders" element={<AdminOrders />} />
