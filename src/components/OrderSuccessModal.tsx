@@ -155,7 +155,7 @@ Thank you for choosing *Desert Deal!*`;
       const phone = (orderData as any).customer_phone;
       if (phone) {
         const cleanPhone = phone.replace(/[^0-9]/g, "");
-        const message = encodeURIComponent(buildWhatsAppMessage());
+        const message = encodeURIComponent(buildWhatsAppMessage(orderData.id));
         window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
       }
 
@@ -230,6 +230,7 @@ Thank you for choosing *Desert Deal!*`;
       if (data) {
         setIsOfflineOrder(false);
         setOrderData({
+          id: data.id,
           order_number: data.order_number,
           customer_name: data.customer_name,
           customer_email: data.customer_email,
