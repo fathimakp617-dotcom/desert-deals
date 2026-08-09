@@ -12,6 +12,7 @@ import { playOrderSuccessSound } from "@/lib/orderSuccessSound";
 import OrderReceipt from "./OrderReceipt";
 
 interface OrderData {
+  id?: string;
   order_number: string;
   customer_name: string;
   customer_email: string;
@@ -81,8 +82,21 @@ const OrderSuccessModal = forwardRef<HTMLDivElement>((_, ref) => {
     }
   }, [orderNumber]);
 
-  const buildWhatsAppMessage = (): string => {
+  const buildWhatsAppMessage = (orderId?: string): string => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://www.desertsdeals.com";
+    const actionLinks = orderId
+      ? `
+
+✅ *CONFIRM YOUR ORDER (1 tap):*
+${origin}/confirm-order?token=${orderId}&action=confirm
+
+❌ *Cancel order:*
+${origin}/confirm-order?token=${orderId}&action=cancel
+`
+      : "";
+
     return `*Order Received* ✅
+${actionLinks}
 
 Thank you for shopping with Desert Deal!
 
