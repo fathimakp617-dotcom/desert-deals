@@ -21,6 +21,10 @@ async function validateSession(supabase: any, email: string, token: string): Pro
       new Promise((resolve) => setTimeout(() => resolve({ data: null, error: "timeout" }), 3000)),
     ]) as any;
 
+    if (result.error && result.error !== "timeout") {
+      console.error("Session lookup failed (DB error), allowing verified email");
+      return "timeout";
+    }
     if (result.error === "timeout") {
       console.log("Session validation timed out, allowing access for verified email");
       return "timeout";
