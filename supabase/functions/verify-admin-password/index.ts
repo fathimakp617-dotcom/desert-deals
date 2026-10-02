@@ -176,7 +176,7 @@ serve(async (req) => {
       }
 
       const sessionToken = generateSessionToken();
-      const sessionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const sessionExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
       // Try to persist session in background – don't block login if DB is slow
       void persistSession(supabaseClient, normalizedEmail, sessionToken, sessionExpiry)
@@ -206,7 +206,7 @@ serve(async (req) => {
     }
 
     const sessionToken = generateSessionToken();
-    const sessionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const sessionExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
     // Try to persist session in background – don't block login if DB is slow
     void persistSession(supabaseClient, normalizedEmail, sessionToken, sessionExpiry)

@@ -55,6 +55,36 @@ export type Database = {
           },
         ]
       }
+      admin_devices: {
+        Row: {
+          created_at: string
+          device_name: string | null
+          email: string
+          id: string
+          platform: string | null
+          push_token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          device_name?: string | null
+          email: string
+          id?: string
+          platform?: string | null
+          push_token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          device_name?: string | null
+          email?: string
+          id?: string
+          platform?: string | null
+          push_token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_otps: {
         Row: {
           created_at: string

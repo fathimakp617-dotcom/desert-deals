@@ -723,7 +723,7 @@ serve(async (req) => {
       };
 
       // Send email confirmation asynchronously - use service role key since send-order-confirmation requires it
-      fetch(`${supabaseUrl}/functions/v1/send-order-confirmation`, {
+      const emailPromise = fetch(`${supabaseUrl}/functions/v1/send-order-confirmation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -735,6 +735,10 @@ serve(async (req) => {
       }).catch(err => {
         console.error("Failed to send email confirmation:", err);
       });
+      // Keep the function alive until the email (with PDFs) finishes sending
+      // deno-lint-ignore no-explicit-any
+      const er = (globalThis as any).EdgeRuntime;
+      if (er?.waitUntil) er.waitUntil(emailPromise); else await emailPromise;
     } catch (emailError) {
       console.error("Error initiating email send:", emailError);
       // Don't fail the order if email fails
