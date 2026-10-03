@@ -1077,7 +1077,7 @@ Thank you for shopping with Desert Deal!
 `;
 
     // Send customer confirmation email with PDF invoice
-    const customerSubject = `Order Confirmed - ${orderData.order_number}`;
+    const customerSubject = `Your Desert Deal Order Confirmation (${orderData.order_number})`;
     let emailResponse = await resend.emails.send({
       from: "Desert Deal <orders@desertsdeals.com>",
       to: [orderData.customer_email],
