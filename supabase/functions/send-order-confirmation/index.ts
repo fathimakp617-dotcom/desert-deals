@@ -298,11 +298,34 @@ const fetchImageBytes = async (url: string): Promise<{ bytes: Uint8Array; type: 
   }
 };
 
+// Standard PDF fonts can't draw Arabic/emoji etc. Replace unsupported characters
+// so customer names/addresses in Arabic never crash the email.
+const makePageTextSafe = (page: any, font: any) => {
+  const supported = new Set<number>(font.getCharacterSet ? font.getCharacterSet() : []);
+  const original = page.drawText.bind(page);
+  page.drawText = (text: any, options: any = {}) => {
+    const f = options?.font || font;
+    const set: Set<number> = f === font ? supported : new Set<number>(f.getCharacterSet ? f.getCharacterSet() : []);
+    let safe = Array.from(String(text ?? ''))
+      .map((ch) => (set.size === 0 || set.has(ch.codePointAt(0)!) ? ch : '?'))
+      .join('')
+      .replace(/\?{2,}/g, '?');
+    if (!safe.trim() || /^[?\s]+$/.test(safe)) safe = safe.replace(/\?/g, '').trim() || '-';
+    try {
+      return original(safe, options);
+    } catch (e) {
+      console.warn('PDF drawText fallback:', e);
+      return original(safe.replace(/[^\x20-\x7E]/g, ''), options);
+    }
+  };
+};
+
 const generateInvoicePDF = async (order: OrderConfirmationRequest): Promise<Uint8Array> => {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]); // A4
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  makePageTextSafe(page, font);
   const { width, height } = page.getSize();
   const m = 45; // margin
 
@@ -620,6 +643,7 @@ const generateShippingLabelPDF = async (order: OrderConfirmationRequest): Promis
   
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  makePageTextSafe(page, font);
   
   const { width, height } = page.getSize();
   const margin = 40;
@@ -1045,9 +1069,14 @@ const handler = async (req: Request): Promise<Response> => {
     
     // Generate PDF invoice for customer
     console.log("Generating PDF invoice...");
-    const invoicePdf = await generateInvoicePDF(orderData);
-    const invoicePdfBase64 = arrayToBase64(invoicePdf);
-    console.log("PDF invoice generated, size:", invoicePdf.length);
+    let invoicePdfBase64: string | null = null;
+    try {
+      const invoicePdf = await generateInvoicePDF(orderData);
+      invoicePdfBase64 = arrayToBase64(invoicePdf);
+      console.log("PDF invoice generated, size:", invoicePdf.length);
+    } catch (pdfErr) {
+      console.error("Invoice PDF failed, sending email without attachment:", pdfErr);
+    }
 
     // Generate plain text version for email
     const plainTextEmail = `Thank you for your order, ${orderData.customer_name}!
