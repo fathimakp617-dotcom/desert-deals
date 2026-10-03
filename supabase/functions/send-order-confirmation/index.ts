@@ -1113,12 +1113,12 @@ Thank you for shopping with Desert Deal!
       subject: customerSubject,
       html: emailHTML,
       text: plainTextEmail,
-      attachments: [
+      attachments: invoicePdfBase64 ? [
         {
           filename: `invoice-${orderData.order_number}.pdf`,
           content: invoicePdfBase64,
         },
-      ],
+      ] : [],
     });
 
     // Retry once on rate limit or error
@@ -1131,12 +1131,12 @@ Thank you for shopping with Desert Deal!
         subject: customerSubject,
         html: emailHTML,
         text: plainTextEmail,
-        attachments: [
+        attachments: invoicePdfBase64 ? [
           {
             filename: `invoice-${orderData.order_number}.pdf`,
             content: invoicePdfBase64,
           },
-        ],
+        ] : [],
       });
     }
 
@@ -1208,10 +1208,10 @@ Invoice and shipping label are attached.
             html: adminEmailHTML,
             text: adminPlainText,
             attachments: [
-              {
+              ...(invoicePdfBase64 ? [{
                 filename: `invoice-${orderData.order_number}.pdf`,
                 content: invoicePdfBase64,
-              },
+              }] : []),
               {
                 filename: `shipping-label-${orderData.order_number}.pdf`,
                 content: shippingLabelBase64,
